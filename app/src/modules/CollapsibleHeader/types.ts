@@ -58,10 +58,11 @@ export type CollapsibleHeaderState = (typeof headerState)[number];
  * @type {object} MenuItemProps
  * @extends {Omit<MenuItemType, 'id'>}
  * @property {boolean} [isSectionVisible] - Indicates whether the linked section is currently visible on the screen.
+ * @property {boolean} isCollapsedMenu - Indicates whether the menu is collapsed.
  *
  * @al-dev93
  */
-export type MenuItemProps = Omit<MenuItemType, 'id'> & { isSectionVisible?: boolean };
+export type MenuItemProps = Omit<MenuItemType, 'id'> & { isSectionVisible?: boolean; isCollapsedMenu?: boolean };
 
 /**
  * Represents the properties for collapsible header component.

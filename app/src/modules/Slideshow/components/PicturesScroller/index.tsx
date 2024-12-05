@@ -63,7 +63,7 @@ function MemoizedPicturesScroller({
       className={style.picturesScroller}
       role='region'
       ref={slideshowRef}
-      aria-label='Image slideshow'
+      aria-label='Diaporama de présentation de projets'
     >
       <ScrollButtons
         slideshowState={slideshowState}

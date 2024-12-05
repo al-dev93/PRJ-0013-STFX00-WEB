@@ -1,5 +1,4 @@
-import classNames from 'classnames';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { ALERTED_STYLE, THINNED_STYLE } from '@utils/constants';
 
@@ -19,19 +18,41 @@ import type { TagProps } from './types';
  * - 'filled': indicates a filled type tag.
  * - 'thinned': indicates a thinned type tag.
  * @property {React.CSSProperties} [position] - Inline styles for positioning.
+ * @property {string} [ariaLabel] - The aria-label for the tag.
  * @returns {React.JSX.Element} The rendered Tag component.
  *
  * @al-dev93
  */
-export function Tag({ className, tag, type, position }: TagProps): React.JSX.Element {
+export function Tag({ className, tag, type, position, ariaLabel }: TagProps): React.JSX.Element {
+  /**
+   * Returns the class name for the tag based on its type.
+   *
+   * @param {string | undefined} typeKey - The type of the tag.
+   * @returns {string} The class name for the tag.
+   */
+  const getClassName = useCallback((typeKey: string | undefined): string => {
+    if (!typeKey) return '';
+    const alertTag = typeKey === ALERTED_STYLE ? style[`tag--${THINNED_STYLE}`] : '';
+    return `${alertTag} ${style[`tag--${typeKey}`]}`;
+  }, []);
+
+  /**
+   * Memoized class name for the tag based on its type.
+   *
+   * @constant
+   * @type {string}
+   */
+  const classNameTag = useMemo(
+    () => [className, style.tag, getClassName(type)].filter(Boolean).join(' '),
+    [className, getClassName, type],
+  );
+
   return (
     <span
-      className={classNames(className, style.tag, {
-        [style[`tag--${type}`]]: type,
-        [style[`tag--${THINNED_STYLE}`]]: type === ALERTED_STYLE,
-      })}
+      className={classNameTag}
       style={position}
       aria-live={type === ALERTED_STYLE ? 'assertive' : 'polite'}
+      aria-label={ariaLabel}
     >
       {tag}
     </span>

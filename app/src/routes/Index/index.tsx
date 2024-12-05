@@ -16,16 +16,30 @@ import type { IndexPageSection } from '@/types';
  * @al-dev93
  */
 export function Index(): React.JSX.Element {
-  // COMMENT: uses the custom hook usePageSection to retrieve the
-  //  layout context
-  const { viewSectionContext, setOpenContactFormDialog } = usePageSection();
+  /**
+   * Initializes the page section context and contact form dialog state.
+   *
+   * @constant {MutableRefObject<MenuSectionsVisibility>} viewSectionContext - The context object for the page sections.
+   * @constant {SetStateBoolean} setOpenContactFormDialog - The function to set the state of the contact form dialog.
+   * @constant {boolean} openContactFormDialog - The state of the contact form dialog.
+   * @constant {string} modalId - The id of the modal.
+   */
+  const { viewSectionContext, setOpenContactFormDialog, openContactFormDialog, modalId } = usePageSection();
+
+  /**
+   * Fetches data from the server using the useFetchData hook.
+   *
+   * @constant {Object} data - The data fetched from the server.
+   */
   const { data } = useFetchData('http://localhost:5173/api/showcaseSections', { method: 'GET' });
 
-  // useEffect(() => {
-  //   setFetchOptionsData('http://localhost:5173/api/showcaseSections', { method: 'GET' });
-  // }, [setFetchOptionsData]);
-
-  const handleClick = (): void => setOpenContactFormDialog((state) => !state);
+  /**
+   * Handles the click event to open or close the contact form dialog.
+   *
+   * @function
+   * @returns {void}
+   */
+  const handleClick = (): void => setOpenContactFormDialog((formState) => !formState);
 
   return (
     <div className={style.wrapperIndex}>
@@ -37,6 +51,8 @@ export function Index(): React.JSX.Element {
           title={title}
           MenuSectionsVisibility={viewSectionContext}
           openModalFormDialog={handleClick}
+          showModalFormDialog={openContactFormDialog}
+          modalId={modalId}
         />
       ))}
     </div>

@@ -33,10 +33,12 @@ function DynamicElementRef(
     // If the component does not support children, do not pass them
     return children ? <Component {...props}>{children}</Component> : <Component {...props} />;
   }
+
   if (isHtmlTag(tag as keyof React.JSX.IntrinsicElements)) {
     // For native HTML elements, we always pass children if they exist.
     return createElement(tag, { ...props, ref }, children);
   }
+
   // TODO: sortir l'erreur
   // The tag does not designate a custom component or a native HTML element.
   console.error(`Invalid tag: ${tag}`);

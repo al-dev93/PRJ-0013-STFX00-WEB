@@ -55,6 +55,7 @@
   width: max-content;
   padding: 5px 0;
   align-self: center;
+  outline: none;
 }
 
 .modal__title {

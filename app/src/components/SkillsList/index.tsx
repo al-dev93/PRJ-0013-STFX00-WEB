@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import React from 'react';
 
 import { Tag } from '@components/Tag';
@@ -21,11 +20,13 @@ import type { SkillsListProps } from './types';
  * @al-dev93
  */
 export function SkillsList({ tagColor, list, lineBreak, tagType }: SkillsListProps): React.JSX.Element {
+  const classNameTag = style.skillsRow + (lineBreak ? ` ${style['skillsRow--wrapp']}` : '');
+
   return (
-    <ul className={classNames(style.skillsRow, { [style['skillsRow--wrapp']]: lineBreak })} aria-label='Skills list'>
-      {list?.map((value) => (
+    <ul className={classNameTag} aria-label='Skills list'>
+      {list?.map((value, index) => (
         <li key={value}>
-          <Tag className={tagColor} tag={value} type={tagType} />
+          <Tag className={tagColor} tag={value} type={tagType} ariaLabel={`Skill ${index + 1} : ${value}`} />
         </li>
       ))}
     </ul>

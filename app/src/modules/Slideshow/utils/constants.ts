@@ -86,7 +86,6 @@ const ADJACENT_VISIBILITY = 'adjacent';
  * @constant {Object} INTERSECTION_OPTIONS_THRESHOLD - Threshold settings for the observer.
  */
 const INTERSECTION_OPTIONS_THRESHOLD = { threshold: [0.1] };
-// const INTERSECTION_OPTIONS_THRESHOLD = [0.1];
 
 /**
  * ARIA labels for accessibility purposes in the slideshow.

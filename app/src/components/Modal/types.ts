@@ -10,6 +10,7 @@ import { MouseEventButton, SetStateBoolean } from '@/types';
  * @property {string} [form] - The ID of the form the button is associated with.
  * @property {MouseEventButton} [onClick] - Click event handler for the button.
  * @property {boolean} [disable] - Indicates whether the button is disabled.
+ * @property {string} [ariaLabel] - The label for the button.
  *
  * @al-dev93
  */
@@ -18,6 +19,7 @@ export type ModalButton = {
   form?: string;
   onClick?: MouseEventButton;
   disable?: boolean;
+  ariaLabel?: string;
 };
 
 /**
@@ -29,6 +31,7 @@ export type ModalButton = {
  * @property {boolean} open - Indicates whether the modal is open.
  * @property {SetStateBoolean} setOpen - Function to set the open state of the modal.
  * @property {ModalButton} [button] - The button configuration for the modal.
+ * @property {string} modalId - The id of the modal.
  * @property {boolean} [closeIcon] - Indicates if there is a modal close button.
  * @property {string} [title] - The title of the modal.
  * @property {string} [subtitle] - The subtitle of the modal.
@@ -45,11 +48,13 @@ export type ModalProps = {
   setOpen: SetStateBoolean;
   closeIcon?: boolean;
   button?: ModalButton;
+  modalId: string;
 } & (
   | {
       title?: string;
       subtitle?: string;
       onRenderComplete?: boolean;
+      focusableElements?: HTMLElement[];
       closeParentModal?: never;
       customStyle?: never;
     }
@@ -57,6 +62,7 @@ export type ModalProps = {
       title?: never;
       subtitle?: never;
       onRenderComplete?: never;
+      focusableElements?: never;
       closeParentModal?: SetStateBoolean;
       customStyle: 'alert';
     }

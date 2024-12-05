@@ -1,7 +1,7 @@
 export const contactFormTooltips = [
   {
     id: '1',
-    line: 'information requise',
+    line: 'Type information attendue',
     lineHeight: 1,
     contactFormInputId: 'name',
   },
@@ -12,7 +12,7 @@ export const contactFormTooltips = [
   },
   {
     id: '3',
-    line: 'information requise',
+    line: 'Type information attendue',
     lineHeight: 1,
     contactFormInputId: 'email',
   },
@@ -23,7 +23,7 @@ export const contactFormTooltips = [
   },
   {
     id: '5',
-    line: 'message requis',
+    line: 'Type information attendue',
     lineHeight: 1,
     contactFormInputId: 'message',
   },

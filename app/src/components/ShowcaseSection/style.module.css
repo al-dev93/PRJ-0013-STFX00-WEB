@@ -7,6 +7,14 @@
   padding-top: 254px;
 }
 
+.section--hero:hover .section--hero:focus {
+  outline: none;
+}
+
+.section--hero:focus-visible {
+  outline: initial;
+}
+
 .section__bodySection {
   padding-bottom: 50px;
 }
@@ -58,6 +66,10 @@
   grid-template-columns: repeat(3, 1fr);
   column-gap: 10px;
   row-gap: 10px;
+}
+
+br {
+  margin-bottom: 15px;
 }
 
 @media (max-width: 768px) {

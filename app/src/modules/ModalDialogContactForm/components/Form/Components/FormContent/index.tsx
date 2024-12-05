@@ -13,13 +13,13 @@ import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
  * The FormContent component gathers all the elements that make up the content of the form. These elements
  * can be downloaded from a URL or provided as input data.
  *
- * @component
+ * @component FormContent
  * @param {FormContentProps} props - The properties for the FormContent component.
  * @property {string} [urlFormContent] - URL to fetch the elements embedded in the FormContent component
  * (optional, used if dataFormContent is not used)
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used)
- * @property {ModalDialogContactFormState} state - the current state of the modal dialog contact form.
+ * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
  * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
  * related to the modal dialog contact form
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
@@ -31,56 +31,53 @@ import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
 export function FormContent({
   urlFormContent,
   dataFormContent,
-  state,
+  formState,
   dispatch,
   onRenderComplete,
 }: FormContentProps): React.JSX.Element | null {
-  const isInitializedStateRef = useRef<boolean>(false);
+  // Flag to determine if the state of the form has been initialized
+  const isInitializedStateRef = useRef(false);
 
-  // Determine if data needs to be fetched
+  // Flag to determine if the formContent should be fetched from a URL or if it should be taken from the provided
+  // data
   const shouldFetch = !dataFormContent;
 
-  // Fetch data to create form content
+  // Fetch the form content if urlFormContent is provided
   const { data } = useFetchData(shouldFetch ? urlFormContent : null, { method: 'GET' });
 
-  // Extract form content data from either fetched or provided props
-  const formContent = dataFormContent || (data as ContactFormInput[] | null);
+  // Get the form content from the fetched data or from the provided dataFormContent
+  const formContent = shouldFetch ? (data as ContactFormInput[]) : dataFormContent;
 
   /**
-   * Initializes the contact form state when input data is fetched or provided.
-   * Dispatches an action to populate the form with the initial state based on the input data.
+   * Initializes the state of the modal dialog contact form. The state is initialized with the IDs of the
+   * form content. This is done only once when the component is mounted.
    */
   useEffect(() => {
-    if (formContent && !isInitializedStateRef.current) {
-      dispatch({ type: INIT_DIALOG_CONTACT_FORM_STATE, payload: formContent.map((item) => item.id) });
-      isInitializedStateRef.current = true;
-      onRenderComplete(true);
-    }
+    if (isInitializedStateRef.current) return;
+    dispatch({
+      type: INIT_DIALOG_CONTACT_FORM_STATE,
+      // Get the IDs of the form content and use them to initialize the state of the form
+      payload: formContent.map(({ id }) => id),
+    });
+    isInitializedStateRef.current = true;
+    onRenderComplete(true);
   }, [dispatch, formContent, onRenderComplete]);
 
-  /**
-   * Renders the FormContent component if the form elements are fetched or loaded and the state initialized.
-   *
-   * @function
-   * @returns {(React.JSX.Element | null)} The rendered FormContent component or null if not applicable.
-   */
-  const renderFormContent = (): React.JSX.Element | null => {
-    return isInitializedStateRef.current && formContent ? (
-      <div className={style.contactForm}>
-        {formContent.map(({ id, input, label, tooltipContent }) => (
-          <DialogFormInput
-            key={id}
-            label={label}
-            name={id}
-            input={input}
-            tooltipContent={tooltipContent as TooltipContent[] | undefined}
-            state={state}
-            dispatch={dispatch}
-          />
-        ))}
-      </div>
-    ) : null;
-  };
-
-  return renderFormContent();
+  return formContent && isInitializedStateRef.current ? (
+    <div className={style.contactForm}>
+      {/* Render each form input */}
+      {formContent.map(({ id, input, label, tooltipContent: tc }) => (
+        <DialogFormInput
+          key={id}
+          label={label}
+          name={id}
+          formInput={input}
+          // Get the tooltip content from the form content
+          tooltipContent={tc as TooltipContent[] | undefined}
+          formState={formState}
+          dispatch={dispatch}
+        />
+      ))}
+    </div>
+  ) : null;
 }

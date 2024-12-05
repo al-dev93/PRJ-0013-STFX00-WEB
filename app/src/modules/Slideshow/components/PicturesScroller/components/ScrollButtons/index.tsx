@@ -1,13 +1,12 @@
 import IonIcon from '@reacticons/ionicons';
-import classNames from 'classnames';
-import React, { MouseEvent, memo } from 'react';
+import React, { MouseEvent, memo, useCallback } from 'react';
 
 import { DISABLED_STATUS, ENABLED_STATUS } from '@utils/constants';
 
 import style from './style.module.css';
 import { CHANGE_SLIDE, NEXT_SLIDE, PREVIOUS_SLIDE, START, STOP } from '../../../../utils/constants';
 
-import type { ScrollButtonsProps, SlideDirection } from '../../../../types';
+import type { AriaLabelScrollButtons, ScrollButtonsProps, SlideDirection } from '../../../../types';
 
 /**
  * Component for the scroll buttons in the slideshow.
@@ -35,42 +34,40 @@ function MemoizedScrollButtons({
    * @function
    * @param {MouseEvent<HTMLDivElement, MouseEvent>} e - The click event.
    */
-  const handleClick = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>): void => {
-    if (slideshowState.slideTransition !== STOP) {
-      // TODO: sortir l'erreur
-      console.warn('Transition in progress, slide change is disabled');
-      return;
-    }
-    const target = e.currentTarget.attributes.getNamedItem('name')?.nodeValue as SlideDirection;
-    slideshowDispatch({ type: CHANGE_SLIDE, payload: { direction: target, transition: START } });
-  };
+  const handleClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>): void => {
+      if (slideshowState.slideTransition !== STOP) {
+        // TODO: sortir l'erreur
+        console.warn('Transition in progress, slide change is disabled');
+        return;
+      }
+      const target = e.currentTarget.firstElementChild?.attributes.getNamedItem('name')?.nodeValue as SlideDirection;
+      slideshowDispatch({ type: CHANGE_SLIDE, payload: { direction: target, transition: START } });
+    },
+    [slideshowDispatch, slideshowState.slideTransition],
+  );
+
+  const renderScrollButton = useCallback(
+    (direction: keyof AriaLabelScrollButtons, name: SlideDirection): React.JSX.Element => (
+      <button
+        type='button'
+        className={`${
+          style.scrollButtons__button
+        } ${style[`scrollButtons__button--${slideshowState.slideTransition !== STOP ? DISABLED_STATUS : ENABLED_STATUS}`]}`}
+        aria-label={ariaLabels[direction]}
+        aria-controls='picturesScroller'
+        onClick={handleClick}
+      >
+        <IonIcon name={name} aria-hidden='true' />
+      </button>
+    ),
+    [ariaLabels, handleClick, slideshowState.slideTransition],
+  );
 
   return (
     <div className={style.scrollButtons}>
-      <IonIcon
-        className={classNames(
-          style.scrollButtons__button,
-          style[`scrollButtons__button--${slideshowState.slideTransition !== STOP ? DISABLED_STATUS : ENABLED_STATUS}`],
-        )}
-        name={PREVIOUS_SLIDE}
-        role='button'
-        aria-label={ariaLabels.leftButton}
-        aria-controls='picturesScroller'
-        onClick={handleClick}
-        tabIndex={0}
-      />
-      <IonIcon
-        className={classNames(
-          style.scrollButtons__button,
-          style[`scrollButtons__button--${slideshowState.slideTransition !== STOP ? DISABLED_STATUS : ENABLED_STATUS}`],
-        )}
-        name={NEXT_SLIDE}
-        role='button'
-        aria-label={ariaLabels.rightButton}
-        aria-controls='picturesScroller'
-        onClick={handleClick}
-        tabIndex={0}
-      />
+      {renderScrollButton('leftButton', PREVIOUS_SLIDE)}
+      {renderScrollButton('rightButton', NEXT_SLIDE)}
     </div>
   );
 }

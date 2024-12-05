@@ -1,5 +1,4 @@
 // import { useEffect } from 'react';
-import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -57,11 +56,11 @@ export function CollapsibleHeader({
       console.error(`Invalid headerSate: ${headerState}`);
     }
 
-    return classNames(style.header, {
-      [style['header--isHidden']]: headerState === SCROLL_DOWN,
-      [style['header--isRegular']]: headerState === TOP_OF_SCREEN,
-      [style['header--isHover']]: headerState === SCROLL_UP,
-    });
+    let className = style.header;
+    if (headerState === SCROLL_DOWN) className += ` ${style['header--isHidden']}`;
+    if (headerState === TOP_OF_SCREEN) className += ` ${style['header--isRegular']}`;
+    if (headerState === SCROLL_UP) className += ` ${style['header--isHover']}`;
+    return className;
   }, [headerState]);
 
   if (error) {
@@ -70,13 +69,19 @@ export function CollapsibleHeader({
   }
 
   return (
-    <header className={getHeaderClass} aria-label='Collapsible Header'>
+    <header
+      className={getHeaderClass}
+      role='banner'
+      aria-label='Collapsible Header'
+      aria-hidden={headerState === SCROLL_DOWN}
+      tabIndex={-1}
+    >
       {logo && (
-        <Link to='/' aria-label='Home'>
+        <Link to='/' aria-label="Retour à l'accueil" tabIndex={headerState === SCROLL_DOWN ? -1 : 0}>
           <img className={style.header__logo} src={src} alt={alt || ''} />
         </Link>
       )}
-      <nav aria-label='Main navigation'>
+      <nav role='navigation' aria-label='Menu principal'>
         <ul className={style.menuList}>
           {(data as MenuItemType[])?.map(({ label, anchor }) => (
             <MenuItem
@@ -84,6 +89,7 @@ export function CollapsibleHeader({
               isSectionVisible={MenuSectionsVisibility?.current[anchor as keyof typeof MenuSectionsVisibility.current]}
               label={label}
               anchor={anchor}
+              isCollapsedMenu={headerState === SCROLL_DOWN}
             />
           ))}
         </ul>

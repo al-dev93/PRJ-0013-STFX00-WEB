@@ -1,20 +1,25 @@
 import { Dispatch } from 'react';
 
 import {
-  AUTOCOMPLETE,
+  AUTO_COMPLETION,
   DELETE_ERROR_TAG_NAME,
   DELETE_INPUT_ERROR,
   DELETE_INPUT_VALUE,
-  HISTORY,
+  FULL_HISTORY,
   INIT_DIALOG_CONTACT_FORM_STATE,
+  IN_EDIT_MODE,
   RESET_AUTO_COMPLETE_OVERLAY,
   SET_AUTO_COMPLETE,
   SET_ERROR_TAG_NAME,
   SET_INPUT_BORDER_BOX,
   SET_INPUT_ERROR,
   SET_INPUT_FOCUS,
+  SET_INPUT_HOVER,
+  SET_INPUT_NODE,
   SET_INPUT_VALUE,
-  SET_OVERLAY_FIRST_ITEM_FOCUS,
+  SET_IS_STORED,
+  SET_POPOVER_LIST_FOCUSED_INDEX,
+  SET_POPOVER_MODE,
 } from './utils/constants';
 
 import type {
@@ -27,12 +32,15 @@ import type {
   TooltipContent,
 } from '@/types';
 
+//* ***** TYPES USED BY MODALDIALOGCONTACTFORM MODULE COMPONENTS ****
+
 /**
  * this object specifies the props used by the ModalDialogContactForm component.
  *
  * @type {Object} ModalDialogContactFormProps
- * @property {boolean} open - state to manage the open/close status of the modale window
- * @property {SetStateBoolean} setOpen - function to set the open state of the modale window
+ * @property {boolean} open - state to manage the open/close status of the modale window.
+ * @property {SetStateBoolean} setOpen - function to set the open state of the modale window.
+ * @property {string} modalId - the id of the modale window.
  * @property {ContactFormModal} [data] - the data used to create the contact form modal.
  * Either `data` or `url` must be provided
  * @property {string | string[]} [url] - URL or array of URLs to fetch the data used to create the contact form modal.
@@ -43,6 +51,7 @@ import type {
 export type ModalDialogContactFormProps = {
   open: boolean;
   setOpen: SetStateBoolean;
+  modalId: string;
 } & ({ data: ContactFormModal; url?: never } | { data?: never; url: string | string[] });
 
 /**
@@ -52,10 +61,10 @@ export type ModalDialogContactFormProps = {
  * @type {Object} DialogFormInputProps
  * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function
  * to handle actions related to the modal dialog contact form
- * @property {FormInput} input - the definition of thr input or textarea element of the form
+ * @property {FormInput} formInput - the definition of the input or textarea element of the form
  * @property {string} label - the label for the input element
  * @property {string} name - the nameattribute for the input element
- * @property {ModalDialogContactFormState} state - the current state of the modal dialog
+ * @property {ModalDialogContactFormState} formState - the current state of the modal dialog
  * contact form
  * @property {TooltipContent[]} [tooltipContent] - content for tooltips associated with
  * the input element (optional)
@@ -64,10 +73,10 @@ export type ModalDialogContactFormProps = {
  */
 export type DialogFormInputProps = {
   dispatch: Dispatch<ModalDialogContactFormAction>;
-  input: FormInput;
+  formInput: FormInput;
   label: string;
   name: string;
-  state: ModalDialogContactFormState;
+  formState: ModalDialogContactFormState;
   tooltipContent?: TooltipContent[];
 };
 
@@ -76,30 +85,26 @@ export type DialogFormInputProps = {
  * used in the module ModalDialogContactForm
  *
  * @type {Object} PopoverProps
- * @property {string[]} [autocompleteList] - List of autocomplete suggestions to display.
- * @property {ErrorMessage} [errorMessage] - Error messages associated with input validation.
- * @property {Validity} [errorState] - State representing input validity errors.
- * @property {boolean} [firstItemFocused] - Determines whether the first item in the list should be focused.
+ * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
+ * @property {string} name - The name of the input element.
+ * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
- * @property {(DialogFormInputElement | null)} [prevFocusNode] - The previous input element to focus back to when necessary.
  *
  * @al-dev93
  */
 export type PopoverProps = {
-  autocompleteList?: string[];
-  errorMessage?: ErrorMessage;
-  errorState?: Validity;
-  firstItemFocused?: boolean;
+  formState: ModalDialogContactFormState;
+  name: string;
+  errorMessage?: string;
   inputAutocomplete: (content: string) => void;
-  prevFocusNode?: DialogFormInputElement | null;
 };
 
 /**
  * @description
  *
  * @type {Object} AlertProps
- * @property {boolean} openAlert - A boolean that controls whether the alert modal is open.
- * @property {SetStateBoolean} setOpenAlert - A function to toggle the open/close state of the alert modal.
+ * @property {boolean} showAlert - A boolean that controls whether the alert modal is open.
+ * @property {SetStateBoolean} setShowAlert - A function to toggle the open/close state of the alert modal.
  * @property {(string | string[])} message - The message(s) to display in the alert. Can be a string or an array of strings.
  * @property {SetStateBoolean} [closeParentModal] - A function to close the parent modal, if necessary (optional).
  *
@@ -108,8 +113,8 @@ export type PopoverProps = {
 export type AlertProps = {
   closeParentModal?: SetStateBoolean;
   message: string | string[];
-  openAlert: boolean;
-  setOpenAlert: SetStateBoolean;
+  showAlert: boolean;
+  setShowAlert: SetStateBoolean;
 };
 
 /**
@@ -117,15 +122,15 @@ export type AlertProps = {
  *
  * @type {Object} FormProps
  * @property {string} idForm - The form identifier in HTML.
- * @property {string} urlApi - URL allowing dialogue with the API.
+ * @property {string} apiEndpointUrl - URL allowing dialogue with the API.
  * @property {string} [urlFormContent] - URL to fetch the elements embedded in the FormContent component
  * (optional, used if dataFormContent is not used).
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used).
- * @property {ModalDialogContactFormState} state - the current state of the modal dialog contact form.
+ * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
  * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
  * related to the modal dialog contact form.
- * @property {SetStateBoolean} setOpenAlert - A function to toggle the open/close state of the alert modal.
+ * @property {SetStateBoolean} setShowAlert - A function to toggle the open/close state of the alert modal.
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
  * FormContent component is rendered.
  *
@@ -133,10 +138,10 @@ export type AlertProps = {
  */
 export type FormProps = {
   idForm: string;
-  urlApi: string;
-  state: ModalDialogContactFormState;
+  apiEndpointUrl: string;
+  formState: ModalDialogContactFormState;
   dispatch: React.Dispatch<ModalDialogContactFormAction>;
-  setOpenAlert: SetStateBoolean;
+  setShowAlert: SetStateBoolean;
   onRenderComplete: SetStateBoolean;
 } & (
   | { dataFormContent: ContactFormInput[]; urlFormContent?: never }
@@ -151,7 +156,7 @@ export type FormProps = {
  * (optional, used if dataFormContent is not used)
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used)
- * @property {ModalDialogContactFormState} state - the current state of the modal dialog contact form.
+ * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
  * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
  * related to the modal dialog contact form.
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
@@ -159,16 +164,18 @@ export type FormProps = {
  *
  * @al-dev93
  */
-export type FormContentProps = Omit<FormProps, 'idForm' | 'urlApi' | 'setOpenAlert'>;
+export type FormContentProps = Omit<FormProps, 'idForm' | 'apiEndpointUrl' | 'setShowAlert'>;
+
+//* *************************** MISCELLANEOUS TYPES ******************************
 
 /**
- * Represents the possible overlay types of popover, either HISTORY or AUTOCOMPLETE
+ * Represents the autocomplete overlay type.
  *
- * @type {('HISTORY' | 'AUTOCOMPLETE')} OverlayType
+ * @type {typeof AUTO_COMPLETION | typeof FULL_HISTORY}
  *
  * @al-dev93
  */
-export type OverlayType = typeof HISTORY | typeof AUTOCOMPLETE;
+export type OverlayType = typeof AUTO_COMPLETION | typeof FULL_HISTORY;
 
 /**
  * Represents a mapping of input names to their corresponding error messages
@@ -217,14 +224,17 @@ export type Validity = {
 export type InputStatus = 'remplir' | 'modifier';
 
 /**
- * Represents the border style status of an input fields. This type can either be
- * 'edited' (indicating the input has been edited correctly) or 'error' (indicating the input contains an error)
+ * Represents the visual styling of an input field's border box.
+ * This type can either be 'edited' (indicating the input field is valid and has been edited)
+ * or 'error' (indicating the input field is invalid).
  *
  * @type {('edited' | 'error')} InputBorderBox
  *
  * @al-dev93
  */
 export type InputBorderBox = 'edited' | 'error';
+
+//* *************************** STATE ******************************
 
 /**
  * Represents the state of a contact form in a modal dialog.
@@ -235,15 +245,19 @@ export type InputBorderBox = 'edited' | 'error';
  * @type {Object, <string, FieldState>} ModalDialogContactFormState
  * @property {Validity} [inputError] - Optional validation error for the input field, indicating its validity.
  * @property {boolean} isFocused - Indicates whether the input field is currently focused.
+ * @property {boolean} [isStored] - Indicates whether the input field value is stored in local storage.
+ * @property {HTMLInputElement | HTMLTextAreaElement} inputElement - The HTML element representing the input field.
  * @property {InputStatus} [inputStatusTag] - Optional tag representing the current status of the input
  * field (e.g. `remplir`, `modifier`).
  * @property {InputBorderBox} [inputBorderBox] - Optional styling for the input field's border box.
  * @property {string} [inputValue] - The current value of the input field.
  * @property {string[]} [autoComplete] - Optional array of autocomplete suggestions for the input field.
- * @property {boolean} [overlayFirstItemFocus] - Indicates whether the first autocomplete suggestion is
- * currently focused.
+ * @property {number} [listItemFocused] - The index of the focused item in the autocomplete list.
  * @property {(string | null)} [applyAutoCompleteToInput] - The value to apply from the autocomplete suggestions,
  * or null if not applicable.
+ * @property {OverlayType} [popoverMode] - The type of overlay to display (if applicable).
+ * @property {boolean} [inEdition] - Indicates whether the input field is in edition mode.
+ * @property {boolean} [isHovered] - Indicates whether the input field is currently hovered.
  *
  * @al-dev93
  */
@@ -252,62 +266,62 @@ export type ModalDialogContactFormState = {
 };
 
 /**
- * Represents the state of an individual form field in the modal dialog contact form.
+ * Represents the state of a single form field in the contact form.
  *
  * @type {Object} FieldState
  * @property {Validity} [inputError] - Optional validation error for the input field, indicating its validity.
  * @property {boolean} isFocused - Indicates whether the input field is currently focused.
+ * @property {boolean} [isStored] - Indicates whether the input field value is stored in local storage.
+ * @property {DialogFormInputElement} inputElement - The HTML element representing the input field.
  * @property {InputStatus} [inputStatusTag] - Optional tag representing the current status of the input
  * field (e.g. `remplir`, `modifier`).
  * @property {InputBorderBox} [inputBorderBox] - Optional styling for the input field's border box.
  * @property {string} [inputValue] - The current value of the input field.
  * @property {string[]} [autoComplete] - Optional array of autocomplete suggestions for the input field.
- * @property {boolean} [overlayFirstItemFocus] - Indicates whether the first autocomplete suggestion is
- * currently focused.
+ * @property {number} [listItemFocused] - The index of the focused item in the autocomplete list.
  * @property {(string | null)} [applyAutoCompleteToInput] - The value to apply from the autocomplete suggestions,
  * or null if not applicable.
+ * @property {OverlayType} [popoverMode] - The type of overlay to display (if applicable).
+ * @property {boolean} [inEdition] - Indicates whether the input field is in edition mode.
+ * @property {boolean} [isHovered] - Indicates whether the input field is currently hovered.
  *
  * @al-dev93
  */
-type FieldState = {
+export type FieldState = {
   inputError?: Validity;
   isFocused: boolean;
+  isHovered?: boolean;
+  isStored?: boolean;
+  inputNode?: DialogFormInputElement;
   inputStatusTag?: InputStatus;
   inputBorderBox?: InputBorderBox;
   inputValue?: string;
   autoComplete?: string[];
-  overlayFirstItemFocus?: boolean;
+  listItemFocused?: number;
   applyAutoCompleteToInput?: string | null;
+  popoverMode?: OverlayType;
+  inEdition?: boolean;
 };
 
 /**
- * Represents different actions related to the autocomplete functionality
- * in a form. Each action can have its own payload structure.
+ * Represents an action to manage the autocomplete overlay for a form input.
  *
- * @type {object} AutoComplete
- * @property {object} RESET_AUTO_COMPLETE_OVERLAY - Action to reset the auto-complete overlay.
- * @property {object} SET_AUTO_COMPLETE - Action to set auto-complete values for a specific input.
- * @property {object} SET_OVERLAY_FIRST_ITEM_FOCUS - Action to set the focus on the first item in the overlay.
- *
- * @type {object} ResetAutoCompleteOverlay
- * @property {string} name - The name of the input field for which the auto-complete overlay is reset.
- *
- * @type {object} SetAutoComplete
- * @property {string} name - The name of the input field for which auto-complete is being set.
- * @property {string[]} autoComplete - The list of auto-complete options for the input.
- *
- * @type {object} SetOverlayFirstItemFocus
- * @property {string} name - The name of the input field for which the focus is set.
- * @property {boolean} overlayFirstItemFocus - Indicates whether the first item in the overlay is focused.
+ * @type {Object} AutoComplete
+ * @property {typeof RESET_AUTO_COMPLETE_OVERLAY | typeof SET_AUTO_COMPLETE | typeof SET_OVERLAY_FIRST_ITEM_FOCUS |
+ * typeof SET_IS_STORED | typeof SET_POPUP_MODE} type - The type of action to perform.
+ * @property {Object} payload - The payload of the action.
+ * @property {string} payload.name - The name of the input field.
+ * @property {string[]} [payload.autoComplete] - An array of autocomplete suggestions (if applicable).
+ * @property {number} [payload.listItemFocused] - The index of the focused item in the autocomplete list (if applicable).
+ * @property {boolean} [payload.isStored] - Indicates whether the input field is currently stored (if applicable).
+ * @property {OverlayType | undefined} [payload.popoverMode] - The type of popover mode (if applicable).
  *
  * @al-dev93
  */
 type AutoComplete =
   | {
       /**
-       * Action to reset the auto-complete overlay.
-       *
-       * @property {string} name - The name of the input field for which the auto-complete overlay is reset.
+       * Action to reset the autocomplete overlay for a form input.
        */
       type: typeof RESET_AUTO_COMPLETE_OVERLAY;
       payload: {
@@ -316,10 +330,7 @@ type AutoComplete =
     }
   | {
       /**
-       * Action to set auto-complete values for a specific input.
-       *
-       * @property {string} name - The name of the input field.
-       * @property {string[]} autoComplete - The list of auto-complete suggestions for the input.
+       * Action to set the autocomplete overlay for a form input.
        */
       type: typeof SET_AUTO_COMPLETE;
       payload: {
@@ -329,42 +340,54 @@ type AutoComplete =
     }
   | {
       /**
-       * Action to set the focus on the first item in the auto-complete overlay.
-       *
-       * @property {string} name - The name of the input field.
-       * @property {boolean} overlayFirstItemFocus - Whether the first item in the overlay should be focused.
+       * Action to set the index of the focused item in the autocomplete list for a form input.
        */
-      type: typeof SET_OVERLAY_FIRST_ITEM_FOCUS;
+      type: typeof SET_POPOVER_LIST_FOCUSED_INDEX;
       payload: {
         name: string;
-        overlayFirstItemFocus: boolean;
+        listItemFocused: number;
+      };
+    }
+  | {
+      /**
+       * Action to set the input as stored for a form input.
+       */
+      type: typeof SET_IS_STORED;
+      payload: {
+        name: string;
+        isStored: boolean;
+      };
+    }
+  | {
+      /**
+       * Action to set the popover mode for a form input.
+       */
+      type: typeof SET_POPOVER_MODE;
+      payload: {
+        name: string;
+        popoverMode: OverlayType | undefined;
       };
     };
 
 /**
- * Represents an action to manage the error tag component for a form input.
+ * Represents an action to manage the error tag for a form input.
  *
- * @type {object} ErrorTagComponent
- * @property {object} SetErrorTag - Action to set an error tag for an input field.
- * @property {object} DeleteErrorTag - Action to delete the error tag for an input field.
+ * This includes actions for:
+ *   - Deleting the error tag
+ *   - Setting the error tag
  *
- * @type {object} SetErrorTag
- * @property {string} name - The name of the input field.
- * @property {InputStatus} errorTagName - The error tag to be applied to the input field.
- *
- * @type {object} DeleteErrorTag
- * @property {string} name - The name of the input field.
- * @property {undefined} errorTagName - There is no error tag when deleting it.
+ * @type {Object} ErrorTagComponent
+ * @property {typeof DELETE_ERROR_TAG_NAME | typeof SET_ERROR_TAG_NAME} type - The type of action to perform.
+ * @property {Object} payload - The payload of the action.
+ * @property {string} payload.name - The name of the input field.
+ * @property {InputStatus | undefined} [payload.errorTagName] - The error tag to set, or undefined to delete.
  *
  * @al-dev93
  */
 export type ErrorTagComponent =
   | {
       /**
-       * Action type for setting an error tag for the input.
-       *
-       * @property {string} name - The name of the input field.
-       * @property {InputStatus} errorTagName - The error tag to be applied.
+       * Action to delete the error tag for a form input.
        */
       type: typeof DELETE_ERROR_TAG_NAME;
       payload: {
@@ -374,10 +397,7 @@ export type ErrorTagComponent =
     }
   | {
       /**
-       * Action type for deleting an error tag from the input
-       *
-       * @property {string} name - The name of the input field.
-       * @property {undefined} errorTagName - There is no error tag to be applied.
+       * Action to set the error tag for a form input.
        */
       type: typeof SET_ERROR_TAG_NAME;
       payload: {
@@ -387,11 +407,11 @@ export type ErrorTagComponent =
     };
 
 /**
- * Represents the action to initialize the dialog contact form state with a payload of strings.
+ * Action to initialize the state of the contact form.
  *
  * @type {object} InitDialogContactFormState
- * @property {string[]} payload - An array of strings representing the initial state for the dialog contact form.
- * @property {string} type - The action type for initializing the dialog contact form state.
+ * @property {typeof INIT_DIALOG_CONTACT_FORM_STATE} type - The type of action to perform.
+ * @property {string[]} payload - The names of the form inputs in the contact form.
  *
  * @al-dev93
  */
@@ -401,50 +421,40 @@ type InitDialogContactFormState = {
 };
 
 /**
- * Union type representing actions related to form input component.
- * This includes actions for setting and deleting input errors, managing border styles,
- * and handling input focus and values.
+ * Represents the actions that can be dispatched in the InputComponent.
  *
- * @type {object} InputComponent
- * @property {object} DeleteInputError - Action to delete an input error.
- * @property {object} SetInputError - Action to set an input error.
- * @property {object} DeleteInputValue - Action to delete the value of an input.
- * @property {object} SetInputBorderBox - Action to set the border style of an input.
- * @property {object} SetInputFocus - Action to update the focus state of an input.
- * @property {object} SetInputValue - Action to update the value of an input.
+ * This includes actions for:
+ *   - Deleting or setting input errors
+ *   - Deleting or setting input values
+ *   - Setting input border box styles
+ *   - Setting input focus
  *
- * @type {object} DeleteInputError
- * @property {string} name - The name of the input field.
- * @property {(Validity | undefined)} [inputError] - The validity of the input (optional).
- *
- * @type {object} SetInputError
- * @property {string} name - The name of the input field.
- * @property {(Validity | undefined)} inputError - The validity state of the input.
- *
- * @type {object} DeleteInputValue
- * @property {string} name - The name of the input field.
- *
- * @type {object} SetInputBorderBox
- * @property {string} name - The name of the input field.
- * @property {InputBorderBox} borderStyle - The style to apply to the input border.
- *
- * @type {object} SetInputFocus
- * @property {string} name - The name of the input field.
- * @property {boolean} isFocused - Whether the input is focused or not.
- *
- * @type {object} SetInputValue
- * @property {string} name - The name of the input field.
- * @property {string} inputValue - The value of the input field.
+ * @type {Object} InputComponent
+ * @property {typeof DELETE_INPUT_ERROR | typeof DELETE_INPUT_VALUE | typeof SET_INPUT_BORDER_BOX | typeof SET_INPUT_ERROR
+ * | typeof SET_INPUT_FOCUS | typeof SET_INPUT_HOVER | typeof SET_INPUT_VALUE | typeof IN_EDIT_MODE} type - The type of action to perform.
+ * @property {Object} payload - The payload of the action.
+ * @property {string} payload.name - The name of the input field.
+ * @property {HTMLInputElement | HTMLTextAreaElement} payload.inputNode - The input node for the input field.
+ * @property {Validity | undefined} [payload.inputError] - The validity of the input error, if applicable.
+ * @property {InputBorderBox | undefined} [payload.borderStyle] - The border style for the input field, if applicable.
+ * @property {boolean} [payload.isFocused] - The focus status of the input field.
+ * @property {boolean} [payload.isHovered] - The hover status of the input field.
+ * @property {string} [payload.inputValue] - The value to set for the input field.
+ * @property {boolean} [payload.inEdition] - The edition status of the input field.
  *
  * @al-dev93
  */
 export type InputComponent =
   | {
+      type: typeof SET_INPUT_NODE;
+      payload: {
+        name: string;
+        inputNode: HTMLInputElement | HTMLTextAreaElement;
+      };
+    }
+  | {
       /**
-       * Action type to delete or set an input error.
-       *
-       * @property {string} name - The name of the input field.
-       * @property {(Validity | undefined)} [inputError] - The validity state of the input (optional when deleting)
+       * Action to delete or set the input error for a form input.
        */
       type: typeof DELETE_INPUT_ERROR | typeof SET_INPUT_ERROR;
       payload: {
@@ -454,9 +464,7 @@ export type InputComponent =
     }
   | {
       /**
-       * Action type to delete the value of an input.
-       *
-       * @property {string} name - The name of the input field.
+       * Action to delete the input value for a form input.
        */
       type: typeof DELETE_INPUT_VALUE;
       payload: {
@@ -465,23 +473,17 @@ export type InputComponent =
     }
   | {
       /**
-       * Action type to set the border style of an input field.
-       *
-       * @property {string} name - The name of the input field.
-       * @property {InputBorderBox} borderStyle - The border style to apply.
+       * Action to set the input border box style for a form input.
        */
       type: typeof SET_INPUT_BORDER_BOX;
       payload: {
         name: string;
-        borderStyle: InputBorderBox;
+        borderStyle: InputBorderBox | undefined;
       };
     }
   | {
       /**
-       * Action type to set the focus state of an input field.
-       *
-       * @property {string} name - The name of the input field.
-       * @property {boolean} isFocused - Whether the input is focused.
+       * Action to set the input focus for a form input.
        */
       type: typeof SET_INPUT_FOCUS;
       payload: {
@@ -491,34 +493,43 @@ export type InputComponent =
     }
   | {
       /**
-       * Action type to set the value of an input field.
-       *
-       * @property {string} name - The name of the input field.
-       * @property {string} inputValue - The value to set for the input field.
+       * Action to set the input hover for a form input.
+       */
+      type: typeof SET_INPUT_HOVER;
+      payload: {
+        name: string;
+        isHovered: boolean;
+      };
+    }
+  | {
+      /**
+       * Action to set the input value for a form input.
        */
       type: typeof SET_INPUT_VALUE;
       payload: {
         name: string;
         inputValue: string;
       };
+    }
+  | {
+      /**
+       * Action to set the edition mode for a form input.
+       */
+      type: typeof IN_EDIT_MODE;
+      payload: {
+        name: string;
+        inEdition: boolean;
+      };
     };
 
 /**
- * Union type representing all possible actions that can be dispatched in the
- * modal dialog contact form.
+ * Represents the actions that can be dispatched to manage the state of the contact form in the modal dialog.
  *
- * This includes actions for:
- *   - Managing auto-complete functionality
- *   - Setting and deleting error tags
- *   - Initializing the dialog contact form state
- *   - Handling input-related actions such as setting error, border styles, focus, and value.
- *
- * @type {object} ModalDialogContactFormAction
- * @property {AutoComplete} AutoComplete - Represents actions related to auto-complete functionality.
- * @property {ErrorTagComponent} ErrorTagComponent - Represents actions for setting or deleting error tags.
- * @property {InitDialogContactFormState} InitDialogContactFormState - Represents the initialization of the contact form state.
- * @property {InputComponent} InputComponent - Represents actions related to input error handling, value, focus,
- * and border styling.
+ * @type {Object} ModalDialogContactFormAction
+ * @property {AutoComplete} AutoComplete - Action related to auto-completion features.
+ * @property {ErrorTagComponent} ErrorTagComponent - Action for managing error tag components.
+ * @property {InitDialogContactFormState} InitDialogContactFormState - Action for initializing the form state.
+ * @property {InputComponent} InputComponent - Action for handling input components.
  *
  * @al-dev93
  */

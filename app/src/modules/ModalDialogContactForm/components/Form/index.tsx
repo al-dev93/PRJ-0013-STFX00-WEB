@@ -1,30 +1,31 @@
-import React, { FormEvent, memo } from 'react';
+import React, { FormEvent, memo, useCallback } from 'react';
 
+import { StringObject } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
-import { refetchWithArgs } from '@utils/fetchDataHelpers';
+import { refetchFormDataWithArguments } from '@utils/fetchDataHelpers';
 
 import { FormContent } from './Components/FormContent';
-import { getSubmitData } from '../../utils/formHelpers';
+import style from './style.module.css';
 
-import type { FormProps } from '../../types';
+import type { FormProps, ModalDialogContactFormState } from '../../types';
 
 /**
  * The Form component integrates the FormContent component and handles the connection with the API.
  * Form component memoized with 'React.memo' to optimize performance. The component will only
  * re-render if the props change.
  *
- * @component
+ * @component Form
  * @param {FormProps} props - The properties for the Form component.
  * @property {string} idForm - The form identifier in HTML.
- * @property {string} urlApi - URL allowing dialogue with the API.
+ * @property {string} apiEndPointUrl - URL allowing dialogue with the API.
  * @property {string} [urlFormContent] - URL to fetch the elements embedded in the FormContent component
  * (optional, used if dataFormContent is not used).
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used).
- * @property {ModalDialogContactFormState} state - the current state of the modal dialog contact form.
+ * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
  * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
  * related to the modal dialog contact form.
- * @property {SetStateBoolean} setOpenAlert - A function to toggle the open/close state of the alert modal.
+ * @property {SetStateBoolean} setShowAlert - A function to toggle the open/close state of the alert modal.
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
  * FormContent component is rendered.
  * @returns {React.JSX.Element}
@@ -33,39 +34,88 @@ import type { FormProps } from '../../types';
  */
 function MemoizedForm({
   idForm,
-  urlApi,
+  apiEndpointUrl,
   urlFormContent,
   dataFormContent,
-  state,
+  formState,
   dispatch,
-  setOpenAlert,
+  setShowAlert,
   onRenderComplete,
 }: FormProps): React.JSX.Element {
   // Prepare for submitting form data via POST
   const { refetch } = useFetchData(undefined, { method: 'POST' }, true);
 
   /**
+   * Refetches the form data with the provided arguments.
+   *
+   * @function memoizedRefetchFormDataWithArguments
+   * @param {Object} args - An object containing the arguments to be passed to the fetch function.
+   * @returns {void}
+   */
+  const memoizedRefetchFormDataWithArguments = useCallback(
+    (args: { [x: string]: unknown }): void => {
+      refetchFormDataWithArguments(apiEndpointUrl, refetch, 'POST', args);
+    },
+    [refetch, apiEndpointUrl],
+  );
+
+  /**
+   * Extracts and prepares the submit data from the contact form state, excluding any fields with input errors.
+   *
+   * @function extractValidFormData
+   * @param {ModalDialogContactFormState} formData - The current state of the contact form, where each key represents
+   * an input field.
+   * @returns {(StringObject | undefined)} - Returns an object containing the valid input values, or 'undefined' if no valid data
+   * is present.
+   *
+   * @description
+   * This function iterates through the contact form state and gathers the input values for fields that do not have any errors.
+   * It returns an object where the keys are the input field names and the values are the corresponding input values.
+   * If a field has an input error, it is skipped.
+   */
+  const extractValidFormData = useCallback((formData: ModalDialogContactFormState): StringObject | undefined => {
+    const validInputValues: { [key: string]: string | '' } | undefined = {};
+    Object.keys(formData).forEach((inputField) => {
+      if (formData[inputField].inputError) return;
+      validInputValues[inputField] = formData[inputField].inputValue || '';
+    });
+    return { ...validInputValues };
+  }, []);
+
+  /**
    * Handles the form submission process. Validates form inputs and triggers an API request
    * if the form values are valid.
    *
+   * @function handleFormSubmission
    * @param {FormEvent<HTMLFormElement>} event - The form submit event.
-   *
-   * @al-dev93
+   * @returns {void}
    */
-  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-    event.stopPropagation();
-    setOpenAlert(true);
-    const validValues = getSubmitData(state);
-    if (validValues) refetchWithArgs(urlApi, refetch, 'POST', validValues);
-  };
+  const handleFormSubmission = useCallback(
+    (event: FormEvent<HTMLFormElement>): void => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      setShowAlert(true);
+      const validValues = extractValidFormData(formState);
+      if (validValues) memoizedRefetchFormDataWithArguments(validValues);
+    },
+    [extractValidFormData, memoizedRefetchFormDataWithArguments, setShowAlert, formState],
+  );
 
   return (
-    <form action='' id={idForm} method='dialog' onSubmit={handleSubmit} noValidate>
+    <form
+      className={style.contactForm}
+      aria-label='formulaire de contact'
+      action=''
+      id={idForm}
+      method='dialog'
+      onSubmit={handleFormSubmission}
+      noValidate
+    >
       <FormContent
         urlFormContent={urlFormContent}
         dataFormContent={dataFormContent}
-        state={state}
+        formState={formState}
         dispatch={dispatch}
         onRenderComplete={onRenderComplete}
       />

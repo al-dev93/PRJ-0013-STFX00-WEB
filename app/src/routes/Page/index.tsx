@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
@@ -11,26 +11,31 @@ import style from './style.module.css';
 import type { OutletContextPage, PageProps, MenuSectionsVisibility } from '@/types';
 
 /**
+ * The main page component of the application.
  *
- * @description layout page containing common elements
- * @export
- * @param {PageProps} {cryptoKey}
- * @return {React.JSX.Element}
+ * @component
+ * @param {PageProps} props - The properties for the Page component
+ * @property {CryptoKey} cryptoKey - Encryption data to hide email address
+ * @returns {React.JSX.Element}
+ *
  * @al-dev93
  */
 export function Page({ cryptoKey }: PageProps): React.JSX.Element {
-  // TODO: add comments
+  // stores the current location of the page using react-router hooks.
   const { pathname, hash, key } = useLocation();
-  // COMMENT: scroll level achieved after using the navigation menu
+  // stores the current scroll position triggered by the menu interaction.
   const scrollWithNav = useRef<number>();
-  // COMMENT: stores the result of the useOnScreen hook applied to the
-  //  Index page to indicate the on screen section in the menu
-  const viewSectionContext = useRef<MenuSectionsVisibility>({});
-
+  // stores the current visible sections of the page and the active menu item(s).
+  const viewSectionContext = useRef<MenuSectionsVisibility>({ home: true });
+  // stores the reference to the skip link element to focus when the component mounts.
+  const skipLinkRef = useRef<HTMLAnchorElement>(null);
+  // stores the state of the contact form dialog and the id of the modal.
   const [openContactFormDialog, setOpenContactFormDialog] = useState<boolean>(false);
+  const modalId = useId();
 
-  // COMMENT: sets the scroll level after a page change or after using
-  //  the menu and the anchors elements
+  /**
+   * Scroll to the top of the page when the hash, or the pathname, or the key changes.
+   */
   useEffect((): void => {
     if (hash === '') window.scrollTo(0, 0);
     else {
@@ -40,12 +45,14 @@ export function Page({ cryptoKey }: PageProps): React.JSX.Element {
         if (element) {
           element.scrollIntoView();
           scrollWithNav.current = window.scrollY;
-          console.log(scrollWithNav.current);
         }
       }, 0);
     }
   }, [hash, pathname, key]);
 
+  /**
+   * Scroll to the top of the page when the openContactFormDialog state changes
+   */
   useEffect(() => {
     if (openContactFormDialog) {
       document.body.classList.add('scrollOff');
@@ -54,18 +61,33 @@ export function Page({ cryptoKey }: PageProps): React.JSX.Element {
     document.body.classList.remove('scrollOff');
   }, [openContactFormDialog]);
 
+  /**
+   * Focus the skip link when the component mounts.
+   */
+  useEffect(() => {
+    if (skipLinkRef.current) skipLinkRef.current.focus();
+  }, []);
+
   return (
-    <div className={style.page}>
+    <div className={style.mainPage} aria-hidden={openContactFormDialog}>
+      {/* Skip link for accessibility purposes */}
+      <a href='#home' className='visually-hidden visually-hidden-focusable' ref={skipLinkRef}>
+        Aller à l&apos;introduction
+      </a>
+      {/* Header component */}
       <CollapsibleHeader
         logo={{ src: logo, alt: 'logo' }}
         MenuSectionsVisibility={viewSectionContext}
         scrollWithMenuItem={scrollWithNav}
       />
+      {/* Contact form dialog */}
       <ModalDialogContactForm
         open={openContactFormDialog}
         setOpen={setOpenContactFormDialog}
+        modalId={modalId}
         url={['http://localhost:5173/api/contactFormModals', 'http://localhost:5173/api/contactFormInputs']}
       />
+      {/* Social media navigation bar component for left navigation */}
       <SocialMediaNavBar
         className={style.socialMediaNavBar}
         type='left-nav'
@@ -73,8 +95,17 @@ export function Page({ cryptoKey }: PageProps): React.JSX.Element {
         cryptoKey={cryptoKey}
       />
 
-      <main className={style.main}>
-        <Outlet context={{ viewSectionContext, setOpenContactFormDialog } satisfies OutletContextPage} />
+      <main className={style.main} aria-label='Introduction et contenu principal'>
+        <Outlet
+          context={
+            {
+              viewSectionContext,
+              setOpenContactFormDialog,
+              openContactFormDialog,
+              modalId,
+            } satisfies OutletContextPage
+          }
+        />
       </main>
       <footer>Pied-de-page</footer>
     </div>

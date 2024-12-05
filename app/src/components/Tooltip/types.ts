@@ -11,7 +11,8 @@ import { TooltipContent } from '@/types';
  * Can be a string, a TooltipContent object, or an array of TooltipContent objects.
  * @property {number} [delay=400] - The defay in milliseconds before showing the tooltip.
  * @property {('bottom' | 'left' | 'right' | 'top')} [direction='top'] - The direction of the tooltip.
- * @property {boolean} forceActive - Force the parent to control the tooltip state.
+ * @property {boolean} isVisible - Indicates whether the tooltip is visible.
+ * @property {string} [ariaLabel] - The aria label for the tooltip.
  *
  * @al-dev93
  */
@@ -20,5 +21,6 @@ export type TooltipProps = {
   content: string | TooltipContent | TooltipContent[];
   delay?: number;
   direction?: 'bottom' | 'left' | 'right' | 'top';
-  forceActive?: boolean;
+  isVisible: boolean;
+  ariaLabel?: string;
 };

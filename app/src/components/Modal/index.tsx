@@ -1,6 +1,6 @@
 import IonIcon from '@reacticons/ionicons';
-import classNames from 'classnames';
 import React, { KeyboardEvent, MouseEvent, useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 import { KeyboardEventButton, KeyboardEventDiv } from '@/types';
 import { ModalFormButton } from '@components/ModalFormButton';
@@ -10,20 +10,31 @@ import style from './style.module.css';
 import type { ModalProps } from './types';
 
 /**
- * Set focus to the specified HTML or SVG element and prevents the default event behavior.
- * Useful in keyboard navigation and accessibility scenarios where focus management is required.
+ * Handles the focus of the elements in the modal when the user navigates with the keyboard.
  *
- * @param {KeyboardEventDiv} event - The keyboard event that triggers the focus change.
- * @param {(HTMLElement | SVGSVGElement | null)} element - The target element to focus on.
- * Can be an HTML element, an SVG element, or null.
- * @returns {void}
+ * @param {KeyboardEventDiv} event - The keyboard event that triggered the function.
+ * @param {number} index - The index of the currently focused element.
+ * @param {HTMLElement[]} elements - The array of focusable elements in the modal.
+ *
+ * @remarks
+ * If the shift key is pressed, the function will focus the previous element.
+ * If the shift key is not pressed, the function will focus the next element.
+ * If the index is at the start or end of the array, the function will loop around to the other end.
  *
  * @al-dev93
  */
-function setFocusToElement(event: KeyboardEventDiv, element: HTMLElement | SVGSVGElement | null): void {
+function setFocusToElement(event: KeyboardEventDiv, index: number, elements: HTMLElement[]): void {
   event.preventDefault();
   event.stopPropagation();
-  element?.focus();
+  let nextIndex = index;
+
+  // If the shift key is pressed, go to the previous element
+  // Otherwise go to the next element
+  // If the index is at the start or end of the array, loop around to the other end
+  if (event.shiftKey) nextIndex = index === 0 ? elements.length - 1 : index - 1;
+  else nextIndex = index === elements.length - 1 ? 0 : index + 1;
+
+  elements[nextIndex].focus();
 }
 
 /**
@@ -36,10 +47,12 @@ function setFocusToElement(event: KeyboardEventDiv, element: HTMLElement | SVGSV
  * @property {boolean} open - Indicates whether the modal is open.
  * @property {SetStateBoolean} setOpen - Function to set the open state of the modal.
  * @property {ModalButton} [button] - The button configuration for the modal.
+ * @property {string} modalId - The id of the modal.
  * @property {boolean} [closeIcon] - Indicates if there is a modal close button.
  * @property {string} [title] - The title of the modal.
  * @property {string} [subtitle] - The subtitle of the modal.
  * @property {boolean} [onRenderComplete] - A flag to warm if a child component is rendered.
+ * @property {HTMLElement[]} [focusableElements] - The focusable elements in the modal.
  * @property {SetStateBoolean} [closeParentModal] - Function to close the parent modal.
  * @property {'alert'} [customStyle] - Custom style for the modal.
  * @returns {React.JSX.Element} The rendered modal component.
@@ -52,10 +65,12 @@ export function Modal({
   open,
   setOpen,
   button,
+  modalId,
   closeIcon,
   title,
   subtitle,
   onRenderComplete,
+  focusableElements,
   closeParentModal,
   customStyle,
 }: ModalProps): React.JSX.Element {
@@ -64,6 +79,7 @@ export function Modal({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const childrenRef = useRef<HTMLDivElement>(null);
   const lastFormChildRef = useRef<HTMLTextAreaElement>();
+  const titleRef = useRef<HTMLDivElement>(null);
 
   /**
    * Closes the modal and prevents the event from propagating.
@@ -74,6 +90,7 @@ export function Modal({
     (event: KeyboardEvent | MouseEvent | Event): void => {
       event.preventDefault();
       event.stopPropagation();
+
       setOpen(false);
     },
     [setOpen],
@@ -96,19 +113,25 @@ export function Modal({
   };
 
   /**
-   * Handles the tab navigation in the modal.
+   * Handles the 'Tab' key press event to manage focus navigation within the modal.
+   * It cycles through the focusable elements: close button, any additional focusable elements,
+   * and the main button, wrapping around when reaching the first or last element.
    *
-   * @param {KeyboardEventDiv} e - The keyboard event.
+   * @param {KeyboardEventDiv} e - The keyboard event triggering the focus change.
+   * Ensures smooth keyboard navigation by setting focus to the next or previous focusable element.
    */
   const handleTabIndex = (e: KeyboardEventDiv): void => {
-    const focusElement = {
-      first: closeRef.current,
-      last: buttonRef.current?.disabled ? lastFormChildRef.current ?? null : buttonRef.current,
-    };
+    if ((!closeRef.current || !buttonRef.current) && !focusableElements) return;
+    let keyboardNavigableElements = [];
 
-    if (document.activeElement === (e.shiftKey ? focusElement.first : focusElement.last) && e.code === 'Tab') {
-      setFocusToElement(e, e.shiftKey ? focusElement.last : focusElement.first);
-    }
+    if (closeRef.current) keyboardNavigableElements[0] = closeRef.current;
+    if (focusableElements) keyboardNavigableElements = [...keyboardNavigableElements, ...focusableElements];
+    if (!buttonRef.current?.disabled) keyboardNavigableElements.push(buttonRef.current as HTMLElement);
+
+    const indexOfActiveElement = keyboardNavigableElements.indexOf(document.activeElement as HTMLElement);
+
+    if (indexOfActiveElement >= 0 && e.code === 'Tab')
+      setFocusToElement(e, indexOfActiveElement, keyboardNavigableElements);
   };
 
   /**
@@ -133,21 +156,39 @@ export function Modal({
    */
   useEffect(() => {
     const dialogNode = dialogRef.current;
+    // const closeNode = closeRef.current;
+    if (!dialogNode) return;
 
     if (open) {
       lastFormChildRef.current = childrenRef.current?.getElementsByTagName('textarea').item(0) || undefined;
-      if (onRenderComplete === true || onRenderComplete === undefined) dialogNode?.showModal();
+      if (onRenderComplete === true || onRenderComplete === undefined) dialogNode.showModal();
     } else {
-      dialogNode?.close();
+      dialogNode.close();
       if (closeParentModal) closeParentModal((state) => !state);
     }
   }, [closeParentModal, onRenderComplete, open]);
+
+  /**
+   * Handles the focus of the title element when the modal is opened.
+   * Necessary for the screen reader to read the title and slogan of the contact form.
+   */
+  useEffect(() => {
+    const closeNode = closeRef.current;
+    const titleNode = titleRef.current;
+    if (!titleNode) return;
+
+    if (open && onRenderComplete) {
+      titleNode.focus();
+      setTimeout(() => closeNode?.focus(), 200);
+    }
+  }, [onRenderComplete, open]);
 
   /**
    * Handles cancellation of the modal (possible 'esc' or other native cancellation).
    */
   useEffect(() => {
     const dialogNode = dialogRef.current;
+    if (!dialogNode) return undefined;
 
     /**
      * Handles the cancel event.
@@ -160,23 +201,14 @@ export function Modal({
     return () => dialogNode?.removeEventListener('cancel', handleCancel);
   }, [setOpenFalse]);
 
-  // Combine the custom style and className using classNames library
-  const modalClassName = classNames(style.modal, className, {
-    [style['modal--hidden']]: !open,
-  });
-  const wrapperClassName = classNames(style.modal__wrapper, customStyle && style[`modal__wrapper--${customStyle}`]);
-  const closeButtonClassName = classNames(
-    style.modal__closeButton,
-    customStyle && style[`modal__closeButton--${customStyle}`],
-  );
+  // Combine the custom style and className
+  const modalClassName = style.modal + (className ? ` ${className}` : '') + (!open ? ` ${style['modal--hidden']}` : '');
+  const wrapperClassName = style.modal__wrapper + (customStyle ? ` ${style[`modal__wrapper--${customStyle}`]}` : '');
+  const closeButtonClassName =
+    style.modal__closeButton + (customStyle ? ` ${style[`modal__closeButton--${customStyle}`]}` : '');
 
-  return (
-    <dialog
-      className={modalClassName}
-      ref={dialogRef}
-      aria-labelledby={title ? 'modal-title' : undefined}
-      aria-describedby={subtitle ? 'modal-description' : undefined}
-    >
+  return createPortal(
+    <dialog className={modalClassName} id={modalId} ref={dialogRef} aria-hidden={!open} aria-modal={open}>
       <div
         className={wrapperClassName}
         role='presentation'
@@ -193,13 +225,13 @@ export function Modal({
                 onClick={handleCloseClick}
                 onKeyDown={handleCloseKeyDown}
                 tabIndex={0}
-                aria-label='close modal'
+                aria-label='Ferme le formulaire de contact'
               >
                 <IonIcon name='close' />
               </button>
             )}
             {(title || subtitle) && (
-              <div className={style.modal__titleWrapper}>
+              <div className={style.modal__titleWrapper} ref={titleRef} role='alertdialog' tabIndex={-1}>
                 {title && (
                   <h3 id='modal-title' className={style.modal__title}>
                     {title}
@@ -227,10 +259,12 @@ export function Modal({
               form={button.form}
               ref={buttonRef}
               disabled={button.disable}
+              ariaLabel={button.ariaLabel}
             />
           </footer>
         )}
       </div>
-    </dialog>
+    </dialog>,
+    document.getElementById('app-container') as HTMLElement,
   );
 }

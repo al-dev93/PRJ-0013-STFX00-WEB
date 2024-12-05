@@ -66,15 +66,17 @@ function MemoizedSlidePicture({
         .map((name) => style[name])
         .join(' ')}
       aria-hidden={ariaHidden}
+      aria-disabled={ariaHidden}
       aria-current={isCurrent ? 'true' : undefined}
       aria-label={`Slide ${index + 1} of ${totalSlides}`}
     >
       <a
-        href={address}
+        href={isCurrent ? address : ''}
         target='_blank'
         rel='noopener noreferrer'
-        className={style.picturesToScroll__link}
+        className={style.picturesToScroll__link + (isCurrent ? '' : ` ${style['picturesToScroll__link--disabled']}`)}
         aria-label={ariaLabel}
+        tabIndex={isCurrent ? 0 : -1}
       >
         <img
           ref={imgRef}

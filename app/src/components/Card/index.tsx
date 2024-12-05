@@ -28,7 +28,7 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
   return (
     <article className={style.card} aria-labelledby={`card-title-${cardData.id}`}>
       <header className={style.card__header}>
-        <IonIcon className={style.card__folderIcon} name='folder-open-sharp' />
+        <IonIcon className={style.card__folderIcon} name='folder-open-sharp' aria-hidden='true' />
         <SocialMediaNavBar changeLinkColor={style.card__additionalNav} type='card' buttons={cardData.deliverables} />
       </header>
       <div className={style.card__main}>

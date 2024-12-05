@@ -35,12 +35,12 @@ export type KeyboardEventDiv = KeyboardEvent<HTMLDivElement>;
 /**
  * @description
  */
-export type DialogFormElement = HTMLElement | HTMLInputElement | HTMLTextAreaElement;
+export type DialogFormInputElement = HTMLInputElement | HTMLTextAreaElement;
 
 /**
  * @description
  */
-export type DialogFormInputElement = HTMLInputElement | HTMLTextAreaElement;
+export type DialogFormElement = DialogFormInputElement | HTMLElement;
 
 /**
  * @description on the main page as the layout
@@ -104,12 +104,16 @@ export type IndexPageSection = Omit<MenuItemType, 'label'> & { title?: string; c
  * @property {MutableRefObject<MenuSectionsVisibility>} viewSectionContext - A mutable reference to the current
  * visible sections of the page.
  * @property {SetStateBoolean} setOpenContactFormDialog - A function to toggle the state of the contact form dialog.
+ * @property {boolean} openContactFormDialog - The current state of the contact form dialog.
+ * @property {string} modalId - The id of the modal.
  *
  * @al-dev93
  */
 export type OutletContextPage = {
   viewSectionContext: MutableRefObject<MenuSectionsVisibility>;
   setOpenContactFormDialog: SetStateBoolean;
+  openContactFormDialog: boolean;
+  modalId: string;
 };
 
 /**
@@ -133,12 +137,15 @@ export type DetailSection = {
 };
 
 // TODO add comments
-
 /**
- * @description
- * @type
- * @export
- * @al-dev93
+ * @description Represents a deliverable of a project.
+ *
+ * @type {object} Deliverable
+ * @property {string} id - The unique identifier for the deliverable.
+ * @property {string} service - The service associated with the deliverable.
+ * @property {IconType} icon - The icon of the service.
+ * @property {string} address - The address of the deliverable on the service.
+ * @property {string} [path] - The path of the deliverable.
  */
 export type Deliverable = {
   id: string;
@@ -175,7 +182,18 @@ export type Skill = {
   value: number;
 };
 
-// NOTE: data for the contact form
+/**
+ * Type of the form that is displayed in the contact form modal window and the dialogue with the api.
+ *
+ * @type {object} ContactFormModal
+ * @property {string} id - The unique identifier for the form.
+ * @property {string} urlFormContent - The URL to fetch the form content.
+ * @property {string} urlApi - The URL to send the form data to.
+ * @property {string} submitButtonName - The name of the submit button.
+ * @property {string} title - The title of the form.
+ * @property {string} subtitle - The subtitle of the form.
+ * @property {string[]} alertOnSubmit - An array of error messages to display in the alert modal.
+ */
 export type ContactFormModal = {
   id: string;
   urlFormContent: string;
@@ -190,8 +208,13 @@ type InputType = 'text' | 'email' | 'tel';
 type InputTag = 'input' | 'textarea';
 
 /**
- * @description Type of content to displayed in the tooltip including
+ * Type of content to displayed in the tooltip including
  * text and line spacing size.
+ *
+ * @type {object} TooltipContent
+ * @property {string} id - The unique identifier for the tooltip content.
+ * @property {string} line - The text to display in the tooltip.
+ * @property {number} [lineHeight] - The line spacing size.
  */
 export type TooltipContent = {
   id: string;

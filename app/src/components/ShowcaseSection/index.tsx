@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import React, { memo, useEffect, useRef } from 'react';
 
 import { ModalFormButton } from '@components/ModalFormButton';
@@ -38,6 +37,8 @@ function getElementClassName(node?: string): string {
  * @property {string} [title] - Section title.
  * @property {MutableRefObject<MenuSectionsVisibility>} MenuSectionsVisibility - Indicates the name of the visible displayed.
  * @property {() => void} [openModalFormDialog] - Trigger for opening the contact modal to use button in the section.
+ * @property {boolean} showModalForm - The current state of the contact form dialog.
+ * @property {string} modalId - The id of the modal.
  * @returns {React.JSX.Element} The rendered Tag component.
  *
  * @al-dev93
@@ -48,41 +49,54 @@ function MemoizedShowcaseSection({
   title,
   MenuSectionsVisibility,
   openModalFormDialog,
+  showModalFormDialog,
+  modalId,
 }: ShowcaseSectionProps): React.JSX.Element {
-  /**
-   * Renders the title section with a decorative line.
-   *
-   * @param {string} titleSection - The title text.
-   * @returns {JSX.Element} The rendered section title.
-   *
-   * @al-dev93
-   */
-  const showcaseSectionTitle = (titleSection: string): JSX.Element => {
-    return (
-      <div className={style.section__titleSection}>
-        <h2>{titleSection}</h2>
-        <img src={titleLine} alt='Decorative line' />
-      </div>
-    );
-  };
-
   const sectionRef = useRef<HTMLElement>(null);
   const isRefDisplayed = useOnScreen(sectionRef, INTERSECTION_OPTIONS_ROOTMARGIN);
 
+  /**
+   * Updates the visibility of the section in the page sections context.
+   */
   useEffect(() => {
     const section = MenuSectionsVisibility;
     if (!anchor) return;
     (section.current as MenuSectionsVisibility)[anchor as keyof MenuSectionsVisibility] = isRefDisplayed;
   }, [anchor, isRefDisplayed, MenuSectionsVisibility]);
 
+  /**
+   * Renders the title section with a decorative line.
+   *
+   * @function
+   * @param {string} titleSection - The title text.
+   * @returns {JSX.Element} The rendered section title.
+   */
+  const showcaseSectionTitle = (titleSection: string): JSX.Element => {
+    return (
+      <div className={style.section__titleSection}>
+        <h2 id={`${anchor}-title`} aria-live='polite'>
+          {titleSection}
+        </h2>
+        <img src={titleLine} alt='' aria-label='Decorative line' />
+      </div>
+    );
+  };
+
   return (
-    <section className={classNames(style.section, { [style['section--hero']]: !title })} ref={sectionRef} id={anchor}>
+    <section
+      className={style.section + (!title ? ` ${style['section--hero']}` : '')}
+      ref={sectionRef}
+      id={anchor}
+      tabIndex={-1}
+      aria-labelledby={`${anchor}-title`}
+    >
       <div className={style.section__bodySection}>
         {title ? showcaseSectionTitle(title) : null}
         {content.map((renderNode) =>
           !renderNode.wrapped ? (
             <DynamicElement // TODO: add comment
               key={renderNode.id}
+              id={renderNode.tag === 'h1' ? `${anchor}-title` : undefined}
               tag={renderNode.tag as keyof React.JSX.IntrinsicElements | ComponentType}
               url={renderNode.urlContent}
               className={getElementClassName(renderNode.name)}
@@ -111,7 +125,14 @@ function MemoizedShowcaseSection({
           ),
         )}
       </div>
-      <ModalFormButton name='Contact' onClick={openModalFormDialog} />
+      <ModalFormButton
+        name='Contact'
+        onClick={openModalFormDialog}
+        ariaLabel='Open contact form'
+        ariaExpanded={showModalFormDialog}
+        ariaHasPopup='dialog'
+        ariaControls={modalId}
+      />
     </section>
   );
 }

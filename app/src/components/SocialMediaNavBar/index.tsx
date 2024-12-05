@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { useFetchData } from '@hooks/useFetchData';
 import verticalLine from '@images/decorations/vertical_line_decorative_light_mode.svg';
@@ -40,10 +40,13 @@ function MemoizedSocialMediaNavBar({
   // Use useFetchData hook if shouldFetch is true
   const { data: fetchedData, error } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
   // Use buttons if provided, otherwise use fetched data
-  const data =
-    type === 'left-nav'
-      ? (buttons || (fetchedData as AccountLink[]))?.filter((item) => item.onPage)
-      : buttons || (fetchedData as AccountLink[]);
+  const data = useMemo(
+    (): AccountLink[] =>
+      type === 'left-nav'
+        ? (buttons || (fetchedData as AccountLink[]))?.filter((item) => item.onPage)
+        : buttons || (fetchedData as AccountLink[]),
+    [buttons, fetchedData, type],
+  );
 
   // TODO: sortir l'erreur
   if (error) {
@@ -51,7 +54,11 @@ function MemoizedSocialMediaNavBar({
   }
 
   return (
-    <nav className={`${className} ${style.socialMediaNavBar}`} aria-label='Social Media Navigation'>
+    <nav
+      className={`${className} ${style.socialMediaNavBar}`}
+      role='navigation'
+      aria-label='Navigation réseaux sociaux et médias'
+    >
       <ul className={style[`socialMediaNavBar--${isVerticalNav ? `vertical` : `horizontal`}`]}>
         {data?.map((element) => (
           <li key={`${element.service}`}>
@@ -64,8 +71,8 @@ function MemoizedSocialMediaNavBar({
         ))}
       </ul>
       {isVerticalNav && (
-        <div className={style['socialMediaNavBar--vertical__line']}>
-          <img src={verticalLine} alt='decorative line' />
+        <div className={style['socialMediaNavBar--verticalLine']}>
+          <img src={verticalLine} alt='' aria-label='Decorative line' />
         </div>
       )}
     </nav>

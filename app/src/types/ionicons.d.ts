@@ -8,4 +8,8 @@ export type IconType =
   | 'open-outline'
   | 'document-outline'
   | 'chevron-back-outline'
-  | 'chevron-forward-outline';
+  | 'chevron-forward-outline'
+  | 'moon-outline'
+  | 'moon'
+  | 'sync-outline'
+  | 'swap-horizontal-outline';

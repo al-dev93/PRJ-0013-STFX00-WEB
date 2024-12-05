@@ -19,13 +19,13 @@ import type { ContactFormInput, ContactFormModal, SetStateBoolean } from '@/type
  * with provided data or fetched dynamically from a specified URL. It manages from validation,
  * submission, and the display of alert messages.
  *
- * @component
+ * @component ModalDialogContactForm
  * @param {ModalDialogContactFormProps} props - The props for the ModalDialogContactForm component.
  * @property {boolean} open - Boolean to control the visibility of the modal.
  * @property {SetStateBoolean} setOpen - Function to toggle the open state of the modal.
+ * @property {string} modalId - The ID of the modal.
  * @property {ContactFormModal} [data] - Predefined form data to populate the form (optional).
  * @property {string} [url] - URL to fetch the form data if 'data' is not provided (optional).
- *
  * @returns {React.JSX.Element} The rendered modal contact form
  *
  * @al-dev93
@@ -33,15 +33,16 @@ import type { ContactFormInput, ContactFormModal, SetStateBoolean } from '@/type
 export function ModalDialogContactForm({
   open,
   setOpen,
-  data: contactFormModal,
+  modalId,
+  data: formModalData,
   url,
 }: ModalDialogContactFormProps): React.JSX.Element {
-  const [isFormContentRendered, setIsFormContentRendered] = useState<boolean>(false);
-  const [openAlert, setOpenAlert] = useState<boolean>(false);
+  const [isFormContentRendered, setFormContentRendered] = useState<boolean>(false);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
   const modalVisibility = useRef<boolean>();
 
   // Determine if data needs to be fetched
-  const shouldFetch = !contactFormModal;
+  const shouldFetch = !formModalData;
 
   // Fetch form modal data
   const { data } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
@@ -50,34 +51,34 @@ export function ModalDialogContactForm({
   /**
    * Memoizes the function to update the 'isFormContentRendered' state to avoid recreating it on every render.
    *
-   * @function
+   * @function setFormContentRenderedCallback
    * @param {boolean} rendered - Indicates whether the form content has been rendered.
    * @returns {void}
    */
-  const setIsFormContentRenderedCallback = useCallback((rendered: boolean) => {
-    setIsFormContentRendered(rendered);
+  const setFormContentRenderedCallback = useCallback((rendered: boolean): void => {
+    setFormContentRendered(rendered);
   }, []) as SetStateBoolean;
 
   /**
    * Memoizes the function to set the alert's open state to avoid recreating it on every render.
    *
-   * @function
+   * @function setShowAlertCallback
    * @param {boolean} isOpen - Indicates whether the alert should be open.
    * @returns {void}
    */
-  const setOpenAlertCallback = useCallback((isOpen: boolean) => {
-    setOpenAlert(isOpen);
+  const setShowAlertCallback = useCallback((isOpen: boolean): void => {
+    setShowAlert(isOpen);
   }, []) as SetStateBoolean;
 
   /**
    * Memoizes the function to manage the modal open state to avoid recreating it on every render.
    *
-   * @function
+   * @function setOpenModal
    * @param {boolean} isOpen - Indicates whether the modal should be open or closed.
    * @returns {void}
    */
   const setOpenModal = useCallback(
-    (isOpen: boolean) => {
+    (isOpen: boolean): void => {
       setOpen(isOpen);
     },
     [setOpen],
@@ -105,8 +106,8 @@ export function ModalDialogContactForm({
     submitButtonName,
     alertOnSubmit,
   } = useMemo(
-    () => contactFormModal || (modalContent as ContactFormModal[])?.at(0) || EMPTY_MODAL_DIALOG_CONTACT_FORM,
-    [contactFormModal, modalContent],
+    () => formModalData || (modalContent as ContactFormModal[])?.at(0) || EMPTY_MODAL_DIALOG_CONTACT_FORM,
+    [formModalData, modalContent],
   );
 
   // Initialize reducer for contact form state management
@@ -121,46 +122,64 @@ export function ModalDialogContactForm({
    * Ensures that the modal is hidden when an alert is shown and displayed otherwise
    */
   useEffect(() => {
-    manageModalVisibility(open, openAlert, modalVisibility);
-  }, [isFormContentRendered, open, openAlert]);
+    manageModalVisibility(open, showAlert, modalVisibility);
+  }, [isFormContentRendered, open, showAlert]);
 
   /**
    * Resets the flag indicating that the form content is rendered when the
    * contact form is closed.
    */
   useEffect(() => {
-    if (!open && isFormContentRendered) setIsFormContentRendered(false);
-  }, [isFormContentRendered, open]);
+    if (!open && isFormContentRendered) setFormContentRenderedCallback(false);
+  }, [isFormContentRendered, open, setFormContentRenderedCallback]);
+
+  /**
+   * Retrieves all focusable input elements in the form based on the contactFormState.
+   * Memoizes the result to avoid recalculating it on every render.
+   * Returns null if the form content has not been rendered yet.
+   *
+   * @constant formFocusableElements
+   */
+  const formFocusableElements: (HTMLInputElement | HTMLTextAreaElement | undefined)[] | null = useMemo(() => {
+    if (!isFormContentRendered) return null;
+    const inputElementsInState = Object.values(contactFormState)
+      .map((item) => item.inputNode)
+      .filter((item) => item !== undefined);
+    return inputElementsInState?.length ? inputElementsInState : null;
+  }, [contactFormState, isFormContentRendered]);
 
   return (
     <Modal
       open={open}
       className={modalVisibility.current ? style.hiddenVisibility : undefined}
       setOpen={setOpenModal}
+      modalId={modalId}
       title={title}
       subtitle={subtitle}
+      focusableElements={formFocusableElements as HTMLElement[]}
       onRenderComplete={isFormContentRendered}
       closeIcon
       button={{
         name: submitButtonName,
         form: idForm,
         disable: hasFormErrors(contactFormState),
+        ariaLabel: 'Soumettre le formulaire de contact',
       }}
     >
       <Alert
-        openAlert={openAlert}
-        setOpenAlert={setOpenAlertCallback}
+        showAlert={showAlert}
+        setShowAlert={setShowAlertCallback}
         message={alertOnSubmit}
         closeParentModal={setOpenModal}
       />
       <Form
         idForm={idForm}
-        urlApi={urlApi}
+        apiEndpointUrl={urlApi}
         dataFormContent={formContent as ContactFormInput[]}
-        state={contactFormState}
+        formState={contactFormState}
         dispatch={contactFormDispatch}
-        setOpenAlert={setOpenAlertCallback}
-        onRenderComplete={setIsFormContentRenderedCallback}
+        setShowAlert={setShowAlertCallback}
+        onRenderComplete={setFormContentRenderedCallback}
       />
     </Modal>
   );

@@ -30,12 +30,19 @@ export function DynamicElementContainer({
   // Fetch data using useFetchData custom hook.
   const { data: fetchedData, error } = useFetchData(url || null, { method: 'GET' });
 
+  /**
+   * Filter fetched data based on the 'display' property. If no filterValue is provided, return the fetched data.
+   *
+   * @constant
+   * @type {FetchData}
+   */
   const filteredData = useMemo(() => {
     const simpleFetchedData = fetchedData as FetchData;
     return filterValue
       ? simpleFetchedData?.filter((item) => item?.['display' as keyof typeof item] === filterValue)
       : simpleFetchedData;
   }, [fetchedData, filterValue]);
+
   // TODO: sortir l'erreur
   // Render error state if an error occured during data fetching.
   if (error) {

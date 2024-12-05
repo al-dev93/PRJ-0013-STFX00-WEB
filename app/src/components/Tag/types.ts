@@ -13,6 +13,7 @@ import { TagType } from '@/types';
  * - 'filled': indicates a filled type tag.
  * - 'thinned': indicates a thinned type tag.
  * @property {React.CSSProperties} [position] - Inline styles for positioning.
+ * @property {string} [ariaLabel] - Aria label for the tag.
  *
  * @al-dev93
  */
@@ -21,4 +22,5 @@ export type TagProps = {
   tag?: string;
   type?: TagType;
   position?: CSSProperties;
+  ariaLabel?: string;
 };

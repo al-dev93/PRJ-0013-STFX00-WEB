@@ -9,6 +9,7 @@ export const detailSections = [
   {
     id: '2',
     tag: 'h1',
+    name: 'title',
     content: 'AlgoNetDesign',
     showcaseSectionId: '1',
   },

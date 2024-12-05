@@ -1,34 +1,30 @@
 .buttonLink {
-  width: 40px;
-  height: 40px;
+  width: var(--button-link-size);
+  height: var(--button-link-size);
   display: flex;
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  color: var(--decorative-light);
-  transition:
-    color 0.3s,
-    background-color 0.3s,
-    transform 0.3s;
+  color: var(--button-link-color);
+  transition: var(--button-link-transition);
 }
 
 .buttonLink:hover,
 .buttonLink:focus {
   color: var(--decorative-dark);
   outline: none;
-  transform: scale(1.1); /* Slightly enlarge the button on hover/focus */
+  transform: var(--button-link-transform-scale); /* Slightly enlarge the button on hover/focus */
 }
 
 .buttonLink:focus-visible {
-  outline: 2px solid var(--decorative-dark);
+  outline: var(--button-link-outline);
 }
 
 .buttonLink__icon {
-  font-size: var(--fs-md);
-  height: var(--fs-md);
+  font-size: var(--button-link-icon-size);
 }
 
 .buttonLink:hover .buttonLink__icon,
 .buttonLink:focus .buttonLink__icon {
-  transform: rotate(10deg); /* Slight rotation on hover/focus */
+  transform: var(--button-link-transform-rotate); /* Slight rotation on hover/focus */
 }

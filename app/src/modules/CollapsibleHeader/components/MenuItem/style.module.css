@@ -3,6 +3,11 @@
   color: var(--rich-black);
   text-decoration: none;
 }
+
+.itemMenu:hover {
+  color: var(--secondary-color);
+}
+
 /* Linked section visible on screen */
 .itemMenu--isSectionVisible {
   color: var(--secondary-color);

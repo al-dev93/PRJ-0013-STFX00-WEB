@@ -1,103 +1,125 @@
-import classNames from 'classnames';
-import React, { KeyboardEvent, MouseEvent, useCallback, useEffect, useRef } from 'react';
+import React, { MouseEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { useAnimation } from '@hooks/useAnimation';
 
 import style from './style.module.css';
+import { PREFIX_AUTO_COMPLETE_ITEM_ID, SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
 
-import type { PopoverProps } from '../../types';
+import type { FieldState, PopoverProps } from '../../types';
 /**
- *
  * Popover component that displays a list of autocomplete suggestions and error messages.
  *
- * @component
+ * @component Popover
  * @param {PopoverProps} props - The properties for the Popover component.
- * @property {string[]} [autocompleteList] - List of autocomplete suggestions to display.
- * @property {ErrorMessage} [errorMessage] - Error messages associated with input validation.
- * @property {Validity} [errorState] - State representing input validity errors.
- * @property {boolean} [firstItemFocused] - Determines whether the first item in the list should be focused.
+ * @property {ModalDialogContactFormState} formState - The current state of the modal dialog contact form.
+ * @property {string} name - The name attribute for the input element.
+ * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
- * @property {(DialogFormInputElement | null)} [prevFocusNode] - The previous input element to focus back to when necessary.
  * @returns {(React.JSX.Element | null)} The rendered Popover component or null if no suggestions or errors.
  *
  * @al-dev93
  */
-export function Popover({
-  autocompleteList,
-  errorMessage,
-  errorState,
-  firstItemFocused,
-  inputAutocomplete,
-  prevFocusNode,
-}: PopoverProps): React.JSX.Element | null {
-  const listOfError = errorState
-    ? Object.entries(errorState).filter(([key, value]) => key !== 'minLength' && key !== 'valid' && value)
-    : undefined;
+export function Popover({ formState, name, errorMessage, inputAutocomplete }: PopoverProps): React.JSX.Element {
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLParagraphElement>(null);
+  const suggestionsRef = useRef<HTMLUListElement>(null);
+  const currentState: FieldState | null = useMemo(() => formState[name], [name, formState]);
 
-  const activeItem = useRef<number>(0);
-  const ulRef = useRef<HTMLUListElement>(null);
+  const [showSuggestions, setShowSuggestions] = useState<string[]>();
 
-  /**
-   * Sets the active item in the autocomplete list based on the given count.
-   *
-   * @function
-   * @param {HTMLUListElement} ulNode - The list element.
-   * @param {boolean} count - Whether to increment or decrement the active item index.
-   * @returns {void}
-   */
-  const setActiveItem = useCallback(
-    (ulNode: HTMLUListElement, count: boolean): void => {
-      if (!autocompleteList) return;
-
-      if (activeItem.current > 0 && activeItem.current < autocompleteList.length - 1)
-        activeItem.current += count ? 1 : -1;
-      else if (activeItem.current === 0)
-        activeItem.current = count ? activeItem.current + 1 : autocompleteList.length - 1;
-      else if (activeItem.current === autocompleteList.length - 1)
-        activeItem.current = count ? 0 : activeItem.current - 1;
-
-      const nextItem = ulNode.children.item(activeItem.current) as HTMLLIElement;
-      if (nextItem) nextItem.focus();
-    },
-    [autocompleteList],
+  // Animations for suggestions and message popups
+  const { isAnimating: isAnimatingSuggestions, shouldRender: shouldRenderSuggestions } = useAnimation(
+    !!currentState.autoComplete?.length && currentState.isFocused,
+    200,
+  );
+  const { isAnimating: isAnimatingMessage, shouldRender: shouldRenderMessage } = useAnimation(
+    !!errorMessage && currentState.isFocused,
+    200,
   );
 
   /**
-   * Handles key down events for navigating and selecting autocomplete items.
-   *
-   * @function
-   * @param {KeyboardEvent<HTMLLIElement>} event - The keyboard event.
-   * @returns {void}
+   * Sets the autocomplete list when it is updated.
    */
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLLIElement>): void => {
-      event.preventDefault();
-      event.stopPropagation();
-      const ulNode = ulRef.current;
-      if (!ulNode) return;
+  useEffect(() => {
+    if (currentState.autoComplete?.length && currentState.isFocused)
+      setShowSuggestions(currentState.autoComplete.sort((a, b) => a.localeCompare(b)));
+  }, [currentState.autoComplete, currentState.isFocused]);
 
-      switch (event.code) {
-        case 'ArrowDown':
-          setActiveItem(ulNode, true);
-          break;
-        case 'ArrowUp':
-          setActiveItem(ulNode, false);
-          break;
-        case 'Enter':
-          if (prevFocusNode) inputAutocomplete(event.currentTarget.textContent ?? '');
-          break;
-        case 'Escape':
-          prevFocusNode?.focus();
-          break;
-        default:
-          break;
+  /**
+   * Sets the width of the popover and its contents based on the provided references.
+   */
+  useEffect(() => {
+    if (!popoverRef.current || (!messageRef.current && !suggestionsRef.current)) return;
+
+    /**
+     * Adjusts the width of the popover and its contents based on the provided references.
+     * - Sets both the master and optional slave element widths to "max-content".
+     * - Compares scroll widths to determine which element's width should dictate
+     *   the popover's width.
+     * - If the master element's scroll width is greater, sets the popover's width
+     *   to match the master element and adjusts the slave element to 100%.
+     * - If the slave element's scroll width is greater, sets the popover's width
+     *   to match the slave element and adjusts the master element to 100%.
+     *
+     * @function setWidth
+     * @param {RefObject<HTMLParagraphElement | HTMLUListElement>} masterRef - The main element reference for width calculation.
+     * @param {RefObject<HTMLParagraphElement | HTMLUListElement>} [slaveRef] - An optional secondary element reference for comparative width calculation.
+     * @returns {void}
+     */
+    const setWidth = (
+      masterRef: RefObject<HTMLParagraphElement | HTMLUListElement>,
+      slaveRef?: RefObject<HTMLParagraphElement | HTMLUListElement>,
+    ): void => {
+      if (!popoverRef.current || !masterRef.current) return;
+      const masterElement = masterRef.current;
+      if (slaveRef && slaveRef.current) {
+        const slaveElement = slaveRef.current;
+        masterElement.style.width = 'max-content';
+        slaveElement.style.width = 'max-content';
+        if (masterElement.scrollWidth > slaveElement.scrollWidth) {
+          popoverRef.current.style.width = `${masterElement.scrollWidth}px`;
+          slaveElement.style.width = '100%';
+          return;
+        }
+        popoverRef.current.style.width = `${slaveElement.scrollWidth}px`;
+        masterElement.style.width = '100%';
+        return;
       }
-    },
-    [inputAutocomplete, prevFocusNode, setActiveItem],
-  );
+      popoverRef.current.style.width = `${masterElement.scrollWidth}px`;
+      masterElement.style.width = 'max-content';
+    };
+
+    if (messageRef.current && suggestionsRef.current) {
+      setWidth(suggestionsRef, messageRef);
+      return;
+    }
+    if (messageRef.current && !suggestionsRef.current) {
+      setWidth(messageRef);
+      return;
+    }
+    if (!messageRef.current && suggestionsRef.current) setWidth(suggestionsRef);
+  }, [showSuggestions, shouldRenderSuggestions]);
 
   /**
-   * Handles click events for selecting autocomplete items.
+   * Scrolls the focused item into view when the list of autocomplete suggestions is updated.
+   * If the list is not rendered or the focused item index is undefined, the function does nothing.
+   */
+  useEffect(() => {
+    if (!suggestionsRef.current || currentState.listItemFocused === undefined) return;
+    const item = suggestionsRef.current.querySelector(
+      `#${PREFIX_AUTO_COMPLETE_ITEM_ID}${currentState.listItemFocused}`,
+    );
+    if (item) {
+      item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+  }, [currentState.listItemFocused]);
+
+  /**
+   * Handles click events for selecting autocomplete items. Prevents the default
+   * behavior and stops the propagation of the event. Calls the `inputAutocomplete` function
+   * with the selected item's text content.
    *
-   * @function
+   * @function handleClick
    * @param {MouseEvent<HTMLLIElement>} event - The mouse event.
    * @returns {void}
    */
@@ -105,64 +127,99 @@ export function Popover({
     (event: MouseEvent<HTMLLIElement>): void => {
       event.preventDefault();
       event.stopPropagation();
+
       inputAutocomplete(event.currentTarget.textContent ?? '');
     },
     [inputAutocomplete],
   );
 
   /**
-   * Renders the message at at the top of the Popover component.
+   * Renders the message that is displayed when there are validation errors.
+   * If `shouldRenderMessage` is `false`, the message will not be rendered.
    *
-   * @function
-   * @returns {(React.JSX.Element | null)} The rendered message in Popover component or null if not applicable.
+   * @constant renderMessage
    */
-  const renderMessage = (): React.JSX.Element | null => {
-    return errorState ? (
-      <p className={style.popover__message}>
-        {listOfError ? listOfError.map(([key]) => errorMessage?.[key as keyof typeof errorMessage]).join('\n') : null}
+  const renderMessage: React.JSX.Element | null = useMemo(() => {
+    if (!errorMessage) return null;
+
+    /**
+     * Determines the class name for the message element.
+     * Includes visibility and message styles based on the provided values.
+     *
+     * @constant classNameMessage
+     */
+    const classNameMessage: string =
+      style.popover__message +
+      (isAnimatingMessage ? ` ${style['popover__message--visible']}` : '') +
+      (!shouldRenderSuggestions ? ` ${style['popover__message--withoutSuggestions']}` : '');
+
+    return shouldRenderMessage ? (
+      <p ref={messageRef} className={classNameMessage}>
+        {errorMessage}
       </p>
     ) : null;
-  };
+  }, [errorMessage, isAnimatingMessage, shouldRenderMessage, shouldRenderSuggestions]);
 
   /**
-   * Sets focus to the first or last item in the autocomplete list when it is updated.
+   * Determines the class name for the autocomplete suggestions.
+   * Includes visibility and message styles based on the provided values.
+   *
+   * @constant classNameSuggestions
    */
-  useEffect(() => {
-    const ulNode = ulRef.current;
-    if (firstItemFocused === undefined || !ulNode) return;
+  const classNameSuggestions: string =
+    style.popover__autocomplete +
+    (isAnimatingSuggestions ? ` ${style['popover__autocomplete--visible']}` : '') +
+    (!errorMessage ? ` ${style['popover__autocomplete--withoutMessage']}` : '');
 
-    if (ulNode.childElementCount > 0) {
-      const focusProperty = firstItemFocused ? 'firstElementChild' : 'lastElementChild';
-      const elementToFocus = ulNode[focusProperty] as HTMLLIElement;
-      activeItem.current = firstItemFocused ? 0 : ulNode.childElementCount - 1;
-      if (elementToFocus) elementToFocus.focus();
-    }
-  }, [firstItemFocused]);
-
-  return errorState || (autocompleteList && autocompleteList.length > 0) ? (
-    <div className={style.popover}>
-      {renderMessage()}
-      <div
-        className={classNames(style.popover__autocomplete, {
-          [style['popover__autocomplete--disable']]: !autocompleteList,
-        })}
+  /**
+   * Renders the list of autocomplete suggestions.
+   * If `shouldRenderSuggestions` is `false`, the suggestions will not be rendered.
+   *
+   * @constant renderSuggestions
+   */
+  const renderSuggestions: React.JSX.Element | null = useMemo(() => {
+    return shouldRenderSuggestions ? (
+      <ul
+        id={`${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}`}
+        className={classNameSuggestions}
+        role='listbox'
+        hidden={!showSuggestions?.length}
+        ref={suggestionsRef}
       >
-        <span className={style.popover__autocomplete__borderTop} />
-        <ul className={style.popover__autocomplete__list} ref={ulRef}>
-          {autocompleteList?.map((value) => (
+        {showSuggestions?.map((value, index) => {
+          /**
+           * Determines the class name for the autocomplete suggestions item.
+           * Includes visibility and message styles based on the provided values.
+           * Includes focus styles if the item is focused.
+           *
+           * @constant classNameSuggestionsItem
+           */
+          const classNameSuggestionsItem =
+            style.popover__autocomplete__item +
+            (currentState.listItemFocused === index ? ` ${style['popover__autocomplete__item--focused']}` : '');
+
+          return (
             <li
               key={value}
-              className={style.popover__autocomplete__list__item}
-              role='presentation'
+              id={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${index}`}
+              className={classNameSuggestionsItem}
+              role='option'
+              aria-selected={currentState.listItemFocused === index}
               tabIndex={-1}
-              onKeyDown={handleKeyDown}
               onMouseDown={handleClick}
             >
               {value}
             </li>
-          ))}
-        </ul>
-      </div>
+          );
+        })}
+      </ul>
+    ) : null;
+  }, [classNameSuggestions, currentState.listItemFocused, handleClick, name, shouldRenderSuggestions, showSuggestions]);
+
+  return (
+    <div className={style.popover} ref={popoverRef}>
+      {renderMessage}
+      {renderSuggestions}
     </div>
-  ) : null;
+  );
 }

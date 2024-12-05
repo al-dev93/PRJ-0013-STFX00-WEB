@@ -50,6 +50,10 @@
   border-color: var(--primary-alert-color);
 }
 
+.dialogFormInput__tooltipIcon {
+  color: var(--primary-color);
+}
+
 .dialogFormInput__label {
   position: absolute;
   display: flex;

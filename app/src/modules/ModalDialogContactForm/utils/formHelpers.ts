@@ -1,37 +1,11 @@
 import { MutableRefObject } from 'react';
 
 import type { ModalDialogContactFormState } from '../types';
-import type { StringObject } from '@/types';
-
-/**
- * Extracts and prepares the submit data from the contact form state, excluding any fields with input errors.
- *
- * @function
- * @param {ModalDialogContactFormState} contactFormState - The current state of the contact form, where each key represents
- * an input field.
- * @returns {(StringObject | undefined)} - Returns an object containing the valid input values, or 'undefined' if no valid data
- * is present.
- *
- * @description
- * This function iterates through the contact form state and gathers the input values for fields that do not have any errors.
- * It returns an object where the keys are the input field names and the values are the corresponding input values.
- * If a field has an input error, it is skipped.
- *
- * @al-dev93
- */
-export function getSubmitData(contactFormState: ModalDialogContactFormState): StringObject | undefined {
-  const inputValues: { [key: string]: string | '' } | undefined = {};
-  Object.keys(contactFormState).forEach((item) => {
-    if (contactFormState[item].inputError) return;
-    inputValues[item] = contactFormState[item].inputValue || '';
-  });
-  return { ...inputValues };
-}
 
 /**
  * Formats a numeric string by grouping digits into pairs separated by spaces.
  *
- * @function
+ * @function formatInputNumber
  * @param {string} number - The numeric string to format.
  * @returns {string} - The formatted numeric string with spaces separating every two digits.
  *
@@ -55,7 +29,7 @@ export function formatInputNumber(number: string): string {
 /**
  * Checks if the form state contains any errors.
  *
- * @function
+ * @function hasFormErrors
  * @param {ModalDialogContactFormState} state - The current form state.
  * @returns {boolean} Returns 'true' if any form field has an error, otherwise 'false'.
  *
@@ -69,7 +43,7 @@ export function hasFormErrors(state: ModalDialogContactFormState): boolean {
  * Manages the visibility of the modal based on the modal's open state, alert state, and whether the form content has been
  * rendered. Updates the 'modalVisibility' ref accordingly to control modal display behavior.
  *
- * @function
+ * @function manageModalVisibility
  * @param {boolean} open - Indicates whether the modal is currently open.
  * @param {boolean} openAlert - Indicates whether an alert is currently shown.
  * @param {(MutableRefObject<boolean | undefined>)} modalVisibilityRef - A ref tracking the current visibility state of the modal.
@@ -81,7 +55,7 @@ export function manageModalVisibility(
   open: boolean,
   openAlert: boolean,
   modalVisibilityRef: MutableRefObject<boolean | undefined>,
-) {
+): void {
   const modalVisibility = modalVisibilityRef;
   const isVisible = modalVisibility.current;
   if (open && !openAlert && isVisible !== undefined) {

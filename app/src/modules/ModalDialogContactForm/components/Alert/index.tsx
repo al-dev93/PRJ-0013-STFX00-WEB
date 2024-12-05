@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useId } from 'react';
 
 import { Modal } from '@components/Modal';
 
@@ -7,12 +7,11 @@ import style from './style.module.css';
 import type { AlertProps } from '../../types';
 
 /**
- * Alert component that displays an alert message in a modal dialog. The alert can contain either a single message
- * or an array of messages.
- * Alert component memoized with 'React.memo' to prevent unnecessary re-render. The component will only re-render
- * when its props change.
+ * Render the alert messages based on the input message.
+ * If the message is an array of strings, render each string as a separate paragraph.
+ * If the message is a single string, render it as a single paragraph.
  *
- * @component
+ * @component Alert
  * @param {AlertProps} props - The properties for the Alert component.
  * @property {boolean} openAlert - A boolean that controls whether the alert modal is open.
  * @property {SetStateBoolean} setOpenAlert - A function to toggle the open/close state of the alert modal.
@@ -22,9 +21,18 @@ import type { AlertProps } from '../../types';
  *
  * @al-dev93
  */
-function MemoizedAlert({ openAlert, setOpenAlert, message, closeParentModal }: AlertProps): React.JSX.Element {
+function MemoizedAlert({ showAlert, setShowAlert, message, closeParentModal }: AlertProps): React.JSX.Element {
+  const modalId = useId();
+
   return (
-    <Modal open={openAlert} setOpen={setOpenAlert} closeIcon closeParentModal={closeParentModal} customStyle='alert'>
+    <Modal
+      open={showAlert}
+      setOpen={setShowAlert}
+      closeIcon
+      closeParentModal={closeParentModal}
+      customStyle='alert'
+      modalId={modalId}
+    >
       <div className={style.wrapperAlert}>
         {Array.isArray(message) ? (
           message.map((value, index) => (

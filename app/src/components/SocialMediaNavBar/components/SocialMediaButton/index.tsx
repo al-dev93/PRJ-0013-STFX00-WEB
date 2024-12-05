@@ -1,5 +1,5 @@
 import IonIcon from '@reacticons/ionicons';
-import React, { MouseEvent } from 'react';
+import React, { MouseEvent, useCallback, useMemo } from 'react';
 
 import { decryptData } from '@services/secure/mockedEncryption';
 
@@ -22,27 +22,30 @@ import type { SocialMediaButtonProps } from '../../types';
  * @al-dev93
  */
 export function SocialMediaButton({ className, button, cryptoKey }: SocialMediaButtonProps): React.JSX.Element {
-  const { icon, address, iv, service } = button;
+  const { icon, address, iv, service } = useMemo(() => button, [button]);
 
   /**
-   * @description Handles the click event for the button. Encrypts the email address and
+   * Handles the click event for the button. Encrypts the email address and
    * opens the email client for composing a new message.
    *
+   * @async
+   * @function
    * @param {MouseEvent} e - The mouse event
    * @returns {Promise<string | undefined>} The mailto link or undefined.
    */
-  async function handleClick(e: MouseEvent): Promise<string | undefined> {
-    e.preventDefault();
-    try {
-      const mailTo = `mailto:${await decryptData(address, iv, cryptoKey)}`;
-      window.location.href = mailTo;
-      return undefined;
-    } catch (error) {
-      // TODO: sortir l'erreur
-      console.error('Error decrypting email address:', error);
-      return undefined;
-    }
-  }
+  const handleClick = useCallback(
+    async (e: MouseEvent): Promise<void> => {
+      e.preventDefault();
+      try {
+        const mailTo = `mailto:${await decryptData(address, iv, cryptoKey)}`;
+        window.location.href = mailTo;
+      } catch (error) {
+        // TODO: sortir l'erreur
+        console.error('Error decrypting email address:', error);
+      }
+    },
+    [address, cryptoKey, iv],
+  );
   // console.log('button');
 
   return (
@@ -53,14 +56,11 @@ export function SocialMediaButton({ className, button, cryptoKey }: SocialMediaB
       rel='noopener noreferrer'
       type='button'
       aria-label={`Link to ${service}`}
+      role='button'
+      tabIndex={0}
       onClick={button.service === 'gmail' ? handleClick : undefined}
     >
-      <IonIcon
-        className={`${className} ${style.buttonLink__icon}`}
-        name={icon}
-        role='img'
-        aria-label={`Icon ${service}`}
-      />
+      <IonIcon className={`${className} ${style.buttonLink__icon}`} name={icon} aria-hidden='true' />
     </a>
   );
 }

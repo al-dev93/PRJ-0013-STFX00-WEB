@@ -7,7 +7,7 @@ import type { DialogFormInputElement } from '@/types';
  * sets the border style of the active input field to distinguish between an incorrect
  * input and a correctly edited input field.
  *
- * @function
+ * @function setInputBorderBox
  * @param {DialogFormInputElement} input - The input element whose border style is being set.
  * @param {Validity} inputValidity - The validity state of the active input field, determining if it has errors or is valid.
  * @returns {InputComponent} - An action object containing the input field's name and the appropriate
@@ -30,7 +30,7 @@ export function setInputBorderBox(input: DialogFormInputElement, inputValidity: 
 /**
  * Sets or removes the error tag for an input field based on its validity and returns the appropriate action.
  *
- * @function
+ * @function setInputErrorTag
  * @param {DialogFormInputElement} input - The input element for which the error tag is being set or deleted.
  * @param {Validity} inputValidity - The validity state of the input field, including whether
  * the field is missing a required value.
@@ -47,8 +47,10 @@ export function setInputBorderBox(input: DialogFormInputElement, inputValidity: 
 export function setInputErrorTag(input: DialogFormInputElement, inputValidity: Validity): ErrorTagComponent {
   const { name } = input;
 
+  const type = inputValidity.valid ? DELETE_ERROR_TAG_NAME : SET_ERROR_TAG_NAME;
+
   return {
-    type: inputValidity.valid ? DELETE_ERROR_TAG_NAME : SET_ERROR_TAG_NAME,
+    type,
     payload: {
       name,
       errorTagName: inputValidity.valueMissing ? 'remplir' : 'modifier',
@@ -59,7 +61,7 @@ export function setInputErrorTag(input: DialogFormInputElement, inputValidity: V
 /**
  * Returns the validity properties of an input field, considering both manual and auto-completed inputs.
  *
- * @function
+ * @function getInputValidityProperties
  * @param {DialogFormInputElement} input - The input element to validate.
  * @param {(boolean | undefined)} isAutocompleted - A flag indicating whether the input was auto-completed or manually entered.
  * @returns {Validity} - An object containing the validity properties of the input, including whether it meets length, pattern,
@@ -103,8 +105,4 @@ export function getInputValidityProperties(
 
   const { patternMismatch, tooShort, valid, valueMissing } = input.validity;
   return { minLength, patternMismatch, tooShort, valid, valueMissing };
-}
-
-export function checkFieldError(inputError: boolean): boolean {
-  return inputError;
 }
