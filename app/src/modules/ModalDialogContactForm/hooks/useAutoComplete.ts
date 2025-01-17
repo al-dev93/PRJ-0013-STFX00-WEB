@@ -1,4 +1,4 @@
-import { Dispatch, useCallback, useLayoutEffect } from 'react';
+import { useCallback, useLayoutEffect } from 'react';
 
 import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
@@ -9,9 +9,6 @@ import {
   SET_IS_STORED,
 } from '../utils/constants';
 import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from '../utils/inputErrorHandler';
-
-import type { ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
-import type { DialogFormInputElement } from '@/types';
 
 /**
  * Handles the user interactions on the input field by dispatching actions to the reducer.
@@ -31,9 +28,10 @@ import type { DialogFormInputElement } from '@/types';
  * @al-dev93
  */
 export function useAutoComplete(
-  state: ModalDialogContactFormState,
-  dispatch: Dispatch<ModalDialogContactFormAction>,
-  input?: DialogFormInputElement,
+  // state: ModalDialogContactFormState,
+  // dispatch: Dispatch<ModalDialogContactFormAction>,
+  // input?: DialogFormInputElement,
+  name: string,
 ): [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean] {
   /**
    * Validates the input field and updates the form state accordingly based on the validity.

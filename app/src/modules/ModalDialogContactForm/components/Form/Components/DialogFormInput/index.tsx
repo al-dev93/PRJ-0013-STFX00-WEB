@@ -15,7 +15,7 @@ import style from './style.module.css';
 import { useContactForm } from '../../../../hooks/useContactForm';
 import { Popover } from '../../../Popover';
 
-import type { DialogFormInputProps, FieldState } from '../../../../types';
+import type { DialogFormInputProps } from '../../../../types';
 import type { DialogFormInputElement, TooltipContent } from '@/types';
 
 /**
@@ -46,7 +46,11 @@ export function MemoizedDialogFormInput({
   const idTooltipContent = useId();
   const idErrorMessage = useId();
   const inputElementRef = useRef<DialogFormInputElement>(null);
-  const setInputAutocomplete = useContactForm(formState, dispatch, name);
+  const [currentState, setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(
+    formState,
+    dispatch,
+    name,
+  );
 
   /**
    * The reference to the input element.
@@ -57,16 +61,6 @@ export function MemoizedDialogFormInput({
       dispatch({ type: SET_INPUT_NODE, payload: { name, inputNode: inputElementRef.current } });
     }
   }, [dispatch, name]);
-
-  /**
-   * The current state of the field.
-   * This state is derived from the form state and the field name.
-   * It is used to determine the current state of the field,
-   * such as its validity, focus, input value, autocomplete options, and visual styling properties.
-   *
-   * @constant currentState
-   */
-  const currentState: FieldState = useMemo(() => formState[name], [name, formState]);
 
   /**
    * Handles setting the autocomplete input.
@@ -101,48 +95,6 @@ export function MemoizedDialogFormInput({
   );
 
   /**
-   * Indicates whether the tooltip should be rendered or not.
-   * The tooltip should be rendered if the form input is required and the tooltip content is provided.
-   *
-   * @constant shouldRenderTooltip
-   */
-  const shouldRenderTooltip: false | TooltipContent[] | undefined = useMemo(
-    () => formInput.required && tooltipContent,
-    [formInput.required, tooltipContent],
-  );
-
-  /**
-   * Indicates whether the tooltip is visible or not:
-   * - If the tooltip should not be rendered, returns undefined.
-   * - If the form input is in edition, returns undefined.
-   * - If the form input has an error, returns undefined.
-   * - Otherwise, returns the value of the isHovered property of the fieldState.
-   *
-   * @constant isTooltipVisible
-   */
-  const isTooltipVisible: boolean | undefined = useMemo(
-    () => currentState.isHovered && !currentState.inEdition && currentState.inputError && !currentState.popoverMode,
-    [currentState.inEdition, currentState.inputError, currentState.isHovered, currentState.popoverMode],
-  );
-
-  /**
-   * Renders the icon for the tooltip.
-   * The icon is determined based on the form input requirements.
-   *
-   * @constant renderTooltipIcon
-   */
-  const renderTooltipIcon: React.JSX.Element = useMemo(() => {
-    // Determine which icon to render based on the form input requirements.
-    if (currentState.inputValue && !currentState.inEdition && !currentState.inputError)
-      // Render the "checkmark-circle" icon if the form input has a value.
-      return <IonIcon className={style.dialogFormInput__tooltipIcon} name='checkmark-circle' />;
-    // Render the "create" icon if the form input is in edition.
-    if (currentState.inEdition) return <IonIcon name='create' />;
-    // Render the "information-circle" icon if the form input has an error.
-    return <IonIcon name='information-circle' />;
-  }, [currentState.inEdition, currentState.inputError, currentState.inputValue]);
-
-  /**
    * Renders the tooltip for the form field.
    * If the tooltip should not be rendered, returns null.
    *
@@ -150,7 +102,7 @@ export function MemoizedDialogFormInput({
    */
   const renderTooltip: React.JSX.Element | null = useMemo(() => {
     // If the tooltip should not be rendered, return null.
-    if (!shouldRenderTooltip) return null;
+    if (!formInput.required || !tooltipContent) return null;
 
     return (
       <Tooltip
@@ -159,10 +111,13 @@ export function MemoizedDialogFormInput({
         isVisible={isTooltipVisible as boolean}
         ariaLabel='tooltip'
       >
-        {renderTooltipIcon}
+        <IonIcon
+          className={tooltipIconName === 'checkmark-circle' ? style.dialogFormInput__tooltipIcon : ''}
+          name={tooltipIconName}
+        />
       </Tooltip>
     );
-  }, [isTooltipVisible, renderTooltipIcon, shouldRenderTooltip, tooltipContent]);
+  }, [formInput.required, tooltipContent, isTooltipVisible, tooltipIconName]);
 
   /**
    * Renders the Tag component if the input status tag is provided.
@@ -235,8 +190,6 @@ export function MemoizedDialogFormInput({
   const classNameDynamicElement: string =
     style.dialogFormInput__inputBox +
     (formInput.tag !== 'input' ? ` ${style['dialogFormInput__inputBox--textArea']}` : '');
-
-  // console.log(currentState.autoComplete);
 
   return (
     <div className={style.dialogFormComponent}>

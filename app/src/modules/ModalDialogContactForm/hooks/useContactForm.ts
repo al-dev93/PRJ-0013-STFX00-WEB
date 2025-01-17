@@ -15,7 +15,7 @@ import {
 } from '../utils/constants';
 import { formatInputNumber } from '../utils/formHelpers';
 
-import type { FieldState, ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
+import type { ContactForm, FieldState, ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
 
 /**
  * Custom hook to manage the contact form input fields.
@@ -36,15 +36,51 @@ export function useContactForm(
   state: ModalDialogContactFormState,
   dispatch: Dispatch<ModalDialogContactFormAction>,
   name: string,
-): (inputValue: string) => void {
-  const currentState: FieldState | null = useMemo(() => state[name], [name, state]);
+): ContactForm {
+  /**
+   * The current state of the field.
+   * This state is derived from the form state and the field name.
+   * It is used to determine the current state of the field,
+   * such as its validity, focus, input value, autocomplete options, and visual styling properties.
+   *
+   * @constant currentState
+   */
+  const currentState: FieldState = useMemo(() => state[name], [name, state]);
   const input = currentState.inputNode;
 
   // Custom hook to manage the autocomplete feature for an input field.
-  const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(state, dispatch, input);
+  const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(name);
 
   /**
-   * Manages the dusplay type of autocomplete suggestions.
+   * Determines which icon to render based on the form input requirements.
+   * If the form input has a value, it renders the "checkmark-circle" icon.
+   * If the form input is in edition, it renders the "create" icon.
+   * If the form input has an error, it renders the "information-circle" icon.
+   *
+   * @constant renderTooltipIcon
+   */
+  const tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle' = useMemo(() => {
+    if (currentState.inputValue && !currentState.inEdition && !currentState.inputError) return 'checkmark-circle';
+    if (currentState.inEdition) return 'create';
+    return 'information-circle';
+  }, [currentState.inEdition, currentState.inputError, currentState.inputValue]);
+
+  /**
+   * Indicates whether the tooltip is visible or not:
+   * - If the tooltip should not be rendered, returns undefined.
+   * - If the form input is in edition, returns undefined.
+   * - If the form input has an error, returns undefined.
+   * - Otherwise, returns the value of the isHovered property of the fieldState.
+   *
+   * @constant isTooltipVisible
+   */
+  const isTooltipVisible: boolean | undefined = useMemo(
+    () => currentState.isHovered && !currentState.inEdition && currentState.inputError && !currentState.popoverMode,
+    [currentState.inEdition, currentState.inputError, currentState.isHovered, currentState.popoverMode],
+  );
+
+  /**
+   * Manages the display type of autocomplete suggestions.
    * If the user is in edition mode, it shows the filtered autocomplete suggestions that start with the current value
    * of the input field.
    * If the user is not in edition mode, it shows all the autocomplete suggestions.
@@ -246,5 +282,5 @@ export function useContactForm(
     };
   }, [handleInputEvent, handleParentInputEvent, input]);
 
-  return putAutoCompleteInInput;
+  return [currentState, putAutoCompleteInInput, tooltipIconName, isTooltipVisible];
 }

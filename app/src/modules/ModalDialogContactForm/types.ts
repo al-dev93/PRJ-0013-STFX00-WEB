@@ -538,3 +538,15 @@ export type ModalDialogContactFormAction =
   | ErrorTagComponent
   | InitDialogContactFormState
   | InputComponent;
+
+export type ContactForm = [
+  currentState: FieldState,
+  (inputValue: string) => void,
+  tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle',
+  isTooltipVisible?: boolean,
+];
+
+export type ContactFormContextProps = {
+  state: ModalDialogContactFormState;
+  dispatch: Dispatch<ModalDialogContactFormAction>;
+};

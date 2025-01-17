@@ -111,11 +111,11 @@ export function ModalDialogContactForm({
   );
 
   // Initialize reducer for contact form state management
-  const [contactFormState, contactFormDispatch] = useReducer(
-    modalDialogContactFormReducer,
-    [],
-    createContactFormInitialState,
-  );
+  // const [contactFormState, contactFormDispatch] = useReducer(
+  //   modalDialogContactFormReducer,
+  //   [],
+  //   createContactFormInitialState,
+  // );
 
   /**
    * Toggles the modal's visibility based on the current modal state and alert status.
