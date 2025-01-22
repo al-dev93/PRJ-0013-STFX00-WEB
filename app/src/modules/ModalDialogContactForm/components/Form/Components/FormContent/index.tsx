@@ -1,14 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-
+import { useContactFormDispatch } from '@/modules/ModalDialogContactForm/hooks/useContactFormDispatch';
 import { useFetchData } from '@hooks/useFetchData';
 import { INIT_DIALOG_CONTACT_FORM_STATE } from '@modules/ModalDialogContactForm/utils/constants';
-
-import style from './style.module.css';
+import React, { useEffect, useRef } from 'react';
 import { DialogFormInput } from '../DialogFormInput';
+import style from './style.module.css';
 
 import type { ContactFormInput, TooltipContent } from '@/types';
 import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
-
 /**
  * The FormContent component gathers all the elements that make up the content of the form. These elements
  * can be downloaded from a URL or provided as input data.
@@ -19,9 +17,9 @@ import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
  * (optional, used if dataFormContent is not used)
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used)
- * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
- * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
- * related to the modal dialog contact form
+ * //@property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
+ * //@property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
+ * //related to the modal dialog contact form
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
  * FormContent component is rendered.
  * @returns {(React.JSX.Element | null)}
@@ -31,10 +29,12 @@ import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
 export function FormContent({
   urlFormContent,
   dataFormContent,
-  formState,
-  dispatch,
+  // formState,
+  // dispatch,
   onRenderComplete,
 }: FormContentProps): React.JSX.Element | null {
+  const contactFormAction = useContactFormDispatch();
+
   // Flag to determine if the state of the form has been initialized
   const isInitializedStateRef = useRef(false);
 
@@ -54,14 +54,14 @@ export function FormContent({
    */
   useEffect(() => {
     if (isInitializedStateRef.current) return;
-    dispatch({
+    contactFormAction({
       type: INIT_DIALOG_CONTACT_FORM_STATE,
       // Get the IDs of the form content and use them to initialize the state of the form
       payload: formContent.map(({ id }) => id),
     });
     isInitializedStateRef.current = true;
     onRenderComplete(true);
-  }, [dispatch, formContent, onRenderComplete]);
+  }, [formContent, onRenderComplete]);
 
   return formContent && isInitializedStateRef.current ? (
     <div className={style.contactForm}>
@@ -74,8 +74,8 @@ export function FormContent({
           formInput={input}
           // Get the tooltip content from the form content
           tooltipContent={tc as TooltipContent[] | undefined}
-          formState={formState}
-          dispatch={dispatch}
+          // formState={formState}
+          // dispatch={dispatch}
         />
       ))}
     </div>
