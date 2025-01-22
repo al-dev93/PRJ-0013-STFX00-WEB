@@ -14,7 +14,6 @@ import {
   SUFFIX_AUTO_COMPLETE_LIST_ID,
 } from '@modules/ModalDialogContactForm/utils/constants';
 
-import style from './style.module.css';
 import { useContactForm } from '../../../../hooks/useContactForm';
 import type { DialogFormInputProps } from '../../../../types';
 import { Popover } from '../../../Popover';
