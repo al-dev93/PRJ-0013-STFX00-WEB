@@ -1,6 +1,5 @@
-import IonIcon from '@reacticons/ionicons';
-import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
-
+import { useContactFormDispatch } from '@/modules/ModalDialogContactForm/hooks/useContactFormDispatch';
+import { useContactFormState } from '@/modules/ModalDialogContactForm/hooks/useContactFormState';
 import {
   PREFIX_AUTO_COMPLETE_ITEM_ID,
   SET_INPUT_HOVER,
@@ -10,47 +9,52 @@ import {
 import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
-
-import style from './style.module.css';
+import IonIcon from '@reacticons/ionicons';
+import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
 import { useContactForm } from '../../../../hooks/useContactForm';
 import { Popover } from '../../../Popover';
+import style from './style.module.css';
 
-import type { DialogFormInputProps } from '../../../../types';
 import type { DialogFormInputElement, TooltipContent } from '@/types';
-
+import type { DialogFormInputProps } from '../../../../types';
 /**
  * DialogFormInput component for rendering input elements within a form.
  * This component includes labels, tooltips error tags, and autocomplete popovers.
  *
  * @component DialogFormInput
  * @param {DialogFormInputProps} props - The properties for the DialogFormInput component.
- * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions related to the modal
- * dialog contact form
+ * //@property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions related to the modal
+ * //dialog contact form
  * @property {FormInput} formInput - the definition of thr input or textarea element of the form
  * @property {string} label - the label for the input element
  * @property {string} name - the nameattribute for the input element
- * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form
+ * //@property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form
  * @property {TooltipContent[]} [tooltipContent] - content for tooltips associated with the input element (optional)
  * @returns {React.JSX.Element} The rendered DialogFormInput component.
  *
  * @al-dev93
  */
 export function MemoizedDialogFormInput({
-  dispatch,
+  // dispatch,
   formInput,
   label,
   name,
-  formState,
+  // formState,
   tooltipContent,
 }: DialogFormInputProps): React.JSX.Element {
   const idTooltipContent = useId();
   const idErrorMessage = useId();
   const inputElementRef = useRef<DialogFormInputElement>(null);
-  const [currentState, setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(
-    formState,
-    dispatch,
+
+  const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(
+    // formState,
+    // dispatch,
     name,
   );
+  const currentState = useContactFormState()[name];
+  const contactFormAction = useContactFormDispatch();
+  // const input = inputElementRef.current;
+  const input = currentState.inputNode;
 
   /**
    * The reference to the input element.
@@ -58,9 +62,9 @@ export function MemoizedDialogFormInput({
    */
   useEffect(() => {
     if (inputElementRef.current) {
-      dispatch({ type: SET_INPUT_NODE, payload: { name, inputNode: inputElementRef.current } });
+      contactFormAction({ type: SET_INPUT_NODE, payload: { name, inputNode: inputElementRef.current } });
     }
-  }, [dispatch, name]);
+  }, [contactFormAction, name]);
 
   /**
    * Handles setting the autocomplete input.
@@ -89,9 +93,9 @@ export function MemoizedDialogFormInput({
    */
   const handleTooltipVisibility = useCallback(
     (visible: boolean): void => {
-      dispatch({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
+      contactFormAction({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
     },
-    [dispatch, name],
+    [contactFormAction, name],
   );
 
   /**
@@ -102,7 +106,7 @@ export function MemoizedDialogFormInput({
    */
   const renderTooltip: React.JSX.Element | null = useMemo(() => {
     // If the tooltip should not be rendered, return null.
-    if (!formInput.required || !tooltipContent) return null;
+    if (!input?.required || !tooltipContent) return null;
 
     return (
       <Tooltip
@@ -117,7 +121,7 @@ export function MemoizedDialogFormInput({
         />
       </Tooltip>
     );
-  }, [formInput.required, tooltipContent, isTooltipVisible, tooltipIconName]);
+  }, [input?.required, tooltipContent, isTooltipVisible, tooltipIconName]);
 
   /**
    * Renders the Tag component if the input status tag is provided.
@@ -162,13 +166,13 @@ export function MemoizedDialogFormInput({
   const renderPopover: React.JSX.Element | null = useMemo(
     () => (
       <Popover
-        formState={formState}
+        // //formState={formState}
         name={name}
         errorMessage={formatedErrorMessage}
         inputAutocomplete={handleSetInputAutocomplete}
       />
     ),
-    [formState, formatedErrorMessage, handleSetInputAutocomplete, name],
+    [formatedErrorMessage, handleSetInputAutocomplete, name],
   );
 
   /**
