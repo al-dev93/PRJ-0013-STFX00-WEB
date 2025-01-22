@@ -6,7 +6,6 @@ import { useFetchData } from '@hooks/useFetchData';
 import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
 import { INIT_DIALOG_CONTACT_FORM_STATE } from '@modules/ModalDialogContactForm/utils/constants';
 
-import style from './style.module.css';
 import { DialogFormInput } from '../DialogFormInput';
 
 /**
