@@ -1,17 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import type { ContactFormInput, ContactFormModal, SetStateBoolean } from '@/types';
 import { Modal } from '@components/Modal';
 import { useFetchData } from '@hooks/useFetchData';
-
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from './components/Alert';
 import { Form } from './components/Form';
 import { useContactFormState } from './hooks/useContactFormState';
 import style from './style.module.css';
-import type { ModalDialogContactFormProps } from './types';
 import { EMPTY_MODAL_DIALOG_CONTACT_FORM } from './utils/constants';
 import { hasFormErrors, manageModalVisibility } from './utils/formHelpers';
 
+import type { ContactFormInput, ContactFormModal, SetStateBoolean } from '@/types';
+import type { ModalDialogContactFormProps } from './types';
 /**
  * Renders a modal dialog containing a contact form. The form can either be populated
  * with provided data or fetched dynamically from a specified URL. It manages from validation,
