@@ -1,6 +1,4 @@
-import { Dispatch, useCallback, useLayoutEffect, useMemo } from 'react';
-
-import { useAutoComplete } from './useAutoComplete';
+import { useCallback, useLayoutEffect, useMemo } from 'react';
 import { getAutocompleteInput } from '../utils/autocompleteStorageUtils';
 import {
   AUTO_COMPLETION,
@@ -14,9 +12,11 @@ import {
   SET_POPOVER_MODE,
 } from '../utils/constants';
 import { formatInputNumber } from '../utils/formHelpers';
+import { useAutoComplete } from './useAutoComplete';
+import { useContactFormDispatch } from './useContactFormDispatch';
+import { useContactFormState } from './useContactFormState';
 
-import type { ContactForm, FieldState, ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
-
+import type { ContactForm, FieldState } from '../types';
 /**
  * Custom hook to manage the contact form input fields.
  *
@@ -25,16 +25,16 @@ import type { ContactForm, FieldState, ModalDialogContactFormAction, ModalDialog
  * and by dispatching actions to the reducer to update the state of the form.
  *
  * @function useContactForm
- * @param {ModalDialogContactFormState} state - The state of the form.
- * @param {Dispatch<ModalDialogContactFormAction>} dispatch - The dispatch function of the reducer.
+ * //@param {ModalDialogContactFormState} state - The state of the form.
+ * //@param {Dispatch<ModalDialogContactFormAction>} dispatch - The dispatch function of the reducer.
  * @param {string} name - The name of the current input field.
- * @returns {(inputValue: string) => void} - Returns a function to handle the input event.
+ * @returns {ContactForm} - Returns an array with item value and tooltip status.
  *
  * @al-dev93
  */
 export function useContactForm(
-  state: ModalDialogContactFormState,
-  dispatch: Dispatch<ModalDialogContactFormAction>,
+  // state: ModalDialogContactFormState,
+  // dispatch: Dispatch<ModalDialogContactFormAction>,
   name: string,
 ): ContactForm {
   /**
@@ -45,11 +45,13 @@ export function useContactForm(
    *
    * @constant currentState
    */
-  const currentState: FieldState = useMemo(() => state[name], [name, state]);
+  // const currentState: FieldState = useMemo(() => state[name], [name, state]);
+  const currentState: FieldState = useContactFormState()[name];
+  const contactFormAction = useContactFormDispatch();
   const input = currentState.inputNode;
 
   // Custom hook to manage the autocomplete feature for an input field.
-  const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(name);
+  const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(name, input);
 
   /**
    * Determines which icon to render based on the form input requirements.
@@ -97,17 +99,17 @@ export function useContactForm(
 
       event.preventDefault();
 
-      dispatch({
+      contactFormAction({
         type: SET_POPOVER_MODE,
         payload: { name, popoverMode: currentState.inEdition ? AUTO_COMPLETION : FULL_HISTORY },
       });
-      dispatch({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete } });
-      dispatch({
+      contactFormAction({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete } });
+      contactFormAction({
         type: SET_POPOVER_LIST_FOCUSED_INDEX,
         payload: { name, listItemFocused: event.code === 'ArrowDown' ? 0 : autoComplete.length - 1 },
       });
     },
-    [currentState.inEdition, currentState.isStored, dispatch, input, name],
+    [contactFormAction, currentState.inEdition, currentState.isStored, input, name],
   );
 
   /**
@@ -128,7 +130,7 @@ export function useContactForm(
       const step = event.code === 'ArrowDown' ? 1 : -1;
 
       if (currentState.listItemFocused !== undefined) {
-        dispatch({
+        contactFormAction({
           type: SET_POPOVER_LIST_FOCUSED_INDEX,
           payload: {
             name,
@@ -138,12 +140,12 @@ export function useContactForm(
         });
         return;
       }
-      dispatch({
+      contactFormAction({
         type: SET_POPOVER_LIST_FOCUSED_INDEX,
         payload: { name, listItemFocused: event.code === 'ArrowDown' ? 0 : currentState.autoComplete.length - 1 },
       });
     },
-    [currentState.autoComplete, currentState.listItemFocused, dispatch, name],
+    [contactFormAction, currentState.autoComplete, currentState.listItemFocused, name],
   );
 
   /**
@@ -180,9 +182,9 @@ export function useContactForm(
       event.preventDefault();
       event.stopPropagation();
 
-      dispatch({ type: RESET_AUTO_COMPLETE_OVERLAY, payload: { name } });
+      contactFormAction({ type: RESET_AUTO_COMPLETE_OVERLAY, payload: { name } });
     },
-    [currentState, dispatch, handleArrowKeys, name, putAutoCompleteInInput, showSuggestions],
+    [contactFormAction, currentState, handleArrowKeys, name, putAutoCompleteInInput, showSuggestions],
   );
 
   /**
@@ -203,7 +205,7 @@ export function useContactForm(
       switch (event.type) {
         case 'input':
           {
-            dispatch({
+            contactFormAction({
               type: IN_EDIT_MODE,
               payload: {
                 name,
@@ -213,15 +215,15 @@ export function useContactForm(
             if (type === 'tel') input.value = formatInputNumber(inputValue);
             validateInput();
             const autoComplete = getAutocompleteInput(input, currentState.isStored, true);
-            dispatch({ type: SET_POPOVER_MODE, payload: { name, popoverMode: AUTO_COMPLETION } });
-            if (autoComplete) dispatch({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete } });
+            contactFormAction({ type: SET_POPOVER_MODE, payload: { name, popoverMode: AUTO_COMPLETION } });
+            if (autoComplete) contactFormAction({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete } });
           }
           break;
 
         case 'change':
           if (!error) {
-            dispatch({ type: SET_INPUT_VALUE, payload: { name, inputValue } });
-            dispatch({ type: IN_EDIT_MODE, payload: { name, inEdition: false } });
+            contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue } });
+            contactFormAction({ type: IN_EDIT_MODE, payload: { name, inEdition: false } });
             storeInputValue();
           }
           break;
@@ -234,7 +236,7 @@ export function useContactForm(
           break;
       }
     },
-    [currentState, dispatch, handleKeyboardEvent, input, name, storeInputValue, validateInput],
+    [contactFormAction, currentState, handleKeyboardEvent, input, name, storeInputValue, validateInput],
   );
 
   /**
@@ -254,14 +256,14 @@ export function useContactForm(
         return;
       }
       if (event.type === 'focusin') {
-        dispatch({ type: SET_INPUT_FOCUS, payload: { name, isFocused: true } });
+        contactFormAction({ type: SET_INPUT_FOCUS, payload: { name, isFocused: true } });
         return;
       }
       if (event.type === 'focusout') {
-        dispatch({ type: SET_INPUT_FOCUS, payload: { name, isFocused: false } });
+        contactFormAction({ type: SET_INPUT_FOCUS, payload: { name, isFocused: false } });
       }
     },
-    [dispatch, input, name],
+    [contactFormAction, input, name],
   );
 
   /**
@@ -282,5 +284,5 @@ export function useContactForm(
     };
   }, [handleInputEvent, handleParentInputEvent, input]);
 
-  return [currentState, putAutoCompleteInInput, tooltipIconName, isTooltipVisible];
+  return [putAutoCompleteInInput, tooltipIconName, isTooltipVisible];
 }
