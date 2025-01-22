@@ -1,5 +1,6 @@
+import { DialogFormInputElement } from '@/types';
 import { useCallback, useLayoutEffect } from 'react';
-
+import { FieldState } from '../types';
 import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
   DELETE_INPUT_ERROR,
@@ -9,6 +10,8 @@ import {
   SET_IS_STORED,
 } from '../utils/constants';
 import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from '../utils/inputErrorHandler';
+import { useContactFormDispatch } from './useContactFormDispatch';
+import { useContactFormState } from './useContactFormState';
 
 /**
  * Handles the user interactions on the input field by dispatching actions to the reducer.
@@ -16,8 +19,9 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  * and by dispatching actions to the reducer to update the state of the form.
  *
  * @function useAutoComplete
- * @param {ModalDialogContactFormState} state - Current state of the contact form.
- * @param {Dispatch<ModalDialogContactFormAction>} dispatch - Dispatch function to update form state.
+ * @param {string} name - Active field of the contact form.
+ * //@param {ModalDialogContactFormState} state - Current state of the contact form.
+ * //@param {Dispatch<ModalDialogContactFormAction>} dispatch - Dispatch function to update form state.
  * @param {DialogFormInputElement} [input] - Current input field.
  *
  * @returns {[(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean]} - Returns an array containing:
@@ -30,9 +34,13 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
 export function useAutoComplete(
   // state: ModalDialogContactFormState,
   // dispatch: Dispatch<ModalDialogContactFormAction>,
-  // input?: DialogFormInputElement,
   name: string,
+  input?: DialogFormInputElement,
 ): [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean] {
+  const currentState: FieldState = useContactFormState()[name];
+  const contactFormAction = useContactFormDispatch();
+  // const input = currentState.inputNode;
+
   /**
    * Validates the input field and updates the form state accordingly based on the validity.
    * Returns a boolean indicating validity.
@@ -45,20 +53,20 @@ export function useAutoComplete(
     (isAutocompleted: boolean = false): boolean => {
       if (!input) return false;
 
-      const { required, name } = input;
+      const { required } = input;
       const inputError = getInputValidityProperties(input, isAutocompleted);
 
-      dispatch({
+      contactFormAction({
         type: inputError.valid ? DELETE_INPUT_ERROR : SET_INPUT_ERROR,
         payload: { name, inputError },
       });
 
-      if (required) dispatch(setInputErrorTag(input, inputError));
-      dispatch(setInputBorderBox(input, inputError));
+      if (required) contactFormAction(setInputErrorTag(input, inputError));
+      contactFormAction(setInputBorderBox(input, inputError));
 
       return inputError.valid;
     },
-    [dispatch, input],
+    [contactFormAction, input, name],
   );
 
   /**
@@ -71,18 +79,18 @@ export function useAutoComplete(
   const putAutoCompleteInInput = useCallback(
     (inputValue: string): void => {
       if (!input) return;
-      const { name } = input;
+      // const { name } = input;
       const currentInput = input;
 
       currentInput.value = inputValue;
 
       input.focus();
       if (validateInput(!!inputValue)) {
-        dispatch({ type: SET_INPUT_VALUE, payload: { name, inputValue } });
-        dispatch({ type: RESET_AUTO_COMPLETE_OVERLAY, payload: { name } });
+        contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue } });
+        contactFormAction({ type: RESET_AUTO_COMPLETE_OVERLAY, payload: { name } });
       }
     },
-    [dispatch, input, validateInput],
+    [contactFormAction, input, name, validateInput],
   );
 
   /**
@@ -94,29 +102,29 @@ export function useAutoComplete(
   const storeInputValue = useCallback((): void => {
     if (!input) return;
 
-    const { name, validity, value } = input;
+    const { validity, value } = input;
 
     if (!value || !validity.valid || name === 'message') return;
 
-    if (state[name].isStored) addToLocalStorage(value, name);
+    if (currentState.isStored) addToLocalStorage(value, name);
     else {
       saveToLocalStorage(value, name);
-      dispatch({
+      contactFormAction({
         type: SET_IS_STORED,
         payload: { name, isStored: true },
       });
     }
-  }, [dispatch, input, state]);
+  }, [contactFormAction, currentState.isStored, input, name]);
 
   /**
    * Updates the form state to indicate that the input field's value is stored in the local storage when the component mounts.
    */
   useLayoutEffect((): void => {
     if (!input) return;
-    const { name } = input;
+    // const { name } = input;
     validateInput();
-    dispatch({ type: SET_IS_STORED, payload: { name, isStored: !!localStorage.getItem(name) } });
-  }, [dispatch, input, validateInput]);
+    contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: !!localStorage.getItem(name) } });
+  }, [contactFormAction, input, name, validateInput]);
 
   return [putAutoCompleteInInput, storeInputValue, validateInput];
 }
