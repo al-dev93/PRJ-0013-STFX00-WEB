@@ -1,17 +1,16 @@
-import React, { MouseEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
 import { useAnimation } from '@hooks/useAnimation';
-
-import style from './style.module.css';
+import React, { MouseEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useContactFormState } from '../../hooks/useContactFormState';
 import { PREFIX_AUTO_COMPLETE_ITEM_ID, SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
+import style from './style.module.css';
 
-import type { FieldState, PopoverProps } from '../../types';
+import type { PopoverProps } from '../../types';
 /**
  * Popover component that displays a list of autocomplete suggestions and error messages.
  *
  * @component Popover
  * @param {PopoverProps} props - The properties for the Popover component.
- * @property {ModalDialogContactFormState} formState - The current state of the modal dialog contact form.
+ * //@property {ModalDialogContactFormState} formState - The current state of the modal dialog contact form.
  * @property {string} name - The name attribute for the input element.
  * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
@@ -19,12 +18,12 @@ import type { FieldState, PopoverProps } from '../../types';
  *
  * @al-dev93
  */
-export function Popover({ formState, name, errorMessage, inputAutocomplete }: PopoverProps): React.JSX.Element {
+export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps): React.JSX.Element {
   const popoverRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
   const suggestionsRef = useRef<HTMLUListElement>(null);
-  const currentState: FieldState | null = useMemo(() => formState[name], [name, formState]);
-
+  // //const currentState: FieldState | null = useMemo(() => formState[name], [name, formState]);
+  const currentState = useContactFormState()[name];
   const [showSuggestions, setShowSuggestions] = useState<string[]>();
 
   // Animations for suggestions and message popups
