@@ -14,7 +14,6 @@ import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
 
-import style from './style.module.css';
 import { useContactForm } from '../../../../hooks/useContactForm';
 import type { DialogFormInputProps } from '../../../../types';
 import { Popover } from '../../../Popover';
