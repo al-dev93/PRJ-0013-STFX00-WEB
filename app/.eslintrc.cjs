@@ -16,6 +16,7 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
+    c,
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
@@ -39,7 +40,8 @@ module.exports = {
     // 'import/no-extraneous-dependencies': 'error',
     'node/no-missing-require': 'off',
     'node/no-extraneous-import': 'off',
-    //*
+    eqeqeq: ['error', 'always'],
+    curly: ['error', 'multi-line'],
     'import/order': [
       'error',
       {

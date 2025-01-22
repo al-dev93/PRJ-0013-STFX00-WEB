@@ -1,13 +1,12 @@
 import { Dispatch } from 'react';
-
 import {
   AUTO_COMPLETION,
   DELETE_ERROR_TAG_NAME,
   DELETE_INPUT_ERROR,
   DELETE_INPUT_VALUE,
   FULL_HISTORY,
-  INIT_DIALOG_CONTACT_FORM_STATE,
   IN_EDIT_MODE,
+  INIT_DIALOG_CONTACT_FORM_STATE,
   RESET_AUTO_COMPLETE_OVERLAY,
   SET_AUTO_COMPLETE,
   SET_ERROR_TAG_NAME,
@@ -72,11 +71,11 @@ export type ModalDialogContactFormProps = {
  * @al-dev93
  */
 export type DialogFormInputProps = {
-  dispatch: Dispatch<ModalDialogContactFormAction>;
+  // dispatch: Dispatch<ModalDialogContactFormAction>;
   formInput: FormInput;
   label: string;
   name: string;
-  formState: ModalDialogContactFormState;
+  // formState: ModalDialogContactFormState;
   tooltipContent?: TooltipContent[];
 };
 
@@ -93,7 +92,7 @@ export type DialogFormInputProps = {
  * @al-dev93
  */
 export type PopoverProps = {
-  formState: ModalDialogContactFormState;
+  // // //formState: ModalDialogContactFormState;
   name: string;
   errorMessage?: string;
   inputAutocomplete: (content: string) => void;
@@ -127,8 +126,8 @@ export type AlertProps = {
  * (optional, used if dataFormContent is not used).
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used).
- * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
- * @property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
+ * //@property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
+ * //@property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
  * related to the modal dialog contact form.
  * @property {SetStateBoolean} setShowAlert - A function to toggle the open/close state of the alert modal.
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
@@ -139,8 +138,8 @@ export type AlertProps = {
 export type FormProps = {
   idForm: string;
   apiEndpointUrl: string;
-  formState: ModalDialogContactFormState;
-  dispatch: React.Dispatch<ModalDialogContactFormAction>;
+  //formState: ModalDialogContactFormState;
+  //dispatch: React.Dispatch<ModalDialogContactFormAction>;
   setShowAlert: SetStateBoolean;
   onRenderComplete: SetStateBoolean;
 } & (
@@ -540,7 +539,7 @@ export type ModalDialogContactFormAction =
   | InputComponent;
 
 export type ContactForm = [
-  currentState: FieldState,
+  // currentState: FieldState,
   (inputValue: string) => void,
   tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle',
   isTooltipVisible?: boolean,
