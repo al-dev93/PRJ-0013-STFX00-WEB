@@ -1,5 +1,9 @@
-import { DialogFormInputElement } from '@/types';
 import { useCallback, useLayoutEffect } from 'react';
+
+import { DialogFormInputElement } from '@/types';
+
+import { useContactFormDispatch } from './useContactFormDispatch';
+import { useContactFormState } from './useContactFormState';
 import { FieldState } from '../types';
 import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
@@ -10,8 +14,6 @@ import {
   SET_IS_STORED,
 } from '../utils/constants';
 import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from '../utils/inputErrorHandler';
-import { useContactFormDispatch } from './useContactFormDispatch';
-import { useContactFormState } from './useContactFormState';
 
 /**
  * Handles the user interactions on the input field by dispatching actions to the reducer.
