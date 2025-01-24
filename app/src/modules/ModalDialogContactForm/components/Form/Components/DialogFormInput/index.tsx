@@ -1,3 +1,6 @@
+import IonIcon from '@reacticons/ionicons';
+import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
+
 import { useContactFormDispatch } from '@/modules/ModalDialogContactForm/hooks/useContactFormDispatch';
 import { useContactFormState } from '@/modules/ModalDialogContactForm/hooks/useContactFormState';
 import {
@@ -6,54 +9,44 @@ import {
   SET_INPUT_NODE,
   SUFFIX_AUTO_COMPLETE_LIST_ID,
 } from '@/modules/ModalDialogContactForm/utils/constants';
+import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
-import IonIcon from '@reacticons/ionicons';
-import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
-import { useContactForm } from '../../../../hooks/useContactForm';
-import { Popover } from '../../../Popover';
-import style from './style.module.css';
 
-import type { DialogFormInputElement, TooltipContent } from '@/types';
+import style from './style.module.css';
+import { useContactForm } from '../../../../hooks/useContactForm';
 import type { DialogFormInputProps } from '../../../../types';
+import { Popover } from '../../../Popover';
+
 /**
  * DialogFormInput component for rendering input elements within a form.
  * This component includes labels, tooltips error tags, and autocomplete popovers.
  *
  * @component DialogFormInput
  * @param {DialogFormInputProps} props - The properties for the DialogFormInput component.
- * //@property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions related to the modal
- * //dialog contact form
  * @property {FormInput} formInput - the definition of thr input or textarea element of the form
  * @property {string} label - the label for the input element
  * @property {string} name - the nameattribute for the input element
- * //@property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form
  * @property {TooltipContent[]} [tooltipContent] - content for tooltips associated with the input element (optional)
  * @returns {React.JSX.Element} The rendered DialogFormInput component.
  *
  * @al-dev93
  */
 export function MemoizedDialogFormInput({
-  // dispatch,
   formInput,
   label,
   name,
-  // formState,
   tooltipContent,
 }: DialogFormInputProps): React.JSX.Element {
   const idTooltipContent = useId();
   const idErrorMessage = useId();
   const inputElementRef = useRef<DialogFormInputElement>(null);
 
-  const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(
-    // formState,
-    // dispatch,
-    name,
-  );
+  const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(name);
   const currentState = useContactFormState()[name];
   const contactFormAction = useContactFormDispatch();
-  // const input = inputElementRef.current;
+
   const input = currentState.inputNode;
 
   /**
@@ -164,14 +157,7 @@ export function MemoizedDialogFormInput({
    * @constant renderPopover
    */
   const renderPopover: React.JSX.Element | null = useMemo(
-    () => (
-      <Popover
-        // //formState={formState}
-        name={name}
-        errorMessage={formatedErrorMessage}
-        inputAutocomplete={handleSetInputAutocomplete}
-      />
-    ),
+    () => <Popover name={name} errorMessage={formatedErrorMessage} inputAutocomplete={handleSetInputAutocomplete} />,
     [formatedErrorMessage, handleSetInputAutocomplete, name],
   );
 
