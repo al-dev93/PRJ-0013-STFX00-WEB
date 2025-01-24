@@ -1,4 +1,9 @@
 import { useCallback, useLayoutEffect, useMemo } from 'react';
+
+import { useAutoComplete } from './useAutoComplete';
+import { useContactFormDispatch } from './useContactFormDispatch';
+import { useContactFormState } from './useContactFormState';
+import type { ContactForm, FieldState } from '../types';
 import { getAutocompleteInput } from '../utils/autocompleteStorageUtils';
 import {
   AUTO_COMPLETION,
@@ -12,11 +17,6 @@ import {
   SET_POPOVER_MODE,
 } from '../utils/constants';
 import { formatInputNumber } from '../utils/formHelpers';
-import { useAutoComplete } from './useAutoComplete';
-import { useContactFormDispatch } from './useContactFormDispatch';
-import { useContactFormState } from './useContactFormState';
-
-import type { ContactForm, FieldState } from '../types';
 /**
  * Custom hook to manage the contact form input fields.
  *
