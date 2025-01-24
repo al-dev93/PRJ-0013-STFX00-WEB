@@ -16,7 +16,6 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
-    c,
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
@@ -45,7 +44,7 @@ module.exports = {
     'import/order': [
       'error',
       {
-        groups: ['builtin', 'external', 'internal', ['sibling', 'parent'], 'index', 'object', 'type'],
+        groups: [['builtin', 'external'], ['internal'], ['parent', 'sibling', 'index']],
         'newlines-between': 'always',
         alphabetize: {
           order: 'asc',
@@ -53,6 +52,17 @@ module.exports = {
         },
       },
     ],
+    // 'import/order': [
+    //   'error',
+    //   {
+    //     groups: ['builtin', 'external', 'internal', ['sibling', 'parent'], 'index', 'object', 'type'],
+    //     'newlines-between': 'always',
+    //     alphabetize: {
+    //       order: 'asc',
+    //       caseInsensitive: true,
+    //     },
+    //   },
+    // ],
   },
   settings: {
     react: {

@@ -6,7 +6,6 @@ import { KeyboardEventButton, KeyboardEventDiv } from '@/types';
 import { ModalFormButton } from '@components/ModalFormButton';
 
 import style from './style.module.css';
-
 import type { ModalProps } from './types';
 
 /**
@@ -130,8 +129,9 @@ export function Modal({
 
     const indexOfActiveElement = keyboardNavigableElements.indexOf(document.activeElement as HTMLElement);
 
-    if (indexOfActiveElement >= 0 && e.code === 'Tab')
+    if (indexOfActiveElement >= 0 && e.code === 'Tab') {
       setFocusToElement(e, indexOfActiveElement, keyboardNavigableElements);
+    }
   };
 
   /**

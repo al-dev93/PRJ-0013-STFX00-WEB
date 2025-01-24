@@ -1,10 +1,11 @@
 import { createContactFormInitialState } from './modalDialogContactFormInitialState';
+import type { ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
 import {
   DELETE_ERROR_TAG_NAME,
   DELETE_INPUT_ERROR,
   DELETE_INPUT_VALUE,
-  INIT_DIALOG_CONTACT_FORM_STATE,
   IN_EDIT_MODE,
+  INIT_DIALOG_CONTACT_FORM_STATE,
   RESET_AUTO_COMPLETE_OVERLAY,
   SET_AUTO_COMPLETE,
   SET_ERROR_TAG_NAME,
@@ -18,8 +19,6 @@ import {
   SET_POPOVER_LIST_FOCUSED_INDEX,
   SET_POPOVER_MODE,
 } from '../utils/constants';
-
-import type { ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
 
 /**
  * Reducer function to manage the state of the modal dialog contact form.

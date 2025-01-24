@@ -1,17 +1,19 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import type { ContactFormInput, ContactFormModal, SetStateBoolean } from '@/types';
 import { Modal } from '@components/Modal';
 import { useFetchData } from '@hooks/useFetchData';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { Alert } from './components/Alert';
 import { Form } from './components/Form';
 import { useContactFormState } from './hooks/useContactFormState';
 // import { createContactFormInitialState } from './reducer/modalDialogContactFormInitialState';
 // import { modalDialogContactFormReducer } from './reducer/modalDialogContactFormReducer';
 import style from './style.module.css';
+import type { ModalDialogContactFormProps } from './types';
 import { EMPTY_MODAL_DIALOG_CONTACT_FORM } from './utils/constants';
 import { hasFormErrors, manageModalVisibility } from './utils/formHelpers';
 
-import type { ModalDialogContactFormProps } from './types';
-import type { ContactFormInput, ContactFormModal, SetStateBoolean } from '@/types';
 /**
  * Renders a modal dialog containing a contact form. The form can either be populated
  * with provided data or fetched dynamically from a specified URL. It manages from validation,
@@ -109,13 +111,6 @@ export function ModalDialogContactForm({
     [formModalData, modalContent],
   );
 
-  // Initialize reducer for contact form state management
-  // const [contactFormState, contactFormDispatch] = useReducer(
-  //   modalDialogContactFormReducer,
-  //   [],
-  //   createContactFormInitialState,
-  // );
-
   /**
    * Toggles the modal's visibility based on the current modal state and alert status.
    * Ensures that the modal is hidden when an alert is shown and displayed otherwise
@@ -175,8 +170,6 @@ export function ModalDialogContactForm({
         idForm={idForm}
         apiEndpointUrl={urlApi}
         dataFormContent={formContent as ContactFormInput[]}
-        // formState={contactFormState}
-        // dispatch={contactFormDispatch}
         setShowAlert={setShowAlertCallback}
         onRenderComplete={setFormContentRenderedCallback}
       />
