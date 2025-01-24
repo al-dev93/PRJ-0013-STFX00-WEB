@@ -1,4 +1,15 @@
 import { Dispatch } from 'react';
+
+import type {
+  ContactFormInput,
+  ContactFormModal,
+  DialogFormInputElement,
+  ErrorMessage,
+  FormInput,
+  SetStateBoolean,
+  TooltipContent,
+} from '@/types';
+
 import {
   AUTO_COMPLETION,
   DELETE_ERROR_TAG_NAME,
@@ -20,16 +31,6 @@ import {
   SET_POPOVER_LIST_FOCUSED_INDEX,
   SET_POPOVER_MODE,
 } from './utils/constants';
-
-import type {
-  ContactFormInput,
-  ContactFormModal,
-  DialogFormInputElement,
-  ErrorMessage,
-  FormInput,
-  SetStateBoolean,
-  TooltipContent,
-} from '@/types';
 
 //* ***** TYPES USED BY MODALDIALOGCONTACTFORM MODULE COMPONENTS ****
 
