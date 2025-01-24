@@ -1,11 +1,12 @@
+import React, { FormEvent, memo, useCallback } from 'react';
+
 import { StringObject } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
 import { refetchFormDataWithArguments } from '@utils/fetchDataHelpers';
-import React, { FormEvent, memo, useCallback } from 'react';
-import { useContactFormState } from '../../hooks/useContactFormState';
+
 import { FormContent } from './Components/FormContent';
 import style from './style.module.css';
-
+import { useContactFormState } from '../../hooks/useContactFormState';
 import type { FormProps, ModalDialogContactFormState } from '../../types';
 /**
  * The Form component integrates the FormContent component and handles the connection with the API.
@@ -20,9 +21,6 @@ import type { FormProps, ModalDialogContactFormState } from '../../types';
  * (optional, used if dataFormContent is not used).
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used).
- * //@property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
- * //@property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
- * related to the modal dialog contact form.
  * @property {SetStateBoolean} setShowAlert - A function to toggle the open/close state of the alert modal.
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
  * FormContent component is rendered.
@@ -35,8 +33,6 @@ function MemoizedForm({
   apiEndpointUrl,
   urlFormContent,
   dataFormContent,
-  // formState,
-  // dispatch,
   setShowAlert,
   onRenderComplete,
 }: FormProps): React.JSX.Element {
@@ -98,7 +94,7 @@ function MemoizedForm({
       const validValues = extractValidFormData(contactFormState);
       if (validValues) memoizedRefetchFormDataWithArguments(validValues);
     },
-    [extractValidFormData, memoizedRefetchFormDataWithArguments, setShowAlert],
+    [contactFormState, extractValidFormData, memoizedRefetchFormDataWithArguments, setShowAlert],
   );
 
   return (
@@ -114,8 +110,6 @@ function MemoizedForm({
       <FormContent
         urlFormContent={urlFormContent}
         dataFormContent={dataFormContent}
-        // formState={formState}
-        // dispatch={dispatch}
         onRenderComplete={onRenderComplete}
       />
     </form>
