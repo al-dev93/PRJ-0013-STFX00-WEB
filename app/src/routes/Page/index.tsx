@@ -1,12 +1,11 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
-import { ContactFormProvider } from '@/modules/ModalDialogContactForm/Contexts/ContactFormContext';
 import type { OutletContextPage, PageProps, MenuSectionsVisibility } from '@/types';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import logo from '@images/brand/logoAND.png';
 import { CollapsibleHeader } from '@modules/CollapsibleHeader';
-import { ModalDialogContactForm } from '@modules/ModalDialogContactForm';
+import ModalDialogContactForm from '@modules/ModalDialogContactForm/ModalDialogContactFormWithProvider';
 
 import style from './style.module.css';
 
@@ -81,14 +80,20 @@ export function Page({ cryptoKey }: PageProps): React.JSX.Element {
         scrollWithMenuItem={scrollWithNav}
       />
       {/* Contact form dialog */}
-      <ContactFormProvider>
+      <ModalDialogContactForm
+        open={openContactFormDialog}
+        setOpen={setOpenContactFormDialog}
+        modalId={modalId}
+        url={['http://localhost:5173/api/contactFormModals', 'http://localhost:5173/api/contactFormInputs']}
+      />
+      {/* <ContactFormProvider>
         <ModalDialogContactForm
           open={openContactFormDialog}
           setOpen={setOpenContactFormDialog}
           modalId={modalId}
           url={['http://localhost:5173/api/contactFormModals', 'http://localhost:5173/api/contactFormInputs']}
         />
-      </ContactFormProvider>
+      </ContactFormProvider> */}
       {/* Social media navigation bar component for left navigation */}
       <SocialMediaNavBar
         className={style.socialMediaNavBar}
