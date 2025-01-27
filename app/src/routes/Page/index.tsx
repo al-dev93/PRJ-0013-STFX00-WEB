@@ -80,12 +80,14 @@ export function Page({ cryptoKey }: PageProps): React.JSX.Element {
         scrollWithMenuItem={scrollWithNav}
       />
       {/* Contact form dialog */}
-      <ModalDialogContactForm
-        open={openContactFormDialog}
-        setOpen={setOpenContactFormDialog}
-        modalId={modalId}
-        url={['http://localhost:5173/api/contactFormModals', 'http://localhost:5173/api/contactFormInputs']}
-      />
+      <ContactFormProvider>
+        <ModalDialogContactForm
+          open={openContactFormDialog}
+          setOpen={setOpenContactFormDialog}
+          modalId={modalId}
+          url={['http://localhost:5173/api/contactFormModals', 'http://localhost:5173/api/contactFormInputs']}
+        />
+      </ContactFormProvider>
       {/* Social media navigation bar component for left navigation */}
       <SocialMediaNavBar
         className={style.socialMediaNavBar}
