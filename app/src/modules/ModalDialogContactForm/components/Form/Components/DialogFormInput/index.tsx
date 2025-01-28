@@ -1,12 +1,13 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
 
+import { useContactFormSelector } from '@/modules/ModalDialogContactForm/hooks/useContactFormSelector';
 import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
 import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
-import { useContactFormState } from '@modules/ModalDialogContactForm/hooks/useContactFormState';
+// import { useContactFormState } from '@modules/ModalDialogContactForm/hooks/useContactFormState';
 import {
   PREFIX_AUTO_COMPLETE_ITEM_ID,
   SET_INPUT_HOVER,
@@ -44,10 +45,19 @@ export function MemoizedDialogFormInput({
   const inputElementRef = useRef<DialogFormInputElement>(null);
 
   const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(name);
-  const currentState = useContactFormState()[name];
+  // const currentState = useContactFormState()[name];
+  const { inputNode, inputStatusTag, inputError, inputBorderBox, popoverMode, listItemFocused } =
+    useContactFormSelector(name, [
+      'inputNode',
+      'inputStatusTag',
+      'inputError',
+      'inputBorderBox',
+      'popoverMode',
+      'listItemFocused',
+    ]);
   const contactFormAction = useContactFormDispatch();
 
-  const input = currentState.inputNode;
+  // const input = inputNode;
 
   /**
    * The reference to the input element.
@@ -99,7 +109,7 @@ export function MemoizedDialogFormInput({
    */
   const renderTooltip: React.JSX.Element | null = useMemo(() => {
     // If the tooltip should not be rendered, return null.
-    if (!input?.required || !tooltipContent) return null;
+    if (!inputNode?.required || !tooltipContent) return null;
 
     return (
       <Tooltip
@@ -114,7 +124,7 @@ export function MemoizedDialogFormInput({
         />
       </Tooltip>
     );
-  }, [input?.required, tooltipContent, isTooltipVisible, tooltipIconName]);
+  }, [inputNode?.required, tooltipContent, isTooltipVisible, tooltipIconName]);
 
   /**
    * Renders the Tag component if the input status tag is provided.
@@ -123,14 +133,14 @@ export function MemoizedDialogFormInput({
    * @constant renderAlertTag
    */
   const renderAlertTag: React.JSX.Element | null = useMemo(() => {
-    if (!currentState.inputStatusTag) return null;
+    if (!inputStatusTag) return null;
 
     const alertTagClass =
       style.dialogFormInput__alertTag +
       (formInput.tag === 'textarea' ? ` ${style['dialogFormInput__alertTag--message']}` : '');
 
-    return <Tag className={alertTagClass} type='alerted' tag={currentState.inputStatusTag} />;
-  }, [currentState.inputStatusTag, formInput.tag]);
+    return <Tag className={alertTagClass} type='alerted' tag={inputStatusTag} />;
+  }, [inputStatusTag, formInput.tag]);
 
   /**
    * Formats the error message for the popover component.
@@ -140,7 +150,7 @@ export function MemoizedDialogFormInput({
    * @constant formatedErrorMessage
    */
   const formatedErrorMessage: string | undefined = useMemo(() => {
-    const errorState = currentState.inputError;
+    const errorState = inputError;
     const errorMessage = formInput.error;
     // Remove minLength and valid keys from errorState
     const errors = errorState
@@ -148,7 +158,7 @@ export function MemoizedDialogFormInput({
       : undefined;
 
     return errors?.map(([key]) => errorMessage?.[key as keyof typeof errorMessage]).join('\n');
-  }, [currentState.inputError, formInput.error]);
+  }, [inputError, formInput.error]);
 
   /**
    * Renders the Popover component if the input field is focused.
@@ -168,8 +178,7 @@ export function MemoizedDialogFormInput({
    * @constant classNameDialogFormInput
    */
   const classNameDialogFormInput: string =
-    style.dialogFormInput +
-    (currentState.inputBorderBox ? ` ${style[`dialogFormInput--${currentState.inputBorderBox}`]}` : '');
+    style.dialogFormInput + (inputBorderBox ? ` ${style[`dialogFormInput--${inputBorderBox}`]}` : '');
 
   /**
    * Creates the class name for the DynamicElement component, based on the tag of the form input.
@@ -195,7 +204,7 @@ export function MemoizedDialogFormInput({
             {tooltipContent.map((item) => item.line).join(' ')}
           </p>
         ) : null}
-        {currentState.inputError ? (
+        {inputError ? (
           <p id={idErrorMessage} className='visually-hidden'>
             {formatedErrorMessage}
           </p>
@@ -220,14 +229,14 @@ export function MemoizedDialogFormInput({
           required={formInput.required}
           autoComplete='off'
           ref={inputElementRef as LegacyRef<DialogFormInputElement>}
-          aria-expanded={currentState.popoverMode}
+          aria-expanded={popoverMode}
           aria-controls={formInput.tag === 'input' ? `${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}` : undefined}
-          aria-activedescendant={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${currentState.listItemFocused}`}
+          aria-activedescendant={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${listItemFocused}`}
           aria-label={name}
           aria-describedby={
             (formatedErrorMessage ? idErrorMessage : '') + (isTooltipVisible ? ` ${idTooltipContent}` : '')
           }
-          aria-invalid={currentState.inputError?.valid ? 'true' : 'false'}
+          aria-invalid={inputError?.valid ? 'true' : 'false'}
         />
         {renderAlertTag}
         {renderPopover}
