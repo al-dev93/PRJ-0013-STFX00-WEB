@@ -1,19 +1,20 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
 
-import { useContactFormDispatch } from '@/modules/ModalDialogContactForm/hooks/useContactFormDispatch';
-import { useContactFormState } from '@/modules/ModalDialogContactForm/hooks/useContactFormState';
+import type { DialogFormInputElement, TooltipContent } from '@/types';
+import { DynamicElement } from '@components/DynamicElement';
+import { Tag } from '@components/Tag';
+import { Tooltip } from '@components/Tooltip';
+import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
+import { useContactFormState } from '@modules/ModalDialogContactForm/hooks/useContactFormState';
 import {
   PREFIX_AUTO_COMPLETE_ITEM_ID,
   SET_INPUT_HOVER,
   SET_INPUT_NODE,
   SUFFIX_AUTO_COMPLETE_LIST_ID,
-} from '@/modules/ModalDialogContactForm/utils/constants';
-import type { DialogFormInputElement, TooltipContent } from '@/types';
-import { DynamicElement } from '@components/DynamicElement';
-import { Tag } from '@components/Tag';
-import { Tooltip } from '@components/Tooltip';
+} from '@modules/ModalDialogContactForm/utils/constants';
 
+import style from './style.module.css';
 import { useContactForm } from '../../../../hooks/useContactForm';
 import type { DialogFormInputProps } from '../../../../types';
 import { Popover } from '../../../Popover';

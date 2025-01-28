@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 
-import { useContactFormDispatch } from '@/modules/ModalDialogContactForm/hooks/useContactFormDispatch';
 import type { ContactFormInput, TooltipContent } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
+import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
 import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
 import { INIT_DIALOG_CONTACT_FORM_STATE } from '@modules/ModalDialogContactForm/utils/constants';
 
+import style from './style.module.css';
 import { DialogFormInput } from '../DialogFormInput';
 
 /**
