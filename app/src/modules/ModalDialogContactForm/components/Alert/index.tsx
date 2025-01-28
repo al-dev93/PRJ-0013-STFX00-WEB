@@ -3,7 +3,6 @@ import React, { memo, useId } from 'react';
 import { Modal } from '@components/Modal';
 
 import style from './style.module.css';
-
 import type { AlertProps } from '../../types';
 
 /**

@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 import { CHANGE_SCROLLING_DOT, CHANGE_SLIDE, INIT_MAX_INDEX_SLIDE, NEXT_SLIDE, SLIDE_TRANSITION } from './constants';
-
 import type { Payload, SlideDirection, SlideTransition, SlideshowAction, SlideshowState } from '../types';
 
 /**

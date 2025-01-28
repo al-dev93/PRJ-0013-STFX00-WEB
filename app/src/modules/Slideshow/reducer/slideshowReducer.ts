@@ -1,7 +1,6 @@
+import type { SlideshowAction, SlideshowState } from '../types';
 import { CHANGE_SCROLLING_DOT, CHANGE_SLIDE, INIT_MAX_INDEX_SLIDE, SLIDE_TRANSITION } from '../utils/constants';
 import { changeScrollingDot, changeSlide, initMaxIndexSlide, slideOnTransition } from '../utils/slideshowStateHandler';
-
-import type { SlideshowAction, SlideshowState } from '../types';
 
 /**
  * Reducer function to manage the state transitions of the slideshow.

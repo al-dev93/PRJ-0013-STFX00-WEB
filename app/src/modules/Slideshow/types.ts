@@ -1,5 +1,7 @@
 import React, { Dispatch } from 'react';
 
+import type { ProjectData } from '@/types';
+
 import {
   CHANGE_SCROLLING_DOT,
   CHANGE_SLIDE,
@@ -11,8 +13,6 @@ import {
   START,
   STOP,
 } from './utils/constants';
-
-import type { ProjectData } from '@/types';
 
 /**
  * Props for the main Slideshow component.

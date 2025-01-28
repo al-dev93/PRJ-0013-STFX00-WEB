@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-import { STOP, TRANSFORM_TRANSITION } from '../utils/constants';
-
 import type { SlideStyle, SlideshowState } from '../types';
+import { STOP, TRANSFORM_TRANSITION } from '../utils/constants';
 
 /**
  * Custom hook to manage the scrolling behavior and transitions in the slideshow.
@@ -32,11 +31,12 @@ export function usePicturesScroller(slideshowState: SlideshowState, duration: nu
    * The hook ensures that the slide's position is updated correctly without triggering a transition.
    */
   useEffect(() => {
-    if (slideshowState.loopSlide && slideshowState.slideTransition === STOP)
+    if (slideshowState.loopSlide && slideshowState.slideTransition === STOP) {
       slideEffectStyle.current = {
         transform: `translate3d(${-(slideshowState.new + 1) * 100}%, 0, 0)`,
         transition: 'none',
       };
+    }
   }, [slideshowState.loopSlide, slideshowState.new, slideshowState.slideTransition]);
 
   /**
@@ -54,8 +54,9 @@ export function usePicturesScroller(slideshowState: SlideshowState, duration: nu
      */
     const offsetSlide = (): number => {
       if (slideshowState.new === 0 && slideshowState.loopSlide) return -(slideshowState.maxIndexSlide + 2);
-      if (slideshowState.new === slideshowState.maxIndexSlide && slideshowState.loopSlide)
+      if (slideshowState.new === slideshowState.maxIndexSlide && slideshowState.loopSlide) {
         return slideshowState.maxIndexSlide;
+      }
       return -1;
     };
 

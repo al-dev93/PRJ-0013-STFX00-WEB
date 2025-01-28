@@ -4,9 +4,8 @@ import { useOnScreen } from '@/hooks/useOnScreen';
 import { EAGER_STATUS, LAZY_STATUS } from '@utils/constants';
 
 import style from './style.module.css';
-import { INTERSECTION_OPTIONS_THRESHOLD } from '../../../../utils/constants';
-
 import type { SlidePictureProps } from '../../../../types';
+import { INTERSECTION_OPTIONS_THRESHOLD } from '../../../../utils/constants';
 
 /**
  * Component to display an individual slide picture in the slideshow.

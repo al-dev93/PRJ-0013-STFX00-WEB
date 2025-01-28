@@ -1,6 +1,5 @@
-import { WithContactFormProvider } from './hoc/WithContactFormProvider';
-
 import { ModalDialogContactForm } from '.';
+import { WithContactFormProvider } from './hoc/WithContactFormProvider';
 
 /**
  * A wrapped version of 'ModalDialogContactForm' that is automatically provided

@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo, useReducer } from 'react';
 
+import type { AccountLink, ProjectData } from '@/types';
 import { SkillsList } from '@components/SkillsList';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import { useFetchData } from '@hooks/useFetchData';
@@ -10,10 +11,8 @@ import { PicturesScroller } from './components/PicturesScroller';
 import { slideshowInitialState } from './reducer/slideshowInitialState';
 import { slideshowReducer } from './reducer/slideshowReducer';
 import style from './style.module.css';
-import { INIT_MAX_INDEX_SLIDE, PENDING, SLIDE_TRANSITION, START, STOP } from './utils/constants';
-
 import type { SlideshowProps } from './types';
-import type { AccountLink, ProjectData } from '@/types';
+import { INIT_MAX_INDEX_SLIDE, PENDING, SLIDE_TRANSITION, START, STOP } from './utils/constants';
 
 /**
  * This component displays a slideshow of projects using either provided data or fetched data.

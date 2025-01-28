@@ -4,9 +4,8 @@ import React, { KeyboardEvent, memo, useMemo } from 'react';
 import { ACTIVE_STATUS, NOT_ACTIVE_STATUS } from '@utils/constants';
 
 import style from './style.module.css';
-import { CHANGE_SCROLLING_DOT, START } from '../../../../utils/constants';
-
 import type { SlideshowDotsProps } from '../../../../types';
+import { CHANGE_SCROLLING_DOT, START } from '../../../../utils/constants';
 
 /**
  * Component for the pagination dots in the slideshow.

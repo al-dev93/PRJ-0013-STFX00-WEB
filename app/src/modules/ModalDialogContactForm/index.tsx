@@ -7,8 +7,6 @@ import { useFetchData } from '@hooks/useFetchData';
 import { Alert } from './components/Alert';
 import { Form } from './components/Form';
 import { useContactFormState } from './hooks/useContactFormState';
-// import { createContactFormInitialState } from './reducer/modalDialogContactFormInitialState';
-// import { modalDialogContactFormReducer } from './reducer/modalDialogContactFormReducer';
 import style from './style.module.css';
 import type { ModalDialogContactFormProps } from './types';
 import { EMPTY_MODAL_DIALOG_CONTACT_FORM } from './utils/constants';

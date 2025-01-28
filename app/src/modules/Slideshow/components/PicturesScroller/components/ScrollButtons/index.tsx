@@ -1,12 +1,11 @@
 import IonIcon from '@reacticons/ionicons';
-import React, { MouseEvent, memo, useCallback } from 'react';
+import React, { memo, MouseEvent, useCallback } from 'react';
 
 import { DISABLED_STATUS, ENABLED_STATUS } from '@utils/constants';
 
 import style from './style.module.css';
-import { CHANGE_SLIDE, NEXT_SLIDE, PREVIOUS_SLIDE, START, STOP } from '../../../../utils/constants';
-
 import type { AriaLabelScrollButtons, ScrollButtonsProps, SlideDirection } from '../../../../types';
+import { CHANGE_SLIDE, NEXT_SLIDE, PREVIOUS_SLIDE, START, STOP } from '../../../../utils/constants';
 
 /**
  * Component for the scroll buttons in the slideshow.

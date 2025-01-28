@@ -7,6 +7,7 @@ import style from './style.module.css';
 import { usePicturesScroller } from '../../hooks/usePicturesScroller';
 import { useSlideClassModifiers } from '../../hooks/useSlideClassModifiers';
 import { useSlideNavigation } from '../../hooks/useSlideNavigation';
+import type { PicturesScrollerProps } from '../../types';
 import {
   ANIMATION_DURATION,
   ARIA_LABEL_SCROLL_BUTTONS,
@@ -14,8 +15,6 @@ import {
   FIRST_SLIDE_INDEX,
   LAST_SLIDE_INDEX,
 } from '../../utils/constants';
-
-import type { PicturesScrollerProps } from '../../types';
 
 /**
  * Component to scroll through pictures in a slideshow with buttons and pagination dots.

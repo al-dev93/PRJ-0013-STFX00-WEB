@@ -1,12 +1,11 @@
 import React from 'react';
 
+import type { IndexPageSection } from '@/types';
 import { ShowcaseSection } from '@components/ShowcaseSection';
 import { useFetchData } from '@hooks/useFetchData';
 import { usePageSection } from '@hooks/usePageSection';
 
 import style from './style.module.css';
-
-import type { IndexPageSection } from '@/types';
 
 /**
  *

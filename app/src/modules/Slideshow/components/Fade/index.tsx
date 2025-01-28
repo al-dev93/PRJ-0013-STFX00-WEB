@@ -1,9 +1,8 @@
 import React, { memo, useMemo } from 'react';
 
 import style from './style.module.css';
-import { ANIMATION_DURATION, STOP } from '../../utils/constants';
-
 import type { FadeProps } from '../../types';
+import { ANIMATION_DURATION, STOP } from '../../utils/constants';
 
 /**
  * Component to handle fade transitions between slides.
