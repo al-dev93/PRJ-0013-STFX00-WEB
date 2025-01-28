@@ -22,10 +22,7 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  *
  * @function useAutoComplete
  * @param {string} name - Active field of the contact form.
- * //@param {ModalDialogContactFormState} state - Current state of the contact form.
- * //@param {Dispatch<ModalDialogContactFormAction>} dispatch - Dispatch function to update form state.
  * @param {DialogFormInputElement} [input] - Current input field.
- *
  * @returns {[(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean]} - Returns an array containing:
  * 1. A function to apply the autocomplete value to the input field.
  * 2. A function to store the input value into local storage.
@@ -34,14 +31,11 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  * @al-dev93
  */
 export function useAutoComplete(
-  // state: ModalDialogContactFormState,
-  // dispatch: Dispatch<ModalDialogContactFormAction>,
   name: string,
   input?: DialogFormInputElement,
 ): [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean] {
   const currentState: FieldState = useContactFormState()[name];
   const contactFormAction = useContactFormDispatch();
-  // const input = currentState.inputNode;
 
   /**
    * Validates the input field and updates the form state accordingly based on the validity.
@@ -81,7 +75,6 @@ export function useAutoComplete(
   const putAutoCompleteInInput = useCallback(
     (inputValue: string): void => {
       if (!input) return;
-      // const { name } = input;
       const currentInput = input;
 
       currentInput.value = inputValue;
@@ -123,7 +116,6 @@ export function useAutoComplete(
    */
   useLayoutEffect((): void => {
     if (!input) return;
-    // const { name } = input;
     validateInput();
     contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: !!localStorage.getItem(name) } });
   }, [contactFormAction, input, name, validateInput]);

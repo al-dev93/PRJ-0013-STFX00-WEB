@@ -25,18 +25,12 @@ import { formatInputNumber } from '../utils/formHelpers';
  * and by dispatching actions to the reducer to update the state of the form.
  *
  * @function useContactForm
- * //@param {ModalDialogContactFormState} state - The state of the form.
- * //@param {Dispatch<ModalDialogContactFormAction>} dispatch - The dispatch function of the reducer.
  * @param {string} name - The name of the current input field.
  * @returns {ContactForm} - Returns an array with item value and tooltip status.
  *
  * @al-dev93
  */
-export function useContactForm(
-  // state: ModalDialogContactFormState,
-  // dispatch: Dispatch<ModalDialogContactFormAction>,
-  name: string,
-): ContactForm {
+export function useContactForm(name: string): ContactForm {
   /**
    * The current state of the field.
    * This state is derived from the form state and the field name.
@@ -45,12 +39,11 @@ export function useContactForm(
    *
    * @constant currentState
    */
-  // const currentState: FieldState = useMemo(() => state[name], [name, state]);
   const currentState: FieldState = useContactFormState()[name];
+
   const contactFormAction = useContactFormDispatch();
   const input = currentState.inputNode;
 
-  // Custom hook to manage the autocomplete feature for an input field.
   const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(name, input);
 
   /**
