@@ -1,12 +1,12 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
 
+import { useContactFormSelector } from '@/modules/ModalDialogContactForm/hooks/useContactFormSelector';
 import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
 import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
-import { useContactFormSelector } from '@modules/ModalDialogContactForm/hooks/useContactFormSelector';
 import {
   PREFIX_AUTO_COMPLETE_ITEM_ID,
   SET_INPUT_HOVER,
