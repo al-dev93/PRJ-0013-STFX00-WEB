@@ -3,7 +3,7 @@ import React, { MouseEvent, RefObject, useCallback, useEffect, useMemo, useRef, 
 import { useAnimation } from '@hooks/useAnimation';
 
 import style from './style.module.css';
-import { useContactFormState } from '../../hooks/useContactFormState';
+import { useContactFormSelector } from '../../hooks/useContactFormSelector';
 import type { PopoverProps } from '../../types';
 import { PREFIX_AUTO_COMPLETE_ITEM_ID, SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
 
@@ -23,16 +23,22 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
   const popoverRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
   const suggestionsRef = useRef<HTMLUListElement>(null);
-  const currentState = useContactFormState()[name];
+
+  // Partial state selector using keys
+  const { autoComplete, isFocused, listItemFocused } = useContactFormSelector(name, [
+    'autoComplete',
+    'isFocused',
+    'listItemFocused',
+  ]);
   const [showSuggestions, setShowSuggestions] = useState<string[]>();
 
   // Animations for suggestions and message popups
   const { isAnimating: isAnimatingSuggestions, shouldRender: shouldRenderSuggestions } = useAnimation(
-    !!currentState.autoComplete?.length && currentState.isFocused,
+    !!autoComplete?.length && isFocused,
     200,
   );
   const { isAnimating: isAnimatingMessage, shouldRender: shouldRenderMessage } = useAnimation(
-    !!errorMessage && currentState.isFocused,
+    !!errorMessage && isFocused,
     200,
   );
 
@@ -40,10 +46,10 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
    * Sets the autocomplete list when it is updated.
    */
   useEffect(() => {
-    if (currentState.autoComplete?.length && currentState.isFocused) {
-      setShowSuggestions(currentState.autoComplete.sort((a, b) => a.localeCompare(b)));
+    if (autoComplete?.length && isFocused) {
+      setShowSuggestions(autoComplete.sort((a, b) => a.localeCompare(b)));
     }
-  }, [currentState.autoComplete, currentState.isFocused]);
+  }, [autoComplete, isFocused]);
 
   /**
    * Sets the width of the popover and its contents based on the provided references.
@@ -105,14 +111,12 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
    * If the list is not rendered or the focused item index is undefined, the function does nothing.
    */
   useEffect(() => {
-    if (!suggestionsRef.current || currentState.listItemFocused === undefined) return;
-    const item = suggestionsRef.current.querySelector(
-      `#${PREFIX_AUTO_COMPLETE_ITEM_ID}${currentState.listItemFocused}`,
-    );
+    if (!suggestionsRef.current || listItemFocused === undefined) return;
+    const item = suggestionsRef.current.querySelector(`#${PREFIX_AUTO_COMPLETE_ITEM_ID}${listItemFocused}`);
     if (item) {
       item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
-  }, [currentState.listItemFocused]);
+  }, [listItemFocused]);
 
   /**
    * Handles click events for selecting autocomplete items. Prevents the default
@@ -196,7 +200,7 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
            */
           const classNameSuggestionsItem =
             style.popover__autocomplete__item +
-            (currentState.listItemFocused === index ? ` ${style['popover__autocomplete__item--focused']}` : '');
+            (listItemFocused === index ? ` ${style['popover__autocomplete__item--focused']}` : '');
 
           return (
             <li
@@ -204,7 +208,7 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
               id={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${index}`}
               className={classNameSuggestionsItem}
               role='option'
-              aria-selected={currentState.listItemFocused === index}
+              aria-selected={listItemFocused === index}
               tabIndex={-1}
               onMouseDown={handleClick}
             >
@@ -214,7 +218,7 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
         })}
       </ul>
     ) : null;
-  }, [classNameSuggestions, currentState.listItemFocused, handleClick, name, shouldRenderSuggestions, showSuggestions]);
+  }, [classNameSuggestions, listItemFocused, handleClick, name, shouldRenderSuggestions, showSuggestions]);
 
   return (
     <div className={style.popover} ref={popoverRef}>

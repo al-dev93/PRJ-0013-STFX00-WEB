@@ -3,8 +3,7 @@ import { useCallback, useLayoutEffect } from 'react';
 import { DialogFormInputElement } from '@/types';
 
 import { useContactFormDispatch } from './useContactFormDispatch';
-import { useContactFormState } from './useContactFormState';
-import { FieldState } from '../types';
+import { useContactFormSelector } from './useContactFormSelector';
 import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
   DELETE_INPUT_ERROR,
@@ -34,7 +33,8 @@ export function useAutoComplete(
   name: string,
   input?: DialogFormInputElement,
 ): [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean] {
-  const currentState: FieldState = useContactFormState()[name];
+  // Partial state selector using keys
+  const { isStored } = useContactFormSelector(name, ['isStored']);
   const contactFormAction = useContactFormDispatch();
 
   /**
@@ -101,7 +101,7 @@ export function useAutoComplete(
 
     if (!value || !validity.valid || name === 'message') return;
 
-    if (currentState.isStored) addToLocalStorage(value, name);
+    if (isStored) addToLocalStorage(value, name);
     else {
       saveToLocalStorage(value, name);
       contactFormAction({
@@ -109,7 +109,7 @@ export function useAutoComplete(
         payload: { name, isStored: true },
       });
     }
-  }, [contactFormAction, currentState.isStored, input, name]);
+  }, [contactFormAction, isStored, input, name]);
 
   /**
    * Updates the form state to indicate that the input field's value is stored in the local storage when the component mounts.

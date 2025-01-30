@@ -1,13 +1,12 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
 
-import { useContactFormSelector } from '@/modules/ModalDialogContactForm/hooks/useContactFormSelector';
 import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
 import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
-// import { useContactFormState } from '@modules/ModalDialogContactForm/hooks/useContactFormState';
+import { useContactFormSelector } from '@modules/ModalDialogContactForm/hooks/useContactFormSelector';
 import {
   PREFIX_AUTO_COMPLETE_ITEM_ID,
   SET_INPUT_HOVER,
@@ -44,8 +43,7 @@ export function MemoizedDialogFormInput({
   const idErrorMessage = useId();
   const inputElementRef = useRef<DialogFormInputElement>(null);
 
-  const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(name);
-  // const currentState = useContactFormState()[name];
+  // Partial state selector using keys
   const { inputNode, inputStatusTag, inputError, inputBorderBox, popoverMode, listItemFocused } =
     useContactFormSelector(name, [
       'inputNode',
@@ -56,8 +54,7 @@ export function MemoizedDialogFormInput({
       'listItemFocused',
     ]);
   const contactFormAction = useContactFormDispatch();
-
-  // const input = inputNode;
+  const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(name);
 
   /**
    * The reference to the input element.
