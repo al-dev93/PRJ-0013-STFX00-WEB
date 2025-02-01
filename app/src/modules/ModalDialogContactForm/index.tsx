@@ -7,10 +7,11 @@ import { useFetchData } from '@hooks/useFetchData';
 import { Alert } from './components/Alert';
 import { Form } from './components/Form';
 import { useContactFormState } from './hooks/useContactFormState';
+import { useContactFormValidityStatus } from './hooks/useContactFormValidityStatus';
 import style from './style.module.css';
 import type { ModalDialogContactFormProps } from './types';
 import { EMPTY_MODAL_DIALOG_CONTACT_FORM } from './utils/constants';
-import { hasFormErrors, manageModalVisibility } from './utils/formHelpers';
+import { manageModalVisibility } from './utils/formHelpers';
 
 /**
  * Renders a modal dialog containing a contact form. The form can either be populated
@@ -38,6 +39,7 @@ export function ModalDialogContactForm({
   const [isFormContentRendered, setFormContentRendered] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const modalVisibility = useRef<boolean>();
+  const contacFormValidity = useContactFormValidityStatus();
   const contactFormState = useContactFormState();
 
   // Determine if data needs to be fetched
@@ -154,7 +156,7 @@ export function ModalDialogContactForm({
       button={{
         name: submitButtonName,
         form: idForm,
-        disable: hasFormErrors(contactFormState),
+        disable: contacFormValidity,
         ariaLabel: 'Soumettre le formulaire de contact',
       }}
     >

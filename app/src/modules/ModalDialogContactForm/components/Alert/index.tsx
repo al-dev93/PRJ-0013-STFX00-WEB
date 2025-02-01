@@ -40,7 +40,7 @@ function MemoizedAlert({ showAlert, setShowAlert, message, closeParentModal }: A
             </span>
           ))
         ) : (
-          <span className={style.alert}>{message}</span>
+          <span className={style.bodyAlert}>{message}</span>
         )}
       </div>
     </Modal>

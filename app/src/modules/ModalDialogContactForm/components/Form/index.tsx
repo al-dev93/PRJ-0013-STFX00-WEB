@@ -71,10 +71,9 @@ function MemoizedForm({
   const extractValidFormData = useCallback((formData: ModalDialogContactFormState): StringObject | undefined => {
     const validInputValues: { [key: string]: string | '' } | undefined = {};
     Object.keys(formData).forEach((inputField) => {
-      if (formData[inputField].inputError) return;
-      validInputValues[inputField] = formData[inputField].inputValue || '';
+      if (!formData[inputField].inputError) validInputValues[inputField] = formData[inputField].inputValue || '';
     });
-    return { ...validInputValues };
+    return Object.keys(validInputValues).length ? { ...validInputValues } : undefined;
   }, []);
 
   /**

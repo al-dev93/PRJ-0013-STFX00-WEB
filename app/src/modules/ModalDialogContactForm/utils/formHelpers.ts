@@ -1,6 +1,6 @@
 import { MutableRefObject } from 'react';
 
-import type { ModalDialogContactFormState } from '../types';
+// import type { ModalDialogContactFormState } from '../types';
 
 /**
  * Formats a numeric string by grouping digits into pairs separated by spaces.
@@ -14,29 +14,16 @@ import type { ModalDialogContactFormState } from '../types';
  * a space after every two digits. It's used to format phone numbers.
  *
  * @example
- * // Returns '12 34 56 78 90'
  * formatInputNumber('1234567890');
+ * Returns '12 34 56 78 90'
  *
- * // Returns '01 23 45 67 89'
  * formatInputNumber('0123456789')
+ * Returns '01 23 45 67 89'
  *
  * @al-dev93
  */
 export function formatInputNumber(number: string): string {
   return number.replace(/\s/g, '').replace(/(\d{2})(?=\d)/g, '$1 ');
-}
-
-/**
- * Checks if the form state contains any errors.
- *
- * @function hasFormErrors
- * @param {ModalDialogContactFormState} state - The current form state.
- * @returns {boolean} Returns 'true' if any form field has an error, otherwise 'false'.
- *
- * @al-dev93
- */
-export function hasFormErrors(state: ModalDialogContactFormState): boolean {
-  return Object.keys(state).some((item) => !!state[item].inputError);
 }
 
 /**
