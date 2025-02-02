@@ -6,10 +6,10 @@ import { useFetchData } from '@hooks/useFetchData';
 
 import { Alert } from './components/Alert';
 import { Form } from './components/Form';
-import { useContactFormState } from './hooks/useContactFormState';
+import { useContactFormFieldsPropSelector } from './hooks/useContactFormFieldsPropSelector';
 import { useContactFormValidityStatus } from './hooks/useContactFormValidityStatus';
 import style from './style.module.css';
-import type { ModalDialogContactFormProps } from './types';
+import type { FieldState, ModalDialogContactFormProps } from './types';
 import { EMPTY_MODAL_DIALOG_CONTACT_FORM } from './utils/constants';
 import { manageModalVisibility } from './utils/formHelpers';
 
@@ -40,7 +40,9 @@ export function ModalDialogContactForm({
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const modalVisibility = useRef<boolean>();
   const contacFormValidity = useContactFormValidityStatus();
-  const contactFormState = useContactFormState();
+  const contactFormFocusableFields = Array.from(
+    (useContactFormFieldsPropSelector('inputNode') as Map<keyof FieldState, HTMLElement>).values(),
+  );
 
   // Determine if data needs to be fetched
   const shouldFetch = !formModalData;
@@ -127,21 +129,6 @@ export function ModalDialogContactForm({
     if (!open && isFormContentRendered) setFormContentRenderedCallback(false);
   }, [isFormContentRendered, open, setFormContentRenderedCallback]);
 
-  /**
-   * Retrieves all focusable input elements in the form based on the contactFormState.
-   * Memoizes the result to avoid recalculating it on every render.
-   * Returns null if the form content has not been rendered yet.
-   *
-   * @constant formFocusableElements
-   */
-  const formFocusableElements: (HTMLInputElement | HTMLTextAreaElement | undefined)[] | null = useMemo(() => {
-    if (!isFormContentRendered) return null;
-    const inputElementsInState = Object.values(contactFormState)
-      .map((item) => item.inputNode)
-      .filter((item) => item !== undefined);
-    return inputElementsInState?.length ? inputElementsInState : null;
-  }, [contactFormState, isFormContentRendered]);
-
   return (
     <Modal
       open={open}
@@ -150,7 +137,7 @@ export function ModalDialogContactForm({
       modalId={modalId}
       title={title}
       subtitle={subtitle}
-      focusableElements={formFocusableElements as HTMLElement[]}
+      focusableElements={contactFormFocusableFields}
       onRenderComplete={isFormContentRendered}
       closeIcon
       button={{
