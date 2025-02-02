@@ -7,9 +7,8 @@ import { useFetchData } from '@hooks/useFetchData';
 import { Alert } from './components/Alert';
 import { Form } from './components/Form';
 import { useContactFormFieldsPropSelector } from './hooks/useContactFormFieldsPropSelector';
-import { useContactFormValidityStatus } from './hooks/useContactFormValidityStatus';
 import style from './style.module.css';
-import type { FieldState, ModalDialogContactFormProps } from './types';
+import type { ModalDialogContactFormProps } from './types';
 import { EMPTY_MODAL_DIALOG_CONTACT_FORM } from './utils/constants';
 import { manageModalVisibility } from './utils/formHelpers';
 
@@ -39,9 +38,9 @@ export function ModalDialogContactForm({
   const [isFormContentRendered, setFormContentRendered] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const modalVisibility = useRef<boolean>();
-  const contacFormValidity = useContactFormValidityStatus();
-  const contactFormFocusableFields = Array.from(
-    (useContactFormFieldsPropSelector('inputNode') as Map<keyof FieldState, HTMLElement>).values(),
+  const contactFormFocusableFields = Object.values(useContactFormFieldsPropSelector('inputNode')) as HTMLElement[];
+  const contacFormValidity = Object.values(useContactFormFieldsPropSelector('inputNode', true)).some(
+    (element) => !element,
   );
 
   // Determine if data needs to be fetched

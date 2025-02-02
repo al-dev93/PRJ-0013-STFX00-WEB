@@ -18,8 +18,11 @@ export function useContactFormSelector<N extends keyof ModalDialogContactFormSta
   name: N,
   keys: K[],
 ): Pick<FieldState, K> {
-  const context = useContactFormState()[name];
+  const state = useContactFormState()[name];
   return useMemo(() => {
-    return keys.reduce((acc, key) => ({ ...acc, [key]: context[key] }), {} as Pick<FieldState, K>);
-  }, [context, keys]);
+    return keys.reduce(
+      (accumulator, current) => ({ ...accumulator, [current]: state[current] }),
+      {} as Pick<FieldState, K>,
+    );
+  }, [state, keys]);
 }
