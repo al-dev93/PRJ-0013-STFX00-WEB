@@ -85,7 +85,6 @@ export type DialogFormInputProps = {
  * used in the module ModalDialogContactForm
  *
  * @type {Object} PopoverProps
- * @property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
  * @property {string} name - The name of the input element.
  * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
@@ -93,7 +92,6 @@ export type DialogFormInputProps = {
  * @al-dev93
  */
 export type PopoverProps = {
-  // // //formState: ModalDialogContactFormState;
   name: string;
   errorMessage?: string;
   inputAutocomplete: (content: string) => void;
@@ -127,9 +125,6 @@ export type AlertProps = {
  * (optional, used if dataFormContent is not used).
  * @property {ContactFormInput[]} [dataFormContent] - Data on elements embedded in the FormContent component
  * (optional,used if urlFormContent is not used).
- * //@property {ModalDialogContactFormState} formState - the current state of the modal dialog contact form.
- * //@property {Dispatch<ModalDialogContactFormAction>} dispatch - the dispatch function to handle actions
- * related to the modal dialog contact form.
  * @property {SetStateBoolean} setShowAlert - A function to toggle the open/close state of the alert modal.
  * @property {SetStateBoolean} onRenderComplete - Function to toggle the flag that tracks whether the
  * FormContent component is rendered.
@@ -139,8 +134,6 @@ export type AlertProps = {
 export type FormProps = {
   idForm: string;
   apiEndpointUrl: string;
-  // formState: ModalDialogContactFormState;
-  // dispatch: React.Dispatch<ModalDialogContactFormAction>;
   setShowAlert: SetStateBoolean;
   onRenderComplete: SetStateBoolean;
 } & (

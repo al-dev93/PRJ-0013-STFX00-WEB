@@ -1,13 +1,13 @@
 import React, { FormEvent, memo, useCallback } from 'react';
 
-import { StringObject } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
 import { refetchFormDataWithArguments } from '@utils/fetchDataHelpers';
 
 import { FormContent } from './Components/FormContent';
 import style from './style.module.css';
-import { useContactFormState } from '../../hooks/useContactFormState';
-import type { FormProps, ModalDialogContactFormState } from '../../types';
+import { useContactFormFieldsPropSelector } from '../../hooks/useContactFormFieldsPropSelector';
+import type { FormProps } from '../../types';
+
 /**
  * The Form component integrates the FormContent component and handles the connection with the API.
  * Form component memoized with 'React.memo' to optimize performance. The component will only
@@ -36,7 +36,8 @@ function MemoizedForm({
   setShowAlert,
   onRenderComplete,
 }: FormProps): React.JSX.Element {
-  const contactFormState = useContactFormState();
+  // Extracts validated values from contact form input elements
+  const validValues = useContactFormFieldsPropSelector('inputValue', true);
   // Prepare for submitting form data via POST
   const { refetch } = useFetchData(undefined, { method: 'POST' }, true);
 
@@ -55,28 +56,6 @@ function MemoizedForm({
   );
 
   /**
-   * Extracts and prepares the submit data from the contact form state, excluding any fields with input errors.
-   *
-   * @function extractValidFormData
-   * @param {ModalDialogContactFormState} formData - The current state of the contact form, where each key represents
-   * an input field.
-   * @returns {(StringObject | undefined)} - Returns an object containing the valid input values, or 'undefined' if no valid data
-   * is present.
-   *
-   * @description
-   * This function iterates through the contact form state and gathers the input values for fields that do not have any errors.
-   * It returns an object where the keys are the input field names and the values are the corresponding input values.
-   * If a field has an input error, it is skipped.
-   */
-  const extractValidFormData = useCallback((formData: ModalDialogContactFormState): StringObject | undefined => {
-    const validInputValues: { [key: string]: string | '' } | undefined = {};
-    Object.keys(formData).forEach((inputField) => {
-      if (!formData[inputField].inputError) validInputValues[inputField] = formData[inputField].inputValue || '';
-    });
-    return Object.keys(validInputValues).length ? { ...validInputValues } : undefined;
-  }, []);
-
-  /**
    * Handles the form submission process. Validates form inputs and triggers an API request
    * if the form values are valid.
    *
@@ -90,10 +69,9 @@ function MemoizedForm({
       event.stopPropagation();
 
       setShowAlert(true);
-      const validValues = extractValidFormData(contactFormState);
       if (validValues) memoizedRefetchFormDataWithArguments(validValues);
     },
-    [contactFormState, extractValidFormData, memoizedRefetchFormDataWithArguments, setShowAlert],
+    [memoizedRefetchFormDataWithArguments, setShowAlert, validValues],
   );
 
   return (
