@@ -49,3 +49,23 @@ export function manageModalVisibility(
     modalVisibility.current = isVisible ? undefined : true;
   } else if (open && openAlert) modalVisibility.current = false;
 }
+
+/**
+ * Cleaning the value entered in the input field. Removing unnecessary,
+ * non-breaking and invisible spaces, control and dangerous characters
+ *
+ * @export
+ * @param {string} inputValue
+ * @returns {string} The sanitized input value
+ */
+export function sanitizeInput(inputValue: string): string {
+  return (
+    inputValue
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[\u00A0\u2007\u202F\u200B\u2060]+/g, '')
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1F\x7F]/g, '')
+      .replace(/[<>"]/g, '')
+  );
+}

@@ -18,7 +18,7 @@ import {
   SET_POPOVER_LIST_FOCUSED_INDEX,
   SET_POPOVER_MODE,
 } from '../utils/constants';
-import { formatInputNumber } from '../utils/formHelpers';
+import { formatInputNumber, sanitizeInput } from '../utils/formHelpers';
 /**
  * Custom hook to manage the contact form input fields.
  *
@@ -65,7 +65,7 @@ export function useContactForm(name: string): ContactForm {
   ]);
   const contactFormAction = useContactFormDispatch();
 
-  const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(name, inputNode);
+  const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(name);
 
   /**
    * Determines which icon to render based on the form input requirements.
@@ -280,7 +280,9 @@ export function useContactForm(name: string): ContactForm {
    */
   const processFinalValue = useCallback(
     (stateInputNode: DialogFormInputElement) => {
-      contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: stateInputNode.value } });
+      const input = stateInputNode;
+      input.value = sanitizeInput(input.value);
+      contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: input.value } });
       contactFormAction({ type: IN_EDIT_MODE, payload: { name, inEdition: false } });
       storeInputValue();
     },

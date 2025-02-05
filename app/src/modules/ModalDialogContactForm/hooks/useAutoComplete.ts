@@ -1,7 +1,5 @@
 import { useCallback, useLayoutEffect } from 'react';
 
-import { DialogFormInputElement } from '@/types';
-
 import { useContactFormDispatch } from './useContactFormDispatch';
 import { useContactFormSelector } from './useContactFormSelector';
 import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
@@ -21,7 +19,6 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  *
  * @function useAutoComplete
  * @param {string} name - Active field of the contact form.
- * @param {DialogFormInputElement} [input] - Current input field.
  * @returns {[(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean]} - Returns an array containing:
  * 1. A function to apply the autocomplete value to the input field.
  * 2. A function to store the input value into local storage.
@@ -31,10 +28,9 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  */
 export function useAutoComplete(
   name: string,
-  input?: DialogFormInputElement,
 ): [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean] {
   // Partial state selector using keys
-  const { isStored } = useContactFormSelector(name, ['isStored']);
+  const { isStored, inputNode: input } = useContactFormSelector(name, ['isStored', 'inputNode']);
   const contactFormAction = useContactFormDispatch();
 
   /**
