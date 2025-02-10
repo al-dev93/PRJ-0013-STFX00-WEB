@@ -162,6 +162,14 @@ export type FormContentProps = Omit<FormProps, 'idForm' | 'apiEndpointUrl' | 'se
 //* *************************** MISCELLANEOUS TYPES ******************************
 
 /**
+ * Represents the values assignable to the input field name.
+ *
+ * @export
+ * @type {('name' | 'company' | 'email' | 'tel' | 'message')} FormInputName
+ */
+export type FormInputName = 'name' | 'company' | 'email' | 'tel' | 'message';
+
+/**
  * Represents the autocomplete overlay type.
  *
  * @type {typeof AUTO_COMPLETION | typeof FULL_HISTORY}
@@ -192,6 +200,8 @@ export type InputErrorMessage = {
  * the specific pattern (optional)
  * @property {boolean} [tooShort] - indicates if the value is shorter than the required
  * minimum length (optional)
+ * @property {boolean} [tooLong] - indicates if the value is longer than the required
+ * maximum length (optional)
  * @property {boolean} valid - indicates if the field is valid
  * @property {boolean} [valueMissing] - indicates if the field is required
  * but not filled (optional)
@@ -199,9 +209,11 @@ export type InputErrorMessage = {
  * @al-dev93
  */
 export type Validity = {
+  maxLength?: number;
   minLength?: number;
   patternMismatch?: boolean;
   tooShort?: boolean;
+  tooLong?: boolean;
   valid: boolean;
   valueMissing?: boolean;
 };

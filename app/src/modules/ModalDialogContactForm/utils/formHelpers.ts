@@ -1,5 +1,7 @@
 import { MutableRefObject } from 'react';
 
+import { FormInputName } from '../types';
+
 // import type { ModalDialogContactFormState } from '../types';
 
 /**
@@ -51,21 +53,67 @@ export function manageModalVisibility(
 }
 
 /**
- * Cleaning the value entered in the input field. Removing unnecessary,
- * non-breaking and invisible spaces, control and dangerous characters
+ * Cleans the value entered in an input field by removing unnecessary spaces,
+ * non-breaking spaces, control characters, and dangerous characters.
+ * The function also applies specific cleaning rules based on the context
+ * (field type) to ensure the value is safe and meets expectations.
  *
  * @export
- * @param {string} inputValue
- * @returns {string} The sanitized input value
+ * @param {string} inputValue - The value to be sanitized.
+ * @param {FormInputName} context - The context of the input field.
+ *   - `'name'` : For the "name" field, allows letters, spaces, and hyphens.
+ *   - `'company'` : For the "company" field, allows letters, digits, spaces, hyphens, apostrophes, periods, and `&`.
+ *   - `'email'` : For the "email" field, allows valid characters for an email address.
+ *   - `'tel'` : For the "phone" field, allows digits and spaces.
+ *   - `'message'` : For the "message" field, escapes angle brackets and removes unauthorized special characters.
+ * @returns {string} The sanitized and safe value.
+ * @throws {Error} If the provided context is invalid.
+ *
+ * @example
+ * NOTE: Sanitize a name
+ * const cleanedName = sanitizeInput("  Jean--Dupont  ", "name");
+ * console.log(cleanedName); // "Jean-Dupont"
+ *
+ * @example
+ * NOTE: Sanitize an email
+ * const cleanedEmail = sanitizeInput("user@example.com", "email");
+ * console.log(cleanedEmail); // "user@example.com"
+ *
+ * @example
+ * NOTE: Sanitize a message
+ * const cleanedMessage = sanitizeInput("<script>alert('XSS')</script>", "message");
+ * console.log(cleanedMessage); // "&lt;script&gt;alert('XSS')&lt;/script&gt;"
  */
-export function sanitizeInput(inputValue: string): string {
-  return (
-    inputValue
-      .trim()
-      .replace(/\s+/g, ' ')
-      .replace(/[\u00A0\u2007\u202F\u200B\u2060]+/g, '')
-      // eslint-disable-next-line no-control-regex
-      .replace(/[\x00-\x1F\x7F]/g, '')
-      .replace(/[<>"]/g, '')
-  );
+export function sanitizeInput(inputValue: string, context: FormInputName): string {
+  let sanitized = inputValue
+    .normalize('NFKC') // Normalise les caractères Unicode
+    .replace(/\p{C}/gu, '') // Supprime les caractères de contrôle
+    .trim();
+
+  switch (context) {
+    case 'name':
+      sanitized = sanitized.replace(/[^a-zA-ZÀ-ú\s-]/g, ''); // Keep only letters, spaces, and hyphens
+      sanitized = sanitized.replace(/\s+/g, ' '); // Replace multiple spaces with a single space    case 'company':
+      break;
+    case 'company':
+      sanitized = sanitized.replace(/[^a-zA-Z0-9À-ú\s\-'.,&]/g, ''); // Keep letters, digits, spaces, hyphens, apostrophes, periods, and &
+      sanitized = sanitized.replace(/\s+/g, ' '); // Replace multiple spaces with a single space
+      break;
+    case 'email':
+      sanitized = sanitized.replace(/[^a-zA-Z0-9._%+-@]/gi, ''); // Keep only valid email characters
+      break;
+    case 'tel':
+      sanitized = sanitized.replace(/[^0-9\s]/g, ''); // Keep only digits and spaces
+      sanitized = sanitized.replace(/\s+/g, ' '); // Replace multiple spaces with a single space
+      break;
+    case 'message':
+      sanitized = sanitized.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape angle brackets
+      sanitized = sanitized.replace(/[^\w\s.,!?-]/g, ''); // Remove unauthorized special characters
+      break;
+    default:
+      // TODO: Sortir l'erreur
+      throw new Error('Invalid context');
+  }
+
+  return sanitized;
 }

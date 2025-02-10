@@ -76,6 +76,7 @@ export function setInputErrorTag(input: DialogFormInputElement, inputValidity: V
  * The returned 'Validity' object includes :
  *   - 'minLength': The minimum length required for the input.
  *   - 'patternMismatch': Whether the input matches the specified pattern.
+ *   - 'tooLong': Whether the input is too long.
  *   - 'tooShort': Whether the input is too short.
  *   - 'valid': Whether the input is considered valid.
  *   - 'valueMissing': Whether a required value is missing.
@@ -92,17 +93,26 @@ export function getInputValidityProperties(
   input: DialogFormInputElement,
   isAutocompleted: boolean | undefined,
 ): Validity {
-  const { minLength, required, value } = input;
+  const { maxLength, minLength, required, value } = input;
   const { pattern } = input as HTMLInputElement;
 
   if (isAutocompleted) {
     const valueMissing = required ? !value.length : false;
     const patternMismatch = pattern ? !new RegExp(pattern).test(value) : false;
-    const tooShort = minLength ? !(value.length >= minLength) : false;
-    const valid = !valueMissing && !patternMismatch && !tooShort;
-    return { minLength, patternMismatch, tooShort, valid, valueMissing };
+    const tooLong = maxLength > 0 ? value.length >= maxLength : false;
+    const tooShort = minLength > 0 ? value.length < minLength : false;
+    const valid = !valueMissing && !patternMismatch && !tooShort && !tooLong;
+    return { maxLength, minLength, patternMismatch, tooShort, tooLong, valid, valueMissing };
   }
 
-  const { patternMismatch, tooShort, valid, valueMissing } = input.validity;
-  return { minLength, patternMismatch, tooShort, valid, valueMissing };
+  const { patternMismatch, tooShort, tooLong: isTooLong, valid: isValid, valueMissing } = input.validity;
+  return {
+    maxLength,
+    minLength,
+    patternMismatch,
+    tooShort,
+    tooLong: maxLength > 0 ? value.length >= maxLength : isTooLong,
+    valid: maxLength > 0 ? value.length < maxLength && isValid : isValid,
+    valueMissing,
+  };
 }

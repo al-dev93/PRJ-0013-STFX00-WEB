@@ -5,7 +5,7 @@ import { DialogFormInputElement } from '@/types';
 import { useAutoComplete } from './useAutoComplete';
 import { useContactFormDispatch } from './useContactFormDispatch';
 import { useContactFormSelector } from './useContactFormSelector';
-import type { ContactForm } from '../types';
+import type { ContactForm, FormInputName } from '../types';
 import { getAutocompleteInput } from '../utils/autocompleteStorageUtils';
 import {
   AUTO_COMPLETION,
@@ -281,7 +281,7 @@ export function useContactForm(name: string): ContactForm {
   const processFinalValue = useCallback(
     (stateInputNode: DialogFormInputElement) => {
       const input = stateInputNode;
-      input.value = sanitizeInput(input.value);
+      input.value = sanitizeInput(input.value, name as FormInputName);
       contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: input.value } });
       contactFormAction({ type: IN_EDIT_MODE, payload: { name, inEdition: false } });
       storeInputValue();

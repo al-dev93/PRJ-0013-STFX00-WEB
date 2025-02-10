@@ -1,5 +1,7 @@
 import { createServer } from 'miragejs';
 
+import type { EncryptedMail } from '@/types';
+
 import { boldDetailSections } from './fixtures/mockedBoldDetailsShowcaseSections';
 import { contactFormTooltips } from './fixtures/mockedContactFormTooltips';
 import { accounts } from './fixtures/mockedDataAccounts';
@@ -15,8 +17,6 @@ import { detailSections } from './fixtures/mockedDetailsShowcaseSections';
 import { projectDeliverables } from './fixtures/mockedProjectDeliverables';
 import { models } from './models/mockedApiModels';
 import { serializers } from './serializers/mockedApiSerializers';
-
-import type { EncryptedMail } from '@/types';
 
 /**
  *

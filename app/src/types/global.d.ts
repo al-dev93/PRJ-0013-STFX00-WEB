@@ -225,6 +225,7 @@ export type TooltipContent = {
 export type ErrorMessage = {
   id: string;
   patternMismatch?: string;
+  tooLong?: string;
   tooShort?: string;
   valueMissing?: string;
 };
@@ -236,6 +237,7 @@ export type FormInput = {
   placeholder: string;
   pattern?: string;
   required?: boolean;
+  maxLength?: number;
   minLength?: number;
   error?: ErrorMessage;
 };

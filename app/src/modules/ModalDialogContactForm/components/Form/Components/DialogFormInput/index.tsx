@@ -151,7 +151,9 @@ export function MemoizedDialogFormInput({
     const errorMessage = formInput.error;
     // Remove minLength and valid keys from errorState
     const errors = errorState
-      ? Object.entries(errorState).filter(([key, value]) => key !== 'minLength' && key !== 'valid' && value)
+      ? Object.entries(errorState).filter(
+          ([key, value]) => key !== 'minLength' && key !== 'maxLength' && key !== 'valid' && value,
+        )
       : undefined;
 
     return errors?.map(([key]) => errorMessage?.[key as keyof typeof errorMessage]).join('\n');
@@ -220,6 +222,7 @@ export function MemoizedDialogFormInput({
           name={name}
           id={name}
           role={formInput.tag === 'input' ? 'combobox' : undefined}
+          maxLength={formInput.maxLength}
           minLength={formInput.minLength}
           pattern={formInput.pattern}
           placeholder={formInput.placeholder}

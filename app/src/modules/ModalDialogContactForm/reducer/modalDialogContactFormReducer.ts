@@ -19,7 +19,6 @@ import {
   SET_POPOVER_LIST_FOCUSED_INDEX,
   SET_POPOVER_MODE,
 } from '../utils/constants';
-
 /**
  * Reducer function to manage the state of the modal dialog contact form.
  *
@@ -148,7 +147,7 @@ export function modalDialogContactFormReducer(
       };
 
     default:
-      // TODO sortir l'erreur
+      // TODO: sortir l'erreur
       throw new Error(`Type d'action inconnu : ${(action as { type: string }).type}`);
   }
 }
