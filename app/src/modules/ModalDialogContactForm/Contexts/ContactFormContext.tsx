@@ -26,7 +26,7 @@ export function ContactFormProvider({ children }: { children: React.ReactNode })
     [],
     createContactFormInitialState,
   );
-
+  console.log(contactFormState);
   return (
     <ContactFormStateContext.Provider value={contactFormState}>
       <ContactFormDispatchContext.Provider value={contactFormDispatch}>{children}</ContactFormDispatchContext.Provider>

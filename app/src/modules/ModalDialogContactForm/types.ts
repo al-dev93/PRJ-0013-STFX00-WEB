@@ -72,11 +72,9 @@ export type ModalDialogContactFormProps = {
  * @al-dev93
  */
 export type DialogFormInputProps = {
-  // dispatch: Dispatch<ModalDialogContactFormAction>;
   formInput: FormInput;
   label: string;
   name: string;
-  // formState: ModalDialogContactFormState;
   tooltipContent?: TooltipContent[];
 };
 
@@ -165,9 +163,9 @@ export type FormContentProps = Omit<FormProps, 'idForm' | 'apiEndpointUrl' | 'se
  * Represents the values assignable to the input field name.
  *
  * @export
- * @type {('name' | 'company' | 'email' | 'tel' | 'message')} FormInputName
+ * @type {('name' | 'company' | 'email' | 'tel' | 'message' | 'consent')} FormInputName
  */
-export type FormInputName = 'name' | 'company' | 'email' | 'tel' | 'message';
+export type FormInputName = 'name' | 'company' | 'email' | 'tel' | 'message' | 'consent';
 
 /**
  * Represents the autocomplete overlay type.

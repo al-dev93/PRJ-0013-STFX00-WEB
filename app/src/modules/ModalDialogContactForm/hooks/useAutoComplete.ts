@@ -19,7 +19,7 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  *
  * @function useAutoComplete
  * @param {string} name - Active field of the contact form.
- * @returns {[(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean]} - Returns an array containing:
+ * @returns {undefined | [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean]} - Returns an array containing:
  * 1. A function to apply the autocomplete value to the input field.
  * 2. A function to store the input value into local storage.
  * 3. A function to validate the input field, returning a boolean indicating validity.

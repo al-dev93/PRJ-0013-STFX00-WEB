@@ -7,6 +7,6 @@ export const contactFormModals = [
     title: 'Prenez Contact !',
     subtitle: 'une demande, un projet...',
     alertOnSubmit: ['Votre message a été envoyé', 'Il sera traité dans les plus brefs délais'],
-    contactFormInputIds: ['name', 'company', 'email', 'tel', 'message'],
+    contactFormInputIds: ['name', 'company', 'email', 'tel', 'message', 'consent'],
   },
 ];

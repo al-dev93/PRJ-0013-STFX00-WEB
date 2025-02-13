@@ -89,6 +89,11 @@ function MemoizedForm({
         dataFormContent={dataFormContent}
         onRenderComplete={onRenderComplete}
       />
+      {/* GDPR Compliance consent checkbox */}
+      {/* <label>
+        <input type='checkbox' required onChange={(e) => setConsent(e.target.checked)} />
+        J&apos;accepte le stockage de mes données pour cette demande de contact.
+      </label> */}
     </form>
   );
 }

@@ -32,4 +32,10 @@ export const contactFormInputs = [
     contactFormModalId: 'contact',
     contactFormTooltipIds: ['5', '6'],
   },
+  {
+    id: 'consent',
+    label: "J'accepte le stockage de mes données pour cette demande de contact",
+    formInputId: '6',
+    contactFormModalId: 'contact',
+  },
 ];

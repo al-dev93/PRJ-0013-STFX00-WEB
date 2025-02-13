@@ -59,4 +59,11 @@ export const formInputs = [
     contactFormInputId: 'message',
     errorMessageId: '5',
   },
+  {
+    id: '6',
+    tag: 'input',
+    required: true,
+    type: 'checkbox',
+    contactFormInputId: 'consent',
+  },
 ];

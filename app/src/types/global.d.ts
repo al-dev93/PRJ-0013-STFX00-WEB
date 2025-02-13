@@ -204,7 +204,7 @@ export type ContactFormModal = {
   alertOnSubmit: string[];
 };
 
-type InputType = 'text' | 'email' | 'tel';
+type InputType = 'text' | 'email' | 'tel' | 'checkbox';
 type InputTag = 'input' | 'textarea';
 
 /**
@@ -234,7 +234,7 @@ export type FormInput = {
   id: string;
   tag: InputTag;
   type?: InputType;
-  placeholder: string;
+  placeholder?: string;
   pattern?: string;
   required?: boolean;
   maxLength?: number;

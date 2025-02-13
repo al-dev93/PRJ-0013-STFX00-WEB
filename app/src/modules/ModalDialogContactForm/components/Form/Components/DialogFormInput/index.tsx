@@ -72,8 +72,6 @@ export function MemoizedDialogFormInput({
    * @function handleSetInputAutocomplete
    * @param {string} value - The autocomplete value to set.
    * @returns {void}
-   * @example
-   * handleSetInputAutocomplete('email');
    */
   const handleSetInputAutocomplete = useCallback(
     (value: string): void => {
@@ -89,7 +87,6 @@ export function MemoizedDialogFormInput({
    * @function handleTooltipVisibility
    * @param {boolean} visible - Indicates whether the tooltip should be visible (true) or hidden (false).
    * @returns {void}
-   * @example
    */
   const handleTooltipVisibility = useCallback(
     (visible: boolean): void => {

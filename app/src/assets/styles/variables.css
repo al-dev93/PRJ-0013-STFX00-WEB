@@ -41,6 +41,8 @@
   --ligth-bg-menu: rgba(255, 255, 255, 0.92);
   --hover-bg-menu: rgba(255, 255, 255, 0.13);
   --primary-alert-color: rgba(201, 24, 31, 0.6);
+  --primary-light-bg-alert-color: rgba(201, 24, 31, 0.07);
+  --primary-bg-alert-color: rgba(201, 24, 31, 0.15);
   --panel-bg: rgba(139, 108, 80, 0.16);
   --modal-backdrop-color: rgba(0, 53, 84, 0.7);
   /* border */

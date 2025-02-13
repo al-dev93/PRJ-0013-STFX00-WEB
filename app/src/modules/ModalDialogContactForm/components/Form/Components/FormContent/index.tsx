@@ -7,6 +7,7 @@ import type { FormContentProps } from '@modules/ModalDialogContactForm/types';
 import { INIT_DIALOG_CONTACT_FORM_STATE } from '@modules/ModalDialogContactForm/utils/constants';
 
 import style from './style.module.css';
+import { DialogFormCheckBox } from '../DialogFormCheckBox';
 import { DialogFormInput } from '../DialogFormInput';
 
 /**
@@ -63,16 +64,20 @@ export function FormContent({
   return formContent && isInitializedStateRef.current ? (
     <div className={style.contactForm}>
       {/* Render each form input */}
-      {formContent.map(({ id, input, label, tooltipContent: tc }) => (
-        <DialogFormInput
-          key={id}
-          label={label}
-          name={id}
-          formInput={input}
-          // Get the tooltip content from the form content
-          tooltipContent={tc as TooltipContent[] | undefined}
-        />
-      ))}
+      {formContent.map(({ id, input, label, tooltipContent: tc }) =>
+        input.type !== 'checkbox' ? (
+          <DialogFormInput
+            key={id}
+            label={label}
+            name={id}
+            formInput={input}
+            // Get the tooltip content from the form content
+            tooltipContent={tc as TooltipContent[] | undefined}
+          />
+        ) : (
+          <DialogFormCheckBox key={id} label={label} name={id} formInput={input} />
+        ),
+      )}
     </div>
   ) : null;
 }

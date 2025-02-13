@@ -1,0 +1,79 @@
+.dialogFormCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--decorative-light);
+  font-family: var(--font-regular);
+  font-size: var(--fs-xxs);
+  font-weight: normal;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+.dialogFormCheckbox__input {
+  opacity: 0;
+  position: absolute;
+}
+
+.dialogFormCheckbox__box {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--dark-secondary);
+  border-radius: var(--br-xxs);
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.dialogFormCheckbox .dialogFormCheckbox__input:checked + .dialogFormCheckbox__box {
+  border-color: var(--tertiary-color);
+  background-color: var(--primary-color);
+}
+
+.dialogFormCheckbox .dialogFormCheckbox__input:checked + .dialogFormCheckbox__box::after {
+  content: '\2714';
+  color: var(--white);
+  font-size: var(--fs-xxs);
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.dialogFormCheckbox .dialogFormCheckbox__input:checked ~ p {
+  color: var(--tertiary-color);
+}
+
+.dialogFormCheckbox:focus-within .dialogFormCheckbox__input:checked + .dialogFormCheckbox__box {
+  border: 1px solid var(--secondary-color);
+}
+
+.dialogFormCheckbox:focus-within .dialogFormCheckbox__input:checked ~ p {
+  color: var(--secondary-color);
+  font-weight: bold;
+}
+
+.dialogFormCheckbox .dialogFormCheckbox__box--error {
+  /* border-color: var(--primary-alert-color); */
+  background-color: var(--primary-bg-alert-color);
+}
+
+.dialogFormCheckbox:hover .dialogFormCheckbox__box--error {
+  /* background-color: var(--primary-light-bg-alert-color); */
+  border-color: var(--primary-alert-color);
+}
+
+.dialogFormCheckbox:hover .dialogFormCheckbox__box--error ~ p {
+  color: var(--primary-alert-color);
+}
+
+.dialogFormCheckbox:focus-within .dialogFormCheckbox__box--error {
+  border: 2px solid var(--primary-alert-color);
+  background-color: var(--primary-light-bg-alert-color);
+}
+
+.dialogFormCheckbox:focus-within .dialogFormCheckbox__box--error ~ p {
+  color: var(--primary-alert-color);
+  font-weight: bold;
+}
