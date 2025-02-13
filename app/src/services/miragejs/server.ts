@@ -73,9 +73,20 @@ export function makeServer(encryptedEmail?: EncryptedMail, { environment = 'deve
       this.get('/contactFormModals', (schema) => {
         return schema.all('contactFormModal');
       });
-      this.post('/contactMessages', (schema, request) => {
+      this.post('/contactMessages', (_schema, request) => {
         const attrs = JSON.parse(request.requestBody);
-        return schema.create('message', attrs);
+
+        if (attrs.website) {
+          console.log('Bot mocké détecté');
+          return { data: { success: true }, status: 200 };
+        }
+
+        if (!attrs.name || !attrs.email || !attrs.message || !attrs.consent) {
+          return { errors: ['Champs requis manquants'], status: 400 };
+        }
+
+        return { data: { success: true }, status: 200 };
+        // return schema.create('message', attrs);
       });
     },
   });

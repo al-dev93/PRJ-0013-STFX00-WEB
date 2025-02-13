@@ -1,4 +1,4 @@
-import React, { FormEvent, memo, useCallback } from 'react';
+import React, { FormEvent, memo, useCallback, useRef } from 'react';
 
 import { useFetchData } from '@hooks/useFetchData';
 import { refetchFormDataWithArguments } from '@utils/fetchDataHelpers';
@@ -36,6 +36,7 @@ function MemoizedForm({
   setShowAlert,
   onRenderComplete,
 }: FormProps): React.JSX.Element {
+  const websiteRef = useRef<HTMLInputElement>(null);
   // Extracts validated values from contact form input elements
   const validValues = useContactFormFieldsPropSelector('inputValue', true);
   // Prepare for submitting form data via POST
@@ -69,7 +70,10 @@ function MemoizedForm({
       event.stopPropagation();
 
       setShowAlert(true);
-      if (validValues) memoizedRefetchFormDataWithArguments(validValues);
+      if (validValues) {
+        validValues.website = websiteRef.current?.value;
+        memoizedRefetchFormDataWithArguments(validValues);
+      }
     },
     [memoizedRefetchFormDataWithArguments, setShowAlert, validValues],
   );
@@ -89,11 +93,9 @@ function MemoizedForm({
         dataFormContent={dataFormContent}
         onRenderComplete={onRenderComplete}
       />
-      {/* GDPR Compliance consent checkbox */}
-      {/* <label>
-        <input type='checkbox' required onChange={(e) => setConsent(e.target.checked)} />
-        J&apos;accepte le stockage de mes données pour cette demande de contact.
-      </label> */}
+      <div className={style.hidingWrap}>
+        <input type='text' name='website' aria-hidden='true' tabIndex={-1} autoComplete='off' ref={websiteRef} />
+      </div>
     </form>
   );
 }
