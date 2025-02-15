@@ -17,6 +17,7 @@ import { detailSections } from './fixtures/mockedDetailsShowcaseSections';
 import { projectDeliverables } from './fixtures/mockedProjectDeliverables';
 import { models } from './models/mockedApiModels';
 import { serializers } from './serializers/mockedApiSerializers';
+import { generateCSRFToken } from '../secure/mockedEncryption';
 
 /**
  *
@@ -49,6 +50,9 @@ export function makeServer(encryptedEmail?: EncryptedMail, { environment = 'deve
     serializers,
     seeds(server) {
       server.loadFixtures();
+      server.db.loadData({
+        CSRFTokens: [{ id: '1', token: generateCSRFToken() }],
+      });
     },
     routes() {
       this.namespace = 'api';
@@ -73,17 +77,29 @@ export function makeServer(encryptedEmail?: EncryptedMail, { environment = 'deve
       this.get('/contactFormModals', (schema) => {
         return schema.all('contactFormModal');
       });
-      this.post('/contactMessages', (_schema, request) => {
+      this.get('/CSRF-token', (schema) => {
+        return schema.db.CSRFTokens[0];
+      });
+      this.post('/contactMessages', (schema, request) => {
         const attrs = JSON.parse(request.requestBody);
+        const storedToken = schema.db.CSRFTokens[0].token;
+        // eslint-disable-next-line no-underscore-dangle
+        const submittedToken = attrs._CSRF;
 
         if (attrs.website) {
-          console.log('Bot mocké détecté');
+          console.log('Bot simulé détecté');
           return { data: { success: true }, status: 200 };
         }
 
         if (!attrs.name || !attrs.email || !attrs.message || !attrs.consent) {
           return { errors: ['Champs requis manquants'], status: 400 };
         }
+
+        if (submittedToken !== storedToken) {
+          return { errors: ['Token CSRF invalide'], status: 403 };
+        }
+
+        schema.db.CSRFTokens.update({ id: '1' }, { token: generateCSRFToken() });
 
         return { data: { success: true }, status: 200 };
         // return schema.create('message', attrs);
