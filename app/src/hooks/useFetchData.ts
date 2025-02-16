@@ -58,9 +58,9 @@ export function useFetchData(
    */
   const storeFetchValue = (url: string | string[], fetchData: unknown): void => {
     if (!url) setData(fetchData as FetchData);
-    else if (Array.isArray(url))
+    else if (Array.isArray(url)) {
       setData((fetchData as FetchData[][]).map((item) => Object.values(item).at(0) as FetchData));
-    else setData(Object.values(fetchData as FetchData[]).at(0) as FetchData);
+    } else setData(Object.values(fetchData as FetchData[]).at(0) as FetchData);
   };
 
   /**

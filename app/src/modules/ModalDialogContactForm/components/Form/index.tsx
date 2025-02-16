@@ -6,8 +6,8 @@ import { refetchFormDataWithArguments } from '@utils/fetchDataHelpers';
 import { FormContent } from './Components/FormContent';
 import style from './style.module.css';
 import { useContactFormFieldsPropSelector } from '../../hooks/useContactFormFieldsPropSelector';
+import { useCsrfToken } from '../../hooks/useCsrfToken';
 import type { FormProps } from '../../types';
-
 /**
  * The Form component integrates the FormContent component and handles the connection with the API.
  * Form component memoized with 'React.memo' to optimize performance. The component will only
@@ -37,6 +37,7 @@ function MemoizedForm({
   onRenderComplete,
 }: FormProps): React.JSX.Element {
   const websiteRef = useRef<HTMLInputElement>(null);
+  const csrfToken = useCsrfToken();
   // Extracts validated values from contact form input elements
   const validValues = useContactFormFieldsPropSelector('inputValue', true);
   // Prepare for submitting form data via POST
@@ -59,6 +60,7 @@ function MemoizedForm({
   /**
    * Handles the form submission process. Validates form inputs and triggers an API request
    * if the form values are valid.
+   * Add honeypot and token content for CSRF protection.
    *
    * @function handleFormSubmission
    * @param {FormEvent<HTMLFormElement>} event - The form submit event.
@@ -71,11 +73,10 @@ function MemoizedForm({
 
       setShowAlert(true);
       if (validValues) {
-        validValues.website = websiteRef.current?.value;
-        memoizedRefetchFormDataWithArguments(validValues);
+        memoizedRefetchFormDataWithArguments({ ...validValues, website: websiteRef.current?.value, csrfToken });
       }
     },
-    [memoizedRefetchFormDataWithArguments, setShowAlert, validValues],
+    [csrfToken, memoizedRefetchFormDataWithArguments, setShowAlert, validValues],
   );
 
   return (
@@ -88,6 +89,7 @@ function MemoizedForm({
       onSubmit={handleFormSubmission}
       noValidate
     >
+      <input type='hidden' name='_csrf' value={csrfToken} />
       <FormContent
         urlFormContent={urlFormContent}
         dataFormContent={dataFormContent}
