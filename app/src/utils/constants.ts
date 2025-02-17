@@ -12,12 +12,32 @@ const FILLED_STYLE = 'filled';
 const THINNED_STYLE = 'thinned';
 const ALERTED_STYLE = 'alerted';
 const INTERSECTION_OPTIONS_ROOTMARGIN = { rootMargin: '-100px' };
-const MIN_COMPANY_LENGTH = 2;
-const MAX_COMPANY_LENGTH = 128;
-const MIN_MESSAGE_LENGTH = 20;
-const MAX_MESSAGE_LENGTH = 1000;
-const MIN_NAME_LENGTH = 2;
-const MAX_NAME_LENGTH = 100;
+
+/**
+ * Constants used for contact form field length
+ *
+ * @type {number}
+ */
+const MIN_COMPANY_LENGTH: number = 2;
+const MAX_COMPANY_LENGTH: number = 128;
+const MIN_MESSAGE_LENGTH: number = 20;
+const MAX_MESSAGE_LENGTH: number = 1000;
+const MIN_NAME_LENGTH: number = 2;
+const MAX_NAME_LENGTH: number = 100;
+
+/**
+ * Constant used with error handling
+ *
+ * @constant ERROR_MESSAGE
+ * @type {Record<number, string>}
+ */
+const ERROR_MESSAGES: Record<number, string> = {
+  400: 'Requête invalide',
+  401: 'Authentification requise',
+  403: 'Accès refusé',
+  404: 'Ressource introuvable',
+  500: 'Erreur interne du serveur',
+};
 
 export {
   ACTIVE_STATUS,
@@ -25,6 +45,7 @@ export {
   DISABLED_STATUS,
   EAGER_STATUS,
   ENABLED_STATUS,
+  ERROR_MESSAGES,
   FILLED_STYLE,
   HIDDEN_STATUS,
   INTERSECTION_OPTIONS_ROOTMARGIN,
