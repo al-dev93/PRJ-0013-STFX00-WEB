@@ -10,7 +10,7 @@ export type AppError = {
 export type RouterError = {
   status: number;
   statusText: string;
-  data?: unknown; // Optionnel, selon votre cas d'usage
+  data?: unknown;
 };
 
 declare module 'react-router-dom' {
