@@ -1,10 +1,18 @@
 import { useState } from 'react';
 
-import { MAX_RETRIES } from '@utils/constants';
-
+import { useErrorHandler } from '../../hooks/useErrorHandler';
+import type { ErrorProps } from '../../types';
+import { MAX_RETRIES } from '../../utils/constants';
 import { ErrorDetail } from '../ErrorDetail';
-import type { ErrorProps } from '../types';
 
+/**
+ * Description placeholder
+ *
+ * @export
+ * @param {ErrorProps} param0
+ * @param {ErrorProps} param0.error
+ * @returns {React.JSX.Element}
+ */
 export function GlobalErrorFallback({ error }: ErrorProps): React.JSX.Element {
   const [retryCount, setRetryCount] = useState(0);
   const handleError = useErrorHandler();

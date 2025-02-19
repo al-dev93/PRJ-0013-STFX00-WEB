@@ -3,9 +3,16 @@ import { ErrorInfo } from 'react-dom/client';
 
 import { normalizeError } from '@utils/errorHandling';
 
+import type { Props, State, Window } from '../../types';
 import { GlobalErrorFallback } from '../GlobalErrorFallback';
-import type { Props, State, Window } from '../types';
-
+/**
+ * Description placeholder
+ *
+ * @export
+ * @class ErrorBoundary
+ * @typedef {ErrorBoundary}
+ * @extends {Component<Props, State>}
+ */
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);

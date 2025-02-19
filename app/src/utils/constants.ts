@@ -39,14 +39,6 @@ const ERROR_MESSAGES: Record<number, string> = {
   500: 'Erreur interne du serveur',
 };
 
-/**
- * Maximum number of attempts after an error
- *
- * @constant MAX_RETRIES
- * @type {number}
- */
-const MAX_RETRIES: number = 3;
-
 export {
   ACTIVE_STATUS,
   ALERTED_STYLE,
@@ -61,7 +53,6 @@ export {
   MAX_COMPANY_LENGTH,
   MAX_MESSAGE_LENGTH,
   MAX_NAME_LENGTH,
-  MAX_RETRIES,
   MIN_COMPANY_LENGTH,
   MIN_MESSAGE_LENGTH,
   MIN_NAME_LENGTH,

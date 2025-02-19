@@ -1,5 +1,13 @@
-import type { ErrorProps } from '../types';
+import type { ErrorProps } from '../../types';
 
+/**
+ * Description placeholder
+ *
+ * @export
+ * @param {ErrorProps} param0
+ * @param {ErrorProps} param0.error
+ * @returns {React.JSX.Element}
+ */
 export function ErrorDetail({ error }: ErrorProps): React.JSX.Element {
   return (
     <div className='error-detail'>

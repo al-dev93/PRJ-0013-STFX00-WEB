@@ -1,4 +1,4 @@
-import { AppError, RouterError } from '@/types';
+import type { AppError, RouterError } from '@/types';
 
 import { ERROR_MESSAGES } from './constants';
 
