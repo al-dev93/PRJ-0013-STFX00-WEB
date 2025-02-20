@@ -1,11 +1,13 @@
 import type { AppError } from '@/types';
 
 /**
- * Description placeholder
+ * A custom error class that extends the native `Error` class.
+ * This class is used to wrap a `Response` object, making it easier to handle
+ * HTTP errors in a consistent way while still throwing an instance of `Error`.
  *
  * @class ResponseError
- * @typedef {ResponseError}
- * @extends {Error}
+ * @extends Error
+ * @property {Response} response - The `Response` object associated with the error.
  */
 class ResponseError extends Error {
   constructor(public response: Response) {
@@ -15,10 +17,12 @@ class ResponseError extends Error {
 }
 
 /**
- * Description placeholder
+ * Returns a default error message based on the provided HTTP status code.
  *
- * @param {number} status
- * @returns {string}
+ * @param {number} status - The HTTP status code for which to retrieve
+ * the error message.
+ * @returns {string} The message corresponding to the status code, or
+ * 'Unknown error' if the status is not defined in the dictionary.
  */
 function getDefaultMessage(status: number): string {
   const messages: Record<number, string> = {
