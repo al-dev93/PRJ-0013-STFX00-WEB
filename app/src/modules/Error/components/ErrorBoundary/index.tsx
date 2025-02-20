@@ -1,10 +1,9 @@
 import { Component, ReactNode } from 'react';
 import { ErrorInfo } from 'react-dom/client';
 
-import { normalizeError } from '@utils/errorHandling';
-
-import type { Props, State, Window } from '../../types';
-import { GlobalErrorFallback } from '../GlobalErrorFallback';
+import { GlobalErrorFallback } from '@modules/Error/components/GlobalErrorFallback';
+import type { Props, State, Window } from '@modules/Error/types';
+import { normalizeError } from '@modules/Error/utils/errorHandling';
 /**
  * A React error boundary component that catches JavaScript errors in its child component tree,
  * logs them, and displays a fallback UI instead of the crashed component tree.
@@ -60,7 +59,14 @@ export class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  // Gestion des erreurs globales
+  /**
+   * Sets up global error handlers when the component is mounted.
+   * This method adds an event listener to catch unhandled promise rejections.
+   *
+   * @example
+   * NOTE: Called automatically by React when the component mounts
+   * componentDidMount();
+   */
   componentDidMount() {
     window.addEventListener('unhandledrejection', this.handlePromiseRejection);
   }
@@ -79,14 +85,32 @@ export class ErrorBoundary extends Component<Props, State> {
     });
   }
 
+  /**
+   * Cleans up global error handlers when the component is unmounted.
+   * This method removes the event listener for unhandled promise rejections.
+   *
+   * @example
+   * NOTE: Called automatically by React when the component unmounts
+   * componentWillUnmount();
+   */
   componentWillUnmount() {
     window.removeEventListener('unhandledrejection', this.handlePromiseRejection);
   }
 
-  handlePromiseRejection = (event: PromiseRejectionEvent) => {
+  /**
+   * Handles unhandled promise rejections by updating the component state.
+   * This method is called when a promise is rejected but not caught by any `.catch()` handler.
+   *
+   * @param {PromiseRejectionEvent} event - The event containing the rejected promise and reason
+   *
+   * @example
+   * NOTE: Called automatically when an unhandled promise rejection occurs
+   * handlePromiseRejection(event);
+   */
+  handlePromiseRejection = async (event: PromiseRejectionEvent) => {
     this.setState({
       hasError: true,
-      error: normalizeError(event.reason),
+      error: await normalizeError(event.reason),
     });
   };
 

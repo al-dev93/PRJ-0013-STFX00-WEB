@@ -1,17 +1,20 @@
 import { useState } from 'react';
 
-import { useErrorHandler } from '../../hooks/useErrorHandler';
-import type { ErrorProps } from '../../types';
-import { MAX_RETRIES } from '../../utils/constants';
-import { ErrorDetail } from '../ErrorDetail';
+import { ErrorDetail } from '@modules/Error/components/ErrorDetail';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import type { ErrorProps } from '@modules/Error/types';
+import { MAX_RETRIES } from '@modules/Error/utils/constants';
 
 /**
- * Description placeholder
+ * Default fallback UI displayed when an error boundary catches an error.
+ * This component provides a user-friendly error message and recovery options.
  *
- * @export
- * @param {ErrorProps} param0
- * @param {ErrorProps} param0.error
- * @returns {React.JSX.Element}
+ * @component
+ * @param {Object} props - Component props
+ * @param {AppError} [props.error] - Normalized error object containing error details
+ *
+ * @example
+ * <DefaultFallback error={error} />
  */
 export function GlobalErrorFallback({ error }: ErrorProps): React.JSX.Element {
   const [retryCount, setRetryCount] = useState(0);

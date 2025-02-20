@@ -1,12 +1,22 @@
-import type { ErrorProps } from '../../types';
+import type { ErrorProps } from '@modules/Error/types';
 
 /**
- * Description placeholder
+ * Displays detailed error information including error code, message,
+ * and technical details (in development environment)
  *
- * @export
- * @param {ErrorProps} param0
- * @param {ErrorProps} param0.error
- * @returns {React.JSX.Element}
+ * @component
+ * @param {Object} props - Component props
+ * @param {AppError} [props.error] - Normalized error object containing error details
+ *
+ * @example
+ * <ErrorDetail error={normalizedError} />
+ *
+ * @example
+ * NOTE: In error boundary fallback
+ * <DefaultFallback>
+ *   <ErrorDetail error={error} />
+ *   <RecoveryActions />
+ * </DefaultFallback>
  */
 export function ErrorDetail({ error }: ErrorProps): React.JSX.Element {
   return (

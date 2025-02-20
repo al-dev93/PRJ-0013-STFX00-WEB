@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import type { AppError } from '@/types';
-import { monitoringService } from '@/utils/monitoring';
-import { normalizeError } from '@utils/errorHandling';
+import { AppError } from '@/types';
+import type { Window } from '@modules/Error/types';
+import { normalizeError } from '@modules/Error/utils/errorHandling';
 
 /**
  * A custom React hook for handling errors in a consistent and centralized way.
@@ -11,7 +11,7 @@ import { normalizeError } from '@utils/errorHandling';
  * to a monitoring service.
  *
  * @export
- * @returns {(error: unknown, context?: Record<string, unknown>) => AppError}
+ * @returns {(error: unknown, context?: Record<string, unknown>) => Promise<AppError>}
  * A function that takes an error and an optional context object. The
  * function normalizes the error, logs it (if monitoring is enabled),
  * and redirects to the error page with the error details.
@@ -31,20 +31,24 @@ import { normalizeError } from '@utils/errorHandling';
  *     .catch(error => handleError(error, { feature: 'dashboard' }));
  * }, []);
  */
-export function useErrorHandler(): (error: unknown, context?: Record<string, unknown>) => AppError {
+export function useErrorHandler(): (error: unknown, context?: Record<string, unknown>) => Promise<AppError> {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  return (error: unknown, context?: Record<string, unknown>) => {
-    const normalizedError = normalizeError(error);
+  return async (error: unknown, context?: Record<string, unknown>) => {
+    const normalizedError = await normalizeError(error);
 
-    // Automatic tracking
-    monitoringService.track(normalizedError, context);
+    // Log the error to the monitoring service (if available)
+    (window as Window).monitoring?.captureException(normalizedError, {
+      ...context,
+      route: location.pathname,
+    });
 
     navigate('/error', {
       state: {
         error: normalizedError,
-        previousPath: window.location.pathname,
         context,
+        previousPath: window.location.pathname,
       },
       replace: true,
     });

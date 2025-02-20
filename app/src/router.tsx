@@ -1,12 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-// COMMENT: importing application routes
-import { Admin } from '@routes/Admin';
-import { Auth } from '@routes/Auth';
-import { Error } from '@routes/Error';
+import { ErrorBoundary } from '@modules/Error/components/ErrorBoundary';
+import { GlobalErrorFallback } from '@modules/Error/components/GlobalErrorFallback';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { ErrorPage } from '@routes/Error';
 import { Index } from '@routes/Index';
 import { LegalNotice } from '@routes/LegalNotice';
 import { Page } from '@routes/Page';
+
+// import { Admin } from '@routes/Admin';
+
+// import { Auth } from '@routes/Auth';
 
 /**
  *
@@ -19,8 +23,12 @@ export const router = (key: CryptoKey | undefined) => {
   return createBrowserRouter([
     {
       path: '/',
-      element: <Page cryptoKey={key} />,
-      errorElement: <Error />,
+      element: (
+        <ErrorBoundary fallback={<GlobalErrorFallback />}>
+          <Page cryptoKey={key} />
+        </ErrorBoundary>
+      ),
+      errorElement: <ErrorPage />,
       children: [
         {
           index: true,
@@ -32,13 +40,30 @@ export const router = (key: CryptoKey | undefined) => {
         },
       ],
     },
+    // {
+    //   path: '/login',
+    //   element: <Auth />,
+    //   errorElement: <ErrorPage />,
+    // },
+    // {
+    //   path: '/admin',
+    //   element: <Admin />,
+    //   errorElement: <ErrorPage />,
+    //   loader: async () => {
+    //    Vérifier l'authentification avant d'accéder à l'admin
+    //    const isAuthenticated = await checkAuth();
+    //    if (!isAuthenticated) {
+    //      throw createError(403, 'Accès non autorisé');
+    //    }
+    //    return null; // Pas de données à passer, juste une vérification
+    //   },
+    // },
     {
-      path: '/login',
-      element: <Auth />,
-    },
-    {
-      path: '/admin',
-      element: <Admin />,
+      path: '*',
+      loader: () => {
+        throw createError(404, 'Page non trouvée');
+      },
+      errorElement: <ErrorPage />,
     },
   ]);
 };

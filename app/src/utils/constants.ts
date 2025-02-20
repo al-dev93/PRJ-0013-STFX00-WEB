@@ -25,27 +25,12 @@ const MAX_MESSAGE_LENGTH: number = 1000;
 const MIN_NAME_LENGTH: number = 2;
 const MAX_NAME_LENGTH: number = 100;
 
-/**
- * Constant used with error handling
- *
- * @constant ERROR_MESSAGE
- * @type {Record<number, string>}
- */
-const ERROR_MESSAGES: Record<number, string> = {
-  400: 'Requête invalide',
-  401: 'Authentification requise',
-  403: 'Accès refusé',
-  404: 'Ressource introuvable',
-  500: 'Erreur interne du serveur',
-};
-
 export {
   ACTIVE_STATUS,
   ALERTED_STYLE,
   DISABLED_STATUS,
   EAGER_STATUS,
   ENABLED_STATUS,
-  ERROR_MESSAGES,
   FILLED_STYLE,
   HIDDEN_STATUS,
   INTERSECTION_OPTIONS_ROOTMARGIN,
