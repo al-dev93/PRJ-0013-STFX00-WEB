@@ -1,17 +1,16 @@
 import React, { memo, useEffect, useRef } from 'react';
 
+import type { MenuSectionsVisibility } from '@/types';
 import { ModalFormButton } from '@components/ModalFormButton';
 import { useOnScreen } from '@hooks/useOnScreen';
 import titleLine from '@images/decorations/title_line.svg';
 import { INTERSECTION_OPTIONS_ROOTMARGIN } from '@utils/constants';
 
 import style from './style.module.css';
-import { DynamicElement } from '../DynamicElement';
-import { DynamicElementContainer } from '../DynamicElementContainer';
-
 import type { ShowcaseSectionProps } from './types';
+import { DynamicElement } from '../DynamicElement';
 import type { ComponentType } from '../DynamicElement/types';
-import type { MenuSectionsVisibility } from '@/types';
+import { DynamicElementContainer } from '../DynamicElementContainer';
 
 /**
  * Retrieves a CSS class name based on the provided node string.
@@ -77,7 +76,7 @@ function MemoizedShowcaseSection({
         <h2 id={`${anchor}-title`} aria-live='polite'>
           {titleSection}
         </h2>
-        <img src={titleLine} alt='' aria-label='Decorative line' />
+        <img src={titleLine} alt='Decorative line' />
       </div>
     );
   };

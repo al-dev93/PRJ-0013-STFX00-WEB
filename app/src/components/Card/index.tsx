@@ -1,12 +1,12 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { memo } from 'react';
 
+import { useErrorHandler } from '@/modules/Error/hooks/useErrorHandler';
+
 import style from './style.module.css';
+import type { CardProps } from './types';
 import { SkillsList } from '../SkillsList';
 import { SocialMediaNavBar } from '../SocialMediaNavBar';
-
-import type { CardProps } from './types';
-
 /**
  * Card component that displays project data including title, description, skills, and social media links.
  *
@@ -18,10 +18,13 @@ import type { CardProps } from './types';
  * @al-dev93
  */
 function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
+  const handleError = useErrorHandler(); // Initializing the hook
   // TODO: sortir l'erreur
   // Ensure that the card is only displayed if the display mode is 'card'
   if (cardData.display !== 'card') {
-    console.error(`Erreur: ${cardData.display} is not a Card`);
+    // console.error(`Erreur: ${cardData.display} is not a Card`);
+    const errorMessage = `${cardData.display} is not a Card`;
+    handleError(new Error(errorMessage), { component: 'Card', data: cardData });
     return null;
   }
 
