@@ -42,7 +42,7 @@ function setFocusToElement(event: KeyboardEventDiv, index: number, elements: HTM
  * @component
  * @param {ModalProps} props - The properties for the Modal component.
  * @property {ReactNode} children - The children elements to display inside the modal.
- * @property {string} [className] - Additonal class names to apply to the modal.
+ * @property {string} [className] - Additional class names to apply to the modal.
  * @property {boolean} open - Indicates whether the modal is open.
  * @property {SetStateBoolean} setOpen - Function to set the open state of the modal.
  * @property {ModalButton} [button] - The button configuration for the modal.
@@ -231,7 +231,13 @@ export function Modal({
               </button>
             )}
             {(title || subtitle) && (
-              <div className={style.modal__titleWrapper} ref={titleRef} role='alertdialog' tabIndex={-1}>
+              <div
+                className={style.modal__titleWrapper}
+                ref={titleRef}
+                role='alertdialog'
+                tabIndex={-1}
+                aria-labelledby='modal-title'
+              >
                 {title && (
                   <h3 id='modal-title' className={style.modal__title}>
                     {title}

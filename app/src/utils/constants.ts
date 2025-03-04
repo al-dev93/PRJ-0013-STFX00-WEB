@@ -16,6 +16,8 @@ const INTERSECTION_OPTIONS_ROOTMARGIN = { rootMargin: '-100px' };
 /**
  * Constants used for contact form field length
  *
+ * @exports
+ * @constant
  * @type {number}
  */
 const MIN_COMPANY_LENGTH: number = 2;

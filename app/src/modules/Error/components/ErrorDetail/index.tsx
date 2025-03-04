@@ -1,4 +1,4 @@
-import type { ErrorProps } from '@modules/Error/types';
+import type { CustomError, ErrorProps } from '@modules/Error/types';
 
 /**
  * Displays detailed error information including error code, message,
@@ -19,13 +19,14 @@ import type { ErrorProps } from '@modules/Error/types';
  * </DefaultFallback>
  */
 export function ErrorDetail({ error }: ErrorProps): React.JSX.Element {
+  const isCustomError = (e?: Error): e is CustomError => {
+    return !!e && 'context' in e;
+  };
+
   return (
     <div className='error-detail'>
-      {error?.code && <p>Code : {error.code}</p>}
-      <p>{error?.message}</p>
-      {!!error?.context?.originalError && (
-        <p className='technical-detail'>Détail technique : {String(error.context.originalError)}</p>
-      )}
+      {isCustomError(error) && error.context?.projectId && <p>Project ID: {error?.context?.projectId as string}</p>}
+      {isCustomError(error) && error.context?.invalidTag && <p>Invalid Tag: {error?.context?.invalidTag as string}</p>}
     </div>
   );
 }

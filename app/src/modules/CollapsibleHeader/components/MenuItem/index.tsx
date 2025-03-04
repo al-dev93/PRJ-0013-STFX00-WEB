@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import style from './style.module.css';
-
 import type { MenuItemProps } from '../../types';
 
 /**

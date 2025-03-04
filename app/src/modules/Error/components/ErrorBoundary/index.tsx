@@ -1,9 +1,10 @@
-import { Component, ReactNode } from 'react';
+import React, { Component, ReactNode } from 'react';
 import { ErrorInfo } from 'react-dom/client';
 
-import { GlobalErrorFallback } from '@modules/Error/components/GlobalErrorFallback';
 import type { Props, State, Window } from '@modules/Error/types';
-import { normalizeError } from '@modules/Error/utils/errorHandling';
+import { normalizeError, normalizeErrorSync } from '@modules/Error/utils/errorHandling';
+
+import { AppErrorFallback } from '../AppErrorFallback';
 /**
  * A React error boundary component that catches JavaScript errors in its child component tree,
  * logs them, and displays a fallback UI instead of the crashed component tree.
@@ -28,6 +29,8 @@ import { normalizeError } from '@modules/Error/utils/errorHandling';
  * @see https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary
  */
 export class ErrorBoundary extends Component<Props, State> {
+  private resetKey = 0;
+
   /**
    * Initializes the component state.
    *
@@ -51,10 +54,10 @@ export class ErrorBoundary extends Component<Props, State> {
     return {
       hasError: true,
       error: {
+        ...error,
         code: 500,
-        message: error.message,
         severity: 'critical',
-        originalError: error,
+        timestamp: Date.now(),
       },
     };
   }
@@ -79,9 +82,30 @@ export class ErrorBoundary extends Component<Props, State> {
    * @returns {void}
    */
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error('ErrorBoundary:', error, info.componentStack);
-    (window as Window).monitoring?.captureException(error, {
-      componentStack: info.componentStack,
+    if (error.name === 'AbortError') {
+      console.log('Requête annulée (comportement normal)');
+      return;
+    }
+    // console.error('ErrorBoundary:', error, info.componentStack);
+    const currentUrl = window.location.href;
+    const normalized = normalizeErrorSync(error, {
+      source: 'component',
+      url: currentUrl,
+      method: 'RENDER',
+      stack: info.componentStack,
+      originalError: error,
+    });
+
+    this.setState({
+      hasError: true,
+      error: normalized,
+    });
+
+    (window as Window).monitoring?.captureException(normalized, {
+      tags: {
+        route: currentUrl,
+        component: 'ErrorBoundary',
+      },
     });
   }
 
@@ -114,18 +138,43 @@ export class ErrorBoundary extends Component<Props, State> {
     });
   };
 
+  private handleReset = () => {
+    const { onReset } = this.props;
+    this.resetKey += 1;
+    this.setState({ hasError: false, error: undefined });
+    if (onReset) onReset();
+  };
+
+  private renderFallback() {
+    const { error } = this.state;
+    const { fallback, onReset } = this.props;
+
+    return React.isValidElement(fallback) ? (
+      React.cloneElement(fallback, { error, onReset: onReset || this.handleReset })
+    ) : (
+      <AppErrorFallback error={error} onReset={onReset || this.handleReset} />
+    );
+  }
+
   /**
    * Renders the child components or the fallback UI if an error has been caught.
    *
    * @returns {ReactNode} - The child components or the fallback UI
    */
   render(): ReactNode {
-    const { hasError, error } = this.state;
-    const { fallback, children } = this.props;
+    const { hasError } = this.state;
+    const { children } = this.props;
+    return <div key={this.resetKey}>{hasError ? this.renderFallback() : children}</div>;
 
-    if (hasError) {
-      return fallback || <GlobalErrorFallback error={error} />;
-    }
-    return children;
+    // if (hasError) {
+    //   const fallbackWithReset = React.isValidElement(fallback) ? (
+    //     React.cloneElement(fallback, { onReset: onReset || this.handleReset })
+    //   ) : (
+    //     <AppErrorFallback error={error as Error} onReset={onReset || this.handleReset} />
+    //   );
+
+    //   return fallbackWithReset;
+    // }
+    // return children;
   }
 }

@@ -21,8 +21,11 @@ import {
  * @type {Object} SlideshowProps
  * @property {ProjectData[]} [data] - Data to display in the slideshow.
  * @property {string} [url] - URL to fetch the data for the slideshow.
+ * @property {React.ReactNode} [children] - Optional child nodes to be rendered inside the component.
  */
-export type SlideshowProps =
+export type SlideshowProps = {
+  children?: React.ReactNode;
+} & (
   | {
       data?: ProjectData[];
       url?: never;
@@ -30,7 +33,8 @@ export type SlideshowProps =
   | {
       data?: never;
       url?: string;
-    };
+    }
+);
 
 /**
  * Props for the PicturesScroller component.

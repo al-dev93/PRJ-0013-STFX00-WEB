@@ -106,4 +106,5 @@ function MemoizedSlideshow({ data: slideshowData, url }: SlideshowProps): React.
   );
 }
 
-export const Slideshow = memo(MemoizedSlideshow);
+const Slideshow = memo(MemoizedSlideshow);
+export default Slideshow;

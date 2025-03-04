@@ -3,7 +3,6 @@ import React, { useCallback, useMemo } from 'react';
 import { ALERTED_STYLE, THINNED_STYLE } from '@utils/constants';
 
 import style from './style.module.css';
-
 import type { TagProps } from './types';
 
 /**

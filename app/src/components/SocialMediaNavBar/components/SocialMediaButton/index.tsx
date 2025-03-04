@@ -4,7 +4,6 @@ import React, { MouseEvent, useCallback, useMemo } from 'react';
 import { decryptData } from '@services/secure/mockedEncryption';
 
 import style from './style.module.css';
-
 import type { SocialMediaButtonProps } from '../../types';
 
 /**

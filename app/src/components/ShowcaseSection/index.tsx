@@ -9,7 +9,7 @@ import { INTERSECTION_OPTIONS_ROOTMARGIN } from '@utils/constants';
 import style from './style.module.css';
 import type { ShowcaseSectionProps } from './types';
 import { DynamicElement } from '../DynamicElement';
-import type { ComponentType } from '../DynamicElement/types';
+import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
 import { DynamicElementContainer } from '../DynamicElementContainer';
 
 /**
@@ -96,7 +96,7 @@ function MemoizedShowcaseSection({
             <DynamicElement // TODO: add comment
               key={renderNode.id}
               id={renderNode.tag === 'h1' ? `${anchor}-title` : undefined}
-              tag={renderNode.tag as keyof React.JSX.IntrinsicElements | ComponentType}
+              tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
               url={renderNode.urlContent}
               className={getElementClassName(renderNode.name)}
             >
@@ -105,7 +105,7 @@ function MemoizedShowcaseSection({
                 ? renderNode.boldContent.map((item) => (
                     <DynamicElement
                       key={item.id}
-                      tag={item.tag as keyof React.JSX.IntrinsicElements | ComponentType}
+                      tag={item.tag as ValidHTMLTag | ValidComponentTag}
                       className={getElementClassName(item.name)}
                     >
                       {item.content}
@@ -116,7 +116,7 @@ function MemoizedShowcaseSection({
           ) : (
             <DynamicElementContainer
               key={renderNode.id}
-              tag={renderNode.tag as keyof React.JSX.IntrinsicElements | ComponentType}
+              tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
               className={getElementClassName(renderNode.name)}
               filterValue='card'
               url='http://localhost:5173/api/projects' // TODO: variable d'environnement

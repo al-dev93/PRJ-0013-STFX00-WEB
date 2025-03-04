@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { FetchData, FetchOptions, FetchResultData } from '@/types';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { FetchErrorContext } from '@modules/Error/types';
+import { normalizeError } from '@modules/Error/utils/errorHandling';
 
 /**
  * Custom hook to fetch data from one or multiple URLs with specified options.
@@ -9,7 +12,7 @@ import type { FetchData, FetchOptions, FetchResultData } from '@/types';
  * @param {(string | string[] | undefined | null)} [initialUrl=null] - The URL(s) to fetch data from.
  * @param {FetchOptions} [initialOptions={}] - The options to use for the fetch request.
  * @param {boolean} [shouldRefetch=false] - A flag indicating if the data should be refetched.
- * if `true`, the hook will trigger a new fetch when dependancies change.
+ * if `true`, the hook will trigger a new fetch when dependencies change.
  * if `false`, the hook will not refetch the data unless explicitly called.
  * @returns {FetchResultData } The result of the fetch operation, including:
  *  - 'data': the fetched data, either as a single result or an array of results;
@@ -28,6 +31,7 @@ export function useFetchData(
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleGlobalError = useErrorHandler();
   const hasFetched = useRef<boolean>(false);
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -37,16 +41,28 @@ export function useFetchData(
    * Otherwise, it sets a generic error message and updates the loading state.
    *
    * @function
-   * @param {unknown} error - The error occured during the fetch. This could be an instance of 'Error' or any other type.
+   * @param {unknown} error - The error occurred during the fetch. This could be an instance of 'Error' or any other type.
    * @returns {void}
    */
-  const handleError = (fetchError: unknown): void => {
-    if (fetchError instanceof Error) {
-      if (fetchError.name !== 'AbortError') setError(fetchError.message);
-    } else setError('An unkown error occured');
+  // const handleError = useCallback(
+  //   async (fetchError: unknown): Promise<void> => {
+  //     const context: FetchErrorContext = {
+  //       url: initialUrl || 'unknown',
+  //       method: initialOptions.method || 'GET',
+  //       retryCount: hasFetched.current ? 1 : 0,
+  //       stack: fetchError instanceof Error ? fetchError.stack : undefined,
+  //     };
+  //     setIsLoaded(true);
+  //     // Ignore abort errors
+  //     if (fetchError instanceof Error && fetchError.name === 'AbortError') return;
 
-    setIsLoaded(true);
-  };
+  //     // Normalize and handle the error globally
+  //     const normalized = await normalizeError(fetchError, context);
+
+  //     handleGlobalError(normalized);
+  //   },
+  //   [handleGlobalError, initialOptions.method, initialUrl],
+  // );
 
   /**
    * Stores the fetched data in the component's state.
@@ -57,10 +73,33 @@ export function useFetchData(
    * @returns {void}
    */
   const storeFetchValue = (url: string | string[], fetchData: unknown): void => {
-    if (!url) setData(fetchData as FetchData);
-    else if (Array.isArray(url)) {
+    if (Array.isArray(url)) {
       setData((fetchData as FetchData[][]).map((item) => Object.values(item).at(0) as FetchData));
+      // setData((fetchData as FetchData[][]).map((item) => item[0]));
     } else setData(Object.values(fetchData as FetchData[]).at(0) as FetchData);
+    // } else setData(fetchData as FetchData);
+  };
+
+  /**
+   * Validates a URL by attempting to create a new URL object.
+   * If the URL is invalid, an error is thrown.
+   *
+   * @function
+   * @param {string} url - The URL to validate.
+   * @throws {Error} Throws an error if the URL is invalid.
+   * @returns {void} This function does not return a value.
+   *
+   * @example
+   * validateUrl("https://example.com"); // No error, URL is valid
+   * validateUrl("invalid-url"); // Throws Error: Invalid URL: invalid-url
+   */
+  const validateUrl = (url: string): void => {
+    try {
+      // eslint-disable-next-line no-new
+      new URL(url);
+    } catch (e) {
+      throw new Error(`Invalid URL: ${url}`);
+    }
   };
 
   /**
@@ -92,12 +131,19 @@ export function useFetchData(
       setError(null);
 
       try {
+        // Check if the URL is valid
+        if (Array.isArray(url)) {
+          url.forEach(validateUrl);
+        } else {
+          validateUrl(url);
+        }
+
         let fetchData;
         if (Array.isArray(url)) {
           // Fetch for multiple URLs
           const fetchPromises = url.map((singleUrl) =>
             fetch(singleUrl, { ...options, signal }).then((response) => {
-              if (!response.ok) throw new Error(`Error: ${response.status} - ${response.statusText}`);
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
               return response.json();
             }),
           );
@@ -105,17 +151,33 @@ export function useFetchData(
         } else {
           // Fetch for a single URL
           const response = await fetch(url, { ...options, signal });
-          if (!response.ok) throw new Error(`Error: ${response.status} - ${response.statusText}`);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
           fetchData = await response.json();
         }
         storeFetchValue(url, fetchData);
         setIsLoaded(true);
         hasFetched.current = true;
       } catch (fetchError: unknown) {
-        handleError(fetchError);
+        //
+        if (fetchError instanceof DOMException && fetchError.name === 'AbortError') {
+          console.log('Fetch annulé volontairement');
+          return;
+        }
+        const context: FetchErrorContext = {
+          url: Array.isArray(url) ? url.join(', ') : url || 'unknown',
+          method: options.method || 'GET',
+          retryCount: hasFetched.current ? 1 : 0,
+          stack: fetchError instanceof Error ? fetchError.stack : undefined,
+        };
+        const normalized = await normalizeError(fetchError, context);
+        if (normalized.severity === 'critical') {
+          handleGlobalError(normalized, context);
+        } else {
+          setError(normalized.message);
+        }
       }
     },
-    [initialOptions, initialUrl, shouldRefetch],
+    [handleGlobalError, initialOptions, initialUrl, shouldRefetch],
   );
 
   /**
@@ -132,10 +194,10 @@ export function useFetchData(
 
     executeFetch();
 
-    // Cleanup function to abort fetch on unmount or when dependancies change
+    // Cleanup function to abort fetch on unmount or when dependencies change
     return () => {
-      if (controllerRef.current) controllerRef.current.abort();
+      controllerRef.current?.abort();
     };
-  }, [executeFetch, initialOptions, initialUrl]);
+  }, [executeFetch, initialUrl]);
   return { data, isLoaded, error, refetch: executeFetch };
 }

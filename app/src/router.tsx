@@ -1,12 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import { ErrorBoundary } from '@modules/Error/components/ErrorBoundary';
-import { GlobalErrorFallback } from '@modules/Error/components/GlobalErrorFallback';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { ErrorPage } from '@routes/Error';
 import { Index } from '@routes/Index';
 import { LegalNotice } from '@routes/LegalNotice';
 import { Page } from '@routes/Page';
+
+import { AppErrorFallback } from './modules/Error/components/AppErrorFallback';
 
 // import { Admin } from '@routes/Admin';
 
@@ -24,7 +25,7 @@ export const router = (key: CryptoKey | undefined) => {
     {
       path: '/',
       element: (
-        <ErrorBoundary fallback={<GlobalErrorFallback />}>
+        <ErrorBoundary fallback={<AppErrorFallback />}>
           <Page cryptoKey={key} />
         </ErrorBoundary>
       ),

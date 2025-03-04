@@ -1,3 +1,7 @@
+import { ValidHTMLTag } from '@/components/DynamicElement/types';
+
+import { HTML_TAGS } from './dynamicElementsconstants';
+
 /**
  * @description Checks if the given tag is a valid HTML tag.
  * This function creates an HTML element using the provided tag and verifies if the resulting element is not
@@ -8,7 +12,9 @@
  *
  * @al-dev93
  */
-export function isHtmlTag(tag: keyof React.JSX.IntrinsicElements): boolean {
-  const element = document.createElement(tag);
-  return !(element instanceof HTMLUnknownElement);
+export function isHtmlTag(tag: ValidHTMLTag): boolean {
+  if (typeof document === 'undefined') return false;
+  // const element = document.createElement(tag);
+  // return !(element instanceof HTMLUnknownElement);
+  return HTML_TAGS.includes(tag);
 }

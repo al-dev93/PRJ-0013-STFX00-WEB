@@ -3,9 +3,11 @@ import { Text } from '@visx/text';
 import Wordcloud from '@visx/wordcloud/lib/Wordcloud';
 import React, { KeyboardEvent, memo, useCallback, useMemo, useState } from 'react';
 
+import type { Skill } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
 
 import style from './style.module.css';
+import type { SkillsCloudProps } from './types';
 import {
   ARIA_LABEL_CONTRAST_MODE,
   ARIA_LABEL_ROTATE_MODE,
@@ -20,10 +22,6 @@ import {
   SKILLS_PADDING,
   SKILLS_SPIRAL_TYPE,
 } from './utils/constants';
-
-import type { SkillsCloudProps } from './types';
-import type { Skill } from '@/types';
-
 /**
  * SkillsCloud component that displays a word cloud of skills.
  *
@@ -202,4 +200,5 @@ function MemoizedSkillsCloud({
   );
 }
 
-export const SkillsCloud = memo(MemoizedSkillsCloud);
+const SkillsCloud = memo(MemoizedSkillsCloud);
+export default SkillsCloud;

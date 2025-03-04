@@ -1,8 +1,13 @@
+import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AppError } from '@/types';
-import type { Window } from '@modules/Error/types';
+import { CardDisplayError } from '@components/Card/error';
+import { DynamicElementError } from '@components/DynamicElement/error';
+import type { FetchErrorContext, Window } from '@modules/Error/types';
 import { normalizeError } from '@modules/Error/utils/errorHandling';
+
+import { monitoringService } from '../services/monitoring';
 
 /**
  * A custom React hook for handling errors in a consistent and centralized way.
@@ -10,11 +15,9 @@ import { normalizeError } from '@modules/Error/utils/errorHandling';
  * including redirecting to an error page and optionally logging the error
  * to a monitoring service.
  *
- * @export
- * @returns {(error: unknown, context?: Record<string, unknown>) => Promise<AppError>}
- * A function that takes an error and an optional context object. The
- * function normalizes the error, logs it (if monitoring is enabled),
- * and redirects to the error page with the error details.
+ * @returns {Function} - A function that takes an error and an optional context object.
+ *                       The function normalizes the error, logs it (if monitoring is enabled),
+ *                       and redirects to the error page with the error details and context.
  *
  * @example
  * const handleError = useErrorHandler();
@@ -31,28 +34,42 @@ import { normalizeError } from '@modules/Error/utils/errorHandling';
  *     .catch(error => handleError(error, { feature: 'dashboard' }));
  * }, []);
  */
-export function useErrorHandler(): (error: unknown, context?: Record<string, unknown>) => Promise<AppError> {
+export function useErrorHandler(): (rawError: unknown, context?: FetchErrorContext) => Promise<AppError> {
   const navigate = useNavigate();
   const location = useLocation();
 
-  return async (error: unknown, context?: Record<string, unknown>) => {
-    const normalizedError = await normalizeError(error);
+  return useCallback(
+    async (rawError: unknown, context: FetchErrorContext = { url: 'unknown', method: 'GET' }): Promise<AppError> => {
+      const fullContext = {
+        ...context,
+        route: location.pathname,
+        timestamp: Date.now(),
+      };
 
-    // Log the error to the monitoring service (if available)
-    (window as Window).monitoring?.captureException(normalizedError, {
-      ...context,
-      route: location.pathname,
-    });
+      const normalized = await normalizeError(rawError, fullContext);
 
-    navigate('/error', {
-      state: {
-        error: normalizedError,
-        context,
-        previousPath: window.location.pathname,
-      },
-      replace: true,
-    });
+      // Log the error by category to the monitoring service (if available)
+      if (rawError instanceof CardDisplayError) {
+        monitoringService.track(normalized, { category: 'UI Component', ...fullContext });
+      } else if (rawError instanceof DynamicElementError) {
+        monitoringService.track(normalized, { category: 'Dynamic Rendering', ...fullContext });
+      } else {
+        (window as Window).monitoring?.captureException(normalized, fullContext);
+      }
 
-    return normalizedError;
-  };
+      // Redirect to the error page with the error details (except for 'low' errors)
+      if (normalized.severity !== 'low') {
+        navigate('/error', {
+          state: {
+            error: normalized,
+            previousPath: window.location.pathname,
+          },
+          replace: true,
+        });
+      }
+
+      return normalized;
+    },
+    [location.pathname, navigate],
+  );
 }

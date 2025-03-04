@@ -1,16 +1,15 @@
-// import { useEffect } from 'react';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
+import type { MenuItemType } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
+// import { useEffect } from 'react';
 
 import { MenuItem } from './components/MenuItem';
 import { useCollapsibleHeader } from './hooks/useCollapsibleHeader';
 import style from './style.module.css';
-import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
-
 import type { CollapsibleHeaderProps } from './types';
-import type { MenuItemType } from '@/types';
+import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
 
 /**
  *

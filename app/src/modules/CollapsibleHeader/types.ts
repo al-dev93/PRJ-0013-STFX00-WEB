@@ -1,8 +1,8 @@
 import { MutableRefObject } from 'react';
 
-import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
-
 import type { MenuItemType, MenuSectionsVisibility } from '@/types';
+
+import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
 
 /**
  * A mutable reference object that helds the current scroll position as

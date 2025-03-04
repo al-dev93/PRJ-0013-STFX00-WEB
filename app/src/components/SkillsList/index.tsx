@@ -3,7 +3,6 @@ import React from 'react';
 import { Tag } from '@components/Tag';
 
 import style from './style.module.css';
-
 import type { SkillsListProps } from './types';
 
 /**

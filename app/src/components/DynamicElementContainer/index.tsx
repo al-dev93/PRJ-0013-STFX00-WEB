@@ -1,18 +1,20 @@
-import React, { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
+import { AppErrorFallback } from '@/modules/Error/components/AppErrorFallback';
+import { useErrorHandler } from '@/modules/Error/hooks/useErrorHandler';
+import { normalizeErrorSync } from '@/modules/Error/utils/errorHandling';
 import { FetchData } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { useFetchData } from '@hooks/useFetchData';
 
 import type { DynamicElementContainerProps } from './types';
-
 /**
  * DynamicElementContainer component that fetches data from given URL,
  * filters it based on a filter value, and renders the DynamicElements.
  *
  * @component
  * @param {DynamicElementContainerProps} props - The properties for the DynamicElementContainer component.
- * @property {ComponentType | keyof React.JSX.IntrinsicElements} tag - The tag or component to render for each DynamicElement.
+ * @property {(ValidHTMLTag | ValidComponentTag)} tag - The tag or component to render for each DynamicElement.
  * @property {string} [className] - The CSS class name for the container element.
  * @property {string} [filterValue] - The value used to filter the fetched data by the 'display' property.
  * @property {string} [url] - The URL to fetch data from.
@@ -27,26 +29,50 @@ export function DynamicElementContainer({
   url,
   ...props
 }: DynamicElementContainerProps): React.JSX.Element {
+  const handleError = useErrorHandler();
+
   // Fetch data using useFetchData custom hook.
   const { data: fetchedData, error } = useFetchData(url || null, { method: 'GET' });
+
+  // Handle errors from data fetching.
+  useEffect(() => {
+    if (error) {
+      handleError(error, {
+        component: 'DynamicElementContainer',
+        operation: 'fetchData',
+        url: url || 'unknown',
+      });
+    }
+  }, [error, handleError, url]);
 
   /**
    * Filter fetched data based on the 'display' property. If no filterValue is provided, return the fetched data.
    *
    * @constant
-   * @type {FetchData}
+   * @type {(FetchData | undefined)}
    */
-  const filteredData = useMemo(() => {
+  const filteredData: FetchData | undefined = useMemo(() => {
     const simpleFetchedData = fetchedData as FetchData;
     return filterValue
       ? simpleFetchedData?.filter((item) => item?.['display' as keyof typeof item] === filterValue)
       : simpleFetchedData;
   }, [fetchedData, filterValue]);
 
-  // TODO: sortir l'erreur
-  // Render error state if an error occured during data fetching.
+  // Render error state if an error occurred during data fetching.
   if (error) {
-    console.error(`Error: ${error}`);
+    // Normalize the error before passing it to AppErrorFallback
+    const normalizedError = normalizeErrorSync(error, {
+      component: 'DynamicElementContainer',
+      operation: 'fetchData',
+      url: url || 'unknown',
+    });
+
+    return (
+      <AppErrorFallback
+        error={normalizedError}
+        onReset={() => window.location.reload()} // Option to reload the page
+      />
+    );
   }
 
   return (

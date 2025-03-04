@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { ComponentType } from '../DynamicElement/types';
+import { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
 
 /**
  * The props for the DynamicElementContainer component.
@@ -14,7 +12,7 @@ import { ComponentType } from '../DynamicElement/types';
  * @al-dev93
  */
 export type DynamicElementContainerProps = {
-  tag: ComponentType | keyof React.JSX.IntrinsicElements;
+  tag: ValidHTMLTag | ValidComponentTag;
   className?: string;
   filterValue?: string;
   url?: string;

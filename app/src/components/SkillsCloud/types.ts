@@ -8,12 +8,12 @@ import type { Skill } from '@/types';
  * @property {string} [url] - URL to download the data needed to create the word cloud.
  * @property {number} [width=800] - Total width of the word cloud. 800px by default.
  * @property {number} [height=400] - Total height of the word cloud. 400px by default.
-
- * @al-dev93
+ * @property {React.ReactNode} [children] - Optional child nodes to be rendered inside the component.
  */
 export type SkillsCloudProps = {
   width: number;
   height: number;
+  children?: React.ReactNode;
 } & (
   | {
       data?: Skill[];

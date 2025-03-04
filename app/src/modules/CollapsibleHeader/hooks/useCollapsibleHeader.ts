@@ -1,8 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 
-import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from '../utils/constants';
-
 import type { CollapsibleHeaderState, ScrollRef } from '../types';
+import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from '../utils/constants';
 
 /**
  * custom hook that manages a collapsible header state based on scroll position.

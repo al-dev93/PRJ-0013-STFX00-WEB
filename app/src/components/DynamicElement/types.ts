@@ -1,56 +1,65 @@
-import React, { ComponentProps, HTMLAttributes, ReactNode } from 'react';
+import { ComponentProps, ReactNode } from 'react';
 
-import { COMPONENT_MAP } from '@/utils/dynamicElementsconstants';
+import type { FetchErrorContext } from '@modules/Error/types';
+import { COMPONENT_MAP, HTML_TAGS } from '@utils/dynamicElementsconstants';
+/**
+ * Represents the type of component that can be rendered.
+ *
+ * @exports
+ * @type {keyof typeof COMPONENT_MAP} ValidComponentTag
+ */
+export type ValidComponentTag = keyof typeof COMPONENT_MAP;
 
 /**
- * Repesents the type of component that can be rendered.
+ * Represents the type of HTML element
  *
- * @type {keyof typeof COMPONENT_MAP} ComponentType
- *
- * @al-dev93
+ * @exports
+ * @type {typeof HTML_TAGS[number]} ValidHTMLTag
  */
-export type ComponentType = keyof typeof COMPONENT_MAP;
+export type ValidHTMLTag = (typeof HTML_TAGS)[number];
 
-/**
- * Properties of custom components (like Card, SkillsCloud, Slideshow).
- *
- * @type {object} CustomComponentProps
- * @property {ComponentType} tag - The custom component type to render, based on the `COMPONENT_MAP`.
- * @property {React.ReactNode} [children] - Optional child nodes to be rendered inside the component.
- * @property {Object} [props] - Any aditional props required by the chosen component type.
- *
- * @al-dev93
- */
-type CustomComponentProps = {
-  tag: ComponentType;
-  children?: ReactNode;
-} & ComponentProps<(typeof COMPONENT_MAP)[ComponentType]>;
+// type ComponentPropsUnion = {
+//   [K in ValidComponentTag]: { tag: K } & ComponentProps<(typeof COMPONENT_MAP)[K]>;
+// }[ValidComponentTag];
 
-/**
- * Props for an HTML element.
- *
- * @type {object} HtmlElementProps
- * @property {keyof React.JSX.IntrinsicElements} tag - The HTML tag to render (e.g., 'div', 'span', etc.).
- * @property {React.ReactNode} [children] - Optional child nodes to be rendered inside the HTML element.
- * @property {HTMLAttributes<HTMLElement>} [props] - Stndard HTML attributes applicable to the HTML element.
- *
- * @al-dev93
- */
-type HtmlElementProps = {
-  tag: keyof React.JSX.IntrinsicElements;
-  children?: ReactNode;
-} & HTMLAttributes<HTMLElement>;
+// type HTMLPropsUnion = {
+//   [K in ValidHTMLTag]: { tag: K } & HTMLAttributes<HTMLElement>;
+// }[ValidHTMLTag];
 
 /**
  * Props for the DynamicElement component, which can render either a custom component
  * or a native HTML element.
  *
- * @type {CustomComponentProps | HtmlElementProps} DynamicElementProps
- * @property {ComponentType | keyof React.JSX.IntrinsicElements} tag - The tag representing either a custom component
+ * @type {(CustomComponentProps | HtmlElementProps)} DynamicElementProps
+ * @property {(ValidHTMLTag | ValidComponentTag)} tag - The tag representing either a custom component
  * or an HTML element.
  * @property {React.ReactNode} [children] - Optional child nodes to be rendered inside the element or component.
- * @property {Object} [props] - Any additinal props or attributes specific to the chosen tag.
- *
- * @al-dev93
+ * @property {Object} [props] - Any additional props or attributes specific to the chosen tag.
  */
-export type DynamicElementProps = CustomComponentProps | HtmlElementProps;
+export type DynamicElementProps<T extends ValidComponentTag | ValidHTMLTag> = {
+  tag: T;
+  children?: ReactNode;
+} & (T extends ValidComponentTag
+  ? ComponentProps<(typeof COMPONENT_MAP)[T]>
+  : T extends (typeof HTML_TAGS)[number]
+    ? JSX.IntrinsicElements[T]
+    : never);
+
+// export type DynamicElementProps = ComponentPropsUnion | HTMLPropsUnion;
+
+/**
+ * Context metadata for DynamicElement-related errors.
+ * Provides structured details to diagnose invalid tag usage.
+ *
+ * @exports
+ * @interface DynamicElementErrorContext
+ * @extends {FetchErrorContext}
+ * @property {string} invalidTag - Invalid tag provided to DynamicElement
+ * @property {string[]} validTags - List of valid tags (custom components + HTML)
+ * @property {string[]} [receivedProps] - Props received by DynamicElement during error
+ */
+export interface DynamicElementErrorContext extends FetchErrorContext {
+  invalidTag: string;
+  validTags: string[];
+  receivedProps?: string[];
+}
