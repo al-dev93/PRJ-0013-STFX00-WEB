@@ -5,10 +5,13 @@ import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
 import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
 import { useContactFormSelector } from '@modules/ModalDialogContactForm/hooks/useContactFormSelector';
 import {
   PREFIX_AUTO_COMPLETE_ITEM_ID,
+  SET_ERROR_MESSAGE,
   SET_INPUT_HOVER,
   SET_INPUT_NODE,
   SUFFIX_AUTO_COMPLETE_LIST_ID,
@@ -25,9 +28,9 @@ import { Popover } from '../../../Popover';
  *
  * @component DialogFormInput
  * @param {DialogFormInputProps} props - The properties for the DialogFormInput component.
- * @property {FormInput} formInput - the definition of thr input or textarea element of the form
+ * @property {FormInput} formInput - the definition of the input or textarea element of the form
  * @property {string} label - the label for the input element
- * @property {string} name - the nameattribute for the input element
+ * @property {string} name - the name attribute for the input element
  * @property {TooltipContent[]} [tooltipContent] - content for tooltips associated with the input element (optional)
  * @returns {React.JSX.Element} The rendered DialogFormInput component.
  *
@@ -43,8 +46,10 @@ export function MemoizedDialogFormInput({
   const idErrorMessage = useId();
   const inputElementRef = useRef<DialogFormInputElement>(null);
 
+  const handleError = useErrorHandler();
+
   // Partial state selector using keys
-  const { inputNode, inputStatusTag, inputError, inputBorderBox, popoverMode, listItemFocused } =
+  const { inputNode, inputStatusTag, inputError, inputBorderBox, popoverMode, listItemFocused, errorMessage } =
     useContactFormSelector(name, [
       'inputNode',
       'inputStatusTag',
@@ -52,6 +57,7 @@ export function MemoizedDialogFormInput({
       'inputBorderBox',
       'popoverMode',
       'listItemFocused',
+      'errorMessage',
     ]);
   const contactFormAction = useContactFormDispatch();
   const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(name);
@@ -61,23 +67,52 @@ export function MemoizedDialogFormInput({
    * This reference is used to set the input node in the state.
    */
   useEffect(() => {
-    if (inputElementRef.current) {
-      contactFormAction({ type: SET_INPUT_NODE, payload: { name, inputNode: inputElementRef.current } });
-    }
-  }, [contactFormAction, name]);
+    if (!inputElementRef.current) return;
+    const setNode = async (inputElement: DialogFormInputElement): Promise<void> => {
+      try {
+        contactFormAction({ type: SET_INPUT_NODE, payload: { name, inputNode: inputElement } });
+      } catch (err) {
+        await handleError(
+          createError(2103, 'Failed to set input node', {
+            originalError: err,
+            component: 'DialogFormInput',
+            inputName: name,
+            operation: 'setNode',
+            category: 'UI Component',
+            url: window.location.href,
+          }),
+        );
+      }
+    };
+    setNode(inputElementRef.current);
+  }, [contactFormAction, handleError, name]);
 
   /**
    * Handles setting the autocomplete input.
    *
    * @function handleSetInputAutocomplete
+   * @async
    * @param {string} value - The autocomplete value to set.
-   * @returns {void}
+   * @returns {Promise<void>}
    */
   const handleSetInputAutocomplete = useCallback(
-    (value: string): void => {
-      setInputAutocomplete(value);
+    async (value: string): Promise<void> => {
+      try {
+        setInputAutocomplete(value);
+      } catch (err) {
+        await handleError(
+          createError(1104, 'Autocomplete error', {
+            originalError: err,
+            component: 'DialogFormInput',
+            inputName: name,
+            operation: 'setInputAutocomplete',
+            category: 'UI Component',
+            url: window.location.href,
+          }),
+        );
+      }
     },
-    [setInputAutocomplete],
+    [handleError, name, setInputAutocomplete],
   );
 
   /**
@@ -85,14 +120,34 @@ export function MemoizedDialogFormInput({
    * This function can be used for events like mouse enter, mouse leave, focus and blur.
    *
    * @function handleTooltipVisibility
+   * @async
    * @param {boolean} visible - Indicates whether the tooltip should be visible (true) or hidden (false).
-   * @returns {void}
+   * @returns {Promise<void>}
    */
   const handleTooltipVisibility = useCallback(
-    (visible: boolean): void => {
-      contactFormAction({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
+    async (
+      event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.FocusEvent<HTMLDivElement, Element>,
+      visible: boolean,
+    ): Promise<void> => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      try {
+        contactFormAction({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
+      } catch (err) {
+        await handleError(
+          createError(1005, 'Tooltip not visible', {
+            originalError: err,
+            component: 'DialogFormInput',
+            inputName: name,
+            operation: 'setTooltipVisibility',
+            category: 'UI Component',
+            url: window.location.href,
+          }),
+        );
+      }
     },
-    [contactFormAction, name],
+    [contactFormAction, handleError, name],
   );
 
   /**
@@ -138,23 +193,39 @@ export function MemoizedDialogFormInput({
 
   /**
    * Formats the error message for the popover component.
-   * If the error state is undefined, returns an empty string.
-   * Otherwise, returns a string with the error messages separated by newlines.
+   * If the error state is undefined, errorMessage of the global state is undefined.
+   * Otherwise, a string with the error messages separated by newlines is stored
+   * in errorMessage of the global state.
    *
-   * @constant formatedErrorMessage
+   * @function formattedErrorMessage
+   * @async
+   * @returns {Promise<void>}
    */
-  const formatedErrorMessage: string | undefined = useMemo(() => {
+  const formattedErrorMessage = useCallback(async (): Promise<void> => {
     const errorState = inputError;
-    const errorMessage = formInput.error;
-    // Remove minLength and valid keys from errorState
-    const errors = errorState
-      ? Object.entries(errorState).filter(
-          ([key, value]) => key !== 'minLength' && key !== 'maxLength' && key !== 'valid' && value,
-        )
-      : undefined;
+    const unformattedMessage = formInput.error;
+    try {
+      // Remove minLength and valid keys from errorState and format the error message
+      const formattedMessage = errorState
+        ? Object.entries(errorState)
+            .filter(([key, value]) => key !== 'minLength' && key !== 'maxLength' && key !== 'valid' && value)
+            .map(([key]) => unformattedMessage?.[key as keyof typeof unformattedMessage])
+            .join('\n')
+        : undefined;
 
-    return errors?.map(([key]) => errorMessage?.[key as keyof typeof errorMessage]).join('\n');
-  }, [inputError, formInput.error]);
+      contactFormAction({ type: SET_ERROR_MESSAGE, payload: { name, errorMessage: formattedMessage } });
+    } catch (err) {
+      await handleError(
+        createError(1105, 'Error while formatting the error message to be displayed in the popover', {
+          originalError: err,
+          component: 'DialogFormInput',
+          inputName: name,
+          operation: 'formattedErrorMessage',
+          url: window.location.href,
+        }),
+      );
+    }
+  }, [inputError, formInput.error, contactFormAction, name, handleError]);
 
   /**
    * Renders the Popover component if the input field is focused.
@@ -163,9 +234,15 @@ export function MemoizedDialogFormInput({
    * @constant renderPopover
    */
   const renderPopover: React.JSX.Element | null = useMemo(
-    () => <Popover name={name} errorMessage={formatedErrorMessage} inputAutocomplete={handleSetInputAutocomplete} />,
-    [formatedErrorMessage, handleSetInputAutocomplete, name],
+    () => <Popover name={name} errorMessage={errorMessage} inputAutocomplete={handleSetInputAutocomplete} />,
+    [errorMessage, handleSetInputAutocomplete, name],
   );
+
+  useEffect(() => {
+    if (formInput.error) {
+      formattedErrorMessage();
+    }
+  }, [formInput.error, formattedErrorMessage]);
 
   /**
    * Creates the class name for the input field, based on the border box of the form input.
@@ -190,10 +267,10 @@ export function MemoizedDialogFormInput({
     <div className={style.dialogFormComponent}>
       <div
         className={classNameDialogFormInput}
-        onMouseEnter={() => handleTooltipVisibility(true)}
-        onMouseLeave={() => handleTooltipVisibility(false)}
-        onFocus={() => handleTooltipVisibility(true)}
-        onBlur={() => handleTooltipVisibility(false)}
+        onMouseEnter={tooltipContent?.length ? (event) => handleTooltipVisibility(event, true) : undefined}
+        onMouseLeave={tooltipContent?.length ? (event) => handleTooltipVisibility(event, false) : undefined}
+        onFocus={tooltipContent?.length ? (event) => handleTooltipVisibility(event, true) : undefined}
+        onBlur={tooltipContent?.length ? (event) => handleTooltipVisibility(event, false) : undefined}
       >
         {tooltipContent?.length ? (
           <p id={idTooltipContent} className='visually-hidden'>
@@ -202,7 +279,7 @@ export function MemoizedDialogFormInput({
         ) : null}
         {inputError ? (
           <p id={idErrorMessage} className='visually-hidden'>
-            {formatedErrorMessage}
+            {errorMessage}
           </p>
         ) : null}
         <div className={style.dialogFormInput__label}>
@@ -230,9 +307,7 @@ export function MemoizedDialogFormInput({
           aria-controls={formInput.tag === 'input' ? `${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}` : undefined}
           aria-activedescendant={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${listItemFocused}`}
           aria-label={name}
-          aria-describedby={
-            (formatedErrorMessage ? idErrorMessage : '') + (isTooltipVisible ? ` ${idTooltipContent}` : '')
-          }
+          aria-describedby={(errorMessage ? idErrorMessage : '') + (isTooltipVisible ? ` ${idTooltipContent}` : '')}
           aria-invalid={inputError?.valid ? 'true' : 'false'}
         />
         {renderAlertTag}

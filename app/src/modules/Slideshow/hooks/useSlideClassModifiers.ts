@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 
-import { ProjectData } from '@/types';
+import type { ProjectData } from '@/types';
 
-import { SlideshowState } from '../types';
+import type { SlideshowState } from '../types';
 
 /**
  * Custom hook to manage CSS class names for slideshow slides.

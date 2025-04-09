@@ -24,3 +24,7 @@
   background-color: var(--light-primary-color);
   border-radius: var(--br-xs);
 }
+
+.tag--empty {
+  padding: 0px;
+}

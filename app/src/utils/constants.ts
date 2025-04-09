@@ -27,6 +27,22 @@ const MAX_MESSAGE_LENGTH: number = 1000;
 const MIN_NAME_LENGTH: number = 2;
 const MAX_NAME_LENGTH: number = 100;
 
+const ICON_VALUES = [
+  'paper-plane-outline',
+  'logo-linkedin',
+  'logo-github',
+  'logo-npm',
+  'logo-figma',
+  'open-outline',
+  'document-outline',
+  'chevron-back-outline',
+  'chevron-forward-outline',
+  'moon-outline',
+  'moon',
+  'sync-outline',
+  'swap-horizontal-outline',
+] as const;
+
 export {
   ACTIVE_STATUS,
   ALERTED_STYLE,
@@ -35,6 +51,7 @@ export {
   ENABLED_STATUS,
   FILLED_STYLE,
   HIDDEN_STATUS,
+  ICON_VALUES,
   INTERSECTION_OPTIONS_ROOTMARGIN,
   LAZY_STATUS,
   MAX_COMPANY_LENGTH,

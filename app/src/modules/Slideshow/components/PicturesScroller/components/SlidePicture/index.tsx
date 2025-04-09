@@ -1,12 +1,11 @@
 import React, { memo, useRef } from 'react';
 
-import { useOnScreen } from '@/hooks/useOnScreen';
+import { useOnScreen } from '@hooks/useOnScreen';
 import { EAGER_STATUS, LAZY_STATUS } from '@utils/constants';
 
 import style from './style.module.css';
 import type { SlidePictureProps } from '../../../../types';
 import { INTERSECTION_OPTIONS_THRESHOLD } from '../../../../utils/constants';
-
 /**
  * Component to display an individual slide picture in the slideshow.
  *

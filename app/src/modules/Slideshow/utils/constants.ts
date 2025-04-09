@@ -1,4 +1,4 @@
-import { ProjectData } from '@/types';
+import type { ProjectData } from '@/types';
 
 /**
  * Slideshow states

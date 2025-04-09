@@ -42,7 +42,7 @@ export class ApplicationError extends Error implements AppError {
   toPlainObject(): AppError {
     return {
       ...this,
-      // code: this.code,
+      code: this.code,
       message: this.message,
       name: this.name,
       // severity: this.severity,

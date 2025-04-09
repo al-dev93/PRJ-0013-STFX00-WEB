@@ -1,6 +1,8 @@
 import React, { MouseEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAnimation } from '@hooks/useAnimation';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
 
 import style from './style.module.css';
 import { useContactFormSelector } from '../../hooks/useContactFormSelector';
@@ -20,6 +22,7 @@ import { PREFIX_AUTO_COMPLETE_ITEM_ID, SUFFIX_AUTO_COMPLETE_LIST_ID } from '../.
  * @al-dev93
  */
 export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps): React.JSX.Element {
+  const handleError = useErrorHandler();
   const popoverRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
   const suggestionsRef = useRef<HTMLUListElement>(null);
@@ -94,17 +97,27 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
       popoverRef.current.style.width = `${masterElement.scrollWidth}px`;
       masterElement.style.width = 'max-content';
     };
-
-    if (messageRef.current && suggestionsRef.current) {
-      setWidth(suggestionsRef, messageRef);
-      return;
+    try {
+      if (messageRef.current && suggestionsRef.current) {
+        setWidth(suggestionsRef, messageRef);
+        return;
+      }
+      if (messageRef.current && !suggestionsRef.current) {
+        setWidth(messageRef);
+        return;
+      }
+      if (!messageRef.current && suggestionsRef.current) setWidth(suggestionsRef);
+    } catch (err) {
+      handleError(
+        createError(1005, 'Error while adjusting popover width.', {
+          originalError: err,
+          component: 'Popover',
+          operation: 'adjustPopoverWidth',
+          category: 'UI COmponent',
+        }),
+      );
     }
-    if (messageRef.current && !suggestionsRef.current) {
-      setWidth(messageRef);
-      return;
-    }
-    if (!messageRef.current && suggestionsRef.current) setWidth(suggestionsRef);
-  }, [showSuggestions, shouldRenderSuggestions]);
+  }, [showSuggestions, shouldRenderSuggestions, handleError]);
 
   /**
    * Scrolls the focused item into view when the list of autocomplete suggestions is updated.
@@ -114,9 +127,20 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     if (!suggestionsRef.current || listItemFocused === undefined) return;
     const item = suggestionsRef.current.querySelector(`#${PREFIX_AUTO_COMPLETE_ITEM_ID}${listItemFocused}`);
     if (item) {
-      item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      try {
+        item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } catch (err) {
+        handleError(
+          createError(1003, 'Failed to scroll focused autocomplete item into view.', {
+            orignalError: err,
+            component: 'Popover',
+            operation: 'scrollToFocusedItem',
+            category: 'UI Interaction',
+          }),
+        );
+      }
     }
-  }, [listItemFocused]);
+  }, [handleError, listItemFocused]);
 
   /**
    * Handles click events for selecting autocomplete items. Prevents the default
@@ -129,12 +153,36 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
    */
   const handleClick = useCallback(
     (event: MouseEvent<HTMLLIElement>): void => {
-      event.preventDefault();
-      event.stopPropagation();
+      try {
+        event.preventDefault();
+        event.stopPropagation();
 
-      inputAutocomplete(event.currentTarget.textContent ?? '');
+        const value = event.currentTarget.textContent;
+
+        if (!value) {
+          handleError(
+            createError(1001, 'Empty value selected from autocomplete list.', {
+              component: 'Popover',
+              operation: 'autocompleteSelection',
+              category: 'UI Interaction',
+            }),
+          );
+          return;
+        }
+
+        inputAutocomplete(event.currentTarget.textContent ?? '');
+      } catch (err) {
+        handleError(
+          createError(1003, 'Failed to handle autocomplete item click.', {
+            originalError: err,
+            component: 'Popover',
+            operation: 'autocompleteSelection',
+            category: 'UI Interaction',
+          }),
+        );
+      }
     },
-    [inputAutocomplete],
+    [handleError, inputAutocomplete],
   );
 
   /**

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { TooltipContent } from '@/types';
+import type { TooltipContent } from '@/types';
 
 /**
  * Props for the Tooltip component

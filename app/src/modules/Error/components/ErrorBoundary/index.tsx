@@ -1,10 +1,7 @@
 import React, { Component, ReactNode } from 'react';
-import { ErrorInfo } from 'react-dom/client';
 
-import type { Props, State, Window } from '@modules/Error/types';
-import { normalizeError, normalizeErrorSync } from '@modules/Error/utils/errorHandling';
-
-import { AppErrorFallback } from '../AppErrorFallback';
+import type { FetchErrorContext, Props, State, Window } from '@modules/Error/types';
+import { normalizeError } from '@modules/Error/utils/errorHandling';
 /**
  * A React error boundary component that catches JavaScript errors in its child component tree,
  * logs them, and displays a fallback UI instead of the crashed component tree.
@@ -29,8 +26,6 @@ import { AppErrorFallback } from '../AppErrorFallback';
  * @see https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary
  */
 export class ErrorBoundary extends Component<Props, State> {
-  private resetKey = 0;
-
   /**
    * Initializes the component state.
    *
@@ -39,7 +34,11 @@ export class ErrorBoundary extends Component<Props, State> {
    */
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = {
+      hasError: false,
+      error: undefined,
+      resetKey: 0,
+    };
   }
 
   /**
@@ -47,15 +46,30 @@ export class ErrorBoundary extends Component<Props, State> {
    * This static method is called during the render phase to derive state from errors.
    *
    * @static
-   * @param {Error} error - The error that was thrown
-   * @returns {State} - The new state to set
+   * @param {unknown} error - The error that was thrown
+   * @returns {Partial<State>} - The new state to set
    */
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: unknown): Partial<State> {
+    if (error instanceof Error) {
+      return {
+        hasError: true,
+        error: {
+          code: 500,
+          name: error.name,
+          message: error.message,
+          severity: 'critical',
+          stack: error.stack,
+          timestamp: Date.now(),
+        },
+      };
+    }
+
     return {
       hasError: true,
       error: {
-        ...error,
         code: 500,
+        name: 'UnknownError',
+        message: 'Unknown or unhandled error',
         severity: 'critical',
         timestamp: Date.now(),
       },
@@ -81,32 +95,20 @@ export class ErrorBoundary extends Component<Props, State> {
    * @param {ErrorInfo} info - Component stack trace information
    * @returns {void}
    */
-  componentDidCatch(error: Error, info: ErrorInfo): void {
-    if (error.name === 'AbortError') {
-      console.log('Requête annulée (comportement normal)');
-      return;
-    }
-    // console.error('ErrorBoundary:', error, info.componentStack);
-    const currentUrl = window.location.href;
-    const normalized = normalizeErrorSync(error, {
+  componentDidCatch(error: unknown, info: React.ErrorInfo): void {
+    const context: FetchErrorContext = {
       source: 'component',
-      url: currentUrl,
-      method: 'RENDER',
       stack: info.componentStack,
-      originalError: error,
-    });
+      url: window.location.href,
+    };
 
-    this.setState({
-      hasError: true,
-      error: normalized,
-    });
-
-    (window as Window).monitoring?.captureException(normalized, {
-      tags: {
-        route: currentUrl,
-        component: 'ErrorBoundary',
-      },
-    });
+    normalizeError(error, context)
+      .then((normalizedError) => {
+        (window as Window).monitoring?.captureException(normalizedError);
+      })
+      .catch((normalizationError) => {
+        console.error('Error during normalization', normalizationError);
+      });
   }
 
   /**
@@ -132,28 +134,43 @@ export class ErrorBoundary extends Component<Props, State> {
    * handlePromiseRejection(event);
    */
   handlePromiseRejection = async (event: PromiseRejectionEvent) => {
-    this.setState({
-      hasError: true,
-      error: await normalizeError(event.reason),
-    });
+    const context: FetchErrorContext = {
+      source: 'promise',
+      url: window.location.href,
+    };
+
+    try {
+      const error = await normalizeError(event.reason, context);
+      this.setState({
+        hasError: true,
+        error,
+      });
+
+      (window as Window).monitoring?.captureException(error);
+    } catch (normalizationError) {
+      console.error('Normalization error in handlePromiseRejection : ', normalizationError);
+    }
   };
 
-  private handleReset = () => {
+  private handleReset = (): void => {
     const { onReset } = this.props;
-    this.resetKey += 1;
-    this.setState({ hasError: false, error: undefined });
+
+    this.setState((prevState) => ({
+      hasError: false,
+      error: undefined,
+      resetKey: prevState.resetKey + 1,
+    }));
+
     if (onReset) onReset();
   };
 
   private renderFallback() {
     const { error } = this.state;
-    const { fallback, onReset } = this.props;
+    const { fallback } = this.props;
 
-    return React.isValidElement(fallback) ? (
-      React.cloneElement(fallback, { error, onReset: onReset || this.handleReset })
-    ) : (
-      <AppErrorFallback error={error} onReset={onReset || this.handleReset} />
-    );
+    return React.isValidElement(fallback)
+      ? React.cloneElement(fallback, { error, onReset: this.handleReset })
+      : fallback;
   }
 
   /**
@@ -162,19 +179,22 @@ export class ErrorBoundary extends Component<Props, State> {
    * @returns {ReactNode} - The child components or the fallback UI
    */
   render(): ReactNode {
-    const { hasError } = this.state;
+    const { hasError, error, resetKey } = this.state;
     const { children } = this.props;
-    return <div key={this.resetKey}>{hasError ? this.renderFallback() : children}</div>;
 
-    // if (hasError) {
-    //   const fallbackWithReset = React.isValidElement(fallback) ? (
-    //     React.cloneElement(fallback, { onReset: onReset || this.handleReset })
-    //   ) : (
-    //     <AppErrorFallback error={error as Error} onReset={onReset || this.handleReset} />
-    //   );
+    if (hasError && !error) {
+      console.error('Aberrant state detected : hasError = true with no error defined.');
 
-    //   return fallbackWithReset;
-    // }
-    // return children;
+      return (
+        <div>
+          <p>An unknown error has occurred.</p>
+          <button type='button' onClick={this.handleReset}>
+            Réessayer
+          </button>
+        </div>
+      );
+    }
+
+    return <div key={resetKey}>{hasError ? this.renderFallback() : children}</div>;
   }
 }

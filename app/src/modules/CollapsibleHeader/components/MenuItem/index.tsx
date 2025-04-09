@@ -1,13 +1,16 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { validateBooleanOrUndefined } from '@utils/typeHelpers';
 
 import style from './style.module.css';
 import type { MenuItemProps } from '../../types';
-
 /**
  * Menu item component. Contains the anchor to the section
  * and changes style when the section is displayed
- * //TODO: add comment memoized
+ * TODO: add comment memoized
  *
  * @component
  * @param {MenuItemProps} { isVisible, label, anchor }
@@ -19,15 +22,42 @@ import type { MenuItemProps } from '../../types';
  *
  * @al-dev93
  */
-function MemoizedMenuItem({ isSectionVisible, label, anchor, isCollapsedMenu }: MenuItemProps): React.JSX.Element {
+function MemoizedMenuItem({
+  isSectionVisible,
+  label,
+  anchor,
+  isCollapsedMenu,
+}: MenuItemProps): React.JSX.Element | null {
+  const handleError = useErrorHandler();
+
+  useEffect(() => {
+    if (!label || !anchor) {
+      // eslint-disable-next-line no-void
+      void handleError(
+        createError(1001, 'Properties "label" and "anchor" are required.', {
+          component: 'MenuItem',
+          operation: 'render',
+          label,
+          anchor,
+          category: 'UI Component',
+          url: window.location.href,
+        }),
+      );
+    }
+  }, [anchor, handleError, label]);
+
+  // Check the type of the isCollapsedMenu and the isSectionVisible properties
+  validateBooleanOrUndefined(isCollapsedMenu, 'isCollapsedMenu');
+  validateBooleanOrUndefined(isSectionVisible, 'isSectionVisible');
+
   const classNameNavLink = style.itemMenu + (isSectionVisible ? ` ${style['itemMenu--isSectionVisible']}` : '');
-  return (
+  return anchor && label ? (
     <li>
       <NavLink className={classNameNavLink} aria-label={label} to={`/#${anchor}`} tabIndex={isCollapsedMenu ? -1 : 0}>
         {label}
       </NavLink>
     </li>
-  );
+  ) : null;
 }
 
 export const MenuItem = memo(MemoizedMenuItem);

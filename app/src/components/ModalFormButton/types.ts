@@ -1,4 +1,4 @@
-import { MouseEventButton } from '@/types';
+import type { MouseEventButton } from '@/types';
 
 /**
  * @description Props for the ModalFormButton component.

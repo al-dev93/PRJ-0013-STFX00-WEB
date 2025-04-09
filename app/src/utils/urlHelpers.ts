@@ -9,7 +9,7 @@ export function isValidUrl(url: string): boolean {
     // eslint-disable-next-line no-new
     new URL(url);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

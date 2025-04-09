@@ -1,20 +1,36 @@
 import { useLayoutEffect, useState } from 'react';
 
+import { AppError } from '@/types';
+
 import type { CollapsibleHeaderState, ScrollRef } from '../types';
 import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from '../utils/constants';
-
 /**
- * custom hook that manages a collapsible header state based on scroll position.
- * It returns 3 states corresponding to the top of screen, scroll-up and scroll-down
+ * Custom hook that detects the user's scroll direction and returns a state indicating
+ * whether the header should be shown, hidden, or reset.
+ *
+ * The hook uses a passed `ref` (e.g., `scrollWithMenuItem`) to monitor the scroll
+ * position and determine whether the user is scrolling up, down,
+ * or has returned to the top of the screen.
+ *
+ * 🚨 In case of a scroll error, the hook does not throw or handle it directly.
+ * Instead, it returns an error instance (`AppError`) via the `headerError` property.
+ * It is up to the calling component to handle this error appropriately
+ * (e.g., using `handleError(...)`, `createError(...)`, or a fallback UI).
  *
  * @param {ScrollRef} scrollWithMenuItem - A reference to track scroll events triggered by a menu.
  * @returns {CollapsibleHeaderState} The current state of the header based on scroll position.
  *
  * @al-dev93
  */
-export function useCollapsibleHeader(scrollWithMenuItem: ScrollRef): CollapsibleHeaderState {
-  const [position, setPosition] = useState<number>(window.scrollY); // Initial scroll position
-  const [scrollState, setScrollState] = useState<CollapsibleHeaderState>(TOP_OF_SCREEN); // Initial scroll state
+export function useCollapsibleHeader(scrollWithMenuItem: ScrollRef): {
+  headerState: CollapsibleHeaderState;
+  headerError?: AppError;
+} {
+  // Initial scroll position
+  const [position, setPosition] = useState<number>(window.scrollY);
+  // Initial scroll state
+  const [headerState, setHeaderState] = useState<CollapsibleHeaderState>(TOP_OF_SCREEN);
+  const [headerError, setHeaderError] = useState<AppError>();
 
   useLayoutEffect(() => {
     // Local copy of scrollWithMenuItem.
@@ -34,27 +50,33 @@ export function useCollapsibleHeader(scrollWithMenuItem: ScrollRef): Collapsible
 
         return SCROLL_UP;
       }
-
       if (currentPosition < position && currentPosition !== TOP_OF_SCREEN) return SCROLL_UP;
       if (currentPosition > position) return SCROLL_DOWN;
       return TOP_OF_SCREEN;
     };
 
     const handleScroll = () => {
-      const currentPosition = window.scrollY;
-      setScrollState(determineScrollState(currentPosition));
-      setPosition(currentPosition);
+      try {
+        const currentPosition = window.scrollY;
+        setHeaderState(determineScrollState(currentPosition));
+        setPosition(currentPosition);
+      } catch (err) {
+        setHeaderError({
+          name: 'ScrollError',
+          code: 500,
+          message: 'An unexpected error occurred while handling scroll',
+          severity: 'medium',
+          context: {
+            originalError: err,
+            operation: 'scrollHandling',
+          },
+        });
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [position, scrollWithMenuItem]);
 
-  // Report bad values of scrollWithMenuItem input parameter // TODO remonter l'erreur
-  if (!scrollWithMenuItem || !['number', 'undefined'].includes(typeof scrollWithMenuItem.current)) {
-    console.error('Invalid scrollWithMenuItem ref provided');
-    return TOP_OF_SCREEN;
-  }
-
-  return scrollState;
+  return { headerState: headerError ? TOP_OF_SCREEN : headerState, headerError };
 }

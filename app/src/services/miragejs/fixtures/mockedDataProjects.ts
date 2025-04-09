@@ -65,7 +65,7 @@ export const projects = [
   {
     id: 'P9BILD-al-2211',
     title: 'Billed',
-    description: "Débuggage et tests d'une application RH",
+    description: "Débogage et tests d'une application RH",
     tags: ['JavaScript', 'Jest', 'Testing Library', 'GitHub'],
     picture: '',
     display: 'card',
@@ -74,7 +74,7 @@ export const projects = [
   {
     id: 'p13agba-al-2302',
     title: 'ARGENT BANK',
-    description: '',
+    description: ' ',
     tags: ['React', 'React Router', 'Redux', 'API Rest', 'Modules CSS', 'GitHub'],
     picture: '',
     display: 'card',

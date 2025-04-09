@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 
+import { AppErrorFallback } from '@modules/Error/components/AppErrorFallback';
 import { ErrorBoundary } from '@modules/Error/components/ErrorBoundary';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { ErrorPage } from '@routes/Error';
@@ -7,11 +8,7 @@ import { Index } from '@routes/Index';
 import { LegalNotice } from '@routes/LegalNotice';
 import { Page } from '@routes/Page';
 
-import { AppErrorFallback } from './modules/Error/components/AppErrorFallback';
-
-// import { Admin } from '@routes/Admin';
-
-// import { Auth } from '@routes/Auth';
+import DevErrorPage from './routes/DevErrorPage';
 
 /**
  *
@@ -60,11 +57,25 @@ export const router = (key: CryptoKey | undefined) => {
     //   },
     // },
     {
+      path: '/error',
+      element: <AppErrorFallback />,
+    },
+    {
       path: '*',
       loader: () => {
         throw createError(404, 'Page non trouvée');
       },
       errorElement: <ErrorPage />,
     },
+    import.meta.env.DEV
+      ? {
+          path: '/dev-error',
+          element: (
+            <ErrorBoundary fallback={<AppErrorFallback />}>
+              <DevErrorPage />
+            </ErrorBoundary>
+          ),
+        }
+      : {},
   ]);
 };

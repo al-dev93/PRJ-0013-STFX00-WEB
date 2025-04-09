@@ -1,5 +1,7 @@
 import { RefObject, useCallback, useEffect, useState } from 'react';
 
+import { AppError } from '@/types';
+
 /**
  * Custom hook to check if an HTML element is visible within the viewport.
  * It uses the IntersectionObserver API to observe changes in the visibility of the target element.
@@ -15,10 +17,11 @@ import { RefObject, useCallback, useEffect, useState } from 'react';
  */
 export function useOnScreen(
   ref: RefObject<HTMLElement>,
-  observerOptions: { rootMargin?: string; threshold?: number[] },
-): boolean {
+  observerOptions: { rootMargin?: string; threshold?: number[]; observerError?: AppError },
+): { isIntersecting: boolean; observerError: AppError | undefined } {
   // State to store whether the target element is visible in the viewport
   const [isIntersecting, setIntersecting] = useState<boolean>(false);
+  const [observerError, setObserverError] = useState<AppError>();
 
   /**
    * Callback function that is triggered when the intersection status of the target element changes.
@@ -49,8 +52,29 @@ export function useOnScreen(
   useEffect(() => {
     const element = ref.current;
 
-    // If there is no target element or IntersectionObserver is not supported, exit early
-    if (!element || !('IntersectionObserver' in window)) return undefined;
+    /**
+     * If there is no target element or IntersectionObserver is not supported, exit early
+     * and sends an error
+     */
+    if (!element) {
+      setObserverError({
+        name: 'MissingRefError',
+        code: 1001,
+        message: 'No DOM reference found for observation',
+        severity: 'low',
+      });
+      return undefined;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      setObserverError({
+        name: 'UnsupportedFeatureError',
+        code: 1204,
+        message: 'IntersectionObserver is not supported in this environment',
+        severity: 'low',
+      });
+      return undefined;
+    }
 
     // Create a new IntersectionObserver instance with the provided callback and options
     const observer = new IntersectionObserver(handleIntersection, observerOptions);
@@ -65,5 +89,5 @@ export function useOnScreen(
     };
   }, [handleIntersection, observerOptions, ref]);
 
-  return isIntersecting;
+  return { isIntersecting, observerError };
 }

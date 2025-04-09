@@ -1,7 +1,7 @@
 import { ComponentProps, ReactNode } from 'react';
 
-import type { FetchErrorContext } from '@modules/Error/types';
 import { COMPONENT_MAP, HTML_TAGS } from '@utils/dynamicElementsconstants';
+
 /**
  * Represents the type of component that can be rendered.
  *
@@ -17,14 +17,6 @@ export type ValidComponentTag = keyof typeof COMPONENT_MAP;
  * @type {typeof HTML_TAGS[number]} ValidHTMLTag
  */
 export type ValidHTMLTag = (typeof HTML_TAGS)[number];
-
-// type ComponentPropsUnion = {
-//   [K in ValidComponentTag]: { tag: K } & ComponentProps<(typeof COMPONENT_MAP)[K]>;
-// }[ValidComponentTag];
-
-// type HTMLPropsUnion = {
-//   [K in ValidHTMLTag]: { tag: K } & HTMLAttributes<HTMLElement>;
-// }[ValidHTMLTag];
 
 /**
  * Props for the DynamicElement component, which can render either a custom component
@@ -44,22 +36,3 @@ export type DynamicElementProps<T extends ValidComponentTag | ValidHTMLTag> = {
   : T extends (typeof HTML_TAGS)[number]
     ? JSX.IntrinsicElements[T]
     : never);
-
-// export type DynamicElementProps = ComponentPropsUnion | HTMLPropsUnion;
-
-/**
- * Context metadata for DynamicElement-related errors.
- * Provides structured details to diagnose invalid tag usage.
- *
- * @exports
- * @interface DynamicElementErrorContext
- * @extends {FetchErrorContext}
- * @property {string} invalidTag - Invalid tag provided to DynamicElement
- * @property {string[]} validTags - List of valid tags (custom components + HTML)
- * @property {string[]} [receivedProps] - Props received by DynamicElement during error
- */
-export interface DynamicElementErrorContext extends FetchErrorContext {
-  invalidTag: string;
-  validTags: string[];
-  receivedProps?: string[];
-}

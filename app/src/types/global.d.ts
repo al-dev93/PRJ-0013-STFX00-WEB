@@ -1,5 +1,7 @@
 import { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
 
+import { FetchErrorContext } from '@/modules/Error/types';
+
 import type { IconType } from '.';
 
 export type StringObject = {
@@ -41,6 +43,8 @@ export type DialogFormInputElement = HTMLInputElement | HTMLTextAreaElement;
  * @description
  */
 export type DialogFormElement = DialogFormInputElement | HTMLElement;
+
+// export type PrimitiveType = 'string' | 'number' | 'boolean' | 'symbol' | 'bigint' | 'undefined';
 
 /**
  * @description on the main page as the layout
@@ -256,6 +260,7 @@ export type ContactMessage = {
   email: string;
   tel?: string;
   message: string;
+  consent: boolean;
 };
 
 // NOTE: data fetched via the useFetchData hook
@@ -281,7 +286,10 @@ export type FetchData =
 export type FetchResultData = {
   data: FetchData | FetchData[];
   isLoaded: boolean;
-  error: string | null;
+  fetchError: {
+    error: unknown;
+    context?: FetchErrorContext;
+  } | null;
   refetch: (url: string | undefined | null, options: FetchOptions) => Promise<void>;
   // setFetchOptionsData: (url: string | undefined | null, options?: object) => (() => void) | undefined;
 };

@@ -1,4 +1,4 @@
-import { SlideshowState } from '../types';
+import type { SlideshowState } from '../types';
 import { STOP } from '../utils/constants';
 
 /**

@@ -14,11 +14,23 @@ export function AppErrorFallback({ error: boundaryError, onReset }: ErrorProps) 
   const [retryCount, setRetryCount] = useState(0);
   const [normalizedError, setNormalizedError] = useState<NormalizedError>();
 
-  // Unification de la gestion des erreurs
+  // Unification of error handling
   useEffect(() => {
     const loadError = async () => {
-      const errorToHandle = boundaryError || routerError;
-      if (!errorToHandle) return;
+      const locationError = (window.history.state?.usr as { error?: unknown } | undefined)?.error;
+      const errorToHandle = boundaryError || routerError || locationError;
+
+      if (!errorToHandle) {
+        console.error('AppErrorFallback displayed without error available (boundaryError and routerError undefined).');
+        setNormalizedError({
+          code: 500,
+          name: 'UnKnownError',
+          message: "Une erreur inconnue s'est produite",
+          severity: 'critical',
+          timestamp: Date.now(),
+        });
+        return;
+      }
 
       const context: FetchErrorContext = {
         source: boundaryError ? 'component' : 'router',
@@ -26,13 +38,24 @@ export function AppErrorFallback({ error: boundaryError, onReset }: ErrorProps) 
       };
 
       try {
-        const error = await normalizeError(errorToHandle, context);
-        setNormalizedError(error);
+        if ('code' in (errorToHandle as object) && 'severity' in (errorToHandle as object)) {
+          setNormalizedError(errorToHandle as NormalizedError);
+        } else {
+          const error = await normalizeError(errorToHandle, context);
+          setNormalizedError(error);
+        }
       } catch (normalizationError) {
         handleGlobalError(normalizationError, {
           component: 'AppErrorFallback',
           operation: 'normalization',
           url: window.location.href,
+        });
+        setNormalizedError({
+          code: 500,
+          name: 'NormalizationError',
+          message: 'Error during error normalization.',
+          severity: 'critical',
+          timestamp: Date.now(),
         });
       }
     };
@@ -43,14 +66,14 @@ export function AppErrorFallback({ error: boundaryError, onReset }: ErrorProps) 
   // Gestion unifiée du retry
   const handleRetry = useCallback<() => void>((): void => {
     if (onReset) {
-      // Cas Error Boundary
+      // Error Boundary case
       onReset();
       setRetryCount(0);
     } else if (retryCount >= MAX_RETRIES) {
-      // Cas limite de retries
+      // Borderline case of retries
       window.location.reload();
     } else {
-      // Cas React Router
+      // React Router case
       setRetryCount((c) => c + 1);
       navigate(normalizedError?.context?.previousPath || '/');
     }
@@ -62,7 +85,9 @@ export function AppErrorFallback({ error: boundaryError, onReset }: ErrorProps) 
     return 'Recharger';
   }, [onReset, retryCount]);
 
-  if (!normalizedError) return <div>Chargement de l&apos;erreur...</div>;
+  if (!normalizedError) {
+    return <div>Chargement de l&apos;erreur...</div>;
+  }
 
   return (
     <div className='error-fallback'>

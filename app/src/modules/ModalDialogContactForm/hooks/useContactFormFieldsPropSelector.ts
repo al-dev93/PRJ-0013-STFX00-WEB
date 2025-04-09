@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useContactFormState } from './useContactFormState';
-import { FieldState, ModalDialogContactFormState } from '../types';
+import type { FieldState, ModalDialogContactFormState } from '../types';
 
 /**
  * Extracts the value of the property passed as a parameter for each element of the contact form

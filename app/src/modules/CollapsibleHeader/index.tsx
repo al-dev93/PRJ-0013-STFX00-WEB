@@ -1,9 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import type { MenuItemType } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
-// import { useEffect } from 'react';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { handleFetchError } from '@utils/fetchDataHelpers';
 
 import { MenuItem } from './components/MenuItem';
 import { useCollapsibleHeader } from './hooks/useCollapsibleHeader';
@@ -12,7 +14,6 @@ import type { CollapsibleHeaderProps } from './types';
 import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
 
 /**
- *
  * Header component including a logo and a menu. It collapses when
  * the user scrolls down and expands with hover effect when the user scrolls up.
  *
@@ -32,14 +33,79 @@ export function CollapsibleHeader({
   logo,
   MenuSectionsVisibility,
   scrollWithMenuItem,
-}: CollapsibleHeaderProps): React.JSX.Element {
+}: CollapsibleHeaderProps): React.JSX.Element | null {
+  const handleError = useErrorHandler();
+
+  const { src, alt } = logo || { src: undefined, alt: undefined };
+
+  const url = 'http://localhost:5173/api/menuItems';
   // TODO variable d'environnement
-  const { data, error } = useFetchData('http://localhost:5173/api/menuItems', { method: 'GET' });
+  const { data, fetchError } = useFetchData(url, { method: 'GET' });
 
   /* Uses custom hook useCollapsibleHeader to get the
      display state based on the scroll direction      */
-  const headerState = useCollapsibleHeader(scrollWithMenuItem);
-  const { src, alt } = logo || { src: undefined, alt: undefined };
+  const { headerState, headerError } = useCollapsibleHeader(scrollWithMenuItem);
+
+  const isValidHeaderState: boolean = useMemo(
+    () => [SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN].includes(headerState),
+    [headerState],
+  );
+
+  const isValidScrollWithMenuItem: boolean = useMemo(
+    () => ['number', 'undefined'].includes(typeof scrollWithMenuItem.current),
+    [scrollWithMenuItem],
+  );
+
+  useEffect(() => {
+    if (fetchError) {
+      // eslint-disable-next-line no-void
+      void handleFetchError('CollapsibleHeader', fetchError, handleError);
+    }
+  }, [fetchError, handleError]);
+
+  useEffect(() => {
+    if (headerError) {
+      // eslint-disable-next-line no-void
+      void handleError(
+        createError(headerError.code, headerError.message, {
+          ...headerError.context,
+          component: 'CollapsibleHeader',
+          category: 'UI Interaction',
+          url: window.location.href,
+        }),
+      );
+    }
+  }, [handleError, headerError]);
+
+  useEffect(() => {
+    if (!isValidHeaderState) {
+      // eslint-disable-next-line no-void
+      void handleError(
+        createError(1003, `Unexpected header state: ${headerState}`, {
+          component: 'CollapsibleHeader',
+          operation: 'getHeaderClass',
+          headerState,
+          category: 'UI Component',
+          url: window.location.href,
+        }),
+      );
+    }
+  }, [handleError, headerState, isValidHeaderState]);
+
+  useEffect(() => {
+    if (!isValidScrollWithMenuItem) {
+      // eslint-disable-next-line no-void
+      void handleError(
+        createError(2002, 'Invalid scrollWithMenuItem ref provided', {
+          component: 'CollapsibleHeader',
+          operation: 'render',
+          scrollWithMenuItem: scrollWithMenuItem.current,
+          category: 'UI Component',
+          url: window.location.href,
+        }),
+      );
+    }
+  }, [handleError, isValidScrollWithMenuItem, scrollWithMenuItem]);
 
   /**
    * Memoized function to selects and returns the appropriates CSS class based on the state of the header.
@@ -50,9 +116,8 @@ export function CollapsibleHeader({
    * @throws {Error} if the `state` is not a valid header state, an exception is thrown // NOTE (optional)
    */
   const getHeaderClass = useMemo(() => {
-    if (![SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN].includes(headerState)) {
-      // TODO: sortir l'erreur
-      console.error(`Invalid headerSate: ${headerState}`);
+    if (!isValidHeaderState) {
+      return style.header;
     }
 
     let className = style.header;
@@ -60,14 +125,9 @@ export function CollapsibleHeader({
     if (headerState === TOP_OF_SCREEN) className += ` ${style['header--isRegular']}`;
     if (headerState === SCROLL_UP) className += ` ${style['header--isHover']}`;
     return className;
-  }, [headerState]);
+  }, [headerState, isValidHeaderState]);
 
-  if (error) {
-    // TODO: sortir l'erreur
-    console.error(`Failed to load menu data: ${error}`);
-  }
-
-  return (
+  return !fetchError && !headerError && isValidScrollWithMenuItem ? (
     <header
       className={getHeaderClass}
       role='banner'
@@ -94,5 +154,5 @@ export function CollapsibleHeader({
         </ul>
       </nav>
     </header>
-  );
+  ) : null;
 }

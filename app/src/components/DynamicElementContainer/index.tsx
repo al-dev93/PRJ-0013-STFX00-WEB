@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react';
 
-import { AppErrorFallback } from '@/modules/Error/components/AppErrorFallback';
-import { useErrorHandler } from '@/modules/Error/hooks/useErrorHandler';
-import { normalizeErrorSync } from '@/modules/Error/utils/errorHandling';
-import { FetchData } from '@/types';
+import type { FetchData } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { useFetchData } from '@hooks/useFetchData';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { handleFetchError } from '@utils/fetchDataHelpers';
 
 import type { DynamicElementContainerProps } from './types';
 /**
@@ -28,22 +28,18 @@ export function DynamicElementContainer({
   filterValue,
   url,
   ...props
-}: DynamicElementContainerProps): React.JSX.Element {
+}: DynamicElementContainerProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
-
   // Fetch data using useFetchData custom hook.
-  const { data: fetchedData, error } = useFetchData(url || null, { method: 'GET' });
+  const { data: fetchedData, fetchError, isLoaded } = useFetchData(url || null, { method: 'GET' });
 
   // Handle errors from data fetching.
   useEffect(() => {
-    if (error) {
-      handleError(error, {
-        component: 'DynamicElementContainer',
-        operation: 'fetchData',
-        url: url || 'unknown',
-      });
+    if (fetchError) {
+      // eslint-disable-next-line no-void
+      void handleFetchError('DynamicElementContainer', fetchError, handleError);
     }
-  }, [error, handleError, url]);
+  }, [fetchError, handleError]);
 
   /**
    * Filter fetched data based on the 'display' property. If no filterValue is provided, return the fetched data.
@@ -58,26 +54,23 @@ export function DynamicElementContainer({
       : simpleFetchedData;
   }, [fetchedData, filterValue]);
 
-  // Render error state if an error occurred during data fetching.
-  if (error) {
-    // Normalize the error before passing it to AppErrorFallback
-    const normalizedError = normalizeErrorSync(error, {
-      component: 'DynamicElementContainer',
-      operation: 'fetchData',
-      url: url || 'unknown',
-    });
+  useEffect(() => {
+    if (isLoaded && !filteredData?.length) {
+      // eslint-disable-next-line no-void
+      void handleError(
+        createError(2202, 'no usable data for dynamic rendering', {
+          component: 'DynamicElementContainer',
+          operation: 'render',
+          url: url || 'unknown',
+          category: 'Dynamic Rendering',
+        }),
+      );
+    }
+  }, [filteredData, handleError, isLoaded, url]);
 
-    return (
-      <AppErrorFallback
-        error={normalizedError}
-        onReset={() => window.location.reload()} // Option to reload the page
-      />
-    );
-  }
-
-  return (
+  return !fetchError && !!filteredData?.length ? (
     <div className={className}>
       {filteredData?.map((item) => <DynamicElement key={item.id} tag={tag} data={item} {...props} />)}
     </div>
-  );
+  ) : null;
 }

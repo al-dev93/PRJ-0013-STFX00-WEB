@@ -1,7 +1,9 @@
-import React, { FormEvent, memo, useCallback, useRef } from 'react';
+import React, { FormEvent, memo, useCallback, useEffect, useRef } from 'react';
 
 import { useFetchData } from '@hooks/useFetchData';
-import { refetchFormDataWithArguments } from '@utils/fetchDataHelpers';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { handleFetchError, refetchFormDataWithArguments } from '@utils/fetchDataHelpers';
 
 import { FormContent } from './Components/FormContent';
 import style from './style.module.css';
@@ -35,13 +37,21 @@ function MemoizedForm({
   dataFormContent,
   setShowAlert,
   onRenderComplete,
-}: FormProps): React.JSX.Element {
+}: FormProps): React.JSX.Element | null {
+  const handleError = useErrorHandler();
   const websiteRef = useRef<HTMLInputElement>(null);
   const csrfToken = useCsrfToken();
   // Extracts validated values from contact form input elements
   const validValues = useContactFormFieldsPropSelector('inputValue', true);
   // Prepare for submitting form data via POST
-  const { refetch } = useFetchData(undefined, { method: 'POST' }, true);
+  const { refetch, fetchError } = useFetchData(undefined, { method: 'POST' }, true);
+
+  useEffect(() => {
+    if (fetchError) {
+      // eslint-disable-next-line no-void
+      void handleFetchError('Form', fetchError, handleError);
+    }
+  }, [fetchError, handleError]);
 
   /**
    * Refetches the form data with the provided arguments.
@@ -51,8 +61,8 @@ function MemoizedForm({
    * @returns {void}
    */
   const memoizedRefetchFormDataWithArguments = useCallback(
-    (args: { [x: string]: unknown }): void => {
-      refetchFormDataWithArguments(apiEndpointUrl, refetch, 'POST', args);
+    async (args: { [x: string]: unknown }): Promise<void> => {
+      await refetchFormDataWithArguments(apiEndpointUrl, refetch, 'POST', args);
     },
     [refetch, apiEndpointUrl],
   );
@@ -67,16 +77,30 @@ function MemoizedForm({
    * @returns {void}
    */
   const handleFormSubmission = useCallback(
-    (event: FormEvent<HTMLFormElement>): void => {
+    async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       event.stopPropagation();
 
-      setShowAlert(true);
-      if (validValues) {
-        memoizedRefetchFormDataWithArguments({ ...validValues, website: websiteRef.current?.value, csrfToken });
+      try {
+        setShowAlert(true);
+        if (validValues) {
+          await memoizedRefetchFormDataWithArguments({ ...validValues, website: websiteRef.current?.value, csrfToken });
+        }
+      } catch (err) {
+        await handleError(
+          createError(2104, 'Form submission failed : error during POST request execution.', {
+            originalError: err,
+            component: 'Form',
+            operation: 'handleFormSubmission',
+            category: 'Validation',
+            url: apiEndpointUrl,
+          }),
+        );
+      } finally {
+        setShowAlert(false);
       }
     },
-    [csrfToken, memoizedRefetchFormDataWithArguments, setShowAlert, validValues],
+    [apiEndpointUrl, csrfToken, handleError, memoizedRefetchFormDataWithArguments, setShowAlert, validValues],
   );
 
   return (

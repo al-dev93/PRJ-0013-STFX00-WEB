@@ -1,4 +1,5 @@
-import { TagType } from '@/types';
+import type { TagType } from '@/types';
+import type { FetchErrorContext } from '@modules/Error/types';
 
 /**
  * Props for the Skills component.

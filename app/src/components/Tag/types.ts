@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
 
-import { TagType } from '@/types';
+import type { TagType } from '@/types';
 
 /**
  * Props for the Tag component.

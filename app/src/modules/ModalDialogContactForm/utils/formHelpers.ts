@@ -1,6 +1,6 @@
 import { MutableRefObject } from 'react';
 
-import { FormInputName } from '../types';
+import type { FormInputName } from '../types';
 
 // import type { ModalDialogContactFormState } from '../types';
 
@@ -86,8 +86,8 @@ export function manageModalVisibility(
  */
 export function sanitizeInput(inputValue: string, context: FormInputName): string {
   let sanitized = inputValue
-    .normalize('NFKC') // Normalise les caractères Unicode
-    .replace(/\p{C}/gu, '') // Supprime les caractères de contrôle
+    .normalize('NFKC') // Normalizes unicode characters
+    .replace(/\p{C}/gu, '') // Removes control characters
     .trim();
 
   switch (context) {

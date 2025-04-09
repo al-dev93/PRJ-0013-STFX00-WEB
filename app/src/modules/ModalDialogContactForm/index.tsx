@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ContactFormInput, ContactFormModal, SetStateBoolean } from '@/types';
 import { Modal } from '@components/Modal';
 import { useFetchData } from '@hooks/useFetchData';
+import { handleFetchError } from '@utils/fetchDataHelpers';
 
 import { Alert } from './components/Alert';
 import { Form } from './components/Form';
@@ -11,7 +12,7 @@ import style from './style.module.css';
 import type { ModalDialogContactFormProps } from './types';
 import { EMPTY_MODAL_DIALOG_CONTACT_FORM } from './utils/constants';
 import { manageModalVisibility } from './utils/formHelpers';
-
+import { useErrorHandler } from '../Error/hooks/useErrorHandler';
 /**
  * Renders a modal dialog containing a contact form. The form can either be populated
  * with provided data or fetched dynamically from a specified URL. It manages from validation,
@@ -34,7 +35,8 @@ export function ModalDialogContactForm({
   modalId,
   data: formModalData,
   url,
-}: ModalDialogContactFormProps): React.JSX.Element {
+}: ModalDialogContactFormProps): React.JSX.Element | null {
+  const handleError = useErrorHandler();
   const [isFormContentRendered, setFormContentRendered] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const modalVisibility = useRef<boolean>();
@@ -47,8 +49,15 @@ export function ModalDialogContactForm({
   const shouldFetch = !formModalData;
 
   // Fetch form modal data
-  const { data } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
+  const { data, fetchError } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
   const [modalContent, formContent] = data || [];
+
+  useEffect(() => {
+    if (fetchError) {
+      // eslint-disable-next-line no-void
+      void handleFetchError('ModalDialogContactForm', fetchError, handleError);
+    }
+  }, [fetchError, handleError]);
 
   /**
    * Memoizes the function to update the 'isFormContentRendered' state to avoid recreating it on every render.
@@ -128,7 +137,7 @@ export function ModalDialogContactForm({
     if (!open && isFormContentRendered) setFormContentRenderedCallback(false);
   }, [isFormContentRendered, open, setFormContentRenderedCallback]);
 
-  return (
+  return !fetchError ? (
     <Modal
       open={open}
       className={modalVisibility.current ? style.hiddenVisibility : undefined}
@@ -160,5 +169,5 @@ export function ModalDialogContactForm({
         onRenderComplete={setFormContentRenderedCallback}
       />
     </Modal>
-  );
+  ) : null;
 }

@@ -1,10 +1,13 @@
 import IonIcon from '@reacticons/ionicons';
 import { Text } from '@visx/text';
 import Wordcloud from '@visx/wordcloud/lib/Wordcloud';
-import React, { KeyboardEvent, memo, useCallback, useMemo, useState } from 'react';
+import React, { KeyboardEvent, memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Skill } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { handleFetchError } from '@utils/fetchDataHelpers';
 
 import style from './style.module.css';
 import type { SkillsCloudProps } from './types';
@@ -22,6 +25,7 @@ import {
   SKILLS_PADDING,
   SKILLS_SPIRAL_TYPE,
 } from './utils/constants';
+
 /**
  * SkillsCloud component that displays a word cloud of skills.
  *
@@ -40,7 +44,8 @@ function MemoizedSkillsCloud({
   url,
   width = 1000,
   height = 400,
-}: SkillsCloudProps): React.JSX.Element {
+}: SkillsCloudProps): React.JSX.Element | null {
+  const handleError = useErrorHandler();
   const [fontSize, setFontSize] = useState<number>(SKILLS_BASE_FONT_SIZE);
   const [contrastMode, setContrastMode] = useState<boolean>(false);
   const [rotateMode, setRotateMode] = useState<boolean>(false);
@@ -48,9 +53,32 @@ function MemoizedSkillsCloud({
   // Determine if data should be fetched based on the presence of skills.
   const shouldFetch = !skillsData;
   // Use useFetchData hook if shouldFetch is true
-  const { data: fetchedData, error } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
+  const { data: fetchedData, fetchError, isLoaded } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
+
   // Use skillsData if provided, otherwise use fetched data.
   const data = useMemo((): Skill[] => skillsData || (fetchedData as Skill[]), [fetchedData, skillsData]);
+
+  useEffect(() => {
+    if (fetchError) {
+      // eslint-disable-next-line no-void
+      void handleFetchError('SkillsCloud', fetchError, handleError);
+    }
+  }, [fetchError, handleError]);
+
+  useEffect(() => {
+    if (isLoaded && !data?.length) {
+      // eslint-disable-next-line no-void
+      void handleError(
+        createError(1001, 'No valid skills data provided.', {
+          component: 'SkillsCloud',
+          operation: 'render',
+          url: url || 'unknown',
+          invalidProperty: 'data',
+          category: 'UI Component',
+        }),
+      );
+    }
+  }, [data?.length, handleError, isLoaded, url]);
 
   /**
    * Handles the keydown event to adjust the font size of the skills cloud.
@@ -61,14 +89,25 @@ function MemoizedSkillsCloud({
    * @returns {void}
    */
   const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLButtonElement>): void => {
+    async (event: KeyboardEvent<HTMLButtonElement>): Promise<void> => {
       event.preventDefault();
       event.stopPropagation();
 
-      if (event.key === 'ArrowUp') setFontSize(fontSize + 1);
-      else if (event.key === 'ArrowDown') setFontSize(fontSize - 1);
+      try {
+        if (event.key === 'ArrowUp') setFontSize(fontSize + 1);
+        else if (event.key === 'ArrowDown') setFontSize(fontSize - 1);
+      } catch (err) {
+        await handleError(
+          createError(1003, 'Pressing the ArrowUp and ArrowDown keys failed', {
+            url: window.location.href,
+            component: 'SkillsCloud',
+            operation: 'handleKeyDown',
+            category: 'UI Interaction',
+          }),
+        );
+      }
     },
-    [fontSize],
+    [fontSize, handleError],
   );
 
   /**
@@ -79,9 +118,23 @@ function MemoizedSkillsCloud({
    * @returns {void}
    */
   const handleToggleMode = useCallback(
-    (mode: 'contrast' | 'rotate'): void =>
-      mode === 'rotate' ? setRotateMode(!rotateMode) : setContrastMode(!contrastMode),
-    [contrastMode, rotateMode],
+    async (mode: 'contrast' | 'rotate'): Promise<void> => {
+      try {
+        if (mode === 'rotate') {
+          setRotateMode(!rotateMode);
+        } else setContrastMode(!contrastMode);
+      } catch (err) {
+        await handleError(
+          createError(1003, `${mode} mode toggle failed`, {
+            url: window.location.href,
+            component: 'SkillsCloud',
+            operation: `handleToggleMode_${mode}`,
+            category: 'UI Interaction',
+          }),
+        );
+      }
+    },
+    [contrastMode, handleError, rotateMode],
   );
 
   /**
@@ -117,12 +170,7 @@ function MemoizedSkillsCloud({
 
   const classNameSkillsCloud = style.skillsCloud + (contrastMode ? ` ${style['skillsCloud--contrastMode']}` : '');
 
-  // TODO: sortir l'erreur
-  if (error) {
-    console.error(`Failed to load skills data: ${error}`);
-  }
-
-  return (
+  return !fetchError && !!data?.length ? (
     <div
       className={classNameSkillsCloud}
       role='region'
@@ -197,7 +245,7 @@ function MemoizedSkillsCloud({
         </button>
       )}
     </div>
-  );
+  ) : null;
 }
 
 const SkillsCloud = memo(MemoizedSkillsCloud);

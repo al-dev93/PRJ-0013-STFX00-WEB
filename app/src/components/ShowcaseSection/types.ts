@@ -1,6 +1,7 @@
 import { MutableRefObject } from 'react';
 
 import type { DetailSection, SectionsRef, MenuSectionsVisibility } from '@/types';
+import type { FetchErrorContext } from '@modules/Error/types';
 
 /**
  * Props for the ShowcaseSection component.
@@ -25,3 +26,18 @@ export type ShowcaseSectionProps = {
   showModalFormDialog: boolean;
   modalId: string;
 };
+
+/**
+ * Context metadata for ShowcaseSection-related errors.
+ * Provides structured details to diagnose invalid data or configurations.
+ *
+ * @export
+ * @interface ShowcaseSectionErrorContext
+ * @extends {FetchErrorContext}
+ * @property {string} invalidProperty - Name of the invalid property that caused the error
+ * @property {string} [invalidNodeId] - ID of the invalid node (if applicable)
+ */
+export interface ShowcaseSectionErrorContext extends FetchErrorContext {
+  invalidProperty: string;
+  invalidNodeId?: string;
+}

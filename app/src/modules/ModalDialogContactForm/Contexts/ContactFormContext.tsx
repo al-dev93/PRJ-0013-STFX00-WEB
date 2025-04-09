@@ -2,7 +2,7 @@ import { createContext, Dispatch, useReducer } from 'react';
 
 import { createContactFormInitialState } from '../reducer/modalDialogContactFormInitialState';
 import { modalDialogContactFormReducer } from '../reducer/modalDialogContactFormReducer';
-import { ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
+import type { ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
 
 export const ContactFormStateContext = createContext<ModalDialogContactFormState | null>(null);
 export const ContactFormDispatchContext = createContext<Dispatch<ModalDialogContactFormAction> | null>(null);

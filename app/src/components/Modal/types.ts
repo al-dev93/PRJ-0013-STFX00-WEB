@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { MouseEventButton, SetStateBoolean } from '@/types';
+import type { MouseEventButton, SetStateBoolean } from '@/types';
 
 /**
  * Type for the button used in the Modal component.

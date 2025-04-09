@@ -1,6 +1,6 @@
 import { Dispatch, useCallback, useEffect, useRef } from 'react';
 
-import { SlideshowAction } from '../types';
+import type { SlideshowAction } from '../types';
 import { CHANGE_SLIDE, NEXT_SLIDE, PREVIOUS_SLIDE, START } from '../utils/constants';
 
 /**

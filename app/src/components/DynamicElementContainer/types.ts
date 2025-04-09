@@ -1,4 +1,4 @@
-import { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
+import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
 
 /**
  * The props for the DynamicElementContainer component.

@@ -31,6 +31,7 @@ export type Props = {
 export type State = {
   hasError: boolean;
   error?: AppError;
+  resetKey: number;
 };
 
 export interface Window {
@@ -40,13 +41,14 @@ export interface Window {
 }
 
 export type FetchErrorContext = {
-  source?: 'component' | 'router';
+  source?: 'component' | 'promise' | 'router';
   component?: string;
   operation?: string;
   url: string | string[];
   method?: string;
   retryCount?: number;
   payload?: unknown;
-  stack?: string;
+  stack?: string | null;
   originalError?: unknown;
+  timestamp?: number;
 };

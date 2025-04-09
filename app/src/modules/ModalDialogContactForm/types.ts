@@ -20,6 +20,7 @@ import {
   INIT_DIALOG_CONTACT_FORM_STATE,
   RESET_AUTO_COMPLETE_OVERLAY,
   SET_AUTO_COMPLETE,
+  SET_ERROR_MESSAGE,
   SET_ERROR_TAG_NAME,
   SET_INPUT_BORDER_BOX,
   SET_INPUT_ERROR,
@@ -287,6 +288,7 @@ export type ModalDialogContactFormState = {
  * @property {OverlayType} [popoverMode] - The type of overlay to display (if applicable).
  * @property {boolean} [inEdition] - Indicates whether the input field is in edition mode.
  * @property {boolean} [isHovered] - Indicates whether the input field is currently hovered.
+ * @property {string | undefined} [errorMessage] - The error message showing in the popover.
  *
  * @al-dev93
  */
@@ -304,6 +306,7 @@ export type FieldState = {
   applyAutoCompleteToInput?: string | null;
   popoverMode?: OverlayType;
   inEdition?: boolean;
+  errorMessage?: string;
 };
 
 /**
@@ -433,10 +436,13 @@ type InitDialogContactFormState = {
  *   - Setting input focus
  *
  * @type {Object} InputComponent
- * @property {typeof DELETE_INPUT_ERROR | typeof DELETE_INPUT_VALUE | typeof SET_INPUT_BORDER_BOX | typeof SET_INPUT_ERROR
- * | typeof SET_INPUT_FOCUS | typeof SET_INPUT_HOVER | typeof SET_INPUT_VALUE | typeof IN_EDIT_MODE} type - The type of action to perform.
+ * @property {typeof SET_ERROR_MESSAGE | typeof SET_INPUT_NODE | typeof DELETE_INPUT_ERROR
+ * | typeof DELETE_INPUT_VALUE | typeof SET_INPUT_BORDER_BOX | typeof SET_INPUT_ERROR
+ * | typeof SET_INPUT_FOCUS | typeof SET_INPUT_HOVER | typeof SET_INPUT_VALUE
+ * | typeof IN_EDIT_MODE} type - The type of action to perform.
  * @property {Object} payload - The payload of the action.
  * @property {string} payload.name - The name of the input field.
+ * @property {string | undefined} [errorMessage] - The error message showing in the popover
  * @property {HTMLInputElement | HTMLTextAreaElement} payload.inputNode - The input node for the input field.
  * @property {Validity | undefined} [payload.inputError] - The validity of the input error, if applicable.
  * @property {InputBorderBox | undefined} [payload.borderStyle] - The border style for the input field, if applicable.
@@ -449,6 +455,19 @@ type InitDialogContactFormState = {
  */
 export type InputComponent =
   | {
+      /**
+       * Action to set the error message in popover
+       */
+      type: typeof SET_ERROR_MESSAGE;
+      payload: {
+        name: string;
+        errorMessage?: string;
+      };
+    }
+  | {
+      /**
+       * Action to set the input element
+       */
       type: typeof SET_INPUT_NODE;
       payload: {
         name: string;

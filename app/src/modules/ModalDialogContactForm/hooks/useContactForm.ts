@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo } from 'react';
 
-import { DialogFormInputElement } from '@/types';
+import type { DialogFormInputElement } from '@/types';
 
 import { useAutoComplete } from './useAutoComplete';
 import { useContactFormDispatch } from './useContactFormDispatch';
@@ -19,6 +19,7 @@ import {
   SET_POPOVER_MODE,
 } from '../utils/constants';
 import { formatInputNumber, sanitizeInput } from '../utils/formHelpers';
+
 /**
  * Custom hook to manage the contact form input fields.
  *
@@ -334,6 +335,8 @@ export function useContactForm(name: string): ContactForm {
   const handleParentInputEvent = useCallback(
     (event: Event): void => {
       if (!inputNode || name === undefined || !['click', 'focusin', 'focusout'].includes(event.type)) return;
+      event.preventDefault();
+      event.stopPropagation();
 
       if (event.type === 'click') {
         inputNode.focus();

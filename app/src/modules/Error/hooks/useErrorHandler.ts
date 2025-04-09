@@ -1,14 +1,11 @@
 import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { AppError } from '@/types';
-import { CardDisplayError } from '@components/Card/error';
-import { DynamicElementError } from '@components/DynamicElement/error';
-import type { FetchErrorContext, Window } from '@modules/Error/types';
+import type { AppError } from '@/types';
+import type { FetchErrorContext } from '@modules/Error/types';
 import { normalizeError } from '@modules/Error/utils/errorHandling';
 
 import { monitoringService } from '../services/monitoring';
-
 /**
  * A custom React hook for handling errors in a consistent and centralized way.
  * This hook provides a function to capture, normalize, and handle errors,
@@ -48,13 +45,15 @@ export function useErrorHandler(): (rawError: unknown, context?: FetchErrorConte
 
       const normalized = await normalizeError(rawError, fullContext);
 
-      // Log the error by category to the monitoring service (if available)
-      if (rawError instanceof CardDisplayError) {
-        monitoringService.track(normalized, { category: 'UI Component', ...fullContext });
-      } else if (rawError instanceof DynamicElementError) {
-        monitoringService.track(normalized, { category: 'Dynamic Rendering', ...fullContext });
-      } else {
-        (window as Window).monitoring?.captureException(normalized, fullContext);
+      // log the error by category to the monitoring service (if available)
+      const category = normalized.context?.category ?? 'General';
+      monitoringService.track(normalized, {
+        category,
+        ...fullContext,
+      });
+
+      if (import.meta.env.DEV) {
+        console.error('Error caught by useErrorHandler : ', normalized);
       }
 
       // Redirect to the error page with the error details (except for 'low' errors)
@@ -66,6 +65,8 @@ export function useErrorHandler(): (rawError: unknown, context?: FetchErrorConte
           },
           replace: true,
         });
+      } else if (import.meta.env.DEV) {
+        console.warn('minor error caught : ', normalized);
       }
 
       return normalized;

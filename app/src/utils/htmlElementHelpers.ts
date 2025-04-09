@@ -1,4 +1,4 @@
-import { ValidHTMLTag } from '@/components/DynamicElement/types';
+import type { ValidHTMLTag } from '@components/DynamicElement/types';
 
 import { HTML_TAGS } from './dynamicElementsconstants';
 

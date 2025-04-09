@@ -1,9 +1,10 @@
-import React, { LegacyRef, forwardRef, memo } from 'react';
+import React, { forwardRef, LegacyRef, memo } from 'react';
+
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
 
 import style from './style.module.css';
-
 import type { FormButtonProps } from './types';
-
 /**
  * ModalFormButton component that renders a button for open modal or for forms,
  * with memoization and ref forwarding.
@@ -27,12 +28,33 @@ import type { FormButtonProps } from './types';
  */
 function MemoizedModalFormButtonRef(props: FormButtonProps, ref?: LegacyRef<HTMLButtonElement>): React.JSX.Element {
   const { className, form, onClick, name, disabled, ariaHasPopup, ariaExpanded, ariaControls, ariaLabel } = props;
+  const handleError = useErrorHandler();
+
+  /**
+   * Description placeholder
+   *
+   * @async
+   * @param {React.MouseEvent<HTMLButtonElement>} e
+   * @returns {Promise<void>}
+   */
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    try {
+      if (onClick) onClick(e);
+    } catch (err) {
+      await handleError(createError(3003, 'Button click event missing'), {
+        component: 'ModalFormButton',
+        operation: 'onClick',
+        url: window.location.href,
+      });
+    }
+  };
+
   return (
     <button
       className={`${style.appButton} ${className}`}
       form={form}
       type={form ? 'submit' : 'button'}
-      onClick={onClick}
+      onClick={handleClick}
       ref={ref}
       disabled={disabled}
       aria-haspopup={ariaHasPopup}

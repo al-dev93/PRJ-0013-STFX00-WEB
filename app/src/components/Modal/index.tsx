@@ -2,12 +2,13 @@ import IonIcon from '@reacticons/ionicons';
 import React, { KeyboardEvent, MouseEvent, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { KeyboardEventButton, KeyboardEventDiv } from '@/types';
+import type { KeyboardEventButton, KeyboardEventDiv } from '@/types';
 import { ModalFormButton } from '@components/ModalFormButton';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
 
 import style from './style.module.css';
 import type { ModalProps } from './types';
-
 /**
  * Handles the focus of the elements in the modal when the user navigates with the keyboard.
  *
@@ -27,9 +28,11 @@ function setFocusToElement(event: KeyboardEventDiv, index: number, elements: HTM
   event.stopPropagation();
   let nextIndex = index;
 
-  // If the shift key is pressed, go to the previous element
-  // Otherwise go to the next element
-  // If the index is at the start or end of the array, loop around to the other end
+  /*
+    If the shift key is pressed, go to the previous element
+    Otherwise go to the next element
+    If the index is at the start or end of the array, loop around to the other end
+  */
   if (event.shiftKey) nextIndex = index === 0 ? elements.length - 1 : index - 1;
   else nextIndex = index === elements.length - 1 ? 0 : index + 1;
 
@@ -73,6 +76,8 @@ export function Modal({
   closeParentModal,
   customStyle,
 }: ModalProps): React.JSX.Element {
+  const handleError = useErrorHandler();
+
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -141,32 +146,60 @@ export function Modal({
     /**
      * Handles the click outside Modal.
      *
+     * @async
      * @param {Event} e - The trigger event.
+     * @returns {Promise<void>}
      */
-    const handleOutsideClick = (e: Event): void => {
-      if (e.target === dialogRef.current) setOpenFalse(e);
+    const handleOutsideClick = async (e: Event): Promise<void> => {
+      try {
+        if (e.target === dialogRef.current) setOpenFalse(e);
+      } catch (err) {
+        await handleError(createError(1003, 'Error in click event outside modal window'), {
+          component: 'Modal',
+          operation: 'handleOutsideClick',
+          url: window.location.href,
+        });
+      }
     };
 
     document.addEventListener('click', handleOutsideClick);
     return () => document.removeEventListener('click', handleOutsideClick);
-  }, [setOpenFalse]);
+  }, [handleError, setOpenFalse]);
 
   /**
    * Handles the opening and closing of the modal.
    */
   useEffect(() => {
     const dialogNode = dialogRef.current;
-    // const closeNode = closeRef.current;
+
     if (!dialogNode) return;
 
-    if (open) {
-      lastFormChildRef.current = childrenRef.current?.getElementsByTagName('textarea').item(0) || undefined;
-      if (onRenderComplete === true || onRenderComplete === undefined) dialogNode.showModal();
-    } else {
-      dialogNode.close();
-      if (closeParentModal) closeParentModal((state) => !state);
-    }
-  }, [closeParentModal, onRenderComplete, open]);
+    /**
+     * Handles opening and closing modal
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
+    const handleModalOpenClose = async (): Promise<void> => {
+      try {
+        if (open) {
+          lastFormChildRef.current = childrenRef.current?.getElementsByTagName('textarea').item(0) || undefined;
+          if (onRenderComplete === true || onRenderComplete === undefined) dialogNode.showModal();
+        } else {
+          dialogNode.close();
+          if (closeParentModal) closeParentModal((state) => !state);
+        }
+      } catch (err) {
+        await handleError(createError(3003, 'Error opening or closing the modal window'), {
+          component: 'Modal',
+          operation: open ? 'openModal' : 'closeModal',
+          url: window.location.href,
+        });
+      }
+    };
+
+    handleModalOpenClose();
+  }, [closeParentModal, handleError, onRenderComplete, open]);
 
   /**
    * Handles the focus of the title element when the modal is opened.
@@ -177,11 +210,31 @@ export function Modal({
     const titleNode = titleRef.current;
     if (!titleNode) return;
 
-    if (open && onRenderComplete) {
-      titleNode.focus();
-      setTimeout(() => closeNode?.focus(), 200);
-    }
-  }, [onRenderComplete, open]);
+    /**
+     * Handles focus when the modal is opened.
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
+    const handleFocus = async (): Promise<void> => {
+      try {
+        if (open && onRenderComplete) {
+          titleNode.focus();
+          setTimeout(() => {
+            closeNode?.focus();
+          }, 200);
+        }
+      } catch (err) {
+        await handleError(createError(2003, 'Focus timeout error on close icon after opening modal window'), {
+          component: 'Modal',
+          operation: 'focusTitleNode',
+          url: window.location.href,
+        });
+      }
+    };
+
+    handleFocus();
+  }, [handleError, onRenderComplete, open]);
 
   /**
    * Handles cancellation of the modal (possible 'esc' or other native cancellation).
@@ -192,14 +245,27 @@ export function Modal({
 
     /**
      * Handles the cancel event.
-     *
+     * @async
      * @param {Event} e - The cancel event.
+     * @returns {Promise<void>}
      */
-    const handleCancel = (e: Event): void => setOpenFalse(e);
+    const handleCancel = async (e: Event): Promise<void> => {
+      try {
+        setOpenFalse(e);
+      } catch (err) {
+        await handleError(createError(1003, 'Error closing modal window with escape key'), {
+          component: 'Modal',
+          operation: 'handleCancel',
+          url: window.location.href,
+        });
+      }
+    };
 
     dialogNode?.addEventListener('cancel', handleCancel);
-    return () => dialogNode?.removeEventListener('cancel', handleCancel);
-  }, [setOpenFalse]);
+    return () => {
+      dialogNode?.removeEventListener('cancel', handleCancel);
+    };
+  }, [handleError, setOpenFalse]);
 
   // Combine the custom style and className
   const modalClassName = style.modal + (className ? ` ${className}` : '') + (!open ? ` ${style['modal--hidden']}` : '');

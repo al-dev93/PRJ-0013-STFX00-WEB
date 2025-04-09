@@ -37,15 +37,25 @@ function getDefaultMessage(status: number): string {
     500: 'Internal Server Error',
     503: 'Service temporarily unavailable',
     504: 'Response time exceeded',
+    1001: 'Invalid value for a prop',
+    1002: 'Invalid Type for a prop',
+    1003: 'UI interaction error',
+    2003: 'Medium UI interaction error',
+    3003: 'Critical UI interaction error',
   };
 
   return messages[status] || 'Unknown error';
 }
 
 function getSeverity(status: number): AppError['severity'] {
-  if (status >= 500) return 'critical';
-  if (status >= 400) return 'medium';
-  return 'low';
+  switch (true) {
+    case (status >= 400 && status < 500) || (status >= 2000 && status < 3000):
+      return 'medium';
+    case (status >= 500 && status < 600) || (status >= 3000 && status < 4000):
+      return 'critical';
+    default:
+      return 'low';
+  }
 }
 
 /**

@@ -1,3 +1,4 @@
+import type { FetchErrorContext } from '@/modules/Error/types';
 import type { AccountLink } from '@/types';
 
 /**
@@ -45,3 +46,18 @@ export type SocialMediaButtonProps = {
   button: AccountLink;
   cryptoKey?: CryptoKey;
 };
+
+/**
+ * Extended error context interface specific to SocialMediaButton component errors.
+ * Provides detailed metadata about social media button-related errors.
+ *
+ * @export
+ * @interface SocialMediaButtonErrorContext
+ * @extends {FetchErrorContext}
+ * @property {string} address - The encrypted or invalid address that caused the error.
+ */
+export interface SocialMediaButtonErrorContext extends FetchErrorContext {
+  component: string;
+  operation: string;
+  address: string | undefined;
+}

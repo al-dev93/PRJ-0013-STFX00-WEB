@@ -1,12 +1,17 @@
 import IonIcon from '@reacticons/ionicons';
-import React, { memo } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 
-import { CardDisplayError } from './error';
-// import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import type { Deliverable } from '@/types';
+import { SkillsList } from '@components/SkillsList';
+import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { isObjectOfType } from '@utils/typeHelpers';
+
+import { optionalCardSchema, requiredCardSchema } from './cardSchema';
 import style from './style.module.css';
 import type { CardProps } from './types';
-import { SkillsList } from '../SkillsList';
-import { SocialMediaNavBar } from '../SocialMediaNavBar';
+
 /**
  * Card component that displays project data including title, description, skills, and social media links.
  *
@@ -18,18 +23,90 @@ import { SocialMediaNavBar } from '../SocialMediaNavBar';
  * @al-dev93
  */
 function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
-  if (cardData.display !== 'card') {
-    throw new CardDisplayError(cardData.display, {
-      url: window.location.href,
-      component: 'Card',
-      projectId: cardData.id,
-      projectTitle: cardData.title,
-      projectDescription: cardData.description,
-      invalidProperty: 'display',
-    });
-  }
+  const handleError = useErrorHandler();
+  const handlePropsValidity = useCallback(
+    async (checkCategory?: 'type') => {
+      const { code, message, context } = ((): { code: 1001 | 1002; message: string; context: object } => {
+        if (checkCategory === 'type') {
+          return {
+            code: 1002,
+            message: 'wrong type of one of the cardData properties',
+            context: {
+              projectId: typeof cardData.id === 'string' ? cardData.id : 'unknown',
+              projectTitle: typeof cardData.title === 'string' ? cardData.title : 'unknown',
+              projectDescription: typeof cardData.description === 'string' ? cardData.description : 'unknown',
+              projectDeliverables: cardData.deliverables.every((element) =>
+                isObjectOfType<Deliverable>(element, requiredCardSchema, optionalCardSchema),
+              )
+                ? 'deliverables'
+                : 'unknown',
+            },
+          };
+        }
+        return {
+          code: 1001,
+          message: 'wrong value of one of the cardData properties',
+          context: {
+            projectId: cardData.id || 'unknown',
+            projectTitle: cardData.title || 'unknown',
+            projectDescription: cardData.description || 'unknown',
+            projectDeliverables: cardData.deliverables ? 'deliverables' : 'unknown',
+          },
+        };
+      })();
 
-  return (
+      await handleError(
+        createError(code, message, {
+          ...context,
+          url: window.location.href,
+          component: 'Card',
+          operation: 'render',
+          category: 'UI Component',
+        }),
+      );
+    },
+    [cardData.deliverables, cardData.description, cardData.id, cardData.title, handleError],
+  );
+
+  useEffect(() => {
+    // Verification of mandatory data
+    const isValueInvalid = !cardData.id || !cardData.title || !cardData.description || !cardData.deliverables;
+
+    // Data type checking
+    const isTypeInvalid =
+      typeof cardData.id !== 'string' ||
+      typeof cardData.title !== 'string' ||
+      typeof cardData.description !== 'string' ||
+      !cardData.deliverables.every((element) =>
+        isObjectOfType<Deliverable>(element, requiredCardSchema, optionalCardSchema),
+      );
+
+    if (isTypeInvalid) {
+      handlePropsValidity('type');
+    } else if (isValueInvalid) {
+      handlePropsValidity();
+    }
+  }, [cardData.deliverables, cardData.description, cardData.id, cardData.title, handlePropsValidity]);
+
+  useEffect(() => {
+    if (cardData.display !== 'card') {
+      // eslint-disable-next-line no-void
+      void handleError(
+        createError(422, `Invalid display mode: ${cardData.display}`, {
+          component: 'Card',
+          operation: 'render',
+          url: window.location.href,
+          projectId: cardData.id,
+          projectTitle: cardData.title,
+          projectDescription: cardData.description,
+          invalidProperty: 'display',
+          category: 'UI Component',
+        }),
+      );
+    }
+  }, [cardData.description, cardData.display, cardData.id, cardData.title, handleError]);
+
+  return cardData.display === 'card' ? (
     <article className={style.card} aria-labelledby={`card-title-${cardData.id}`}>
       <header className={style.card__header}>
         <IonIcon className={style.card__folderIcon} name='folder-open-sharp' aria-hidden='true' />
@@ -43,7 +120,7 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
         <SkillsList tagColor={style.card__skillsList} lineBreak list={cardData.tags} />
       </footer>
     </article>
-  );
+  ) : null;
 }
 
 const Card = memo(MemoizedCard);

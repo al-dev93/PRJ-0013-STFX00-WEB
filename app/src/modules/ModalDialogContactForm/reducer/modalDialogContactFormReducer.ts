@@ -8,6 +8,7 @@ import {
   INIT_DIALOG_CONTACT_FORM_STATE,
   RESET_AUTO_COMPLETE_OVERLAY,
   SET_AUTO_COMPLETE,
+  SET_ERROR_MESSAGE,
   SET_ERROR_TAG_NAME,
   SET_INPUT_BORDER_BOX,
   SET_INPUT_ERROR,
@@ -53,6 +54,12 @@ export function modalDialogContactFormReducer(
       return {
         ...state,
         [action.payload.name]: { ...state[action.payload.name], inputBorderBox: action.payload.borderStyle },
+      };
+
+    case SET_ERROR_MESSAGE:
+      return {
+        ...state,
+        [action.payload.name]: { ...state[action.payload.name], errorMessage: action.payload.errorMessage },
       };
 
     case SET_ERROR_TAG_NAME:

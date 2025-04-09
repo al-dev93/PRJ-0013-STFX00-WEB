@@ -1,3 +1,5 @@
+import type { BelongsTo, HasMany } from 'miragejs/-types';
+
 import type {
   ContactFormInput,
   ContactFormModal,
@@ -9,7 +11,6 @@ import type {
   ProjectData,
   TooltipContent,
 } from '.';
-import type { BelongsTo, HasMany } from 'miragejs/-types';
 
 export type MockedContactFormInput = ContactFormInput & {
   contactFormModal?: BelongsTo<string>;

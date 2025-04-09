@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
 import { ALERTED_STYLE, THINNED_STYLE } from '@utils/constants';
 
 import style from './style.module.css';
 import type { TagProps } from './types';
-
 /**
  * Tag component that displays a tag with various style.
  *
@@ -12,7 +13,7 @@ import type { TagProps } from './types';
  * @param {TagProps} props - The properties for the Tag component.
  * @property {string} [className] - Additional class names for the tag.
  * @property {string} [tag] - Text content of the tag.
- * @property {('alerted' | 'filled' | 'thinned')} [type] - Type of the tag wich determines its style.
+ * @property {('alerted' | 'filled' | 'thinned')} [type] - Type of the tag which determines its style.
  * - 'alerted': indicates an error type tag.
  * - 'filled': indicates a filled type tag.
  * - 'thinned': indicates a thinned type tag.
@@ -23,6 +24,48 @@ import type { TagProps } from './types';
  * @al-dev93
  */
 export function Tag({ className, tag, type, position, ariaLabel }: TagProps): React.JSX.Element {
+  const handleError = useErrorHandler();
+
+  /**
+   * Checks the validity and type of the tag prop
+   *
+   * @function handleTagValidity
+   * @returns {(checkValidity?: 'tagType') => Promise<void>}
+   */
+  const handleTagValidity = useCallback(
+    async (checkValidity?: 'tagType'): Promise<void> => {
+      const { code, message } = (() => {
+        if (checkValidity === 'tagType') {
+          return {
+            code: 1002,
+            message: 'Invalid tag type provided.',
+          };
+        }
+        return {
+          code: 1001,
+          message: 'Tag content is missing or empty.',
+        };
+      })();
+      await handleError(
+        createError(code, message, {
+          component: 'Tag',
+          operation: 'render',
+          category: 'UI Component',
+          url: window.location.href,
+        }),
+      );
+    },
+    [handleError],
+  );
+
+  useEffect(() => {
+    if (!tag) {
+      handleTagValidity();
+    } else if (type && !['alerted', 'filled', 'thinned'].includes(type)) {
+      handleTagValidity('tagType');
+    }
+  }, [handleTagValidity, tag, type]);
+
   /**
    * Returns the class name for the tag based on its type.
    *
@@ -41,14 +84,14 @@ export function Tag({ className, tag, type, position, ariaLabel }: TagProps): Re
    * @constant
    * @type {string}
    */
-  const classNameTag = useMemo(
+  const classNameTag: string = useMemo(
     () => [className, style.tag, getClassName(type)].filter(Boolean).join(' '),
     [className, getClassName, type],
   );
 
   return (
     <span
-      className={classNameTag}
+      className={tag ? classNameTag : `${style.tag} ${style['tag--empty']}`}
       style={position}
       aria-live={type === ALERTED_STYLE ? 'assertive' : 'polite'}
       aria-label={ariaLabel}

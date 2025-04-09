@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useContactFormState } from './useContactFormState';
-import { FieldState, ModalDialogContactFormState } from '../types';
+import type { FieldState, ModalDialogContactFormState } from '../types';
 
 /**
  * Selector extracting only the values from the state corresponding to name
