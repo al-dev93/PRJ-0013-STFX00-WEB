@@ -34,7 +34,7 @@ export const detailSections = [
     name: 'description',
     content:
       'Développeur concepteur de logiciel, j’ai choisi de déployer mon activité en l’adossant à une société unipersonnelle: AlgoNetDesign.',
-    showcaseSectionId: '4',
+    showcaseSectionId: '2',
   },
   {
     id: '6',
@@ -42,7 +42,7 @@ export const detailSections = [
     name: 'description',
     content:
       'Spécialisée dans le développement Front-end, AlgoNetDesign peut intégrer une maquette existante ou la créer en élaborant le design avec vous.',
-    showcaseSectionId: '4',
+    showcaseSectionId: '2',
     boldDetailSectionIds: ['1', '2'],
   },
   {
@@ -51,7 +51,7 @@ export const detailSections = [
     name: 'description',
     content:
       "AlgoNetDesign peut également vous aider à mettre en oeuvre ou à améliorer votre projet. Elle proposera ainsi de déboguer un code défectueux, de refactoriser une base de code pour l'optimiser, de créer des tests pour accroître la fiabilité, ou encore de convertir une application avec des technologies récentes.",
-    showcaseSectionId: '4',
+    showcaseSectionId: '2',
     boldDetailSectionIds: ['3', '4'],
   },
   {
@@ -59,21 +59,21 @@ export const detailSections = [
     tag: 'p',
     name: 'description',
     content:
-      'HTML et CSS sont au coeur des technologies maîtrisées par AlgoNetDesign. Elles sont complétées par la liste ci-dessous. Enfin, pour une application nécessitant un Back-end modeste, AlgoNetDesign peut en assurer la création.',
-    showcaseSectionId: '4',
+      'HTML et CSS sont au cœur des technologies maîtrisées par AlgoNetDesign. Elles sont complétées par la liste ci-dessous. Enfin, pour une application nécessitant un Back-end modeste, AlgoNetDesign peut en assurer la création.',
+    showcaseSectionId: '2',
     boldDetailSectionIds: ['5', '6'],
   },
   {
     id: '9',
     tag: 'SkillsCloud',
     urlContent: 'http://localhost:5173/api/skills',
-    showcaseSectionId: '4',
+    showcaseSectionId: '2',
   },
   {
     id: '10',
     tag: 'Slideshow',
     urlContent: 'http://localhost:5173/api/projects',
-    showcaseSectionId: '2',
+    showcaseSectionId: '3',
   },
   {
     id: '11',
@@ -81,6 +81,6 @@ export const detailSections = [
     name: 'cardsWrapper',
     urlContent: 'http://localhost:5173/api/projects',
     wrapped: true,
-    showcaseSectionId: '3',
+    showcaseSectionId: '4',
   },
 ];
