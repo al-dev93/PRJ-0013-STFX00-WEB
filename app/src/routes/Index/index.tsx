@@ -25,12 +25,14 @@ export function Index(): React.JSX.Element {
    */
   const { viewSectionContext, setOpenContactFormDialog, openContactFormDialog, modalId } = usePageSection();
 
+  const endpoint = import.meta.env.VITE_API_SHOWCASES_DATA_ENDPOINT;
   /**
    * Fetches data from the server using the useFetchData hook.
    *
    * @constant {Object} data - The data fetched from the server.
    */
-  const { data } = useFetchData('http://localhost:5173/api/showcaseSections', { method: 'GET' });
+  const { data } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
+  if (data) console.log(data);
 
   /**
    * Handles the click event to open or close the contact form dialog.

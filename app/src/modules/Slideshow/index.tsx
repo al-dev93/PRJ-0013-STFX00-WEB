@@ -20,24 +20,28 @@ import { INIT_MAX_INDEX_SLIDE, PENDING, SLIDE_TRANSITION, START, STOP } from './
  * @component
  * @param {SlideshowProps} props - The props for the slideshow.
  * @property {ProjectData[] | undefined} [data] - The project data to display.
- * @property {string | undefined} [url] - The URL to fetch the slideshow data if not provided.
  * @returns {React.JSX.Element | null} A JSX element representing the slideshow.
  *
  * @al-dev93
  */
-function MemoizedSlideshow({ data: slideshowData, url }: SlideshowProps): React.JSX.Element | null {
+function MemoizedSlideshow({
+  data: slideshowData,
+  endpoint: slideshowEndpoint,
+}: SlideshowProps): React.JSX.Element | null {
   // Determine if needs to be fetched based on presence of data in props.
   const shouldFetch = !slideshowData;
 
   // Fetch data only if necessary (when no slideshowData is provided)
-  const { data: fetchedData } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
+  // const projectsEndpoint = shouldFetch ? import.meta.env.VITE_API_PROJECTS_DATA_ENDPOINT : null;
+  const endpoint = useMemo(() => (shouldFetch ? slideshowEndpoint : null), [shouldFetch, slideshowEndpoint]);
+  const { data: fetchedData } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
 
   /**
    * Memoize the slideshow data by filtering out projects that are set to display in the slideshow.
    *
    * @type {ProjectData[]}
    */
-  const data = useMemo(() => {
+  const data: ProjectData[] = useMemo(() => {
     return (slideshowData || (fetchedData as ProjectData[]))?.filter((item) => item.display === 'slideshow');
   }, [fetchedData, slideshowData]);
 
@@ -76,7 +80,7 @@ function MemoizedSlideshow({ data: slideshowData, url }: SlideshowProps): React.
    *
    * @type {ProjectData}
    */
-  const activeSlide = useMemo(
+  const activeSlide: ProjectData = useMemo(
     () => data?.[slideshowState.slideTransition === START ? slideshowState.current : slideshowState.new],
     [data, slideshowState],
   );

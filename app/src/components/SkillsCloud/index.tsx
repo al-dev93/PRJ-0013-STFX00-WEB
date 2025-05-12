@@ -32,7 +32,6 @@ import {
  * @component
  * @param {SkillsCloudProps} props - The properties for the SkillsCloud component.
  * @property {Skill[]} [data] - Data needed to create the word cloud (optional).
- * @property {string} [url] - URL to download the data needed to create the word cloud (optional).
  * @property {number} [width=800] - Total width of the word cloud. 800px by default.
  * @property {number} [height=400] - Total height of the word cloud. 400px by default.
  * @returns {React.JSX.Element} The rendered skills cloud component.
@@ -41,9 +40,9 @@ import {
  */
 function MemoizedSkillsCloud({
   data: skillsData,
-  url,
   width = 1000,
   height = 400,
+  endpoint: skillsCloudEndpoint,
 }: SkillsCloudProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
   const [fontSize, setFontSize] = useState<number>(SKILLS_BASE_FONT_SIZE);
@@ -53,7 +52,8 @@ function MemoizedSkillsCloud({
   // Determine if data should be fetched based on the presence of skills.
   const shouldFetch = !skillsData;
   // Use useFetchData hook if shouldFetch is true
-  const { data: fetchedData, fetchError, isLoaded } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
+  const endpoint = useMemo(() => (shouldFetch ? skillsCloudEndpoint : null), [shouldFetch, skillsCloudEndpoint]);
+  const { data: fetchedData, fetchError, isLoaded } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
 
   // Use skillsData if provided, otherwise use fetched data.
   const data = useMemo((): Skill[] => skillsData || (fetchedData as Skill[]), [fetchedData, skillsData]);
@@ -72,13 +72,13 @@ function MemoizedSkillsCloud({
         createError(1001, 'No valid skills data provided.', {
           component: 'SkillsCloud',
           operation: 'render',
-          url: url || 'unknown',
+          endpoint: endpoint || 'unknown',
           invalidProperty: 'data',
           category: 'UI Component',
         }),
       );
     }
-  }, [data?.length, handleError, isLoaded, url]);
+  }, [data?.length, handleError, isLoaded, endpoint]);
 
   /**
    * Handles the keydown event to adjust the font size of the skills cloud.

@@ -15,5 +15,6 @@ export type DynamicElementContainerProps = {
   tag: ValidHTMLTag | ValidComponentTag;
   className?: string;
   filterValue?: string;
-  url?: string;
+  endpoint?: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 };

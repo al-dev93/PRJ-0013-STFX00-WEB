@@ -3,42 +3,6 @@ import { createError } from '@/modules/Error/utils/errorHandling';
 import { AppError } from '@/types';
 
 /**
- * Executes a refetch operation with dynamic arguments such as URL, HTTP method, and optional data payload.
- *
- * @async
- * @function
- * @param {string | null} url - The URL to which the request should be made. If null, no refetch is triggered.
- * @param {(url: string | null, options: RequestInit) => Promise<void>} refetch - The function that handles
- * the refetch operation. It accepts the URL and options as arguments.
- * @param {'GET' | 'POST'} method - The HTTP method to use for the request ('GET' or 'POST').
- * @param {object} [data] - Optional data to include in the request body when using the 'POST' method.
- * @returns {Promise <void>}
- *
- * @example
- * refetchFormDataWithArguments(
- *   'https://example.com/api/data',
- *   refetch,
- *   'POST',
- *   { name: 'John Doe', age: 30 }
- * );
- *
- * @al-dev93
- */
-export async function refetchFormDataWithArguments(
-  url: string | null,
-  refetch: (url: string | null, options: RequestInit) => Promise<void>,
-  method: 'GET' | 'POST',
-  data?: object,
-): Promise<void> {
-  const options: RequestInit = { method };
-  if (method === 'POST') {
-    options.headers = { 'Content-Type': 'application/json' };
-    options.body = data ? JSON.stringify(data) : null;
-  }
-  if (url) await refetch(url, options);
-}
-
-/**
  * Attempts to safety cast an unknown value to an AppError if it matches the expected structure.
  *
  * This function is useful when working with error objects coming from external sources,
@@ -62,6 +26,21 @@ export function castIfAppError(error: unknown): AppError | null {
   return null;
 }
 
+/**
+ * Handles errors arising from fetch operations by normalizing them into AppError instances
+ * and delegating to a provided error handler.
+ *
+ * @async
+ * @param {string} component - The name of the component or module where the fetch error occurred.
+ * @param {{ error: unknown; context?: FetchErrorContext }} fetchError - An object containing the
+ * raw error thrown during fetching and optional context such as request parameters or
+ * response details.
+ * @param {(rawError: unknown, context?: FetchErrorContext) => Promise<AppError>} handleError - An
+ * async callback that takes a normalized AppError (or raw error) and optional context, and returns
+ * a Promise resolving to an AppError after handling/logging/reporting it.
+ * @returns {Promise<void>} Resolves after the provided error handler has been invoked with
+ * the appropriate AppError.
+ */
 export async function handleFetchError(
   component: string,
   fetchError: { error: unknown; context?: FetchErrorContext },

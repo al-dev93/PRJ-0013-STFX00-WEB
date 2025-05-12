@@ -23,8 +23,8 @@ import { DynamicElementContainer } from '../DynamicElementContainer';
  * @property {SectionsRef} [anchor] - Name of the Id assigned to the section.
  * @property {string} [title] - Section title.
  * @property {MutableRefObject<MenuSectionsVisibility>} MenuSectionsVisibility - Indicates the name of the visible displayed.
- * @property {() => void} [openModalFormDialog] - Trigger for opening the contact modal to use button in the section.
- * @property {boolean} showModalForm - The current state of the contact form dialog.
+ * @property {function} [openModalFormDialog] - Trigger for opening the contact modal to use button in the section.
+ * @property {boolean} showModalFormDialog - The current state of the contact form dialog.
  * @property {string} modalId - The id of the modal.
  * @returns {React.JSX.Element} The rendered Tag component.
  *
@@ -175,7 +175,7 @@ function MemoizedShowcaseSection({
           key={renderNode.id}
           id={renderNode.tag === 'h1' ? `${anchor}-title` : undefined}
           tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
-          url={renderNode.urlContent}
+          endpoint={renderNode.endpoint}
           className={getElementClassName(renderNode.name)}
         >
           {renderNode.content}
@@ -217,7 +217,8 @@ function MemoizedShowcaseSection({
               tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
               className={getElementClassName(renderNode.name)}
               filterValue='card'
-              url='http://localhost:5173/api/projects' // TODO: variable d'environnement
+              endpoint={renderNode.endpoint}
+              method='POST'
             />
           ),
         )}

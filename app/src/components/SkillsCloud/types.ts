@@ -17,11 +17,11 @@ export type SkillsCloudProps = {
 } & (
   | {
       data?: Skill[];
-      url?: never;
+      endpoint?: never;
     }
   | {
       data?: never;
-      url?: string;
+      endpoint?: string;
     }
 );
 

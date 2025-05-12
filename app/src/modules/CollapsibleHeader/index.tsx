@@ -38,9 +38,8 @@ export function CollapsibleHeader({
 
   const { src, alt } = logo || { src: undefined, alt: undefined };
 
-  const url = 'http://localhost:5173/api/menuItems';
-  // TODO variable d'environnement
-  const { data, fetchError } = useFetchData(url, { method: 'GET' });
+  const endpoint = import.meta.env.VITE_API_MENU_ITEMS_DATA_ENDPOINT;
+  const { data, fetchError } = useFetchData({ endpoint, initialOptions: { method: 'GET' } });
 
   /* Uses custom hook useCollapsibleHeader to get the
      display state based on the scroll direction      */

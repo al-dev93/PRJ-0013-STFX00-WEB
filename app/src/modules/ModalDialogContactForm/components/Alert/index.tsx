@@ -28,30 +28,8 @@ function MemoizedAlert({
   message: alertMessage,
   closeParentModal,
 }: AlertProps): React.JSX.Element | null {
-  const modalId = useId();
   const handleError = useErrorHandler();
-
-  const renderMessage: React.JSX.Element | null = useMemo(() => {
-    if (Array.isArray(alertMessage) && isPrimitiveArray(alertMessage, 'string')) {
-      return (
-        <div className={style.wrapperAlert}>
-          {alertMessage.map((value, index) => (
-            <span key={`id-${index + 1}`} className={style.bodyAlert}>
-              {value}
-            </span>
-          ))}
-        </div>
-      );
-    }
-    if (typeof alertMessage === 'string') {
-      return (
-        <div className={style.wrapperAlert}>
-          <span className={style.bodyAlert}>{alertMessage}</span>
-        </div>
-      );
-    }
-    return null;
-  }, [alertMessage]);
+  const modalId = useId();
 
   const handlePropsValidity = useCallback(
     async (checkCategory?: 'type') => {
@@ -90,6 +68,28 @@ function MemoizedAlert({
     [alertMessage, handleError],
   );
 
+  const renderMessage: React.JSX.Element | null = useMemo(() => {
+    if (Array.isArray(alertMessage) && isPrimitiveArray(alertMessage, 'string')) {
+      return (
+        <div className={style.wrapperAlert}>
+          {alertMessage.map((value, index) => (
+            <span key={`id-${index + 1}`} className={style.bodyAlert}>
+              {value}
+            </span>
+          ))}
+        </div>
+      );
+    }
+    if (typeof alertMessage === 'string') {
+      return (
+        <div className={style.wrapperAlert}>
+          <span className={style.bodyAlert}>{alertMessage}</span>
+        </div>
+      );
+    }
+    return null;
+  }, [alertMessage]);
+
   useEffect(() => {
     const isValueInvalid = !alertMessage || !alertMessage.length;
     const isTypeInvalid = typeof alertMessage !== 'string' && !isPrimitiveArray(alertMessage, 'string');
@@ -99,7 +99,7 @@ function MemoizedAlert({
     } else if (isValueInvalid) {
       handlePropsValidity();
     }
-  });
+  }, [alertMessage, handlePropsValidity]);
 
   return (
     <Modal

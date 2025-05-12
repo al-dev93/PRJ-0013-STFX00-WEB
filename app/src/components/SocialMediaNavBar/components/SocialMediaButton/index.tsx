@@ -4,7 +4,6 @@ import React, { MouseEvent, useCallback, useEffect, useMemo } from 'react';
 import type { AccountLink } from '@/types';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
-import { decryptData } from '@services/secure/mockedEncryption';
 import { ICON_VALUES } from '@utils/constants';
 import { isObjectOfType } from '@utils/typeHelpers';
 import { isValidUrl } from '@utils/urlHelpers';
@@ -27,12 +26,9 @@ import type { SocialMediaButtonProps } from '../../types';
  * @al-dev93
  */
 export function SocialMediaButton({ className, button, cryptoKey }: SocialMediaButtonProps): React.JSX.Element | null {
-  const { icon, address, iv, service, id } = useMemo(() => button, [button]);
+  const { icon, address, service, id } = useMemo(() => button, [button]);
   const handleError = useErrorHandler();
-  const isValidService = useMemo(
-    () => (!!service && service !== 'gmail') || (service === 'gmail' && cryptoKey),
-    [cryptoKey, service],
-  );
+  const isValidService = useMemo(() => (!!service && service !== 'gmail') || (service === 'gmail' && true), [service]);
 
   /**
    * Checks the validity of mandatory props
@@ -129,7 +125,7 @@ export function SocialMediaButton({ className, button, cryptoKey }: SocialMediaB
     async (event: MouseEvent): Promise<void> => {
       event.preventDefault();
       try {
-        const mailTo = `mailto:${await decryptData(address, iv, cryptoKey)}`;
+        const mailTo = `mailto:`;
         window.location.href = mailTo;
       } catch (err) {
         await handleError(
@@ -145,7 +141,7 @@ export function SocialMediaButton({ className, button, cryptoKey }: SocialMediaB
         );
       }
     },
-    [address, cryptoKey, handleError, iv, service],
+    [address, handleError, service],
   );
 
   return isValidService ? (

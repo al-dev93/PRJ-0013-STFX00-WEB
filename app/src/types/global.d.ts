@@ -136,7 +136,7 @@ export type DetailSection = {
   wrapped?: boolean;
   name?: string;
   content?: string;
-  urlContent?: string;
+  endpoint?: string;
   boldContent?: DetailSection[];
 };
 
@@ -200,12 +200,13 @@ export type Skill = {
  */
 export type ContactFormModal = {
   id: string;
-  urlFormContent: string;
-  urlApi: string;
+  // endpoint: string;
+  // urlApi: string;
   submitButtonName: string;
   title: string;
   subtitle: string;
   alertOnSubmit: string[];
+  dataFormContent: ContactFormInput[];
 };
 
 type InputType = 'text' | 'email' | 'tel' | 'checkbox';
@@ -265,6 +266,25 @@ export type ContactMessage = {
 
 // NOTE: data fetched via the useFetchData hook
 
+/**
+ * Defines the type of parameters used by the custom hook useFetchData
+ *
+ * @export
+ * @type {object} UseFetchDataParams
+ * @property {(string | string[] | null)} [endpoint] - final part of the API URL or an array
+ * of final part.
+ * @property {FetchOptions} initialOptions - The options to use for the fetch request.
+ * @property {boolean} [shouldRefetch] - A flag indicating if the data should be refetched.
+ * @property {boolean} [edgeFunction] - Whether to target a serverless edge function (true)
+ * or the standard API (false).
+ */
+export type UseFetchDataParams = {
+  endpoint?: string | string[] | null;
+  initialOptions: FetchOptions;
+  shouldRefetch?: boolean;
+  edgeFunction?: boolean;
+};
+
 // TODO: add comment
 /**
  * @description
@@ -278,23 +298,46 @@ export type FetchData =
   | IndexPageSection[]
   | ProjectData[]
   | Skill[]
+  | ContactFormModal[]
   | ContactFormInput[]
   | ContactFormModal[]
   | ErrorMessage[]
   | null;
 
+/**
+ * Defines the type of the result of the fetch operation with
+ * custom hook useFetchData.
+ *
+ * @export
+ * @type {object} FetchResultData
+ * @property {(FetchData | FetchData[] | string)} data - The fetched data, either as a single result
+ * or an array of results.
+ * @property {boolean} isLoaded - Boolean indicating if the fetch is completed.
+ * @property {({error: unknown; context?: FetchErrorContext} | null)} fetchError - An error definition object.
+ * @property {(url: string | undefined | null, options: FetchOptions) => Promise<void>} refetch - function to
+ * manually trigger a fetch request.
+ */
 export type FetchResultData = {
-  data: FetchData | FetchData[];
+  data: FetchData | FetchData[] | string;
   isLoaded: boolean;
   fetchError: {
     error: unknown;
     context?: FetchErrorContext;
   } | null;
   refetch: (url: string | undefined | null, options: FetchOptions) => Promise<void>;
-  // setFetchOptionsData: (url: string | undefined | null, options?: object) => (() => void) | undefined;
 };
 
 /**
  * Options for the fetch request.
  */
 export type FetchOptions = RequestInit;
+
+// NOTE: setting up the application operation
+
+/**
+ * sets the operating mode
+ *
+ * @export
+ * @type FetchMode
+ */
+export type FetchMode = 'auto' | 'local' | 'remote';

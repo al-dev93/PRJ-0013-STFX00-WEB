@@ -3,7 +3,7 @@ import type { ValidHTMLTag } from '@components/DynamicElement/types';
 import { HTML_TAGS } from './dynamicElementsconstants';
 
 /**
- * @description Checks if the given tag is a valid HTML tag.
+ * Checks if the given tag is a valid HTML tag.
  * This function creates an HTML element using the provided tag and verifies if the resulting element is not
  * an instance of 'HTMLUnknownElement', which would indicate that the tag is not a valid intrinsic HTML element.
  *

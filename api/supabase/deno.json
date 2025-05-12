@@ -1,0 +1,6 @@
+{
+  "importMap": "import_map.json",
+  "tasks": {
+    "dev": "deno run --allow-env --allow-net --watch=functions/csrf/index.ts, functions/contact/index.ts functions/csrf/index.ts, functions/contact/index.ts"
+  }
+}

@@ -26,12 +26,14 @@ export function DynamicElementContainer({
   tag,
   className,
   filterValue,
-  url,
+  endpoint: dynamicElementContainerEndpoint,
+  method = 'GET',
   ...props
 }: DynamicElementContainerProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
   // Fetch data using useFetchData custom hook.
-  const { data: fetchedData, fetchError, isLoaded } = useFetchData(url || null, { method: 'GET' });
+  const endpoint = useMemo(() => dynamicElementContainerEndpoint || null, [dynamicElementContainerEndpoint]);
+  const { data: fetchedData, fetchError, isLoaded } = useFetchData({ endpoint, initialOptions: { method } });
 
   // Handle errors from data fetching.
   useEffect(() => {
@@ -61,12 +63,12 @@ export function DynamicElementContainer({
         createError(2202, 'no usable data for dynamic rendering', {
           component: 'DynamicElementContainer',
           operation: 'render',
-          url: url || 'unknown',
+          endpoint: endpoint || 'unknown',
           category: 'Dynamic Rendering',
         }),
       );
     }
-  }, [filteredData, handleError, isLoaded, url]);
+  }, [endpoint, filteredData, handleError, isLoaded]);
 
   return !fetchError && !!filteredData?.length ? (
     <div className={className}>

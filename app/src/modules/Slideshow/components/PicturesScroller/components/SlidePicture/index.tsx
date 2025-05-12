@@ -47,7 +47,7 @@ function MemoizedSlidePicture({
   /**
    * Custom hook useOnScreen to manage whether the image is in view, used for lazy loading.
    *
-   * @type {boolean}
+   * @type {{isIntersecting: boolean; observerError: AppError | undefined;}}
    */
   const inView = useOnScreen(imgRef, INTERSECTION_OPTIONS_THRESHOLD);
 

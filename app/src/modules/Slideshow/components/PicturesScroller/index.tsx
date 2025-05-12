@@ -1,5 +1,7 @@
 import React, { memo, useMemo } from 'react';
 
+import { ProjectData } from '@/types';
+
 import { ScrollButtons } from './components/ScrollButtons';
 import { SlidePicture } from './components/SlidePicture';
 import { SlideshowDots } from './components/SlideshowDots';
@@ -15,7 +17,6 @@ import {
   FIRST_SLIDE_INDEX,
   LAST_SLIDE_INDEX,
 } from '../../utils/constants';
-
 /**
  * Component to scroll through pictures in a slideshow with buttons and pagination dots.
  *
@@ -53,8 +54,8 @@ function MemoizedPicturesScroller({
    *
    * @type {ProjectData}
    */
-  const prependSlide = useMemo(() => slideContent[LAST_SLIDE_INDEX(slideContent)], [slideContent]);
-  const appendSlide = useMemo(() => slideContent[FIRST_SLIDE_INDEX], [slideContent]);
+  const prependSlide: ProjectData = useMemo(() => slideContent[LAST_SLIDE_INDEX(slideContent)], [slideContent]);
+  const appendSlide: ProjectData = useMemo(() => slideContent[FIRST_SLIDE_INDEX], [slideContent]);
 
   return (
     <div

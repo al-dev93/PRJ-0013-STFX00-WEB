@@ -11,7 +11,6 @@ import type { AccountLink } from '@/types';
  * on the page or in Card component.
  * @property {CryptoKey} [cryptoKey] - Encryption data to hide email address.
  * @property {AccountLink[]} [buttons] - SocialMediaNavBar button definition data.
- * @property {string} [url] - The URL to fetch the data needed by the SocialMediaNavBar component.
  *
  * @al-dev93
  */
@@ -20,16 +19,8 @@ export type SocialMediaNavBarProps = {
   changeLinkColor?: string;
   type?: 'left-nav' | 'right-nav' | 'card';
   cryptoKey?: CryptoKey;
-} & (
-  | {
-      buttons?: AccountLink[];
-      url?: never;
-    }
-  | {
-      buttons?: never;
-      url?: string;
-    }
-);
+  buttons?: AccountLink[];
+};
 
 /**
  * Props for the SocialMediaButton component.

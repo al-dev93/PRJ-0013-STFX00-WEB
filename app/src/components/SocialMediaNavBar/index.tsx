@@ -32,7 +32,6 @@ function MemoizedSocialMediaNavBar({
   changeLinkColor,
   type,
   buttons,
-  url,
   cryptoKey,
 }: SocialMediaNavBarProps): React.JSX.Element | null {
   const isVerticalNav = type === 'left-nav' || type === 'right-nav';
@@ -40,7 +39,8 @@ function MemoizedSocialMediaNavBar({
   // Determine if we should fetch data based on the presence of buttons
   const shouldFetch = !buttons;
   // Use useFetchData hook if shouldFetch is true
-  const { data: fetchedData, fetchError } = useFetchData(shouldFetch ? url : null, { method: 'GET' });
+  const endpoint = useMemo(() => (shouldFetch ? import.meta.env.VITE_API_ACCOUNTS_DATA_ENDPOINT : null), [shouldFetch]);
+  const { data: fetchedData, fetchError } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
 
   useEffect(() => {
     if (fetchError) {
@@ -98,12 +98,12 @@ function MemoizedSocialMediaNavBar({
   }, [buttons, fetchedData, type]);
 
   useEffect(() => {
-    if ((!url || url.length === 0) && (!buttons || buttons.length === 0)) {
+    if ((!endpoint || endpoint.length === 0) && (!buttons || buttons.length === 0)) {
       handleSocialMediaData('props');
     } else if (data && data.length === 0) {
       handleSocialMediaData();
     }
-  }, [buttons, data, handleSocialMediaData, url]);
+  }, [endpoint, buttons, data, handleSocialMediaData]);
 
   return !fetchError ? (
     <nav

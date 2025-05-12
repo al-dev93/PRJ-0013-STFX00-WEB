@@ -1,30 +1,38 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { FetchData, FetchOptions, FetchResultData } from '@/types';
+import type { FetchData, FetchOptions, FetchResultData, UseFetchDataParams } from '@/types';
+import { getFetchUrlOrUrls } from '@/utils/urlHelpers';
 import { ApplicationError } from '@modules/Error/error';
 import type { FetchErrorContext } from '@modules/Error/types';
+
 /**
  * Custom hook to fetch data from one or multiple URLs with specified options.
  *
  * @function
- * @param {(string | string[] | undefined | null)} [initialUrl=null] - The URL(s) to fetch data from.
- * @param {FetchOptions} [initialOptions={}] - The options to use for the fetch request.
- * @param {boolean} [shouldRefetch=false] - A flag indicating if the data should be refetched.
+ * @param {UseFetchDataParams} params - Object with the hook parameters.
+ * @property {(string | string[] | undefined | null)} [endpoint] - final part of the API URL or an array
+ * of final part. If `null`, the hook exits early without running effects.
+ * @property {FetchOptions} [initialOptions={}] - The options to use for the fetch request.
+ * @property {boolean} [shouldRefetch=false] - A flag indicating if the data should be refetched.
  * if `true`, the hook will trigger a new fetch when dependencies change.
  * if `false`, the hook will not refetch the data unless explicitly called.
+ * @property {boolean} [edgeFunction=false] - Whether to target a serverless edge function (true) or the standard API (false).
  * @returns {FetchResultData } The result of the fetch operation, including:
  *  - 'data': the fetched data, either as a single result or an array of results;
  *  - 'isLoaded': boolean indicating if the fetch is completed;
- *  - 'error': Error message, if any;
+ *  - 'fetchError': An error definition object, if any;
  *  - 'refetch': function to manually trigger a fetch request.
  *
  * @al-dev93
  */
-export function useFetchData(
-  initialUrl: string | string[] | undefined | null = null,
-  initialOptions: FetchOptions = {},
-  shouldRefetch: boolean = false,
-): FetchResultData {
+export function useFetchData({
+  endpoint,
+  initialOptions = {},
+  shouldRefetch = false,
+  edgeFunction = false,
+}: UseFetchDataParams): FetchResultData {
+  const { apiEndpoint: urlOrUrls, apiOptions } = getFetchUrlOrUrls({ endpoint, initialOptions, edgeFunction });
+
   const [data, setData] = useState<FetchData | FetchData[] | null>(null);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<{ error: unknown; context?: FetchErrorContext } | null>(null);
@@ -42,8 +50,8 @@ export function useFetchData(
    */
   const storeFetchValue = (url: string | string[], fetchData: unknown): void => {
     if (Array.isArray(url)) {
-      setData((fetchData as FetchData[][]).map((item) => Object.values(item).at(0) as FetchData));
-    } else setData(Object.values(fetchData as FetchData[]).at(0) as FetchData);
+      setData(fetchData as FetchData[]);
+    } else setData(fetchData as FetchData);
   };
 
   /**
@@ -77,11 +85,11 @@ export function useFetchData(
    *
    * @function
    * @param {(string | string[] | undefined | null)} [url=initialUrl] - The URL or array of URLs to fetch data from.
-   * @param {FetchOptions} [options=initialOptions] - Options for the fetch request (method, headers, body, etc.)
+   * @param {FetchOptions} [options=apiOptions] - Options for the fetch request (method, headers, body, etc.)
    * @returns {void} Triggers a side-effect for fetching data and updates the state accordingly.
    */
   const executeFetch = useCallback(
-    async (url: string | string[] | undefined | null = initialUrl, options: FetchOptions = initialOptions) => {
+    async (url: string | string[] | undefined | null = urlOrUrls, options: FetchOptions = apiOptions) => {
       if (!url) {
         setFetchError({
           error: new ApplicationError(400, 'No URL provided', 'medium', {
@@ -164,7 +172,7 @@ export function useFetchData(
         setFetchError({ error: normalizedError, context });
       }
     },
-    [initialOptions, initialUrl, shouldRefetch],
+    [apiOptions, shouldRefetch, urlOrUrls],
   );
 
   /**
@@ -172,12 +180,12 @@ export function useFetchData(
    * If the data has already been fetched and refetching is not required, no fetch is triggered.
    * Aborts the fetch if the component is unmounted or if the URL changes before the fetch completes.
    *
-   * Dependencies: 'executeFetch', 'initialOptions' and 'initialUrl'.
+   * Dependencies: 'executeFetch', 'initialOptions' and 'endpoint'.
    *
    * @returns {void} - The cleanup function that aborts the ongoing fetch if necessary.
    */
   useEffect(() => {
-    if (!initialUrl || hasFetched.current) return undefined;
+    if (!urlOrUrls || hasFetched.current) return undefined;
 
     executeFetch();
 
@@ -185,6 +193,6 @@ export function useFetchData(
     return () => {
       controllerRef.current?.abort();
     };
-  }, [executeFetch, initialUrl]);
+  }, [executeFetch, urlOrUrls]);
   return { data, isLoaded, fetchError, refetch: executeFetch };
 }

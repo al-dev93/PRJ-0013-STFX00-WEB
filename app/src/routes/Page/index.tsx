@@ -1,7 +1,8 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
-import type { OutletContextPage, PageProps, MenuSectionsVisibility } from '@/types';
+import { useCsrfToken } from '@/modules/ModalDialogContactForm/hooks/useCsrfToken';
+import type { OutletContextPage, MenuSectionsVisibility, PageProps } from '@/types';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import logo from '@images/brand/logoAND.png';
 import { CollapsibleHeader } from '@modules/CollapsibleHeader';
@@ -20,6 +21,7 @@ import style from './style.module.css';
  * @al-dev93
  */
 export function Page({ cryptoKey }: PageProps): React.JSX.Element {
+  const csrfToken = useCsrfToken();
   // stores the current location of the page using react-router hooks.
   const { pathname, hash, key } = useLocation();
   // stores the current scroll position triggered by the menu interaction.
@@ -84,15 +86,10 @@ export function Page({ cryptoKey }: PageProps): React.JSX.Element {
         open={openContactFormDialog}
         setOpen={setOpenContactFormDialog}
         modalId={modalId}
-        url={['http://localhost:5173/api/contactFormModals', 'http://localhost:5173/api/contactFormInputs']}
+        csrfToken={csrfToken}
       />
       {/* Social media navigation bar component for left navigation */}
-      <SocialMediaNavBar
-        className={style.socialMediaNavBar}
-        type='left-nav'
-        url='http://localhost:5173/api/accounts'
-        cryptoKey={cryptoKey}
-      />
+      <SocialMediaNavBar className={style.socialMediaNavBar} type='left-nav' cryptoKey={cryptoKey} />
 
       <main className={style.main} aria-label='Introduction et contenu principal'>
         <Outlet

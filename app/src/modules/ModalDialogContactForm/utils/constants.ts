@@ -8,12 +8,11 @@ import type { ContactFormModal } from '@/types';
  */
 const EMPTY_MODAL_DIALOG_CONTACT_FORM: ContactFormModal = {
   id: '',
-  urlFormContent: '',
-  urlApi: '',
   title: '',
   subtitle: '',
   submitButtonName: '',
   alertOnSubmit: [],
+  dataFormContent: [],
 };
 /**
  * Code representing an autocomplete feature for input.

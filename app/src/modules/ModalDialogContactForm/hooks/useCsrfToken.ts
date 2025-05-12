@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { getFetchUrlOrUrls } from '@/utils/urlHelpers';
+
 /**
  * Custom hook to fetch the token used for CSRF protection
  *
@@ -7,15 +9,16 @@ import { useEffect, useState } from 'react';
  * @returns {string} The token generated on the server
  */
 export function useCsrfToken() {
-  const [csrfToken, setCsrfToken] = useState<string>('');
-
+  const [token, setToken] = useState<string>('');
   useEffect(() => {
-    fetch('/api/csrf-token')
+    const endpoint = import.meta.env.VITE_API_CSRF_TOKEN_ENDPOINT;
+    const { apiEndpoint, apiOptions } = getFetchUrlOrUrls({ endpoint, initialOptions: {}, edgeFunction: true });
+    fetch(apiEndpoint as string, apiOptions)
       .then((response) => response.json())
-      .then((data) => setCsrfToken(data.token))
+      .then(({ csrfToken }) => setToken(csrfToken))
       // ! Sortir l'erreur sur la page erreur
       .catch((error) => console.error('Erreur CSRF :', error));
   }, []);
 
-  return csrfToken;
+  return token;
 }

@@ -17,13 +17,13 @@ import DevErrorPage from './routes/DevErrorPage';
  * @return {*} {(key: CryptoKey | undefined) => Router}
  * @al-dev93
  */
-export const router = (key: CryptoKey | undefined) => {
+export const router = () => {
   return createBrowserRouter([
     {
       path: '/',
       element: (
         <ErrorBoundary fallback={<AppErrorFallback />}>
-          <Page cryptoKey={key} />
+          <Page />
         </ErrorBoundary>
       ),
       errorElement: <ErrorPage />,
