@@ -327,6 +327,11 @@ export type FetchResultData = {
   refetch: (url: string | undefined | null, options: FetchOptions) => Promise<void>;
 };
 
+export type CsrfRecord = {
+  token: string;
+  fetchedAt: number;
+};
+
 /**
  * Options for the fetch request.
  */

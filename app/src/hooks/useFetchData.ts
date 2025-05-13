@@ -68,6 +68,8 @@ export function useFetchData({
    * validateUrl("invalid-url"); // Throws Error: Invalid URL: invalid-url
    */
   const validateUrl = (url: string): void => {
+    const postEndpoint = import.meta.env.VITE_API_FORM_RESPONSES_ENDPOINT;
+    if (url === `/${postEndpoint}`) return;
     try {
       // eslint-disable-next-line no-new
       new URL(url);
