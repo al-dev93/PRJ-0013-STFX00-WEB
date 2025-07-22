@@ -2,7 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { useCsrfToken } from '@/modules/ModalDialogContactForm/hooks/useCsrfToken';
-import type { OutletContextPage, MenuSectionsVisibility, PageProps } from '@/types';
+import type { OutletContextPage, MenuSectionsVisibility } from '@/types';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import logo from '@images/brand/logoAND.png';
 import { CollapsibleHeader } from '@modules/CollapsibleHeader';
@@ -14,13 +14,11 @@ import style from './style.module.css';
  * The main page component of the application.
  *
  * @component
- * @param {PageProps} props - The properties for the Page component
- * @property {CryptoKey} cryptoKey - Encryption data to hide email address
  * @returns {React.JSX.Element}
  *
  * @al-dev93
  */
-export function Page({ cryptoKey }: PageProps): React.JSX.Element {
+export function Page(): React.JSX.Element {
   const csrfToken = useCsrfToken();
   // stores the current location of the page using react-router hooks.
   const { pathname, hash, key } = useLocation();
@@ -89,7 +87,7 @@ export function Page({ cryptoKey }: PageProps): React.JSX.Element {
         csrfToken={csrfToken}
       />
       {/* Social media navigation bar component for left navigation */}
-      <SocialMediaNavBar className={style.socialMediaNavBar} type='left-nav' cryptoKey={cryptoKey} />
+      <SocialMediaNavBar className={style.socialMediaNavBar} type='left-nav' />
 
       <main className={style.main} aria-label='Introduction et contenu principal'>
         <Outlet

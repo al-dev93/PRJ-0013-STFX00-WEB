@@ -33,6 +33,5 @@ export function useCsrfToken() {
     };
   }, []);
 
-  console.log(token);
   return token;
 }

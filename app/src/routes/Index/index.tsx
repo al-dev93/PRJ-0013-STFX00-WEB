@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import type { IndexPageSection } from '@/types';
+import { isArrayOfType } from '@/utils/typeHelpers';
 import { ShowcaseSection } from '@components/ShowcaseSection';
 import { useFetchData } from '@hooks/useFetchData';
 import { usePageSection } from '@hooks/usePageSection';
 
+import { optionalIndexSchema, requiredIndexSchema } from './indexSchema';
 import style from './style.module.css';
 
 /**
@@ -14,7 +16,7 @@ import style from './style.module.css';
  * @return {React.JSX.Element}
  * @al-dev93
  */
-export function Index(): React.JSX.Element {
+export function Index(): React.JSX.Element | null {
   /**
    * Initializes the page section context and contact form dialog state.
    *
@@ -32,7 +34,26 @@ export function Index(): React.JSX.Element {
    * @constant {Object} data - The data fetched from the server.
    */
   const { data } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
-  if (data) console.log(data);
+
+  /**
+   * Memoized and sorted list of page sections.
+   *
+   * @remarks
+   * - Validates that `data` is a non-null array of `IndexPageSection` before sorting.
+   * - Returns `undefined` if `data` is missing or fails the schema check.
+   * - Sorts by the numeric `order` property in ascending order.
+   *
+   * @type {IndexPageSection[] | undefined}
+   */
+  const sortedAndValidatedData = useMemo<IndexPageSection[] | undefined>(() => {
+    // Only sort if we actually have data and it passes our runtime guard
+    if (data && isArrayOfType<IndexPageSection>(data, requiredIndexSchema, optionalIndexSchema)) {
+      // Clone + sort to avoid mutating the original array
+      return [...data].sort((a, b) => a.order - b.order);
+    }
+    // Fallback: either no data yet or invalid data shape
+    return undefined;
+  }, [data]);
 
   /**
    * Handles the click event to open or close the contact form dialog.
@@ -42,9 +63,9 @@ export function Index(): React.JSX.Element {
    */
   const handleClick = (): void => setOpenContactFormDialog((formState) => !formState);
 
-  return (
+  return sortedAndValidatedData ? (
     <div className={style.wrapperIndex}>
-      {(data as IndexPageSection[])?.map(({ id, content, anchor, title }) => (
+      {sortedAndValidatedData.map(({ id, content, anchor, title }) => (
         <ShowcaseSection
           key={id}
           content={content}
@@ -57,5 +78,5 @@ export function Index(): React.JSX.Element {
         />
       ))}
     </div>
-  );
+  ) : null;
 }

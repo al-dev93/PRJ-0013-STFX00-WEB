@@ -47,7 +47,27 @@ export function isObjectOfType<T extends object>(
       (key) => !(key in value) || optionalSchema[key]?.((value as T)[key]),
     );
   }
+
   return true;
+}
+
+/**
+ * Type guard to assert that a value is an array of objects conforming to type T.
+ *
+ * @template T - The object type to validate against.
+ * @param {unknown} value – The value to test.
+ * @param {Record<RequiredKeys<T>, (x: unknown) => x is T[RequiredKeys<T>]>} requiredSchema –
+ *   An object mapping each required property key of T to a type-guard function for that property.
+ * @param {Partial<Record<keyof T, (x: unknown) => x is T[keyof T]>>} [optionalSchema] –
+ *   An object mapping each optional property key of T to a type-guard function for that property.
+ * @returns {value is T[]} True if `value` is an array and every element satisfies the required (and, if present, optional) schemas.
+ */
+export function isArrayOfType<T extends object>(
+  value: unknown,
+  requiredSchema: { [K in RequiredKeys<T>]: (x: unknown) => x is T[K] },
+  optionalSchema?: { [K in keyof T]?: (x: unknown) => x is T[K] },
+): value is T[] {
+  return Array.isArray(value) && value.every((item) => isObjectOfType<T>(item, requiredSchema, optionalSchema));
 }
 
 /**

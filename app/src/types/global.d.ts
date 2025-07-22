@@ -75,7 +75,6 @@ export type AccountLink = {
   icon: IconType;
   onPage?: boolean;
   address?: string;
-  iv?: string;
 };
 
 // NOTE: on the index page
@@ -99,7 +98,12 @@ export type SectionsRef = 'home' | 'work' | 'about' | 'services';
  *
  * @al-dev93
  */
-export type IndexPageSection = Omit<MenuItemType, 'label'> & { title?: string; content: DetailSection[] };
+export type IndexPageSection = Omit<MenuItemType, 'label', 'anchor'> & {
+  title?: string;
+  content: DetailSection[];
+  order: number;
+  anchor?: SectionsRef;
+};
 
 /**
  * @description Represents the context passed to the page sections from a React Router outlet.
@@ -151,13 +155,11 @@ export type DetailSection = {
  * @property {string} address - The address of the deliverable on the service.
  * @property {string} [path] - The path of the deliverable.
  */
-export type Deliverable = {
-  id: string;
-  service: string;
-  icon: IconType;
+export type Deliverable = Omit<AccountLink, 'onPage'> & {
   address: string;
   path?: string;
 };
+
 /**
  * @description
  * @type

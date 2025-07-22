@@ -76,7 +76,8 @@ export function getFetchUrlOrUrls({
     if (edgeFunction) return `${basePath}/${endpoint}`;
     return Array.isArray(endpoint)
       ? endpoint.map((item) => `${basePath}${initialOptions.method === 'POST' ? '/rpc' : ''}/${item}?select=*`)
-      : `${basePath}${initialOptions.method === 'POST' ? '/rpc' : ''}/${endpoint}?select=*`;
+      : // : `${basePath}${initialOptions.method === 'POST' ? '/rpc' : ''}/${endpoint}?select=*`;
+        `${basePath}${initialOptions.method === 'POST' ? '/rpc' : ''}/${endpoint}`;
   };
 
   const apiOptions: FetchOptions = {

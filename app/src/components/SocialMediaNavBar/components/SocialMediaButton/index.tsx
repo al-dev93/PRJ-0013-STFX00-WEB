@@ -1,14 +1,19 @@
 import IonIcon from '@reacticons/ionicons';
-import React, { MouseEvent, useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
-import type { AccountLink } from '@/types';
+import type { AccountLink, Deliverable } from '@/types';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { ICON_VALUES } from '@utils/constants';
 import { isObjectOfType } from '@utils/typeHelpers';
 import { isValidUrl } from '@utils/urlHelpers';
 
-import { optionalSocialMediaButtonSchema, requiredSocialMediaButtonSchema } from './socialMediaButtonSchema';
+import {
+  optionalAccountLinkButtonSchema,
+  optionalDeliverableButtonSchema,
+  requiredAccountLinkButtonSchema,
+  requiredDeliverableButtonSchema,
+} from './socialMediaButtonSchema';
 import style from './style.module.css';
 import type { SocialMediaButtonProps } from '../../types';
 /**
@@ -19,16 +24,14 @@ import type { SocialMediaButtonProps } from '../../types';
  * @component
  * @param {SocialMediaButtonProps} props - The properties for the SocialMediaButton component.
  * @property {string} [className] - Additional class names to apply to the button.
- * @property {AccountLink} button - The button data.
- * @property {CryptoKey} [cryptoKey] - Crypto key for encryption.
+ * @property {AccountLink | Deliverable} button - The button data.
  * @returns {React.JSX.Element} The rendered social media button component.
  *
  * @al-dev93
  */
-export function SocialMediaButton({ className, button, cryptoKey }: SocialMediaButtonProps): React.JSX.Element | null {
+export function SocialMediaButton({ className, button }: SocialMediaButtonProps): React.JSX.Element | null {
   const { icon, address, service, id } = useMemo(() => button, [button]);
   const handleError = useErrorHandler();
-  const isValidService = useMemo(() => (!!service && service !== 'gmail') || (service === 'gmail' && true), [service]);
 
   /**
    * Checks the validity of mandatory props
@@ -85,76 +88,28 @@ export function SocialMediaButton({ className, button, cryptoKey }: SocialMediaB
       handlePropsValidity();
     } else if (
       button &&
-      !isObjectOfType<AccountLink>(button, requiredSocialMediaButtonSchema, optionalSocialMediaButtonSchema)
+      !isObjectOfType<AccountLink>(button, requiredAccountLinkButtonSchema, optionalAccountLinkButtonSchema) &&
+      !isObjectOfType<Deliverable>(button, requiredDeliverableButtonSchema, optionalDeliverableButtonSchema)
     ) {
       handlePropsValidity('type');
     }
   }, [button, handlePropsValidity, icon, id, service]);
 
-  useEffect(() => {
-    if (!isValidService) {
-      // eslint-disable-next-line no-void
-      void handleError(
-        createError(
-          1001,
-          service === 'gmail' && !cryptoKey
-            ? 'Crypto key is required for email decryption.'
-            : 'The service is not correct.',
-          {
-            component: 'SocialMediaButton',
-            operation: 'decrypt',
-            url: window.location.href,
-            address,
-            category: 'UI Component',
-          },
-        ),
-      );
-    }
-  }, [address, cryptoKey, handleError, isValidService, service]);
-
-  /**
-   * Handles the click event for the button. Encrypts the email address and
-   * opens the email client for composing a new message.
-   *
-   * @async
-   * @function
-   * @param {MouseEvent} e - The mouse event
-   * @returns {Promise<string | undefined>} The mailto link or undefined.
-   */
-  const handleClick = useCallback(
-    async (event: MouseEvent): Promise<void> => {
-      event.preventDefault();
-      try {
-        const mailTo = `mailto:`;
-        window.location.href = mailTo;
-      } catch (err) {
-        await handleError(
-          createError(2001, 'Failed to decrypt email address.', {
-            url: window.location.href,
-            component: 'SocialMediaButton',
-            operation: 'decryptEmailAddress',
-            originalError: err,
-            address,
-            service,
-            category: 'UI Component',
-          }),
-        );
-      }
-    },
-    [address, handleError, service],
-  );
-
-  return isValidService ? (
+  return service.length ? (
     <a
       className={`${className} ${style.buttonLink}`}
-      href={button.address}
-      target='_blank'
+      href={
+        isObjectOfType<Deliverable>(button, requiredDeliverableButtonSchema, optionalDeliverableButtonSchema) &&
+        button.path
+          ? `${button.address}${button.path}`
+          : button.address
+      }
+      target={button.service === 'gmail' ? undefined : '_blank'}
       rel='noopener noreferrer'
       type='button'
       aria-label={`Link to ${service}`}
       role='button'
       tabIndex={0}
-      onClick={button.service === 'gmail' ? handleClick : undefined}
     >
       <IonIcon className={`${className} ${style.buttonLink__icon}`} name={icon} aria-hidden='true' />
     </a>

@@ -1,5 +1,3 @@
-import { config as loadEnv } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-import { cors } from "https://deno.land/x/hono@v4.3.11/middleware/cors/index.ts";
 import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 
 /**
@@ -69,37 +67,10 @@ async function sign(secret: string): Promise<string> {
  * This application instance is used to define routes, apply middleware,
  * and handle incoming HTTP requests.
  *
- * @constant app
- * @type {import('hono').Hono}
+ * @constant csrfApp
+ * @type {Hono<Env, BlankSchema, "/">}
  */
-const app = new Hono();
-
-// Detect dev or prod
-const isDev = import.meta.main;
-
-if (isDev) loadEnv({ export: true });
-
-const allowList = isDev
-  ? ["http://localhost:3000", "http://localhost:5173"]
-  : ["https://www.votre-domaine.com"];
-
-/**
- * Registers global CORS middleware on the application.
- *
- * Applies cross-origin resource sharing to all routes ("*"), allowing only
- * origins in the `allowList` and including credentials in requests.
- *
- * @param {"*"} path – The route pattern to match (wildcard “*” for all routes).
- * @param {import('@hono/cors').HonoMiddleware} middleware – The CORS middleware instance
- *   configured with the specified `origin` list and `credentials` flag.
- */
-app.use(
-  "*",
-  cors({
-    origin: allowList,
-    credentials: true,
-  })
-);
+const csrfApp = new Hono();
 
 /**
  * Defines a GET route at "/csrf" that generates and returns a CSRF token.
@@ -113,7 +84,7 @@ app.use(
  * @param {import('hono').Context} c – The Hono context for the current request.
  * @returns {Promise<import('hono').Response>} A JSON response with the CSRF token.
  */
-app.get("/csrf", async (c) => {
+csrfApp.get("/", async (c) => {
   const secret = genSecret();
   const csrfToken = await sign(secret);
 
@@ -126,9 +97,4 @@ app.get("/csrf", async (c) => {
 });
 
 export const config = { runtime: "edge" };
-export default app.fetch;
-
-if (isDev) {
-  console.log("▶️  Local dev server on http://localhost:8000");
-  Deno.serve({ port: 8000 }, app.fetch);
-}
+export default csrfApp;

@@ -1,5 +1,3 @@
-import { config as loadEnv } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-import { cors } from "https://deno.land/x/hono@v4.3.11/middleware/cors/index.ts";
 import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { StatusCode } from "https://deno.land/x/hono@v4.3.11/utils/http-status.ts";
 
@@ -74,35 +72,10 @@ async function verify(secret: string, token: string, maxAgeMs = 15 * 60_000) {
  * This application instance is used to define routes, apply middleware,
  * and handle incoming HTTP requests.
  *
- * @constant app
- * @type {import('hono').Hono}
+ * @constant contactApp
+ * @type {Hono<Env, BlankSchema, "/">}
  */
-const app = new Hono();
-// Detect dev or prod
-const isDev = import.meta.main;
-if (isDev) loadEnv({ export: true });
-
-const allowList = isDev
-  ? ["http://localhost:3000", "http://localhost:5173"]
-  : ["https://www.votre-domaine.com"];
-
-/**
- * Registers global CORS middleware on the application.
- *
- * Applies cross-origin resource sharing to all routes ("*"), allowing only
- * origins in the `allowList` and including credentials in requests.
- *
- * @param {"*"} path – The route pattern to match (wildcard “*” for all routes).
- * @param {import('@hono/cors').HonoMiddleware} middleware – The CORS middleware instance
- *   configured with the specified `origin` list and `credentials` flag.
- */
-app.use(
-  "*",
-  cors({
-    origin: allowList,
-    credentials: true,
-  })
-);
+const contactApp = new Hono();
 
 /**
  * Defines a POST route at "/contact" to process contact form submissions.
@@ -119,7 +92,7 @@ app.use(
  * @param {import('hono').Context} c – The Hono context for the current request.
  * @returns {Promise<import('hono').Response>} A JSON response indicating success or error with appropriate status.
  */
-app.post("/contact", async (c) => {
+contactApp.post("/", async (c) => {
   const { name, company, email, tel, message, consent, website, csrfToken } =
     await c.req.json();
 
@@ -167,9 +140,4 @@ app.post("/contact", async (c) => {
 });
 
 export const config = { runtime: "edge" };
-export default app.fetch;
-
-if (isDev) {
-  console.log("▶️  Local dev server on http://localhost:8000");
-  Deno.serve({ port: 8000 }, app.fetch);
-}
+export default contactApp;

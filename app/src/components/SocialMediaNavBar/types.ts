@@ -1,5 +1,5 @@
 import type { FetchErrorContext } from '@/modules/Error/types';
-import type { AccountLink } from '@/types';
+import type { AccountLink, Deliverable } from '@/types';
 
 /**
  * Props for the SocialMediaNavBar component.
@@ -18,8 +18,7 @@ export type SocialMediaNavBarProps = {
   className?: string;
   changeLinkColor?: string;
   type?: 'left-nav' | 'right-nav' | 'card';
-  cryptoKey?: CryptoKey;
-  buttons?: AccountLink[];
+  buttons?: AccountLink[] | Deliverable[];
 };
 
 /**
@@ -34,8 +33,7 @@ export type SocialMediaNavBarProps = {
  */
 export type SocialMediaButtonProps = {
   className?: string;
-  button: AccountLink;
-  cryptoKey?: CryptoKey;
+  button: AccountLink | Deliverable;
 };
 
 /**

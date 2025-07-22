@@ -1,3 +1,3 @@
-export type PageProps = {
-  cryptoKey?: CryptoKey;
-};
+// export type PageProps = {
+//   cryptoKey?: CryptoKey;
+// };

@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 
-import type { AccountLink } from '@/types';
+import type { AccountLink, Deliverable } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
 import verticalLine from '@images/decorations/vertical_line_decorative_light_mode.svg';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
@@ -20,7 +20,6 @@ import type { SocialMediaNavBarProps } from './types';
  * @property {string} [changeLinkColor] -
  * @property {('left-nav' | 'right-nav' | 'card')} [type] - Type of SocialMediaNavBar placed
  * on the page or in Card component.
- * @property {CryptoKey} [cryptoKey] - Encryption data to hide email address.
  * @property {AccountLink[]} [buttons] - SocialMediaNavBar button definition data.
  * @property {string} [url] - The URL to fetch the data needed by the SocialMediaNavBar component.
  * @returns {React.JSX.Element} The rendered SocialMediaNavBar component.
@@ -32,7 +31,6 @@ function MemoizedSocialMediaNavBar({
   changeLinkColor,
   type,
   buttons,
-  cryptoKey,
 }: SocialMediaNavBarProps): React.JSX.Element | null {
   const isVerticalNav = type === 'left-nav' || type === 'right-nav';
   const handleError = useErrorHandler();
@@ -40,7 +38,11 @@ function MemoizedSocialMediaNavBar({
   const shouldFetch = !buttons;
   // Use useFetchData hook if shouldFetch is true
   const endpoint = useMemo(() => (shouldFetch ? import.meta.env.VITE_API_ACCOUNTS_DATA_ENDPOINT : null), [shouldFetch]);
-  const { data: fetchedData, fetchError } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
+  const { data: fetchedData, fetchError } = useFetchData({
+    endpoint,
+    initialOptions: { method: 'GET' },
+    edgeFunction: true,
+  });
 
   useEffect(() => {
     if (fetchError) {
@@ -89,12 +91,12 @@ function MemoizedSocialMediaNavBar({
    *  Use buttons if provided, otherwise use fetched data
    *
    * @constant data
-   * @type {AccountLink[]}
+   * @type {AccountLink[] | Deliverable[]}
    */
-  const data: AccountLink[] = useMemo((): AccountLink[] => {
+  const data = useMemo<AccountLink[] | Deliverable[]>(() => {
     return type === 'left-nav'
-      ? (buttons || (fetchedData as AccountLink[]))?.filter((item) => item.onPage)
-      : buttons || (fetchedData as AccountLink[]);
+      ? ((buttons || fetchedData) as AccountLink[])?.filter((item) => item.onPage)
+      : buttons || (fetchedData as Deliverable[]);
   }, [buttons, fetchedData, type]);
 
   useEffect(() => {
@@ -117,7 +119,6 @@ function MemoizedSocialMediaNavBar({
             <SocialMediaButton
               className={`${style.socialMediaNavBar__externalLink} ${changeLinkColor}`}
               button={element}
-              cryptoKey={cryptoKey}
             />
           </li>
         ))}
