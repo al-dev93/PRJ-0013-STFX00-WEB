@@ -11,7 +11,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@miragejs/pretender-node-polyfill": "^0.1.2",
     "@reacticons/ionicons": "^7.1.0",
     "@visx/text": "^3.3.0",
     "@visx/wordcloud": "^3.3.0",
@@ -37,7 +36,6 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
-    "miragejs": "^0.1.48",
     "prettier": "^3.2.5",
     "typescript": "^5.2.2",
     "vite": "^7.0.0"

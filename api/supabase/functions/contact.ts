@@ -117,7 +117,7 @@ contactApp.post("/", async (c) => {
     return c.json({ error: "Invalid CSRF token" }, 400);
 
   const SUPA_URL = Deno.env.get("SUPABASE_URL")!;
-  const ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
+  const ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
   // Insert in base
   const res = await fetch(`${SUPA_URL}/rest/v1/contacts`, {

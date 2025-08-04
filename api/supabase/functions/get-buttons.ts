@@ -1,4 +1,5 @@
 import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import { StatusCode } from "https://deno.land/x/hono@v4.3.11/utils/http-status.ts";
 
 /**
  * Initializes a new Hono application instance.
@@ -66,14 +67,18 @@ async function hmacSha256(secret: string, msg: string): Promise<string> {
  */
 getButtonsApp.get("/", async (c) => {
   const SUPA_URL = Deno.env.get("SUPABASE_URL")!;
-  const FN_URL = Deno.env.get("EDGE_FUNCTION_URL")!;
-  const ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
+  // const FN_URL = Deno.env.get("EDGE_FUNCTION_URL")!;
+  const ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const ENV = Deno.env.get("NODE_ENV") ?? "development";
 
   // Secret HMAC partagé, stocké en secret Supabase
   const MAILTO_SECRET = Deno.env.get("MAILTO_HMAC_SECRET")!;
 
   // In dev we serve the functions on localhost:54321, in prod on http://168.119.153.168
-  const MAILTO_FN_URL = `${FN_URL}/functions/v1/get-mailto`;
+  const MAILTO_FN_URL =
+    ENV === "development"
+      ? "http://localhost:8000/functions/v1/get-mailto"
+      : Deno.env.get("PUBLIC_MAILTO_FN_URL");
 
   // Fetch selected fields from the Supabase "accounts" table
   const res = await fetch(
@@ -81,20 +86,36 @@ getButtonsApp.get("/", async (c) => {
     {
       headers: {
         apikey: ROLE_KEY,
+        Authorization: `Bearer ${ROLE_KEY}`,
       },
     }
   );
+
+  const text = await res.text();
+
   if (!res.ok) {
-    return c.json({ error: `Supabase error ${res.status}` }, 500);
+    return c.json(
+      { error: `Supabase error ${res.status}`, detail: text },
+      res.status as StatusCode | undefined
+    );
   }
   // Parse the JSON response into a typed array
-  const rows = (await res.json()) as Array<{
-    id: number;
-    icon: string;
-    on_page?: boolean;
-    service: string;
-    address?: string | null;
-  }>;
+  let rows;
+  try {
+    rows = JSON.parse(text) as Array<{
+      id: number;
+      icon: string;
+      on_page?: boolean;
+      service: string;
+      address?: string | null;
+    }>;
+  } catch (err) {
+    if (err instanceof Error) {
+      return c.json({ error: "Malformed JSON", message: err.message }, 500);
+    }
+    // fallback if not an instance of Error
+    return c.json({ error: "Malformed JSON", message: String(err) }, 500);
+  }
   // Map each row to a button descriptor, generating HMAC-signed links for Gmail
   const buttons = await Promise.all(
     rows.map(async (r) => {

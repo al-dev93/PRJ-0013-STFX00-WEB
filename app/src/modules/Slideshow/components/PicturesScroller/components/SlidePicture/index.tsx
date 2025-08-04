@@ -56,6 +56,10 @@ function MemoizedSlidePicture({
   };
   const { picture, title } = slide;
   const loading = inView || isAdjacent ? EAGER_STATUS : LAZY_STATUS;
+  const src =
+    import.meta.env.VITE_FETCH_MODE === 'remote'
+      ? `${import.meta.env.VITE_BUCKET_REMOTE}/${picture}`
+      : `${import.meta.env.VITE_BUCKET_LOCAL}/${picture}`;
 
   return (
     <div
@@ -79,7 +83,7 @@ function MemoizedSlidePicture({
         <img
           ref={imgRef}
           className={style.picturesToScroll__link__picture}
-          src={inView ? picture : ''}
+          src={inView ? src : ''}
           alt={`Project ${title}`}
           loading={loading}
         />

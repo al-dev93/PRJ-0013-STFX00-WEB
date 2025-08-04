@@ -5,23 +5,23 @@ import { defineConfig } from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
-    port: 5173,
-    proxy: {
-      '/csrf': {
-        target: 'http://127.0.0.1:54321',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/csrf/, '/functions/v1/csrf'),
-        secure: false,
-      },
-      '/contact': {
-        target: 'http://127.0.0.1:54321',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/contact/, '/functions/v1/contact'),
-        secure: false,
-      },
-    },
-  },
+  // server: {
+  //   port: 5173,
+  //   proxy: {
+  //     '/csrf': {
+  //       target: 'http://127.0.0.1:54321',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/csrf/, '/functions/v1/csrf'),
+  //       secure: false,
+  //     },
+  //     '/contact': {
+  //       target: 'http://127.0.0.1:54321',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/contact/, '/functions/v1/contact'),
+  //       secure: false,
+  //     },
+  //   },
+  // },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),

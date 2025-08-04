@@ -90,7 +90,7 @@ csrfApp.get("/", async (c) => {
 
   c.header(
     "Set-Cookie",
-    `csrf_secret=${secret}; Path=/; SameSite=Strict; HttpOnly`
+    `csrf_secret=${secret}; Path=/; SameSite=None; Secure;  HttpOnly; Partitioned`
   );
 
   return c.json({ csrfToken });
