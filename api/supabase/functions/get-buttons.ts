@@ -67,7 +67,6 @@ async function hmacSha256(secret: string, msg: string): Promise<string> {
  */
 getButtonsApp.get("/", async (c) => {
   const SUPA_URL = Deno.env.get("SUPABASE_URL")!;
-  // const FN_URL = Deno.env.get("EDGE_FUNCTION_URL")!;
   const ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const ENV = Deno.env.get("NODE_ENV") ?? "development";
 

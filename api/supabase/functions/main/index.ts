@@ -2,7 +2,8 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { cors } from "https://deno.land/x/hono@v4.3.11/middleware/cors/index.ts";
 import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import contactApp from "../contact.ts";
-import csrfApp from "../csrf.ts";
+import csrfSecretHandler from "../csrf-secret.ts";
+import csrfTokenHandler from "../csrf-token.ts";
 import getButtonsApp from "../get-buttons.ts";
 import getMailtoApp from "../get-mailto.ts";
 
@@ -29,12 +30,18 @@ app.use(
   })
 );
 
+// other functions
 app.route("/functions/v1/contact", contactApp);
-app.route("/functions/v1/csrf", csrfApp);
 app.route("/functions/v1/get-buttons", getButtonsApp);
 app.route("/functions/v1/get-mailto", getMailtoApp);
 
-// 404
+// csrf group
+const csrfApp = new Hono();
+csrfApp.get("/secret", csrfSecretHandler);
+csrfApp.get("/token", csrfTokenHandler);
+app.route("/functions/v1/csrf", csrfApp);
+
+// 404 fallback
 app.all("*", (c) => c.text("Not found", 404));
 
 serve(app.fetch);

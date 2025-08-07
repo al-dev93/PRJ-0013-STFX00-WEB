@@ -1,5 +1,6 @@
 import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { StatusCode } from "https://deno.land/x/hono@v4.3.11/utils/http-status.ts";
+import { parseCookies } from "./csrf-utils.ts";
 
 /**
  * Converts a URL-safe Base64 string into a standard Base64 string.
@@ -78,66 +79,83 @@ async function verify(secret: string, token: string, maxAgeMs = 15 * 60_000) {
 const contactApp = new Hono();
 
 /**
- * Defines a POST route at "/contact" to process contact form submissions.
+ * Handles POST requests to the contact form endpoint.
  *
- * - Parses JSON body: `name`, `company`, `email`, `tel`, `message`, `consent`, optional honeypot `website`, and `csrfToken`.
- * - Returns success immediately if `website` honeypot field is filled (bot detection).
- * - Validates that `consent` is true, otherwise returns 400 with an error.
- * - Reads the `csrf_secret` from an HttpOnly cookie and verifies `csrfToken`; returns 400 on failure.
- * - Reads Supabase credentials from environment (`SUPABASE_URL`, `SERVICE_ROLE_KEY`).
- * - Inserts the contact record into the `contacts` table via a REST POST; returns 400 with error text on failure.
- * - Returns JSON `{ success: true }` on successful insertion.
+ * ### Request Payload (JSON)
+ * - `name`: string – User's name
+ * - `company`: string – User's company
+ * - `email`: string – User's email
+ * - `tel`: string – User's phone number
+ * - `message`: string – The message content
+ * - `consent`: boolean – Must be `true` (legal consent)
+ * - `website`: string (optional) – Honeypot field to detect bots
+ * - `csrfToken`: string – Token signed with the CSRF secret
  *
- * @param {"/contact"} path – The route path for contact submissions.
- * @param {import('hono').Context} c – The Hono context for the current request.
- * @returns {Promise<import('hono').Response>} A JSON response indicating success or error with appropriate status.
+ * ### Behavior
+ * - ✅ Immediately returns `{ success: true }` if honeypot is filled (bot detected).
+ * - ❌ Returns `400` if `consent` is missing or false.
+ * - ❌ Returns `400` if the `csrf_secret` cookie is missing.
+ * - ❌ Returns `400` if the CSRF token is invalid.
+ * - ✅ On valid request, inserts data into the `contacts` table using Supabase REST API.
+ * - ❌ Returns `400`–`500` with `{ error: string }` if Supabase insertion fails.
+ * - ✅ On success, returns `{ success: true }` with status `200`.
+ *
+ * @param {import('hono').Context} c - Hono context containing the request and response.
+ * @returns {Promise<import('hono').Response>} JSON response with success or error message.
  */
 contactApp.post("/", async (c) => {
   const { name, company, email, tel, message, consent, website, csrfToken } =
     await c.req.json();
 
+  // 1️⃣ Anti-bot honeypot
   if (website) return c.json({ success: true });
+
+  // 2️⃣ Check consent
   if (!consent) return c.json({ error: "consent required" }, 400);
 
-  // Read the HttpOnly cookie
+  // 3️⃣ Extract CSRF secret from cookies
   const cookieHeader = c.req.header("cookie") ?? "";
-  const cookies = cookieHeader
-    .split(";")
-    .map((pair) => pair.trim().split("="))
-    .reduce<Record<string, string>>((acc, [k, ...v]) => {
-      acc[k] = v.join("=");
-      return acc;
-    }, {});
+  const cookies = parseCookies(cookieHeader);
 
   const secret = cookies["csrf_secret"];
   if (!secret) return c.json({ error: "Missing CSRF secret" }, 400);
 
-  // Verify the signed token
-  if (!(await verify(secret, csrfToken)))
-    return c.json({ error: "Invalid CSRF token" }, 400);
+  // 4️⃣ Verify CSRF token
+  const valid = await verify(secret, csrfToken);
+  if (!valid) return c.json({ error: "Invalid CSRF token" }, 400);
 
-  const SUPA_URL = Deno.env.get("SUPABASE_URL")!;
-  const ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  // 5️⃣ Get Supabase credentials
+  const SUPA_URL = Deno.env.get("SUPABASE_URL");
+  const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
+  if (!SUPA_URL || !ANON_KEY) {
+    return c.json({ error: "Missing Supabase credentials" }, 500);
+  }
 
-  // Insert in base
-  const res = await fetch(`${SUPA_URL}/rest/v1/contacts`, {
+  // 6️⃣ Send to Supabase
+  const response = await fetch(`${SUPA_URL}/rest/v1/contacts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: ROLE_KEY,
+      apikey: ANON_KEY,
+      authorization: `Bearer ${ANON_KEY}`,
       Prefer: "return=minimal",
     },
     body: JSON.stringify([
-      { name, company, email, tel, message, consent: consent ? true : false },
+      { name, company, email, tel, message, consent: true },
     ]),
   });
-  if (!res.ok) {
-    const err = await res.text();
-    return c.json({ error: err }, res.status as StatusCode);
+  if (!response.ok) {
+    let errorMsg: string;
+    try {
+      const errorJson = await response.json();
+      errorMsg = errorJson.message || JSON.stringify(errorJson);
+    } catch {
+      errorMsg = await response.text();
+    }
+    return c.json({ error: errorMsg }, response.status as StatusCode);
   }
 
   return c.json({ success: true });
 });
 
-export const config = { runtime: "edge" };
 export default contactApp;
