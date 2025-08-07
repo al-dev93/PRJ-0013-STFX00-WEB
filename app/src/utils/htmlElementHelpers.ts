@@ -14,7 +14,5 @@ import { HTML_TAGS } from './dynamicElementsconstants';
  */
 export function isHtmlTag(tag: ValidHTMLTag): boolean {
   if (typeof document === 'undefined') return false;
-  // const element = document.createElement(tag);
-  // return !(element instanceof HTMLUnknownElement);
   return HTML_TAGS.includes(tag);
 }
