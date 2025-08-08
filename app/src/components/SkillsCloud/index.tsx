@@ -90,6 +90,7 @@ function MemoizedSkillsCloud({
    */
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent<HTMLButtonElement>): Promise<void> => {
+      if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
       event.preventDefault();
       event.stopPropagation();
 
