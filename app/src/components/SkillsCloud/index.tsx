@@ -90,7 +90,7 @@ function MemoizedSkillsCloud({
    */
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent<HTMLButtonElement>): Promise<void> => {
-      if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
       event.preventDefault();
       event.stopPropagation();
 
@@ -189,25 +189,6 @@ function MemoizedSkillsCloud({
           .join(', ')}
       </p>
 
-      <fieldset className={style.skillsCloud__controls}>
-        <legend className='visually-hidden'>Change le contraste ou le mode de rotation</legend>
-        <button
-          className={style.skillsCloud__controls__toggleMode}
-          onClick={() => handleToggleMode('contrast')}
-          type='button'
-          aria-label={ARIA_LABEL_CONTRAST_MODE}
-        >
-          <IonIcon name={contrastMode ? CONTRAST_MODE_ICON_OFF : CONTRAST_MODE_ICON_ON} aria-hidden='true' />
-        </button>
-        <button
-          className={style.skillsCloud__controls__toggleMode}
-          onClick={() => handleToggleMode('rotate')}
-          type='button'
-          aria-label={ARIA_LABEL_ROTATE_MODE}
-        >
-          <IonIcon name={rotateMode ? ROTATE_MODE_ICON_OFF : ROTATE_MODE_ICON_ON} aria-hidden='true' />
-        </button>
-      </fieldset>
       {data && (
         <button
           className={style.skillsCloud__interactiveWrapper}
@@ -245,6 +226,25 @@ function MemoizedSkillsCloud({
           </div>
         </button>
       )}
+      <fieldset className={style.skillsCloud__controls}>
+        <legend className='visually-hidden'>Change le contraste ou le mode de rotation</legend>
+        <button
+          className={style.skillsCloud__controls__toggleMode}
+          onClick={() => handleToggleMode('contrast')}
+          type='button'
+          aria-label={ARIA_LABEL_CONTRAST_MODE}
+        >
+          <IonIcon name={contrastMode ? CONTRAST_MODE_ICON_OFF : CONTRAST_MODE_ICON_ON} aria-hidden='true' />
+        </button>
+        <button
+          className={style.skillsCloud__controls__toggleMode}
+          onClick={() => handleToggleMode('rotate')}
+          type='button'
+          aria-label={ARIA_LABEL_ROTATE_MODE}
+        >
+          <IonIcon name={rotateMode ? ROTATE_MODE_ICON_OFF : ROTATE_MODE_ICON_ON} aria-hidden='true' />
+        </button>
+      </fieldset>
     </div>
   ) : null;
 }
