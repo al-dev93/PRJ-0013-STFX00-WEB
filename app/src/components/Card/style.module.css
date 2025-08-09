@@ -9,7 +9,8 @@
 }
 
 .card:hover,
-.card:focus-within {
+/* .card:focus-within  */
+.card:has(:focus-visible) {
   background-color: var(--decorative-dark);
   box-shadow: 5px 5px 8px -1px var(--dark-bg-menu);
   transform: translate3d(8px, -9px, 0);
@@ -29,12 +30,14 @@
   color: var(--decorative-dark);
 }
 .card:hover .card__additionalNav,
-.card:focus-within .card__additionalNav {
+/* .card:focus-within .card__additionalNav  */
+.card:has(:focus-visible) .card__additionalNav {
   color: var(--dark-primary);
 }
 
 .card:hover .card__additionalNav:hover,
-.card:focus-within .card__additionalNav:focus {
+/* .card:focus-within .card__additionalNav:focus  */
+.card:has(:focus-visible) .card__additionalNav:focus-visible {
   color: var(--white);
 }
 
@@ -57,16 +60,20 @@
 }
 
 .card:hover .card__folderIcon,
-.card:focus-within .card__folderIcon,
+/* .card:focus-within .card__folderIcon, */
+.card:has(:focus-visible) .card__folderIcon,
 .card:hover .card__skillsList,
-.card:focus-within .card__skillsList {
+/* .card:focus-within .card__skillsList  */
+.card:has(:focus-visible) .card__skillsList {
   color: var(--dark-primary);
 }
 
 .card:hover .card__description,
-.card:focus-within .card__description,
+/* .card:focus-within .card__description, */
+.card:has(:focus-visible) .card__description,
 .card:hover h3,
-.card:focus-within h3 {
+/* .card:focus-within h3  */
+.card:has(:focus-visible) h3 {
   color: var(--white);
 }
 
