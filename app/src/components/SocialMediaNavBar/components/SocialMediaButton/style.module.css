@@ -5,26 +5,54 @@
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  color: var(--button-link-color);
-  transition: var(--button-link-transition);
+  /* color: var(--button-link-color); */
+  transform: none;
+  /* transition: var(--button-link-transition); */
+  transition: transform 200ms ease;
+  transform-origin: center;
 }
 
-.buttonLink:hover,
+/* feedback bref au press */
+.buttonLink:active {
+  transform: var(--button-link-transform-scale-active, scale(0.97));
+}
+
+/* focus clavier : anneau seulement (géré par le parent), pas de scale ici */
+.buttonLink:focus {
+  outline: none;
+  /* color: var(--decorative-dark); */
+}
+
+/* .buttonLink:hover,
 .buttonLink:focus {
   color: var(--decorative-dark);
   outline: none;
-  transform: var(--button-link-transform-scale); /* Slightly enlarge the button on hover/focus */
+  transform: var(--button-link-transform-scale); Slightly enlarge the button on hover/focus
 }
 
 .buttonLink:focus-visible {
   outline: var(--button-link-outline);
-}
+} */
 
 .buttonLink__icon {
   font-size: var(--button-link-icon-size);
+  transition:
+    transform 200ms ease,
+    filter 200ms ease;
 }
 
-.buttonLink:hover .buttonLink__icon,
-.buttonLink:focus .buttonLink__icon {
+/* .buttonLink:hover .buttonLink__icon, */
+/* .buttonLink:focus .buttonLink__icon  */
+.buttonLink:active .buttonLink__icon {
   transform: var(--button-link-transform-rotate); /* Slight rotation on hover/focus */
+}
+
+/* Optionnel : limiter les effets hover aux pointeurs fins (desktop) */
+@media (hover: hover) and (pointer: fine) {
+  .buttonLink:hover {
+    transform: var(--button-link-transform-scale);
+  }
+  .buttonLink:hover .buttonLink__icon {
+    transform: var(--button-link-transform-rotate);
+  }
 }

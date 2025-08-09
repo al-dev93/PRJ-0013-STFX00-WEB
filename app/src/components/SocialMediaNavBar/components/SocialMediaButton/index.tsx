@@ -97,7 +97,7 @@ export function SocialMediaButton({ className, button }: SocialMediaButtonProps)
 
   return service.length ? (
     <a
-      className={`${className} ${style.buttonLink}`}
+      className={`${style.buttonLink} ${className ?? ''}`}
       href={
         isObjectOfType<Deliverable>(button, requiredDeliverableButtonSchema, optionalDeliverableButtonSchema) &&
         button.path
@@ -106,12 +106,13 @@ export function SocialMediaButton({ className, button }: SocialMediaButtonProps)
       }
       target={button.service === 'gmail' ? undefined : '_blank'}
       rel='noopener noreferrer'
-      type='button'
+      // type='button'
       aria-label={`Link to ${service}`}
-      role='button'
-      tabIndex={0}
+      // role='button'
+      // tabIndex={0}
     >
-      <IonIcon className={`${className} ${style.buttonLink__icon}`} name={icon} aria-hidden='true' />
+      {/* <IonIcon className={`${className} ${style.buttonLink__icon}`} name={icon} aria-hidden='true' /> */}
+      <IonIcon className={style.buttonLink__icon} name={icon} aria-hidden='true' />
     </a>
   ) : null;
 }

@@ -36,12 +36,13 @@
   margin-right: 24px;
 }
 
-/* External links styling, with hover effect */
+/* Button icon styling */
 .externalLinks {
   color: var(--primary-color);
 }
 
-.externalLinks:hover {
+/* Color of Button icon when focus with tab keyboard */
+.externalLinks:focus-visible {
   color: var(--white);
 }
 
@@ -51,4 +52,11 @@
   align-items: center;
   justify-content: space-between;
   background-color: var(--quaternary-color);
+}
+
+/* Mouse only */
+@media (hover: hover) and (pointer: fine) {
+  .externalLinks:hover {
+    color: var(--white);
+  }
 }

@@ -25,15 +25,25 @@
 .socialMediaNavBar__externalLink {
   color: var(--decorative-light);
   text-decoration: none;
-  transition: color 0.3s;
+  /* transition: color 0.3s; */
+  transition: color 200ms ease;
 }
 
-.socialMediaNavBar__externalLink:hover,
+/* .socialMediaNavBar__externalLink:hover, */
 .socialMediaNavBar__externalLink:focus {
-  color: var(--decorative-dark);
+  /* color: var(--decorative-dark); */
   outline: none;
 }
 
 .socialMediaNavBar__externalLink:focus-visible {
+  color: var(--decorative-dark);
   outline: 2px solid var(--decorative-dark);
+  outline-offset: 2px;
+}
+
+/* Mouse only */
+@media (hover: hover) and (pointer: fine) {
+  .socialMediaNavBar__externalLink:hover {
+    color: var(--decorative-dark);
+  }
 }

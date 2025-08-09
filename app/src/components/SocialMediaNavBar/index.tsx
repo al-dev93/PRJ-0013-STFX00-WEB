@@ -109,15 +109,15 @@ function MemoizedSocialMediaNavBar({
 
   return !fetchError ? (
     <nav
-      className={`${className} ${style.socialMediaNavBar}`}
-      role='navigation'
+      className={`${style.socialMediaNavBar} ${className ?? ''}`}
+      // role='navigation'
       aria-label='Navigation réseaux sociaux et médias'
     >
       <ul className={style[`socialMediaNavBar--${isVerticalNav ? `vertical` : `horizontal`}`]}>
         {data?.map((element) => (
           <li key={`${element.service}`}>
             <SocialMediaButton
-              className={`${style.socialMediaNavBar__externalLink} ${changeLinkColor}`}
+              className={`${style.socialMediaNavBar__externalLink} ${changeLinkColor ?? ''}`}
               button={element}
             />
           </li>
@@ -125,7 +125,7 @@ function MemoizedSocialMediaNavBar({
       </ul>
       {isVerticalNav && (
         <div className={style['socialMediaNavBar--verticalLine']}>
-          <img src={verticalLine} alt='Decorative line' />
+          <img src={verticalLine} alt='' aria-hidden='true' />
         </div>
       )}
     </nav>
