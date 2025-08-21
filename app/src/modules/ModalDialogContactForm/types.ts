@@ -73,7 +73,7 @@ export type ModalDialogContactFormProps = {
 export type DialogFormInputProps = {
   formInput: FormInput;
   label: string;
-  name: string;
+  name: FormInputName;
   tooltipContent?: TooltipContent[];
 };
 
