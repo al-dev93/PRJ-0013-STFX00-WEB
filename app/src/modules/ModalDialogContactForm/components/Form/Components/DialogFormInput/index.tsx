@@ -162,18 +162,19 @@ export function MemoizedDialogFormInput({
 
     return (
       <Tooltip
+        id={idTooltipContent}
         content={tooltipContent as TooltipContent[]}
         direction='right'
         isVisible={isTooltipVisible as boolean}
-        ariaLabel='tooltip'
       >
         <IonIcon
           className={tooltipIconName === 'checkmark-circle' ? style.dialogFormInput__tooltipIcon : ''}
           name={tooltipIconName}
+          aria-hidden='true'
         />
       </Tooltip>
     );
-  }, [inputNode?.required, tooltipContent, isTooltipVisible, tooltipIconName]);
+  }, [idTooltipContent, inputNode?.required, isTooltipVisible, tooltipContent, tooltipIconName]);
 
   /**
    * Renders the Tag component if the input status tag is provided.
@@ -272,16 +273,6 @@ export function MemoizedDialogFormInput({
         onFocus={tooltipContent?.length ? (event) => handleTooltipVisibility(event, true) : undefined}
         onBlur={tooltipContent?.length ? (event) => handleTooltipVisibility(event, false) : undefined}
       >
-        {tooltipContent?.length ? (
-          <p id={idTooltipContent} className='visually-hidden'>
-            {tooltipContent.map((item) => item.line).join(' ')}
-          </p>
-        ) : null}
-        {inputError ? (
-          <p id={idErrorMessage} className='visually-hidden'>
-            {errorMessage}
-          </p>
-        ) : null}
         <div className={style.dialogFormInput__label}>
           <label className={style.dialogFormInput__label__content} htmlFor={name}>
             {label}
@@ -306,8 +297,8 @@ export function MemoizedDialogFormInput({
           aria-expanded={popoverMode}
           aria-controls={formInput.tag === 'input' ? `${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}` : undefined}
           aria-activedescendant={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${listItemFocused}`}
-          aria-label={name}
-          aria-describedby={(errorMessage ? idErrorMessage : '') + (isTooltipVisible ? ` ${idTooltipContent}` : '')}
+          // aria-label={name}
+          aria-describedby={(errorMessage ? idErrorMessage : '') + (tooltipContent ? ` ${idTooltipContent}` : '')}
           aria-invalid={inputError?.valid ? 'true' : 'false'}
         />
         {renderAlertTag}

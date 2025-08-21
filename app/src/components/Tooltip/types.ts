@@ -12,15 +12,20 @@ import type { TooltipContent } from '@/types';
  * @property {number} [delay=400] - The defay in milliseconds before showing the tooltip.
  * @property {('bottom' | 'left' | 'right' | 'top')} [direction='top'] - The direction of the tooltip.
  * @property {boolean} isVisible - Indicates whether the tooltip is visible.
- * @property {string} [ariaLabel] - The aria label for the tooltip.
  *
  * @al-dev93
  */
 export type TooltipProps = {
+  id?: string;
   children: ReactNode;
   content: string | TooltipContent | TooltipContent[];
   delay?: number;
   direction?: 'bottom' | 'left' | 'right' | 'top';
   isVisible: boolean;
-  ariaLabel?: string;
 };
+
+// export type DescribedByProps = {
+//   'aria-describedby'?: string;
+// };
+
+// export type ChildValidation = { ok: true; child: React.ReactElement<DescribedByProps> } | { ok: false };

@@ -126,10 +126,23 @@ export function Modal({
    */
   const handleTabIndex = (e: KeyboardEventDiv): void => {
     if ((!closeRef.current || !buttonRef.current) && !focusableElements) return;
-    let keyboardNavigableElements = [];
+    const keyboardNavigableElements: HTMLElement[] = [];
 
     if (closeRef.current) keyboardNavigableElements[0] = closeRef.current;
-    if (focusableElements) keyboardNavigableElements = [...keyboardNavigableElements, ...focusableElements];
+
+    const inDialog = dialogRef.current;
+    if (inDialog) {
+      const autoList = Array.from(
+        inDialog.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
+            'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+
+      keyboardNavigableElements.push(...(focusableElements ?? autoList));
+    }
+
+    // if (focusableElements) keyboardNavigableElements = [...keyboardNavigableElements, ...focusableElements];
     if (!buttonRef.current?.disabled) keyboardNavigableElements.push(buttonRef.current as HTMLElement);
 
     const indexOfActiveElement = keyboardNavigableElements.indexOf(document.activeElement as HTMLElement);
@@ -143,6 +156,9 @@ export function Modal({
    * Handles the closing of the modal when a click is made outside of it.
    */
   useEffect(() => {
+    const dialogNode = dialogRef.current;
+    if (!dialogNode) return () => {};
+
     /**
      * Handles the click outside Modal.
      *
@@ -152,7 +168,7 @@ export function Modal({
      */
     const handleOutsideClick = async (e: Event): Promise<void> => {
       try {
-        if (e.target === dialogRef.current) setOpenFalse(e);
+        if (e.target === dialogNode) setOpenFalse(e);
       } catch (err) {
         await handleError(createError(1003, 'Error in click event outside modal window'), {
           component: 'Modal',
@@ -162,8 +178,8 @@ export function Modal({
       }
     };
 
-    document.addEventListener('click', handleOutsideClick);
-    return () => document.removeEventListener('click', handleOutsideClick);
+    dialogNode.addEventListener('click', handleOutsideClick);
+    return () => dialogNode.removeEventListener('click', handleOutsideClick);
   }, [handleError, setOpenFalse]);
 
   /**
@@ -180,61 +196,123 @@ export function Modal({
      * @async
      * @returns {Promise<void>}
      */
-    const handleModalOpenClose = async (): Promise<void> => {
-      try {
-        if (open) {
-          lastFormChildRef.current = childrenRef.current?.getElementsByTagName('textarea').item(0) || undefined;
-          if (onRenderComplete === true || onRenderComplete === undefined) dialogNode.showModal();
-        } else {
-          dialogNode.close();
-          if (closeParentModal) closeParentModal((state) => !state);
-        }
-      } catch (err) {
-        await handleError(createError(3003, 'Error opening or closing the modal window'), {
-          component: 'Modal',
-          operation: open ? 'openModal' : 'closeModal',
-          url: window.location.href,
-        });
-      }
-    };
+    // const handleModalOpenClose = async (): Promise<void> => {
+    // const handleModalOpenClose = (): void => {
+    // try {
+    if (open) {
+      lastFormChildRef.current = childrenRef.current?.getElementsByTagName('textarea').item(0) || undefined;
+      if (onRenderComplete === true || onRenderComplete === undefined) {
+        dialogNode.showModal();
+        if (!dialogNode.hasAttribute('tabindex')) dialogNode.tabIndex = -1;
 
-    handleModalOpenClose();
+        // Focus the dialog container so SR announces it consistently
+        dialogNode.focus();
+        //   const auto = dialogNode.querySelector<HTMLElement>('[autofocus]');
+        //   if (auto) {
+        //     auto.focus();
+        //     return;
+        //   }
+        //   const firstFocusable = dialogNode.querySelector<HTMLElement>(
+        //     'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
+        //       'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        //   );
+        //   if (firstFocusable) {
+        //     firstFocusable.focus();
+        //   } else {
+        //     // 3) Fallback : focus sur le dialog lui-même (lis le titre + descr.)
+        //     dialogNode.focus();
+        //   }
+        // }
+      }
+    } else {
+      dialogNode.close();
+      if (closeParentModal) closeParentModal((state) => !state);
+    }
+
+    // } catch (err) {
+    //   await handleError(createError(3003, 'Error opening or closing the modal window'), {
+    //     component: 'Modal',
+    //     operation: open ? 'openModal' : 'closeModal',
+    //     url: window.location.href,
+    //   });
+    // }
+    // };
+
+    // handleModalOpenClose();
   }, [closeParentModal, handleError, onRenderComplete, open]);
 
   /**
    * Handles the focus of the title element when the modal is opened.
    * Necessary for the screen reader to read the title and slogan of the contact form.
    */
-  useEffect(() => {
-    const closeNode = closeRef.current;
-    const titleNode = titleRef.current;
-    if (!titleNode) return;
+  // useEffect(() => {
+  //   // const closeNode = closeRef.current;
+  //   // const titleNode = titleRef.current;
+  //   const dialogNode = dialogRef.current;
+  //   if (!dialogNode) return;
 
-    /**
-     * Handles focus when the modal is opened.
-     *
-     * @async
-     * @returns {Promise<void>}
-     */
-    const handleFocus = async (): Promise<void> => {
-      try {
-        if (open && onRenderComplete) {
-          titleNode.focus();
-          setTimeout(() => {
-            closeNode?.focus();
-          }, 200);
-        }
-      } catch (err) {
-        await handleError(createError(2003, 'Focus timeout error on close icon after opening modal window'), {
-          component: 'Modal',
-          operation: 'focusTitleNode',
-          url: window.location.href,
-        });
-      }
-    };
+  //   // if (!titleNode) return;
 
-    handleFocus();
-  }, [handleError, onRenderComplete, open]);
+  //   if (open && onRenderComplete) {
+  //         const auto = dialogNode.querySelector<HTMLElement>('[autofocus]');
+  //         if (auto) {
+  //           auto.focus();
+  //           return;
+  //         }
+  //         const firstFocusable = dialogNode.querySelector<HTMLElement>(
+  //           'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
+  //             'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  //         );
+
+  //         if (firstFocusable) {
+  //           firstFocusable.focus();
+  //         } else {
+  //           dialogNode.focus();
+  //       } else {
+  //   node.close();
+  //   if (closeParentModal) closeParentModal((s) => !s);
+  // }
+
+  //   // /**
+  //   //  * Handles focus when the modal is opened.
+  //   //  *
+  //   //  * @async
+  //   //  * @returns {Promise<void>}
+  //   //  */
+  //   // const handleFocus = async (): Promise<void> => {
+  //   //   try {
+  //   //     if (open && onRenderComplete) {
+  //   //       const auto = dialogNode.querySelector<HTMLElement>('[autofocus]');
+  //   //       if (auto) {
+  //   //         auto.focus();
+  //   //         return;
+  //   //       }
+  //   //       const firstFocusable = dialogNode.querySelector<HTMLElement>(
+  //   //         'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
+  //   //           'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  //   //       );
+
+  //   //       if (firstFocusable) {
+  //   //         firstFocusable.focus();
+  //   //       } else {
+  //   //         dialogNode.focus();
+  //   //       }
+  //   //       // titleNode.focus();
+  //   //       // setTimeout(() => {
+  //   //       //   closeNode?.focus();
+  //   //       // }, 200);
+  //   //     }
+  //   //   } catch (err) {
+  //   //     await handleError(createError(2003, 'Focus timeout error on close icon after opening modal window'), {
+  //   //       component: 'Modal',
+  //   //       operation: 'focusTitleNode',
+  //   //       url: window.location.href,
+  //   //     });
+  //   //   }
+  //   // };
+
+  //   // handleFocus();
+  // }, [handleError, onRenderComplete, open]);
 
   /**
    * Handles cancellation of the modal (possible 'esc' or other native cancellation).
@@ -274,7 +352,15 @@ export function Modal({
     style.modal__closeButton + (customStyle ? ` ${style[`modal__closeButton--${customStyle}`]}` : '');
 
   return createPortal(
-    <dialog className={modalClassName} id={modalId} ref={dialogRef} aria-hidden={!open} aria-modal={open}>
+    <dialog
+      className={modalClassName}
+      id={modalId}
+      ref={dialogRef}
+      aria-modal='true'
+      aria-labelledby={title ? 'modal-title' : undefined}
+      aria-describedby={subtitle ? 'modal-description' : undefined}
+      tabIndex={-1}
+    >
       <div
         className={wrapperClassName}
         role='presentation'
@@ -290,20 +376,14 @@ export function Modal({
                 name='closeButton'
                 onClick={handleCloseClick}
                 onKeyDown={handleCloseKeyDown}
-                tabIndex={0}
+                // tabIndex={0}
                 aria-label='Ferme le formulaire de contact'
               >
-                <IonIcon name='close' />
+                <IonIcon name='close' aria-hidden='true' />
               </button>
             )}
             {(title || subtitle) && (
-              <div
-                className={style.modal__titleWrapper}
-                ref={titleRef}
-                role='alertdialog'
-                tabIndex={-1}
-                aria-labelledby='modal-title'
-              >
+              <div className={style.modal__titleWrapper} ref={titleRef}>
                 {title && (
                   <h3 id='modal-title' className={style.modal__title}>
                     {title}

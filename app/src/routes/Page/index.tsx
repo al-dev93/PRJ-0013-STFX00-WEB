@@ -1,5 +1,5 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { useCsrfToken } from '@/modules/ModalDialogContactForm/hooks/useCsrfToken';
 import type { OutletContextPage, MenuSectionsVisibility } from '@/types';
@@ -11,69 +11,296 @@ import ModalDialogContactForm from '@modules/ModalDialogContactForm/ModalDialogC
 import style from './style.module.css';
 
 /**
- * The main page component of the application.
+ * Page
+ *
+ * Main landing route of the app. Handles:
+ * - Anchor navigation to in-page sections (#home/#about/#work).
+ * - Deterministic scroll + focus after SPA navigations (including cross-route).
+ * - Background scroll locking while the contact dialog is open.
+ * - Focus restoration to the opener after dialog close (without scroll jumps).
+ *
+ * Accessibility:
+ * - Uses programmatic focus (with `preventScroll`) so screen readers announce the target.
+ * - Works with sticky headers via `scroll-margin-top`/`scroll-padding-top` on targets/containers.
+ *
+ * Side effects:
+ * - Mutates `document.body` styles for scroll lock.
+ * - Listens to document-level clicks (capture) for "same-hash" re-trigger.
  *
  * @component
  * @returns {React.JSX.Element}
- *
- * @al-dev93
+ * @since 2025-08
+ * @author al-dev93
  */
 export function Page(): React.JSX.Element {
   const csrfToken = useCsrfToken();
-  // stores the current location of the page using react-router hooks.
-  const { pathname, hash, key } = useLocation();
-  // stores the current scroll position triggered by the menu interaction.
+  // Current routing state (used to derive anchor targets and issue router updates).
+  const { pathname, hash, key, search } = useLocation();
+  const navigate = useNavigate();
+
+  // Forwarded to header; used to coordinate menu-driven scroll logic if needed downstream.
   const scrollWithNav = useRef<number>();
-  // stores the current visible sections of the page and the active menu item(s).
+
+  // Shared visibility context for menu highlighting.
   const viewSectionContext = useRef<MenuSectionsVisibility>({ home: true });
-  // stores the reference to the skip link element to focus when the component mounts.
-  const skipLinkRef = useRef<HTMLAnchorElement>(null);
-  // stores the state of the contact form dialog and the id of the modal.
+
+  // Root to observe for section availability after route changes (Outlet renders inside).
+  const mainRef = useRef<HTMLElement | null>(null);
+
+  // Element that opened the dialog (focus will be restored on close).
+  const lastOpenerRef = useRef<HTMLElement | null>(null);
+
+  // One-shot guard: prevents the route/hash effect from stealing focus right after dialog close.
+  const suppressNextRouteFocusRef = useRef(false);
+
+  // Remembered scroll position while the dialog is open (body is fixed).
+  const yRef = useRef(0);
+
+  // Contact dialog UI state and unique id.
   const [openContactFormDialog, setOpenContactFormDialog] = useState<boolean>(false);
   const modalId = useId();
 
-  /**
-   * Scroll to the top of the page when the hash, or the pathname, or the key changes.
-   */
-  useEffect((): void => {
-    if (hash === '') window.scrollTo(0, 0);
-    else {
-      setTimeout(() => {
-        const id = hash.replace('#', '');
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView();
-          scrollWithNav.current = window.scrollY;
-        }
-      }, 0);
-    }
-  }, [hash, pathname, key]);
+  // Fallback section id when no hash is present.
+  const DEFAULT_ID = 'home';
 
   /**
-   * Scroll to the top of the page when the openContactFormDialog state changes
+   * Waits for an element with the given id to exist in the DOM, then runs `fn` once.
+   * Uses a one-shot MutationObserver and auto-cleans on success or timeout.
+   *
+   * @param {string} id - Target element id to watch for.
+   * @param {() => void} fn - Callback executed once the element is available.
+   * @param {Node} [root=mainRef.current ?? document] - Observation root (defaults to <main> subtree).
+   * @param {number} [timeoutMs=2000] - Safety timeout to disconnect the observer.
+   * @returns {() => void} Cleanup function (disconnects observer and clears timeout).
    */
-  useEffect(() => {
+  function onElementAvailable(
+    id: string,
+    fn: () => void,
+    root: Node = mainRef.current ?? document,
+    timeoutMs = 2000,
+  ): () => void {
+    // Fast-path: already in DOM.
+    if (document.getElementById(id)) {
+      fn();
+      return () => {};
+    }
+    const observer = new MutationObserver(() => {
+      if (document.getElementById(id)) {
+        observer.disconnect();
+        fn();
+      }
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    const t = window.setTimeout(() => observer.disconnect(), timeoutMs);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(t);
+    };
+  }
+
+  /**
+   * Extracts a clean element id from a URL hash string (with or without leading '#').
+   *
+   * @param {string | null} currentHash
+   * @returns {string | null} Decoded id or null.
+   */
+  function idFromHash(currentHash: string | null): string | null {
+    if (!currentHash) return null;
+    const raw = currentHash.startsWith('#') ? currentHash.slice(1) : currentHash;
+    return raw ? decodeURIComponent(raw) : null;
+  }
+
+  /**
+   * Scrolls to a target element by id and gives it focus (without causing a second scroll).
+   * Ensures non-natively-focusable targets can receive programmatic focus via `tabIndex=-1`.
+   *
+   * @param {string} id - Element id to bring into view.
+   * @returns {boolean} True if the element exists and scrolling was initiated.
+   */
+  const scrollAndFocusById = useCallback((id: string): boolean => {
+    const targetElement = document.getElementById(id) as HTMLElement | null;
+    if (!targetElement) return false;
+
+    targetElement.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
+
+    // Make programmatically focusable only when necessary.
+    if (
+      !targetElement.matches('a[href], button, input, select, textarea, [contenteditable="true"]') &&
+      !targetElement.hasAttribute('tabindex')
+    ) {
+      targetElement.tabIndex = -1;
+    }
+
+    // Do not override intentional focus inside the target.
+    if (document.activeElement !== targetElement && !targetElement.contains(document.activeElement)) {
+      (targetElement as HTMLElement).focus({ preventScroll: true });
+    }
+    return true;
+  }, []);
+
+  /**
+   * Skip-link handler: jump to the main region ("home") and keep the URL hash in sync.
+   *
+   * Note:
+   * - Uses Router `navigate(..., { replace: true })` to avoid adding an extra history entry.
+   * - If the same hash is already present, it attempts immediate scroll/focus; otherwise, it will
+   *   wait for the target to appear in the DOM (one-shot observer).
+   *
+   * @param {React.MouseEvent<HTMLAnchorElement>} e
+   * @returns {void}
+   */
+  const handleSkipToContent = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+
+      const id = DEFAULT_ID;
+
+      if (hash !== `#${id}`) {
+        navigate({ pathname, search, hash: `#${id}` }, { replace: true });
+      } else if (!scrollAndFocusById(id)) {
+        onElementAvailable(id, () => {
+          scrollAndFocusById(id);
+        });
+      }
+    },
+    [hash, navigate, pathname, scrollAndFocusById, search],
+  );
+
+  /**
+   * Dialog open/close effect (runs before paint).
+   *
+   * - ON OPEN:
+   *   - Store opener element and current scrollY.
+   *   - Lock background scroll via `.scrollOff` and freeze layout at the same visual position
+   *     using `body.style.top = -scrollY` (prevents any jump).
+   *
+   * - ON CLOSE:
+   *   - Unlock scroll and restore the exact scroll position.
+   *   - Temporarily force `scroll-behavior: auto` to avoid smooth-scroll artifacts.
+   *   - Set the suppression flag so the route/hash effect does not run immediately.
+   *   - Restore focus to the opener with `{ preventScroll: true }`.
+   */
+  useLayoutEffect(() => {
     if (openContactFormDialog) {
+      lastOpenerRef.current = document.activeElement as HTMLElement | null;
+      yRef.current = window.scrollY || 0;
+      document.body.style.top = `-${yRef.current}px`;
       document.body.classList.add('scrollOff');
       return;
     }
     document.body.classList.remove('scrollOff');
+
+    const html = document.documentElement;
+    const prevBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+
+    document.body.style.top = '';
+    window.scrollTo(0, yRef.current);
+
+    suppressNextRouteFocusRef.current = true;
+    lastOpenerRef.current?.focus?.({ preventScroll: true });
+
+    html.style.scrollBehavior = prevBehavior || '';
   }, [openContactFormDialog]);
 
   /**
-   * Focus the skip link when the component mounts.
+   * Anchor navigation effect (runs before paint).
+   *
+   * Purpose:
+   * - After route/hash changes, scroll to and focus the target section.
+   * - Skip while the dialog is open.
+   * - Skip exactly once right after dialog close (consumes suppression flag).
+   * - If the target is not yet in the DOM (Outlet still mounting), arm a one-shot observer
+   *   on `<main>` and execute when available.
+   *
+   * Dependencies:
+   * - React Router signals: [pathname, hash, key]
+   * - `openContactFormDialog` and `scrollAndFocusById`.
+   */
+  useLayoutEffect(() => {
+    if (openContactFormDialog) return () => {};
+
+    // Consume the one-shot suppression right after dialog close.
+    if (suppressNextRouteFocusRef.current) {
+      suppressNextRouteFocusRef.current = false;
+      return () => {};
+    }
+
+    const targetId = idFromHash(hash) || DEFAULT_ID;
+
+    // Try immediately; if not available yet, wait for it under <main>.
+    const ok = scrollAndFocusById(targetId);
+    if (!ok) {
+      return onElementAvailable(
+        targetId,
+        () => {
+          scrollAndFocusById(targetId);
+        },
+        mainRef.current ?? document,
+      );
+    }
+    return () => {};
+  }, [pathname, hash, key, scrollAndFocusById, openContactFormDialog]);
+
+  /**
+   * Same-hash re-trigger (document-level, capture phase).
+   *
+   * Rationale:
+   * - If the user clicks a menu item that points to the same hash already in the URL,
+   *   React Router won't navigate. We explicitly re-run scroll+focus for that case.
+   *
+   * Filters:
+   * - Unmodified primary-button clicks only.
+   * - Same origin and protocol, same pathname (otherwise the route effect will handle it).
+   *
+   * Cleanup:
+   * - Removes the listener on unmount to avoid duplicates.
    */
   useEffect(() => {
-    if (skipLinkRef.current) skipLinkRef.current.focus();
-  }, []);
+    const onSameHashClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      const target = e.target as Element | null;
+      const anchor = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!anchor) return;
+
+      const href = anchor.getAttribute('href') ?? '';
+      if (!href.includes('#')) return;
+
+      let url: URL;
+      try {
+        url = new URL(href, window.location.href);
+      } catch {
+        return;
+      }
+
+      if (url.origin !== window.location.origin || !/^https?:$/.test(url.protocol)) return;
+      if (url.pathname !== window.location.pathname) return;
+      if (url.hash && url.hash === window.location.hash) {
+        const id = decodeURIComponent(url.hash.slice(1));
+        if (!id) return;
+        if (!scrollAndFocusById(id)) {
+          onElementAvailable(id, () => {
+            scrollAndFocusById(id);
+          });
+        }
+      }
+    };
+
+    document.addEventListener('click', onSameHashClick, true);
+    return () => document.removeEventListener('click', onSameHashClick, true);
+  }, [scrollAndFocusById]);
 
   return (
+    // If the dialog is rendered via a portal (recommended), `aria-hidden`
+    // will correctly hide background content from AT while leaving the dialog exposed.
+    // If not portaled, avoid applying `aria-hidden` on this wrapper.
     <div className={style.mainPage} aria-hidden={openContactFormDialog}>
-      {/* Skip link for accessibility purposes */}
-      <a href='#home' className='visually-hidden visually-hidden-focusable' ref={skipLinkRef}>
-        Aller à l&apos;introduction
+      {/* Skip link for keyboard users; announced as a quick jump to the main content */}
+      <a href='#home' className={style['skip-link']} onClick={handleSkipToContent}>
+        Aller au contenu
       </a>
-      {/* Header component */}
+      {/* Collapsible site header (logo + navigation) */}
       <CollapsibleHeader
         logo={{ src: logo, alt: 'logo' }}
         MenuSectionsVisibility={viewSectionContext}
@@ -86,10 +313,10 @@ export function Page(): React.JSX.Element {
         modalId={modalId}
         csrfToken={csrfToken}
       />
-      {/* Social media navigation bar component for left navigation */}
+      {/* Left-side social links (external navigation) */}
       <SocialMediaNavBar className={style.socialMediaNavBar} type='left-nav' />
-
-      <main className={style.main} aria-label='Introduction et contenu principal'>
+      {/* Main content; observed to detect when anchor targets become available */}
+      <main className={style.main} aria-label='Introduction et contenu principal' ref={mainRef}>
         <Outlet
           context={
             {

@@ -6,11 +6,29 @@
   background-color: var(--white);
 }
 
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(-150%);
+  padding: 0.6rem 0.9rem;
+  background: var(--white);
+  color: var(--rich-black);
+  border: 2px solid currentColor;
+  outline: none;
+  z-index: 1000;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none; /* apparaît sans reflow */
+  outline: 3px solid var(--rich-black);
+}
+
 .socialMediaNavBar {
   position: fixed;
   bottom: 0;
   right: auto;
-  left: 50px;
+  left: var(--lateral-margin);
   padding: 6px 6px 0;
 }
 
@@ -24,4 +42,7 @@
 
 .scrollOff {
   position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
 }

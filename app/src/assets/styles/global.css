@@ -119,6 +119,7 @@ main {
 section {
   max-width: 1000px;
   margin: 0 auto;
+  scroll-margin-top: 110px;
   padding: 45px 0 54px;
 }
 
