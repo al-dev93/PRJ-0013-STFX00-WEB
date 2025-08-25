@@ -14,6 +14,21 @@ const EMPTY_MODAL_DIALOG_CONTACT_FORM: ContactFormModal = {
   alertOnSubmit: [],
   dataFormContent: [],
 };
+
+/**
+ * Names of input element
+ *
+ * @type {{ readonly name: true; readonly company: true; readonly email: true; readonly tel: true; readonly message: true; readonly consent: true; }}
+ */
+const FORM_INPUT_NAME_MAP = {
+  name: true,
+  company: true,
+  email: true,
+  tel: true,
+  message: true,
+  consent: true,
+} as const;
+
 /**
  * Code representing an autocomplete feature for input.
  *
@@ -117,5 +132,6 @@ export {
   SET_POPOVER_LIST_FOCUSED_INDEX,
   SET_POPOVER_MODE,
   SUFFIX_AUTO_COMPLETE_LIST_ID,
+  FORM_INPUT_NAME_MAP,
   // SOFT_MODAL,
 };

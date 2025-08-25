@@ -1,7 +1,7 @@
 import { MutableRefObject } from 'react';
 
+import { FORM_INPUT_NAME_MAP } from './constants';
 import type { FormInputName } from '../types';
-
 // import type { ModalDialogContactFormState } from '../types';
 
 /**
@@ -116,4 +116,28 @@ export function sanitizeInput(inputValue: string, context: FormInputName): strin
   }
 
   return sanitized;
+}
+
+/**
+ * Type guard that checks whether a runtime value is a valid {@link FormInputName}.
+ *
+ * @remarks
+ * When this function returns `true`, TypeScript narrows `value` to `FormInputName`.
+ * It uses `FORM_INPUT_NAME_MAP` as the single source of truth, so adding a new key
+ * there keeps the union type and this guard in sync.
+ * Requires `Object.hasOwn` (ES2022+). For older targets, use:
+ * `Object.prototype.hasOwnProperty.call(FORM_INPUT_NAME_MAP, value)`.
+ *
+ * @param value - The value to test.
+ * @returns `true` if `value` is a valid {@link FormInputName}, otherwise `false`.
+ * @example
+ * const value: string = getUserInput();
+ * if (isFormInputName(value)) {
+ *   // value is now narrowed to FormInputName
+ * } else {
+ *   // handle invalid input name
+ * }
+ */
+export function isFormInputName(value: unknown): value is FormInputName {
+  return typeof value === 'string' && Object.hasOwn(FORM_INPUT_NAME_MAP, value);
 }

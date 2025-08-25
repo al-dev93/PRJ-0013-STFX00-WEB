@@ -28,12 +28,12 @@ import { formatInputNumber, sanitizeInput } from '../utils/formHelpers';
  * and by dispatching actions to the reducer to update the state of the form.
  *
  * @function useContactForm
- * @param {string} name - The name of the current input field.
+ * @param {FormInputName} name - The name of the current input field.
  * @returns {ContactForm} - Returns an array with item value and tooltip status.
  *
  * @al-dev93
  */
-export function useContactForm(name: string): ContactForm {
+export function useContactForm(name: FormInputName): ContactForm {
   /**
    * The current state of the field.
    * This state is derived from the form state and the field name.
@@ -282,7 +282,7 @@ export function useContactForm(name: string): ContactForm {
   const processFinalValue = useCallback(
     (stateInputNode: DialogFormInputElement) => {
       const input = stateInputNode;
-      input.value = sanitizeInput(input.value, name as FormInputName);
+      input.value = sanitizeInput(input.value, name);
       contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: input.value } });
       contactFormAction({ type: IN_EDIT_MODE, payload: { name, inEdition: false } });
       storeInputValue();

@@ -2,6 +2,7 @@ import { useCallback, useLayoutEffect } from 'react';
 
 import { useContactFormDispatch } from './useContactFormDispatch';
 import { useContactFormSelector } from './useContactFormSelector';
+import { FormInputName } from '../types';
 import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
   DELETE_INPUT_ERROR,
@@ -10,6 +11,7 @@ import {
   SET_INPUT_VALUE,
   SET_IS_STORED,
 } from '../utils/constants';
+import { isFormInputName } from '../utils/formHelpers';
 import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from '../utils/inputErrorHandler';
 
 /**
@@ -18,7 +20,7 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  * and by dispatching actions to the reducer to update the state of the form.
  *
  * @function useAutoComplete
- * @param {string} name - Active field of the contact form.
+ * @param {FormInputName} name - Active field of the contact form.
  * @returns {undefined | [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean]} - Returns an array containing:
  * 1. A function to apply the autocomplete value to the input field.
  * 2. A function to store the input value into local storage.
@@ -27,7 +29,7 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  * @al-dev93
  */
 export function useAutoComplete(
-  name: string,
+  name: FormInputName,
 ): [(inputValue: string) => void, () => void, (isAutocompleted?: boolean) => boolean] {
   // Partial state selector using keys
   const { isStored, inputNode: input } = useContactFormSelector(name, ['isStored', 'inputNode']);
@@ -48,13 +50,14 @@ export function useAutoComplete(
       const { required } = input;
       const inputError = getInputValidityProperties(input, isAutocompleted);
 
-      contactFormAction({
-        type: inputError.valid ? DELETE_INPUT_ERROR : SET_INPUT_ERROR,
-        payload: { name, inputError },
-      });
-
-      if (required) contactFormAction(setInputErrorTag(input, inputError));
-      contactFormAction(setInputBorderBox(input, inputError));
+      if (isFormInputName(name)) {
+        contactFormAction({
+          type: inputError.valid ? DELETE_INPUT_ERROR : SET_INPUT_ERROR,
+          payload: { name, inputError },
+        });
+        if (required) contactFormAction(setInputErrorTag(name, inputError));
+        contactFormAction(setInputBorderBox(name, input, inputError));
+      }
 
       return inputError.valid;
     },

@@ -1,5 +1,7 @@
 import type { DialogFormInputElement } from '@/types';
 
+import { FormInputName } from '../types';
+
 /**
  * Saves a single value to the local storage for a specific input field.
  *
@@ -8,12 +10,12 @@ import type { DialogFormInputElement } from '@/types';
  *
  * @function saveToLocalStorage
  * @param {string} value - The value to save to the local storage.
- * @param {string} name - The name of the input field for which to save the value.
+ * @param {FormInputName} name - The name of the input field for which to save the value.
  * @returns {void}
  *
  * @al-dev93
  */
-export function saveToLocalStorage(value: string, name: string): void {
+export function saveToLocalStorage(value: string, name: FormInputName): void {
   localStorage.setItem(name, JSON.stringify([value]));
 }
 
@@ -28,12 +30,12 @@ export function saveToLocalStorage(value: string, name: string): void {
  *
  * @function addToLocalStorage
  * @param {string} value - The value to add to the local storage.
- * @param {string} name - The name of the input field for which to add the value.
+ * @param {FormInputName} name - The name of the input field for which to add the value.
  * @returns {void}
  *
  * @al-dev93
  */
-export function addToLocalStorage(value: string, name: string): void {
+export function addToLocalStorage(value: string, name: FormInputName): void {
   const storageSet = new Set(JSON.parse(localStorage.getItem(name) ?? '[]')).add(value);
   localStorage.setItem(name, JSON.stringify([...storageSet].sort()));
 }

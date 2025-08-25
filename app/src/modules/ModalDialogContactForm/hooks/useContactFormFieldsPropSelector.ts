@@ -12,7 +12,7 @@ import type { FieldState, ModalDialogContactFormState } from '../types';
  * @template {keyof FieldState} K - Type parameter
  * @param {K} property - Property extracted for each input element
  * @param {boolean} [inputToCheck=false] - Indicates whether the return is based on the validity of input element
- * @returns {{ [x: string]: string | number | boolean | string[] | Validity | HTMLInputElement | HTMLTextAreaElement | FieldState[K] | null | undefined}}
+ * @returns {{ [x: string]: string | FormInputName | number | boolean | string[] | Validity | HTMLInputElement | HTMLTextAreaElement | FieldState[K] | null | undefined}}
  * Returns value of property or undefined if inputError is set.
  */
 export function useContactFormFieldsPropSelector<K extends keyof FieldState>(

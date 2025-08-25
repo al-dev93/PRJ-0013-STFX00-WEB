@@ -27,7 +27,7 @@ import style from './style.module.css';
  * @param {DialogFormInputProps} props - The properties for the DialogFormCheckBox component.
  * @property {FormInput} formInput - the definition of the input checkbox element of the form
  * @property {string} label - the label for the input element
- * @property {string} name - the name attribute for the input element
+ * @property {FormInputName} name - the name attribute for the input element
  * @returns {React.JSX.Element} The rendered DialogFormCheckBox component.
  */
 export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputProps): React.JSX.Element {
@@ -115,7 +115,7 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
         id={name}
         required={formInput.required}
         ref={inputElementRef as LegacyRef<DialogFormInputElement>}
-        aria-label={name}
+        // aria-label={name}
       />
       <span className={classDialogFormCheckbox} />
       <p>{label}</p>

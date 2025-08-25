@@ -14,7 +14,7 @@ import { PREFIX_AUTO_COMPLETE_ITEM_ID, SUFFIX_AUTO_COMPLETE_LIST_ID } from '../.
  *
  * @component Popover
  * @param {PopoverProps} props - The properties for the Popover component.
- * @property {string} name - The name attribute for the input element.
+ * @property {FormInputName} name - The name attribute for the input element.
  * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
  * @returns {(React.JSX.Element | null)} The rendered Popover component or null if no suggestions or errors.

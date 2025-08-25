@@ -15,6 +15,7 @@ import {
   DELETE_ERROR_TAG_NAME,
   DELETE_INPUT_ERROR,
   DELETE_INPUT_VALUE,
+  FORM_INPUT_NAME_MAP,
   FULL_HISTORY,
   IN_EDIT_MODE,
   INIT_DIALOG_CONTACT_FORM_STATE,
@@ -82,14 +83,14 @@ export type DialogFormInputProps = {
  * used in the module ModalDialogContactForm
  *
  * @type {Object} PopoverProps
- * @property {string} name - The name of the input element.
+ * @property {FormInputName} name - The name of the input element.
  * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
  *
  * @al-dev93
  */
 export type PopoverProps = {
-  name: string;
+  name: FormInputName;
   errorMessage?: string;
   inputAutocomplete: (content: string) => void;
 };
@@ -156,7 +157,7 @@ export type FormContentProps = Omit<FormProps, 'idForm' | 'setShowAlert'>;
  * @export
  * @type {('name' | 'company' | 'email' | 'tel' | 'message' | 'consent')} FormInputName
  */
-export type FormInputName = 'name' | 'company' | 'email' | 'tel' | 'message' | 'consent';
+export type FormInputName = keyof typeof FORM_INPUT_NAME_MAP;
 
 /**
  * Represents the autocomplete overlay type.
@@ -306,7 +307,7 @@ export type FieldState = {
  * @property {typeof RESET_AUTO_COMPLETE_OVERLAY | typeof SET_AUTO_COMPLETE | typeof SET_OVERLAY_FIRST_ITEM_FOCUS |
  * typeof SET_IS_STORED | typeof SET_POPUP_MODE} type - The type of action to perform.
  * @property {Object} payload - The payload of the action.
- * @property {string} payload.name - The name of the input field.
+ * @property {FormInputName} payload.name - The name of the input field.
  * @property {string[]} [payload.autoComplete] - An array of autocomplete suggestions (if applicable).
  * @property {number} [payload.listItemFocused] - The index of the focused item in the autocomplete list (if applicable).
  * @property {boolean} [payload.isStored] - Indicates whether the input field is currently stored (if applicable).
@@ -321,7 +322,7 @@ type AutoComplete =
        */
       type: typeof RESET_AUTO_COMPLETE_OVERLAY;
       payload: {
-        name: string;
+        name: FormInputName;
       };
     }
   | {
@@ -330,7 +331,7 @@ type AutoComplete =
        */
       type: typeof SET_AUTO_COMPLETE;
       payload: {
-        name: string;
+        name: FormInputName;
         autoComplete: string[];
       };
     }
@@ -340,7 +341,7 @@ type AutoComplete =
        */
       type: typeof SET_POPOVER_LIST_FOCUSED_INDEX;
       payload: {
-        name: string;
+        name: FormInputName;
         listItemFocused: number;
       };
     }
@@ -350,7 +351,7 @@ type AutoComplete =
        */
       type: typeof SET_IS_STORED;
       payload: {
-        name: string;
+        name: FormInputName;
         isStored: boolean;
       };
     }
@@ -360,7 +361,7 @@ type AutoComplete =
        */
       type: typeof SET_POPOVER_MODE;
       payload: {
-        name: string;
+        name: FormInputName;
         popoverMode: OverlayType | undefined;
       };
     };
@@ -375,7 +376,7 @@ type AutoComplete =
  * @type {Object} ErrorTagComponent
  * @property {typeof DELETE_ERROR_TAG_NAME | typeof SET_ERROR_TAG_NAME} type - The type of action to perform.
  * @property {Object} payload - The payload of the action.
- * @property {string} payload.name - The name of the input field.
+ * @property {FormInputName} payload.name - The name of the input field.
  * @property {InputStatus | undefined} [payload.errorTagName] - The error tag to set, or undefined to delete.
  *
  * @al-dev93
@@ -387,7 +388,7 @@ export type ErrorTagComponent =
        */
       type: typeof DELETE_ERROR_TAG_NAME;
       payload: {
-        name: string;
+        name: FormInputName;
         errorTagName?: undefined;
       };
     }
@@ -397,7 +398,7 @@ export type ErrorTagComponent =
        */
       type: typeof SET_ERROR_TAG_NAME;
       payload: {
-        name: string;
+        name: FormInputName;
         errorTagName?: InputStatus;
       };
     };
@@ -413,7 +414,7 @@ export type ErrorTagComponent =
  */
 type InitDialogContactFormState = {
   type: typeof INIT_DIALOG_CONTACT_FORM_STATE;
-  payload: string[];
+  payload: FormInputName[];
 };
 
 /**
@@ -431,7 +432,7 @@ type InitDialogContactFormState = {
  * | typeof SET_INPUT_FOCUS | typeof SET_INPUT_HOVER | typeof SET_INPUT_VALUE
  * | typeof IN_EDIT_MODE} type - The type of action to perform.
  * @property {Object} payload - The payload of the action.
- * @property {string} payload.name - The name of the input field.
+ * @property {FormInputName} payload.name - The name of the input field.
  * @property {string | undefined} [errorMessage] - The error message showing in the popover
  * @property {HTMLInputElement | HTMLTextAreaElement} payload.inputNode - The input node for the input field.
  * @property {Validity | undefined} [payload.inputError] - The validity of the input error, if applicable.
@@ -450,7 +451,7 @@ export type InputComponent =
        */
       type: typeof SET_ERROR_MESSAGE;
       payload: {
-        name: string;
+        name: FormInputName;
         errorMessage?: string;
       };
     }
@@ -460,7 +461,7 @@ export type InputComponent =
        */
       type: typeof SET_INPUT_NODE;
       payload: {
-        name: string;
+        name: FormInputName;
         inputNode: HTMLInputElement | HTMLTextAreaElement;
       };
     }
@@ -470,7 +471,7 @@ export type InputComponent =
        */
       type: typeof DELETE_INPUT_ERROR | typeof SET_INPUT_ERROR;
       payload: {
-        name: string;
+        name: FormInputName;
         inputError?: Validity | undefined;
       };
     }
@@ -480,7 +481,7 @@ export type InputComponent =
        */
       type: typeof DELETE_INPUT_VALUE;
       payload: {
-        name: string;
+        name: FormInputName;
       };
     }
   | {
@@ -489,7 +490,7 @@ export type InputComponent =
        */
       type: typeof SET_INPUT_BORDER_BOX;
       payload: {
-        name: string;
+        name: FormInputName;
         borderStyle: InputBorderBox | undefined;
       };
     }
@@ -499,7 +500,7 @@ export type InputComponent =
        */
       type: typeof SET_INPUT_FOCUS;
       payload: {
-        name: string;
+        name: FormInputName;
         isFocused: boolean;
       };
     }
@@ -509,7 +510,7 @@ export type InputComponent =
        */
       type: typeof SET_INPUT_HOVER;
       payload: {
-        name: string;
+        name: FormInputName;
         isHovered: boolean;
       };
     }
@@ -519,7 +520,7 @@ export type InputComponent =
        */
       type: typeof SET_INPUT_VALUE;
       payload: {
-        name: string;
+        name: FormInputName;
         inputValue: string;
       };
     }
@@ -529,7 +530,7 @@ export type InputComponent =
        */
       type: typeof IN_EDIT_MODE;
       payload: {
-        name: string;
+        name: FormInputName;
         inEdition: boolean;
       };
     };

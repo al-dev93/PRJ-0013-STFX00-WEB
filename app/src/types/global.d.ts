@@ -250,7 +250,7 @@ export type FormInput = {
 };
 
 export type ContactFormInput = {
-  id: string;
+  id: FormInputName;
   label: string;
   input: FormInput;
   tooltipContent?: string | TooltipContent | TooltipContent[];

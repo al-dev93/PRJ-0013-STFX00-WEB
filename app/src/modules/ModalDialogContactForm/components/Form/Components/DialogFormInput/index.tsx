@@ -30,7 +30,7 @@ import { Popover } from '../../../Popover';
  * @param {DialogFormInputProps} props - The properties for the DialogFormInput component.
  * @property {FormInput} formInput - the definition of the input or textarea element of the form
  * @property {string} label - the label for the input element
- * @property {string} name - the name attribute for the input element
+ * @property {FormInputName} name - the name attribute for the input element
  * @property {TooltipContent[]} [tooltipContent] - content for tooltips associated with the input element (optional)
  * @returns {React.JSX.Element} The rendered DialogFormInput component.
  *

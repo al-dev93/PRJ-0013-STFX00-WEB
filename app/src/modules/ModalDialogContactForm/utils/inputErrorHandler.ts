@@ -1,8 +1,8 @@
 import type { DialogFormInputElement } from '@/types';
 
 import { DELETE_ERROR_TAG_NAME, SET_ERROR_TAG_NAME, SET_INPUT_BORDER_BOX } from './constants';
-import type { ErrorTagComponent, InputBorderBox, InputComponent, Validity } from '../types';
-
+import { FormInputName, InputBorderBox } from '../types';
+import type { ErrorTagComponent, InputComponent, Validity } from '../types';
 /**
  * sets the border style of the active input field to distinguish between an incorrect
  * input and a correctly edited input field.
@@ -20,9 +20,18 @@ import type { ErrorTagComponent, InputBorderBox, InputComponent, Validity } from
  *
  * @al-dev93
  */
-export function setInputBorderBox(input: DialogFormInputElement, inputValidity: Validity): InputComponent {
-  const { name, value } = input;
-  const borderStyle = (!inputValidity.valid ? 'error' : !!value && 'edited') as InputBorderBox;
+export function setInputBorderBox(
+  name: FormInputName,
+  input: DialogFormInputElement,
+  inputValidity: Validity,
+): InputComponent {
+  const { value } = input;
+
+  const borderStyle = ((): InputBorderBox | undefined => {
+    if (!inputValidity.valid) return 'error';
+    if (value) return 'edited';
+    return undefined;
+  })();
 
   return { type: SET_INPUT_BORDER_BOX, payload: { name, borderStyle } };
 }
@@ -44,18 +53,29 @@ export function setInputBorderBox(input: DialogFormInputElement, inputValidity: 
  *
  * @al-dev93
  */
-export function setInputErrorTag(input: DialogFormInputElement, inputValidity: Validity): ErrorTagComponent {
-  const { name } = input;
-
+export function setInputErrorTag(
+  name: FormInputName,
+  // input: DialogFormInputElement,
+  inputValidity: Validity,
+): ErrorTagComponent {
+  // const { name } = input;
   const type = inputValidity.valid ? DELETE_ERROR_TAG_NAME : SET_ERROR_TAG_NAME;
+  const tag = inputValidity.valueMissing ? 'remplir' : 'modifier';
 
-  return {
-    type,
-    payload: {
-      name,
-      errorTagName: inputValidity.valueMissing ? 'remplir' : 'modifier',
-    },
-  } as ErrorTagComponent;
+  return type === SET_ERROR_TAG_NAME
+    ? {
+        type,
+        payload: {
+          name,
+          errorTagName: tag || undefined,
+        },
+      }
+    : {
+        type,
+        payload: {
+          name,
+        },
+      };
 }
 
 /**
