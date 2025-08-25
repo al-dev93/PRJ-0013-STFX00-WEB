@@ -92,7 +92,9 @@ export function useContactForm(name: FormInputName): ContactForm {
    * @constant isTooltipVisible
    */
   const isTooltipVisible: boolean | undefined = useMemo(
-    () => isHovered && !inEdition && inputError && !popoverMode,
+    // () => isHovered && !inEdition && inputError && !popoverMode,
+    () => isHovered && !inEdition && !!inputError && !popoverMode,
+
     [inEdition, inputError, isHovered, popoverMode],
   );
 
@@ -252,17 +254,18 @@ export function useContactForm(name: FormInputName): ContactForm {
    */
   const processInputValue = useCallback(
     (stateInputNode: DialogFormInputElement) => {
-      const input = stateInputNode;
+      const { type } = stateInputNode;
+      let { value } = stateInputNode;
       contactFormAction({
         type: IN_EDIT_MODE,
         payload: {
           name,
-          inEdition: input.value !== inputValue && !!input.value,
+          inEdition: value !== inputValue && !!value.length,
         },
       });
-      if (input.type === 'tel') input.value = formatInputNumber(input.value);
+      if (type === 'tel') value = formatInputNumber(value);
       validateInput();
-      const autocompleteInput = getAutocompleteInput(input, isStored, true);
+      const autocompleteInput = getAutocompleteInput(stateInputNode, isStored, true);
       contactFormAction({ type: SET_POPOVER_MODE, payload: { name, popoverMode: AUTO_COMPLETION } });
       if (autocompleteInput) {
         contactFormAction({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete: autocompleteInput } });
