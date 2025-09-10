@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import React, { KeyboardEvent, memo, useMemo } from 'react';
 
 import { ACTIVE_STATUS, NOT_ACTIVE_STATUS } from '@utils/constants';
@@ -6,7 +5,6 @@ import { ACTIVE_STATUS, NOT_ACTIVE_STATUS } from '@utils/constants';
 import style from './style.module.css';
 import type { SlideshowDotsProps } from '../../../../types';
 import { CHANGE_SCROLLING_DOT, START } from '../../../../utils/constants';
-
 /**
  * Component for the pagination dots in the slideshow.
  *
@@ -62,21 +60,20 @@ function MemoizedSlideshowDots({
 
   return (
     <div className={style.slideshowDots} role='navigation' aria-label='Slide navigation'>
-      {slidesIndex.map((value) => (
-        <div
-          key={value}
-          className={classNames(
-            style.slideshowDots__dot,
-            style[`slideshowDots__dot--${activeSlideIndex === value ? ACTIVE_STATUS : NOT_ACTIVE_STATUS}`],
-            style['slideshowDots__dot--transition'],
-          )}
-          role='button'
-          aria-label={`Go to slide ${value + 1}`}
-          onClick={() => handleClick(value)}
-          onKeyDown={(e) => handleKeyDown(e, value)}
-          tabIndex={0}
-        />
-      ))}
+      {slidesIndex.map((value) => {
+        const status = activeSlideIndex === value ? ACTIVE_STATUS : NOT_ACTIVE_STATUS;
+        return (
+          <div
+            key={value}
+            className={`${style.slideshowDots__dot} ${style[`slideshowDots__dot--${status}`]} ${style['slideshowDots__dot--transition']}`}
+            role='button'
+            aria-label={`Go to slide ${value + 1}`}
+            onClick={() => handleClick(value)}
+            onKeyDown={(e) => handleKeyDown(e, value)}
+            tabIndex={0}
+          />
+        );
+      })}
     </div>
   );
 }
