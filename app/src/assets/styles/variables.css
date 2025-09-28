@@ -47,6 +47,7 @@
   --primary-bg-alert-color: rgba(201, 24, 31, 0.15);
   --panel-bg: rgba(139, 108, 80, 0.16);
   --modal-backdrop-color: rgba(0, 53, 84, 0.7);
+  --focus-ring: #2257e6; /* couleur du ring */
   /* border */
   --br-xxs: 4px;
   --br-xs: 6px;
@@ -79,4 +80,3 @@
   --button-link-icon-size: 2rem;
   --button-link-outline: 2px solid var(--decorative-dark);
 }
-/* 0 10px 20px -5px rgba(2, 12, 84, 0.6); */

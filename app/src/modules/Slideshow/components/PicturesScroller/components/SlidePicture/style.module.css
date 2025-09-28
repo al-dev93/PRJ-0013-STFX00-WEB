@@ -1,24 +1,16 @@
 /* Container for each individual picture */
 .picturesToScroll {
   flex: 1 0 100%;
+  will-change: transform, opacity;
   transition:
     transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s ease-in-out;
-  will-change: transform, opacity;
 }
 
 /* Visible picture styling */
 .picturesToScroll--visible {
-  /* height: 100%; */
   opacity: 1;
   transform: translateY(0);
-}
-
-/* Hover effect for visible pictures */
-.picturesToScroll--visible:hover {
-  transition:
-    transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
 }
 
 /* Hidden picture styling */
@@ -45,57 +37,105 @@
   transform: translateY(0);
 }
 
-/* Link styling */
-.picturesToScroll__link {
+/* Wrapper de ratio : empêche le CLS */
+.picturesToScroll__frame {
+  --frame-pad-x: 45px;
+  --focus-gap: 6px;
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 16 / 9;
   width: 100%;
-  height: 510px;
-  padding: 0 45px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0 var(--frame-pad-x);
+  background: transparent;
+  border-radius: var(--br-sm);
+  overflow: hidden;
+  overflow: clip;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* ring dessiné AU-DESSUS de l'image, avec marge égale partout */
+.picturesToScroll__frame::after {
+  content: '';
+  position: absolute;
+  z-index: 1; /* au-dessus de l'image */
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+
+  /* Écart identique : top/bottom = --focus-gap
+     left/right   = padding horizontal + --focus-gap  */
+  inset: var(--focus-gap) calc(var(--frame-pad-x) - var(--focus-gap));
+
+  /* anneau visible et net */
+  border: 2px solid var(--focus-ring);
+}
+
+/* Élément interactif (lien ou span fallback) */
+.picturesToScroll__link {
+  display: block;
+}
+
+.picturesToScroll__link:focus-visible {
+  outline: none;
+}
+
+/* affichage du ring quand le LIEN a le focus clavier */
+.picturesToScroll__link:focus-visible .picturesToScroll__frame::after {
+  opacity: 1;
 }
 
 .picturesToScroll__link--disabled {
   pointer-events: none;
 }
 
-/* Hover effect for link */
-.picturesToScroll__link:hover,
-.picturesToScroll__link:focus {
-  transform: scale(1.03);
-}
-
-/* Image styling wrapped in a link */
-.picturesToScroll__link__picture {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: var(--br-sm);
-}
-
-/* Hover effect for image wrapped in link */
-.picturesToScroll__link_picture:hover,
-.picturesToScroll__link__picture:focus {
+/* optionnel : la même ombre que le hover quand focus clavier */
+.picturesToScroll__link:focus-visible .picturesToScroll__img {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Effets hover/focus seulement si pointeur fin et pas reduced motion */
+@media (hover: hover) and (pointer: fine) {
+  .picturesToScroll--visible:hover .picturesToScroll__frame,
+  .picturesToScroll__link:focus-visible .picturesToScroll__frame {
+    transform: scale(1.03);
+  }
+  .picturesToScroll--visible:hover .picturesToScroll__img,
+  .picturesToScroll__link:focus-visible .picturesToScroll__img {
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.16));
+  }
+}
+
+/* Image */
+.picturesToScroll__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* ou cover selon rendu souhaité */
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
+  transition: filter 0.25s ease;
 }
 
 /* Smartphones */
 @media (max-width: 768px) {
-  .picturesToScroll__link__picture {
-    width: 100%;
-    height: auto;
-    transform: translateY(0);
-  }
-
   .picturesToScroll--parallaxOn {
     transform: none;
   }
 }
 
 /* Tablet */
-@media (max-width: 1024px) {
-  .picturesToScroll__link__picture {
-    width: 50%;
+/* @media (max-width: 1024px) {
+  .picturesToScroll__img {
+    max-width: 50%;
+    margin-inline: auto;
+  }
+} */
+
+/* Respect des préférences d’accessibilité (réduction d’animations) */
+@media (prefers-reduced-motion: reduce) {
+  .picturesToScroll,
+  .picturesToScroll__frame,
+  .picturesToScroll__img {
+    transition: none !important;
   }
 }

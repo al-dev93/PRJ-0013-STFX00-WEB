@@ -180,6 +180,7 @@ export type ProjectData = {
   picture?: string;
   display?: DisplayMode;
   deliverables: Deliverable[];
+  projectSheet?: string;
 };
 
 export type Skill = {

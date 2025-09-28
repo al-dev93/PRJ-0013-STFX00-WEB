@@ -1,11 +1,15 @@
-import React, { memo, useRef } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 
 import { useOnScreen } from '@hooks/useOnScreen';
 import { EAGER_STATUS, LAZY_STATUS } from '@utils/constants';
 
 import style from './style.module.css';
-import type { SlidePictureProps } from '../../../../types';
-import { INTERSECTION_OPTIONS_THRESHOLD } from '../../../../utils/constants';
+import type { FetchPriorityAttr, SlidePictureProps } from '../../../../types';
+import {
+  INTERSECTION_OPTIONS_THRESHOLD,
+  PICTURE_EXTENSION,
+  PROJECT_SHEET_EXTENSION,
+} from '../../../../utils/constants';
 /**
  * Component to display an individual slide picture in the slideshow.
  *
@@ -36,58 +40,93 @@ function MemoizedSlidePicture({
   ariaHidden,
   ariaLabel,
 }: SlidePictureProps): React.JSX.Element {
+  const isRemote = import.meta.env.VITE_FETCH_MODE === 'remote';
+  const remoteBase = String(import.meta.env.VITE_BUCKET_REMOTE || '').replace(/\/+$/, '');
+  const localBase = String(import.meta.env.VITE_BUCKET_LOCAL || '').replace(/\/+$/, '');
+
+  const { picture, title, projectSheet } = slide;
+
   /**
    * useRef to keep track of the image DOM element.
    * This is used by IntersectionObserver to observe its visibility.
    *
    * @type {React.MutableRefObject<HTMLImageElement | null>}
    */
-  const imgRef = useRef<HTMLImageElement | null>(null);
+  // const imgRef = useRef<HTMLImageElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   /**
    * Custom hook useOnScreen to manage whether the image is in view, used for lazy loading.
    *
    * @type {{isIntersecting: boolean; observerError: AppError | undefined;}}
    */
-  const inView = useOnScreen(imgRef, INTERSECTION_OPTIONS_THRESHOLD);
+  // const inView = useOnScreen(imgRef, INTERSECTION_OPTIONS_THRESHOLD);
+  const inView = useOnScreen(wrapperRef, INTERSECTION_OPTIONS_THRESHOLD);
 
-  const { address } = slide.deliverables.find((item) => item.service === 'external') as {
-    address: string | undefined;
-  };
-  const { picture, title } = slide;
-  const loading = inView || isAdjacent ? EAGER_STATUS : LAZY_STATUS;
-  const src =
-    import.meta.env.VITE_FETCH_MODE === 'remote'
-      ? `${import.meta.env.VITE_BUCKET_REMOTE}/${picture}`
-      : `${import.meta.env.VITE_BUCKET_LOCAL}/${picture}`;
+  const shouldLoad = inView || isAdjacent;
+  const loading = shouldLoad ? EAGER_STATUS : LAZY_STATUS;
+
+  const encodePath = (p: string) => p.split('/').map(encodeURIComponent).join('/');
+
+  const { src, href } = useMemo(() => {
+    const srcBase = isRemote ? `${remoteBase}/images` : localBase;
+
+    return {
+      src: picture ? `${srcBase}/${encodePath(picture)}${PICTURE_EXTENSION}` : undefined,
+      href:
+        isRemote && projectSheet
+          ? `${remoteBase}/project-sheets/${encodeURIComponent(projectSheet)}${PROJECT_SHEET_EXTENSION}`
+          : undefined,
+    };
+  }, [isRemote, localBase, picture, projectSheet, remoteBase]);
+
+  const renderImg =
+    shouldLoad && src ? (
+      <img
+        className={style.picturesToScroll__img}
+        src={src}
+        alt={ariaLabel ? '' : `Project ${title}`}
+        loading={loading}
+        decoding='async'
+        width={1600}
+        height={900}
+        tabIndex={-1}
+        sizes='(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 100vw'
+        {...({ fetchpriority: isCurrent ? 'high' : 'auto' } satisfies FetchPriorityAttr)}
+      />
+    ) : null;
+
+  const classes = getClassModifier(index)
+    .map((name) => style[name])
+    .join(' ');
 
   return (
     <div
-      key={slide.id}
-      className={getClassModifier(index)
-        .map((name) => style[name])
-        .join(' ')}
-      aria-hidden={ariaHidden}
-      aria-disabled={ariaHidden}
-      aria-current={isCurrent ? 'true' : undefined}
+      ref={wrapperRef}
+      className={`${classes} ${style.picturesToScroll}`}
+      aria-hidden={ariaHidden || undefined}
+      aria-disabled={ariaHidden || undefined}
       aria-label={`Slide ${index + 1} of ${totalSlides}`}
     >
-      <a
-        href={isCurrent ? address : ''}
-        target='_blank'
-        rel='noopener noreferrer'
-        className={style.picturesToScroll__link + (isCurrent ? '' : ` ${style['picturesToScroll__link--disabled']}`)}
-        aria-label={ariaLabel}
-        tabIndex={isCurrent ? 0 : -1}
-      >
-        <img
-          ref={imgRef}
-          className={style.picturesToScroll__link__picture}
-          src={inView ? src : ''}
-          alt={`Project ${title}`}
-          loading={loading}
-        />
-      </a>
+      {isCurrent && href ? (
+        <a
+          href={href}
+          target='_blank'
+          rel='noopener noreferrer'
+          className={style.picturesToScroll__link}
+          aria-label={ariaLabel ?? `Voir la fiche PDF détaillée du project ${title}`}
+          aria-current='true'
+        >
+          <div className={style.picturesToScroll__frame}>{renderImg}</div>
+        </a>
+      ) : (
+        <span
+          className={`${style.picturesToScroll__link} ${style['picturesToScroll__link--disabled']}`}
+          aria-disabled='true'
+        >
+          <div className={style.picturesToScroll__frame}>{renderImg}</div>
+        </span>
+      )}
     </div>
   );
 }

@@ -38,6 +38,14 @@
     "noFallthroughCasesInSwitch": true
   },
   // NOTE: paths depuis src/** etc. ajoutés sans résultat
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.js", "vite.config.ts", ".eslintrc.cjs"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "vite.config.ts",
+    ".eslintrc.cjs",
+    "types"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -255,3 +255,5 @@ export type SlideStyle =
  * @typedef {SlideshowAction | SlideDirection | SlideTransition | number} Payload
  */
 export type Payload = SlideshowAction | SlideDirection | SlideTransition | number;
+
+export type FetchPriorityAttr = { fetchpriority: 'auto' | 'high' | 'low' };

@@ -88,6 +88,15 @@ const ADJACENT_VISIBILITY = 'adjacent';
 const INTERSECTION_OPTIONS_THRESHOLD = { threshold: [0.1] };
 
 /**
+ * Defined the file type used for the slide image and the project sheet
+ *
+ * @constant {string} PICTURE_EXTENSION - Extension of the image file used on the slide.
+ * @constant {string} PROJECT_SHEET_EXTENSION - Extension of the project sheet.
+ */
+const PICTURE_EXTENSION = '.webp';
+const PROJECT_SHEET_EXTENSION = '.pdf';
+
+/**
  * ARIA labels for accessibility purposes in the slideshow.
  *
  * @constant {string} ARIA_LABEL_NEXT - ARIA label for the next slide button.
@@ -126,4 +135,6 @@ export {
   STOP,
   TRANSFORM_TRANSITION,
   TRANSITION_EFFECT,
+  PICTURE_EXTENSION,
+  PROJECT_SHEET_EXTENSION,
 };

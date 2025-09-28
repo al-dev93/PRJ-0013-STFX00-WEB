@@ -50,7 +50,7 @@ function MemoizedPicturesScroller({
   const { slideEffectStyle } = usePicturesScroller(slideshowState, duration);
 
   /**
-   * Extracts the slides befor the first and after the last used to createthe illusion of an infinite slideshow
+   * Extracts the slides before the first and after the last used to createthe illusion of an infinite slideshow
    *
    * @type {ProjectData}
    */
@@ -78,6 +78,7 @@ function MemoizedPicturesScroller({
             totalSlides={slideContent.length}
             getClassModifier={getClassModifier}
             isAdjacent={false}
+            isCurrent={slideshowState.new === slideContent.length - 1 && slideshowState.loopSlide}
             ariaHidden
             ariaLabel={prependSlide.title}
           />
@@ -100,6 +101,7 @@ function MemoizedPicturesScroller({
             totalSlides={slideContent.length}
             getClassModifier={getClassModifier}
             isAdjacent={false}
+            isCurrent={slideshowState.new === 0 && slideshowState.loopSlide}
             ariaHidden
             ariaLabel={appendSlide.title}
           />
