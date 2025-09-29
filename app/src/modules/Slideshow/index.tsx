@@ -13,7 +13,7 @@ import { slideshowReducer } from './reducer/slideshowReducer';
 import style from './style.module.css';
 import type { SlideshowProps } from './types';
 import { INIT_MAX_INDEX_SLIDE, PENDING, SLIDE_TRANSITION, START, STOP } from './utils/constants';
-
+import { ProjectSheetLink } from '../../components/ProjectSheetLink';
 /**
  * This component displays a slideshow of projects using either provided data or fetched data.
  *
@@ -75,6 +75,8 @@ function MemoizedSlideshow({
     return () => clearTimeout(timer);
   }, [slideshowState.slideTransition]);
 
+  // const { isRemote, urlBase } = getUrlBase();
+
   /**
    * Determines the active slide based on the current transition state.
    *
@@ -94,7 +96,14 @@ function MemoizedSlideshow({
         <PicturesScroller slideContent={data} slideshowState={slideshowState} slideshowDispatch={slideshowDispatch} />
         <Fade state={slideshowState}>
           <div className={style.slideshowWrapper}>
-            <p className={style.description}>{activeSlide.description}</p>
+            <p className={style.description}>
+              {activeSlide.description}
+              <ProjectSheetLink
+                projectSheet={activeSlide.projectSheet}
+                title={activeSlide.title}
+                className={style.projectLink}
+              />
+            </p>
             <footer className={style.footer}>
               <SkillsList list={activeSlide.tags} tagType={FILLED_STYLE} />
               <SocialMediaNavBar

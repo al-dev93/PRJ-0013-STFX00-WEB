@@ -27,8 +27,18 @@
 /* Text style for the description below the slideshow */
 .description {
   padding: 8px 20px 5px;
+  text-align: justify;
+  text-align-last: left;
   font-size: var(--fs-xs);
   color: var(--tertiary-color);
+  display: flow-root;
+  line-height: 1.45;
+}
+
+/* Link to open the detailled project sheet in PDF format */
+.projectLink {
+  float: right;
+  margin-left: 1em;
 }
 
 /* Styles for navigation buttons */
@@ -54,9 +64,25 @@
   background-color: var(--quaternary-color);
 }
 
+@media (forced-colors: active) {
+  .linkPdf:focus-visible {
+    outline: 2px solid ButtonText;
+    outline-offset: 2px;
+  }
+}
+
 /* Mouse only */
 @media (hover: hover) and (pointer: fine) {
   .externalLinks:hover {
     color: var(--white);
+  }
+}
+
+@media (max-width: 480px) {
+  .projectLink {
+    float: none;
+    display: inline-block;
+    margin-left: 0.5rem;
+    margin-top: 0.4rem;
   }
 }

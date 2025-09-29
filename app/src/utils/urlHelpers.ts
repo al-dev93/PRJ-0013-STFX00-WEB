@@ -224,3 +224,15 @@ export function getFetchUrlOrUrls({
     ? getEdgeFunctionConfig(endpoint as string, initialOptions.method ?? 'GET')
     : getRestApiConfig(endpoint, initialOptions.method ?? 'GET');
 }
+
+export function getUrlBase(): { isRemote: boolean; urlBase: string } {
+  const isRemote = import.meta.env.VITE_FETCH_MODE === 'remote';
+  const remoteBase = String(import.meta.env.VITE_BUCKET_REMOTE || '').replace(/\/+$/, '');
+  const localBase = String(import.meta.env.VITE_BUCKET_LOCAL || '').replace(/\/+$/, '');
+
+  return isRemote ? { urlBase: remoteBase, isRemote } : { urlBase: localBase, isRemote };
+}
+
+export function encodePath(p: string): string {
+  return p.split('/').map(encodeURIComponent).join('/');
+}

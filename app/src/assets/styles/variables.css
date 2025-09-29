@@ -47,6 +47,11 @@
   --primary-bg-alert-color: rgba(201, 24, 31, 0.15);
   --panel-bg: rgba(139, 108, 80, 0.16);
   --modal-backdrop-color: rgba(0, 53, 84, 0.7);
+  --link: #2456a6;
+  --link-hover: #1a3f7a;
+  --link-visited: #6a2bbf;
+  --link-underline-thickness: 2px;
+  --link-underline-offset: 0.14em;
   --focus-ring: #2257e6; /* couleur du ring */
   /* border */
   --br-xxs: 4px;
@@ -80,3 +85,11 @@
   --button-link-icon-size: 2rem;
   --button-link-outline: 2px solid var(--decorative-dark);
 }
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --link: #86b7ff;
+    --link-hover: #d0e2ff;
+    --link-visited: #c1a3ff;
+  }
+} */

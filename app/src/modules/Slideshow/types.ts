@@ -135,6 +135,20 @@ export type FadeProps = {
 };
 
 /**
+ * Props for the ProjectSheetLink component.
+ *
+ * @type {Object} ProjectSheetLinkProps
+ * @property {string} [projectSheet] - The project sheet identifier or relative path (without extension).
+ * @property {string} title - Project title used for the accessible label.
+ * @property {string} [className] - Optional CSS class to style the anchor element. Defaults to "link-pdf".
+ */
+export type ProjectSheetLinkProps = {
+  projectSheet?: string;
+  title: string;
+  className?: string;
+};
+
+/**
  * State for the slideshow component.
  * Contains information about the current slide, looping, and transitions.
  *

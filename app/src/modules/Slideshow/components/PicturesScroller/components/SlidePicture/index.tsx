@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useRef } from 'react';
 
+import { encodePath, getUrlBase } from '@/utils/urlHelpers';
 import { useOnScreen } from '@hooks/useOnScreen';
 import { EAGER_STATUS, LAZY_STATUS } from '@utils/constants';
 
@@ -40,10 +41,6 @@ function MemoizedSlidePicture({
   ariaHidden,
   ariaLabel,
 }: SlidePictureProps): React.JSX.Element {
-  const isRemote = import.meta.env.VITE_FETCH_MODE === 'remote';
-  const remoteBase = String(import.meta.env.VITE_BUCKET_REMOTE || '').replace(/\/+$/, '');
-  const localBase = String(import.meta.env.VITE_BUCKET_LOCAL || '').replace(/\/+$/, '');
-
   const { picture, title, projectSheet } = slide;
 
   /**
@@ -66,19 +63,17 @@ function MemoizedSlidePicture({
   const shouldLoad = inView || isAdjacent;
   const loading = shouldLoad ? EAGER_STATUS : LAZY_STATUS;
 
-  const encodePath = (p: string) => p.split('/').map(encodeURIComponent).join('/');
-
   const { src, href } = useMemo(() => {
-    const srcBase = isRemote ? `${remoteBase}/images` : localBase;
+    const { isRemote, urlBase } = getUrlBase();
 
     return {
-      src: picture ? `${srcBase}/${encodePath(picture)}${PICTURE_EXTENSION}` : undefined,
+      src: picture ? `${urlBase}/images/${encodePath(picture)}${PICTURE_EXTENSION}` : undefined,
       href:
         isRemote && projectSheet
-          ? `${remoteBase}/project-sheets/${encodeURIComponent(projectSheet)}${PROJECT_SHEET_EXTENSION}`
+          ? `${urlBase}/project-sheets/${encodePath(projectSheet)}${PROJECT_SHEET_EXTENSION}`
           : undefined,
     };
-  }, [isRemote, localBase, picture, projectSheet, remoteBase]);
+  }, [picture, projectSheet]);
 
   const renderImg =
     shouldLoad && src ? (

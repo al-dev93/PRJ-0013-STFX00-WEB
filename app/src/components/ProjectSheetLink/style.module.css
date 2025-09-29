@@ -1,0 +1,70 @@
+/* Base appearance and layout */
+.linkPdf {
+  display: flex; /* Allow icon + text alignment */
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  padding: 0 0.25rem;
+  outline: none; /* :focus-visible used with a custom outline */
+  transition:
+    color 150ms ease,
+    transform 120ms ease;
+}
+
+/* Enforce uniform color for normal and visited states */
+.linkPdf,
+.linkPdf:visited {
+  color: var(--link);
+}
+
+/* Interactive states: make the link feel clickable without overpowering */
+.linkPdf:hover,
+.linkPdf:focus-visible {
+  color: var(--link-hover);
+  text-decoration: underline;
+  text-decoration-thickness: var(--link-underline-thickness);
+  text-underline-offset: var(--link-underline-offset);
+  transform: translateY(-1px);
+}
+
+/* Accessible focus outline that matches the design system */
+.linkPdf:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Icon sizing follows the text color via currentColor */
+.linkPdf .icon {
+  width: 1.1em; /* Scales with font size */
+  height: 1.1em;
+  flex: 0 0 auto; /* Prevent icon from shrinking */
+}
+
+/* High-contrast mode support:
+   - Respect system link colors
+   - Ensure visible focus outline with system color */
+@media (forced-colors: active) {
+  .linkPdf,
+  .linkPdf:visited,
+  .linkPdf:hover,
+  .linkPdf:focus-visible {
+    color: LinkText; /* System-defined link color */
+  }
+  .linkPdf:focus-visible {
+    outline: 2px solid ButtonText; /* High-contrast friendly ring */
+  }
+}
+
+/* Motion sensitivity:
+   - Remove transitions and lifts when the user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .linkPdf {
+    transition: none;
+  }
+  .linkPdf:hover,
+  .linkPdf:focus-visible {
+    transform: none;
+  }
+}
