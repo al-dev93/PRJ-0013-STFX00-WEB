@@ -3,7 +3,7 @@ import React, { memo, useMemo } from 'react';
 import { encodePath, getUrlBase } from '@/utils/urlHelpers';
 
 import styles from './style.module.css';
-import { ProjectSheetLinkProps } from '../../modules/Slideshow/types';
+import { ProjectSheetLinkProps } from './types';
 import { PROJECT_SHEET_EXTENSION } from '../../modules/Slideshow/utils/constants';
 
 /**
@@ -27,7 +27,12 @@ import { PROJECT_SHEET_EXTENSION } from '../../modules/Slideshow/utils/constants
  * - `encodePath()` is applied segment-wise to preserve slashes while encoding.
  * - The visible text is intentionally concise; the `aria-label` carries fuller context.
  */
-function MemoizedProjectSheetLink({ projectSheet, title, className }: ProjectSheetLinkProps): React.JSX.Element | null {
+function MemoizedProjectSheetLink({
+  projectSheet,
+  title,
+  linkLabel,
+  className,
+}: ProjectSheetLinkProps): React.JSX.Element | null {
   const { isRemote, urlBase } = useMemo(() => getUrlBase(), []);
 
   const href = useMemo(() => {
@@ -61,7 +66,7 @@ function MemoizedProjectSheetLink({ projectSheet, title, className }: ProjectShe
         <path d='M9 13h6' />
         <path d='M9 17h6' />
       </svg>
-      Lire la fiche projet (PDF)
+      {linkLabel}
       <span className='visually-hidden'> — ouvre dans un nouvel onglet</span>
     </a>
   );

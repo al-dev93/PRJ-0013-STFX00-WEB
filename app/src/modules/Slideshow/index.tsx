@@ -101,6 +101,7 @@ function MemoizedSlideshow({
               <ProjectSheetLink
                 projectSheet={activeSlide.projectSheet}
                 title={activeSlide.title}
+                linkLabel='Voir la fiche projet (PDF)'
                 className={style.projectLink}
               />
             </p>

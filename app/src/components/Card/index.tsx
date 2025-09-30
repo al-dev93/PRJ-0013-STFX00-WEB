@@ -120,6 +120,7 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
           <ProjectSheetLink
             projectSheet={cardData.projectSheet}
             title={cardData.title}
+            linkLabel='Voir la fiche projet'
             className={style.card__description__projectLink}
           />
         </p>
