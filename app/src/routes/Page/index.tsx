@@ -58,7 +58,7 @@ export function Page(): React.JSX.Element {
 
   // Contact dialog UI state and unique id.
   const [openContactFormDialog, setOpenContactFormDialog] = useState<boolean>(false);
-  const modalId = useId();
+  const modalId = `modal-${useId()}`;
 
   // Fallback section id when no hash is present.
   const DEFAULT_ID = 'home';

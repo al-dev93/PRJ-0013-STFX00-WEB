@@ -22,48 +22,73 @@ export type ModalButton = {
   ariaLabel?: string;
 };
 
+/** Common fields shared by all modal variants. */
+interface ModalBaseProps {
+  /** Modal content. */
+  children: ReactNode;
+  /** Extra class names applied to the root <dialog>. */
+  className?: string;
+  /** Controls visibility. */
+  open: boolean;
+  /** State setter that opens/closes the dialog. */
+  setOpen: SetStateBoolean;
+  /** Whether to render the top-right close (X) button. */
+  closeIcon?: boolean;
+  /** Primary action button configuration (footer). */
+  button?: ModalButton;
+  /** Unique, stable id used to build ARIA ids. */
+  modalId: string;
+  /** Extra SR-only text announced once on open. */
+  srOnlyDescription?: string;
+}
+
+/** Standard modal (with title/subtitle). */
+interface StandardModalProps extends ModalBaseProps {
+  /** Visible title; also used for the accessible name when present. */
+  title?: string;
+  /** Visible subtitle; used as ARIA description when the title is active. */
+  subtitle?: string;
+  /**
+   * Wait for children to mount before opening.
+   * Helps avoid empty SR announcements and focus jumps.
+   */
+  onRenderComplete?: boolean;
+  /** Explicit focus order; overrides auto-discovery. */
+  focusableElements?: HTMLElement[];
+  /** Not applicable for the standard variant. */
+  closeParentModal?: never;
+  /** Not applicable for the standard variant. */
+  customStyle?: never;
+}
+
+/** Alert-style modal (nested/stacked flows). */
+interface AlertModalProps extends ModalBaseProps {
+  /**
+   * Close the parent modal when this one closes.
+   * Useful for nested modal flows.
+   */
+  closeParentModal?: SetStateBoolean;
+  /** Discriminant for the alert visual/behavioral variant. */
+  customStyle: 'alert';
+  /** Titles are intentionally not used on the alert variant. */
+  title?: never;
+  subtitle?: never;
+  onRenderComplete?: never;
+  focusableElements?: never;
+}
+
 /**
  * Props for the Modal component.
  *
- * @type {object} ModalProps
- * @property {ReactNode} children - The children elements to display inside the modal.
- * @property {string} [className] - Additonal class names to apply to the modal.
- * @property {boolean} open - Indicates whether the modal is open.
- * @property {SetStateBoolean} setOpen - Function to set the open state of the modal.
- * @property {ModalButton} [button] - The button configuration for the modal.
- * @property {string} modalId - The id of the modal.
- * @property {boolean} [closeIcon] - Indicates if there is a modal close button.
- * @property {string} [title] - The title of the modal.
- * @property {string} [subtitle] - The subtitle of the modal.
- * @property {boolean} [onRenderComplete] - A flag to warm if a child component is rendered.
- * @property {SetStateBoolean} [closeParentModal] - Function to close the parent modal.
- * @property {'alert'} [customStyle] - Custom style for the modal.
+ * @remarks
+ * Discriminated union on `customStyle`:
+ * - **Standard (default)**: omit `customStyle`. Supports `title`, `subtitle`,
+ *   `onRenderComplete`, and `focusableElements`.
+ * - **Alert**: set `customStyle: 'alert'` and provide `closeParentModal`. Titles are not used.
  *
- * @al-dev93
+ * Quick reference:
+ * - children, className, open, setOpen, closeIcon, button, modalId, srOnlyDescription
+ * - (Standard) title, subtitle, onRenderComplete, focusableElements
+ * - (Alert) customStyle: 'alert', closeParentModal
  */
-export type ModalProps = {
-  children: ReactNode;
-  className?: string;
-  open: boolean;
-  setOpen: SetStateBoolean;
-  closeIcon?: boolean;
-  button?: ModalButton;
-  modalId: string;
-} & (
-  | {
-      title?: string;
-      subtitle?: string;
-      onRenderComplete?: boolean;
-      focusableElements?: HTMLElement[];
-      closeParentModal?: never;
-      customStyle?: never;
-    }
-  | {
-      title?: never;
-      subtitle?: never;
-      onRenderComplete?: never;
-      focusableElements?: never;
-      closeParentModal?: SetStateBoolean;
-      customStyle: 'alert';
-    }
-);
+export type ModalProps = StandardModalProps | AlertModalProps;

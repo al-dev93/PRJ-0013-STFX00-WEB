@@ -1,5 +1,5 @@
 import IonIcon from '@reacticons/ionicons';
-import React, { KeyboardEvent, MouseEvent, useCallback, useEffect, useRef } from 'react';
+import React, { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import type { KeyboardEventButton, KeyboardEventDiv } from '@/types';
@@ -9,30 +9,14 @@ import { createError } from '@modules/Error/utils/errorHandling';
 
 import style from './style.module.css';
 import type { ModalProps } from './types';
-/**
- * Handles the focus of the elements in the modal when the user navigates with the keyboard.
- *
- * @param {KeyboardEventDiv} event - The keyboard event that triggered the function.
- * @param {number} index - The index of the currently focused element.
- * @param {HTMLElement[]} elements - The array of focusable elements in the modal.
- *
- * @remarks
- * If the shift key is pressed, the function will focus the previous element.
- * If the shift key is not pressed, the function will focus the next element.
- * If the index is at the start or end of the array, the function will loop around to the other end.
- *
- * @al-dev93
- */
+
 function setFocusToElement(event: KeyboardEventDiv, index: number, elements: HTMLElement[]): void {
+  // Prevent default tab behavior so we can loop within the modal instead of letting focus escape.
+  // We wrap around at boundaries (0 and last) to maintain a stable, cyclic tab order.
   event.preventDefault();
   event.stopPropagation();
   let nextIndex = index;
 
-  /*
-    If the shift key is pressed, go to the previous element
-    Otherwise go to the next element
-    If the index is at the start or end of the array, loop around to the other end
-  */
   if (event.shiftKey) nextIndex = index === 0 ? elements.length - 1 : index - 1;
   else nextIndex = index === elements.length - 1 ? 0 : index + 1;
 
@@ -40,26 +24,45 @@ function setFocusToElement(event: KeyboardEventDiv, index: number, elements: HTM
 }
 
 /**
- * Modal component that display a modal dialog.
+ * Accessible modal dialog using the native <dialog> element.
  *
- * @component
- * @param {ModalProps} props - The properties for the Modal component.
- * @property {ReactNode} children - The children elements to display inside the modal.
- * @property {string} [className] - Additional class names to apply to the modal.
- * @property {boolean} open - Indicates whether the modal is open.
- * @property {SetStateBoolean} setOpen - Function to set the open state of the modal.
- * @property {ModalButton} [button] - The button configuration for the modal.
- * @property {string} modalId - The id of the modal.
- * @property {boolean} [closeIcon] - Indicates if there is a modal close button.
- * @property {string} [title] - The title of the modal.
- * @property {string} [subtitle] - The subtitle of the modal.
- * @property {boolean} [onRenderComplete] - A flag to warm if a child component is rendered.
- * @property {HTMLElement[]} [focusableElements] - The focusable elements in the modal.
- * @property {SetStateBoolean} [closeParentModal] - Function to close the parent modal.
- * @property {'alert'} [customStyle] - Custom style for the modal.
- * @returns {React.JSX.Element} The rendered modal component.
+ * Responsibilities:
+ * - Open/close via showModal()/close(), including ESC and backdrop click.
+ * - Deterministic keyboard traversal (Tab/Shift+Tab) with wrap-around.
+ * - First focus management and SR-friendly announcements on open.
  *
- * @al-dev93
+ * @remarks Full props in {@link ModalProps | ModalProps (standard vs alert)}.
+ *
+ * @param props - Component props.
+ * @param props.children - Modal content.
+ * @param props.className - Extra class names applied to the root <dialog>.
+ * @param props.open - Controls visibility.
+ * @param props.setOpen - Opens/closes the dialog.
+ * @param props.button - Primary action button (footer).
+ * @param props.modalId - Stable id used to build ARIA ids.
+ * @param props.closeIcon - Render the top-right close (X) button.
+ * @param props.title - (Standard) Visible title and SR name.
+ * @param props.subtitle - (Standard) Visible subtitle; SR description when title is active.
+ * @param props.srOnlyDescription - Extra SR-only text announced once on open.
+ * @param props.onRenderComplete - (Standard) Wait for children before opening (avoids empty SR announcements).
+ * @param props.focusableElements - (Standard) Explicit focus order; overrides auto-discovery.
+ * @param props.closeParentModal - (Alert) Close the parent modal when this one closes.
+ * @param props.customStyle - (Alert) Visual/behavioral variant; set to 'alert'.
+ * @returns React.JSX.Element
+ *
+ * @example
+ * ```tsx
+ * <Modal
+ * open={open}
+ * setOpen={setOpen}
+ * modalId="contact"
+ * closeIcon
+ * title="Contact"
+ * subtitle="Drop us a line"
+ * >
+ * <ContactForm />
+ * </Modal>
+ * ```
  */
 export function Modal({
   children,
@@ -71,6 +74,7 @@ export function Modal({
   closeIcon,
   title,
   subtitle,
+  srOnlyDescription,
   onRenderComplete,
   focusableElements,
   closeParentModal,
@@ -82,92 +86,89 @@ export function Modal({
   const closeRef = useRef<HTMLButtonElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const childrenRef = useRef<HTMLDivElement>(null);
-  const lastFormChildRef = useRef<HTMLTextAreaElement>();
-  const titleRef = useRef<HTMLDivElement>(null);
+  const onFirstCycleRef = useRef<boolean>(true);
+
+  // SR-only IDs that back the accessible name/description and the open announcement
+  const srTitleId = useMemo<string>((): string => `${modalId}-title-sr`, [modalId]);
+  const srSubId = useMemo<string>((): string => `${modalId}-subtitle-sr`, [modalId]);
+  const liveId = useMemo<string>((): string => `${modalId}-open-live`, [modalId]);
+
+  // Live text on opening (announced once, then cleared)
+  const [liveText, setLiveText] = useState<string>('');
+  const [hasDialogTitle, setHasDialogTitle] = useState<boolean>(true);
 
   /**
-   * Closes the modal and prevents the event from propagating.
-   *
-   * @param {KeyboardEvent | MouseEvent | Event} event - The trigger event.
+   * Close helper shared by click, key, cancel and backdrop flows.
    */
   const setOpenFalse = useCallback(
     (event: KeyboardEvent | MouseEvent | Event): void => {
       event.preventDefault();
       event.stopPropagation();
-
       setOpen(false);
     },
     [setOpen],
   );
 
-  /**
-   * Handles the click event on the close button.
-   *
-   * @param {MouseEvent<HTMLButtonElement>} e - The mouse event.
-   */
   const handleCloseClick = (e: MouseEvent<HTMLButtonElement>): void => setOpenFalse(e);
-
-  /**
-   * Handles the key down event on the close button.
-   *
-   * @param {KeyboardEventButton} e - The keyboard event.
-   */
   const handleCloseKeyDown = (e: KeyboardEventButton): void => {
     if (e.code === 'Enter') setOpenFalse(e);
   };
 
   /**
-   * Handles the 'Tab' key press event to manage focus navigation within the modal.
-   * It cycles through the focusable elements: close button, any additional focusable elements,
-   * and the main button, wrapping around when reaching the first or last element.
+   * Custom focus traversal for Tab / Shift+Tab when the dialog is open.
+   * We build an ordered list:
+   * 1) close button (if present),
+   * 2) provided `focusableElements` or an auto-discovered list,
+   * 3) primary action button (if enabled).
    *
-   * @param {KeyboardEventDiv} e - The keyboard event triggering the focus change.
-   * Ensures smooth keyboard navigation by setting focus to the next or previous focusable element.
+   * Rationale:
+   * - Keeps a consistent, predictable order regardless of DOM structure.
+   * - Ensures the primary action is reachable but not focused first (close gets priority for dismissable modals).
    */
   const handleTabIndex = (e: KeyboardEventDiv): void => {
-    if ((!closeRef.current || !buttonRef.current) && !focusableElements) return;
-    const keyboardNavigableElements: HTMLElement[] = [];
+    const dialogNode = dialogRef.current;
+    if (!dialogNode) return;
 
+    const keyboardNavigableElements: HTMLElement[] = [];
     if (closeRef.current) keyboardNavigableElements[0] = closeRef.current;
 
-    const inDialog = dialogRef.current;
-    if (inDialog) {
-      const autoList = Array.from(
-        inDialog.querySelectorAll<HTMLElement>(
+    let autoList: HTMLElement[] = [];
+
+    // If the caller doesn't provide an explicit focus list, fall back to a conservative selector.
+    // Avoid hidden/disabled nodes and respect custom tabindex (except -1). We intentionally omit
+    // [contenteditable="true"] unless your use-case requires it; add it to the selector if needed.
+    if (!focusableElements) {
+      autoList = Array.from(
+        dialogNode.querySelectorAll<HTMLElement>(
           'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
             'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
         ),
       );
-
-      keyboardNavigableElements.push(...(focusableElements ?? autoList));
     }
 
-    // if (focusableElements) keyboardNavigableElements = [...keyboardNavigableElements, ...focusableElements];
+    keyboardNavigableElements.push(...(focusableElements ?? autoList));
+
     if (!buttonRef.current?.disabled) keyboardNavigableElements.push(buttonRef.current as HTMLElement);
 
+    // Compute the current position in the traversal and handle Tab only (ignore other keys here).
     const indexOfActiveElement = keyboardNavigableElements.indexOf(document.activeElement as HTMLElement);
-
     if (indexOfActiveElement >= 0 && e.code === 'Tab') {
       setFocusToElement(e, indexOfActiveElement, keyboardNavigableElements);
     }
   };
 
   /**
-   * Handles the closing of the modal when a click is made outside of it.
+   * Close on backdrop clicks.
+   * Note: clicks on the <dialog> element (not its inner wrapper) represent backdrop clicks.
+   * We attach the listener directly to the dialog node to avoid false positives.
    */
   useEffect(() => {
     const dialogNode = dialogRef.current;
     if (!dialogNode) return () => {};
 
-    /**
-     * Handles the click outside Modal.
-     *
-     * @async
-     * @param {Event} e - The trigger event.
-     * @returns {Promise<void>}
-     */
     const handleOutsideClick = async (e: Event): Promise<void> => {
       try {
+        // Treat clicks on the dialog backdrop (event target === dialog) as a dismiss action.
         if (e.target === dialogNode) setOpenFalse(e);
       } catch (err) {
         await handleError(createError(1003, 'Error in click event outside modal window'), {
@@ -183,150 +184,121 @@ export function Modal({
   }, [handleError, setOpenFalse]);
 
   /**
-   * Handles the opening and closing of the modal.
+   * Open/close lifecycle.
+   * - Call `showModal()` only when the dialog is rendered and `open` is true.
+   * - On close, also notify a parent modal if required (nested modals use `closeParentModal`).
+   *
+   * Guarding on `onRenderComplete` allows child content to mount before we open,
+   * avoiding "empty" announcements or focus jumps.
    */
   useEffect(() => {
     const dialogNode = dialogRef.current;
 
     if (!dialogNode) return;
 
-    /**
-     * Handles opening and closing modal
-     *
-     * @async
-     * @returns {Promise<void>}
-     */
-    // const handleModalOpenClose = async (): Promise<void> => {
-    // const handleModalOpenClose = (): void => {
-    // try {
     if (open) {
-      lastFormChildRef.current = childrenRef.current?.getElementsByTagName('textarea').item(0) || undefined;
-      if (onRenderComplete === true || onRenderComplete === undefined) {
-        dialogNode.showModal();
-        if (!dialogNode.hasAttribute('tabindex')) dialogNode.tabIndex = -1;
-
-        // Focus the dialog container so SR announces it consistently
-        dialogNode.focus();
-        //   const auto = dialogNode.querySelector<HTMLElement>('[autofocus]');
-        //   if (auto) {
-        //     auto.focus();
-        //     return;
-        //   }
-        //   const firstFocusable = dialogNode.querySelector<HTMLElement>(
-        //     'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
-        //       'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        //   );
-        //   if (firstFocusable) {
-        //     firstFocusable.focus();
-        //   } else {
-        //     // 3) Fallback : focus sur le dialog lui-même (lis le titre + descr.)
-        //     dialogNode.focus();
-        //   }
-        // }
-      }
-    } else {
+      if (!dialogNode.open && (onRenderComplete === true || onRenderComplete === undefined)) dialogNode.showModal();
+    } else if (dialogNode.open) {
       dialogNode.close();
       if (closeParentModal) closeParentModal((state) => !state);
     }
-
-    // } catch (err) {
-    //   await handleError(createError(3003, 'Error opening or closing the modal window'), {
-    //     component: 'Modal',
-    //     operation: open ? 'openModal' : 'closeModal',
-    //     url: window.location.href,
-    //   });
-    // }
-    // };
-
-    // handleModalOpenClose();
-  }, [closeParentModal, handleError, onRenderComplete, open]);
+  }, [closeParentModal, onRenderComplete, open]);
 
   /**
-   * Handles the focus of the title element when the modal is opened.
-   * Necessary for the screen reader to read the title and slogan of the contact form.
+   * Initial focus on open:
+   * - Prefer the close button for dismissable modals; otherwise focus the first interactive element.
+   * - Use a double requestAnimationFrame to wait for layout & paint so the focus call:
+   *   a) hits mounted nodes,
+   *   b) does not cause unexpected scroll (we pass { preventScroll: true }).
+   *
+   * Rationale: avoids race conditions with portals and late-rendered children.
    */
-  // useEffect(() => {
-  //   // const closeNode = closeRef.current;
-  //   // const titleNode = titleRef.current;
-  //   const dialogNode = dialogRef.current;
-  //   if (!dialogNode) return;
+  useEffect(() => {
+    if (!open) return () => {};
+    const dialogNode = dialogRef.current;
 
-  //   // if (!titleNode) return;
+    if (!dialogNode) return () => {};
 
-  //   if (open && onRenderComplete) {
-  //         const auto = dialogNode.querySelector<HTMLElement>('[autofocus]');
-  //         if (auto) {
-  //           auto.focus();
-  //           return;
-  //         }
-  //         const firstFocusable = dialogNode.querySelector<HTMLElement>(
-  //           'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
-  //             'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-  //         );
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        if (closeRef.current) closeRef.current.focus({ preventScroll: true });
+        else {
+          dialogNode
+            .querySelector<HTMLElement>(
+              'input:not([disabled]):not([tabindex="-1"]), ' +
+                'textarea:not([disabled]):not([tabindex="-1"]), ' +
+                'button:not([disabled]):not([tabindex="-1"]), ' +
+                'select:not([disabled]):not([tabindex="-1"]), ' +
+                '[tabindex]:not([tabindex="-1"])',
+            )
+            ?.focus({ preventScroll: true });
+        }
+      });
+    });
 
-  //         if (firstFocusable) {
-  //           firstFocusable.focus();
-  //         } else {
-  //           dialogNode.focus();
-  //       } else {
-  //   node.close();
-  //   if (closeParentModal) closeParentModal((s) => !s);
-  // }
-
-  //   // /**
-  //   //  * Handles focus when the modal is opened.
-  //   //  *
-  //   //  * @async
-  //   //  * @returns {Promise<void>}
-  //   //  */
-  //   // const handleFocus = async (): Promise<void> => {
-  //   //   try {
-  //   //     if (open && onRenderComplete) {
-  //   //       const auto = dialogNode.querySelector<HTMLElement>('[autofocus]');
-  //   //       if (auto) {
-  //   //         auto.focus();
-  //   //         return;
-  //   //       }
-  //   //       const firstFocusable = dialogNode.querySelector<HTMLElement>(
-  //   //         'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
-  //   //           'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-  //   //       );
-
-  //   //       if (firstFocusable) {
-  //   //         firstFocusable.focus();
-  //   //       } else {
-  //   //         dialogNode.focus();
-  //   //       }
-  //   //       // titleNode.focus();
-  //   //       // setTimeout(() => {
-  //   //       //   closeNode?.focus();
-  //   //       // }, 200);
-  //   //     }
-  //   //   } catch (err) {
-  //   //     await handleError(createError(2003, 'Focus timeout error on close icon after opening modal window'), {
-  //   //       component: 'Modal',
-  //   //       operation: 'focusTitleNode',
-  //   //       url: window.location.href,
-  //   //     });
-  //   //   }
-  //   // };
-
-  //   // handleFocus();
-  // }, [handleError, onRenderComplete, open]);
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [open]);
 
   /**
-   * Handles cancellation of the modal (possible 'esc' or other native cancellation).
+   * Opening announcement via polite live region:
+   * - Concatenates title, subtitle, and SR-only description on first open cycle.
+   * - Uses a small timeout to avoid overlapping native dialog announcements (varies by AT/browser).
+   * - Clears after the first user interaction to prevent re-reading during navigation.
+   *
+   * `hasDialogTitle` toggles the labelling strategy below (aria-labelledby vs aria-label).
+   */
+  useEffect(() => {
+    const dialogNode = dialogRef.current;
+
+    if (!open || !dialogNode) {
+      setLiveText('');
+      setHasDialogTitle(false);
+      onFirstCycleRef.current = true;
+      return () => {};
+    }
+
+    setHasDialogTitle(true);
+    let delay = 0;
+    if (onFirstCycleRef.current) {
+      // Small delay to defer after potential native <dialog> announcement in some AT/browser combos.
+      delay = window.setTimeout(() => {
+        setLiveText([title, subtitle, srOnlyDescription].filter(Boolean).join(' '));
+      }, 300);
+      onFirstCycleRef.current = false;
+    }
+    const clear = () => {
+      // After the first interaction, remove live text to prevent repeated reads when focus moves.
+      if (!onFirstCycleRef.current) setLiveText('');
+      setHasDialogTitle(false);
+    };
+
+    const addOptions: AddEventListenerOptions = { capture: true, once: true };
+    const removeCapture: boolean = true;
+    const types: (keyof HTMLElementEventMap)[] = ['keydown', 'pointerdown', 'mousedown', 'click', 'touchstart'];
+
+    types.forEach((type) => dialogNode.addEventListener(type, clear, addOptions));
+
+    return () => {
+      window.clearTimeout(delay);
+      types.forEach((type) => dialogNode.removeEventListener(type, clear, removeCapture));
+
+      setLiveText('');
+    };
+  }, [open, srOnlyDescription, subtitle, title]);
+
+  /**
+   * Handle native <dialog> "cancel" (usually Escape).
+   * We normalize to the same close path used elsewhere for consistency and error reporting.
    */
   useEffect(() => {
     const dialogNode = dialogRef.current;
     if (!dialogNode) return undefined;
 
-    /**
-     * Handles the cancel event.
-     * @async
-     * @param {Event} e - The cancel event.
-     * @returns {Promise<void>}
-     */
     const handleCancel = async (e: Event): Promise<void> => {
       try {
         setOpenFalse(e);
@@ -345,59 +317,73 @@ export function Modal({
     };
   }, [handleError, setOpenFalse]);
 
-  // Combine the custom style and className
+  // Compose BEM-style classes with runtime modifiers; keep "hidden" state on the root <dialog> for CSS transitions.
   const modalClassName = style.modal + (className ? ` ${className}` : '') + (!open ? ` ${style['modal--hidden']}` : '');
   const wrapperClassName = style.modal__wrapper + (customStyle ? ` ${style[`modal__wrapper--${customStyle}`]}` : '');
   const closeButtonClassName =
     style.modal__closeButton + (customStyle ? ` ${style[`modal__closeButton--${customStyle}`]}` : '');
 
+  // Mount into #app-container; if not found, fall back to document.body to avoid a hard crash in non-standard hosts.
   return createPortal(
+    // ARIA strategy:
+    // - Prefer aria-labelledby when we have a visible (for SR) title; fallback to aria-label otherwise.
+    // - aria-describedby is used only when a subtitle is present and the title is active.
+    // Note: The visual title/subtitle are aria-hidden to avoid duplicate reads; SR-only counterparts provide the name.
     <dialog
       className={modalClassName}
       id={modalId}
       ref={dialogRef}
       aria-modal='true'
-      aria-labelledby={title ? 'modal-title' : undefined}
-      aria-describedby={subtitle ? 'modal-description' : undefined}
-      tabIndex={-1}
+      aria-labelledby={hasDialogTitle ? srTitleId : undefined}
+      aria-label={!hasDialogTitle ? 'Contact' : undefined}
+      aria-describedby={subtitle && hasDialogTitle ? srSubId : undefined}
     >
-      <div
-        className={wrapperClassName}
-        role='presentation'
-        onKeyDown={closeIcon || button ? handleTabIndex : undefined}
-      >
-        {(closeIcon || title || subtitle) && (
-          <header className={style.modal__header}>
-            {closeIcon && (
-              <button
-                className={closeButtonClassName}
-                type='button'
-                ref={closeRef}
-                name='closeButton'
-                onClick={handleCloseClick}
-                onKeyDown={handleCloseKeyDown}
-                // tabIndex={0}
-                aria-label='Ferme le formulaire de contact'
-              >
-                <IonIcon name='close' aria-hidden='true' />
-              </button>
-            )}
-            {(title || subtitle) && (
-              <div className={style.modal__titleWrapper} ref={titleRef}>
-                {title && (
-                  <h3 id='modal-title' className={style.modal__title}>
-                    {title}
-                  </h3>
-                )}
-                {subtitle && (
-                  <p id='modal-description' className={style.modal__slogan}>
-                    {subtitle}
-                  </p>
-                )}
-              </div>
-            )}
-          </header>
-        )}
+      {/* 1) Persistent polite live region for the initial open announcement */}
+      <p id={liveId} role='status' aria-live='polite' aria-atomic='true' className='visually-hidden'>
+        {liveText}
+      </p>
+
+      {/* 2) Keyboard trap host: handles Tab navigation only when close icon or primary button are present */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <div className={wrapperClassName} onKeyDown={closeIcon || button ? handleTabIndex : undefined}>
+        {/* Accessible name/description for SR: SR-only title/subtitle mirror the visual content */}
+        <h3 id={srTitleId} className='visually-hidden' aria-hidden={!hasDialogTitle}>
+          {title}
+        </h3>
+        {subtitle ? (
+          <p id={srSubId} className='visually-hidden' aria-hidden={!hasDialogTitle}>
+            {subtitle}
+          </p>
+        ) : null}
+
+        <header className={style.modal__header}>
+          {closeIcon && (
+            <button
+              className={closeButtonClassName}
+              type='button'
+              ref={closeRef}
+              name='closeButton'
+              onClick={handleCloseClick}
+              onKeyDown={handleCloseKeyDown}
+              // Consider externalizing this string for i18n; keep it concise and action-oriented.
+              aria-label='Ferme le formulaire de contact'
+            >
+              <IonIcon name='close' aria-hidden='true' />
+            </button>
+          )}
+          <div className={style.modal__titleWrapper} aria-hidden='true'>
+            <h3 className={title ? style.modal__title : 'visually-hidden'} aria-hidden='true'>
+              {title ?? 'Modal Title'}
+            </h3>
+
+            {subtitle ? (
+              <p className={style.modal__slogan} aria-hidden='true'>
+                {subtitle}
+              </p>
+            ) : null}
+          </div>
+        </header>
+
         {open && (
           <div className={style.modal__innerWrapper} ref={childrenRef}>
             {children}

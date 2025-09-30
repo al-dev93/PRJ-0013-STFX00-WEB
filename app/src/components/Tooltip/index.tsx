@@ -62,7 +62,7 @@ export function Tooltip({
    *
    * @returns {string} Returns id
    */
-  const reactId = useId();
+  const reactId = `tooltip-${useId()}`;
   const tooltipId = isNonEmptyString(id) ? id : reactId;
 
   const handleError = useErrorHandler();

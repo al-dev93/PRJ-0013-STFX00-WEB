@@ -1,5 +1,8 @@
 .popover {
   position: absolute;
+  display: inline-grid;
+  grid-template-columns: max-content;
+  grid-auto-rows: auto;
   max-width: calc(100% - 10px);
   top: 100%;
   left: 4px;
@@ -12,23 +15,31 @@
   z-index: 100;
 }
 
-.popover__message {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: max-content;
-  padding: 8px 12px;
-  white-space: pre-line;
-  background-color: var(--popover-message-bg);
-  border-radius: 0 0 var(--br-xxs) var(--br-xxs);
+.popover__message,
+.popover__autocomplete {
+  grid-column: 1;
+  width: 100%;
+  min-width: 0;
   opacity: 0;
-  transition: opacity 200ms ease-in-out;
-  z-index: 200;
+  overflow-wrap: anywhere;
 }
 
-.popover__message--visible {
-  min-width: max-content;
+.popover__message {
+  grid-row: 1;
+  padding: 8px 12px;
+  background-color: var(--popover-message-bg);
+  border-radius: 0 0 var(--br-xxs) var(--br-xxs);
+  transition: opacity 200ms ease-in-out;
+}
+
+.popover__message--visible,
+.popover__autocomplete--visible {
   opacity: 1;
+}
+
+.popover__message--visible li {
+  display: block;
+  white-space: pre-line;
 }
 
 .popover__message--withoutSuggestions {
@@ -36,24 +47,21 @@
 }
 
 .popover__autocomplete {
+  grid-row: 2;
   display: block;
   max-height: 0px;
   overflow-y: auto;
-  opacity: 0;
   transition:
     max-height 200ms ease,
     opacity 200ms ease-in-out;
 }
 
 .popover__autocomplete--visible {
-  width: 100%;
   max-height: 120px;
-  margin-top: 33px;
-  opacity: 1;
 }
 
-.popover__autocomplete--withoutMessage {
-  margin-top: 0px;
+.popover__autocomplete[hidden] {
+  display: none;
 }
 
 .popover__autocomplete__item {

@@ -55,6 +55,7 @@ export function ModalDialogContactForm({
     [shouldFetch],
   );
   const { data: fetchedData, fetchError } = useFetchData({ endpoint, initialOptions: { method: 'GET' } });
+
   // Use formModalData if provided, otherwise use fetched data.
   const data = useMemo(
     (): ContactFormModal | ContactFormModal[] => formModalData || (fetchedData as ContactFormModal[]),
@@ -121,6 +122,7 @@ export function ModalDialogContactForm({
     id: idForm,
     title,
     subtitle,
+    srOnlyDescription,
     submitButtonName,
     alertOnSubmit,
     dataFormContent,
@@ -155,6 +157,7 @@ export function ModalDialogContactForm({
       modalId={modalId}
       title={title}
       subtitle={subtitle}
+      srOnlyDescription={srOnlyDescription}
       focusableElements={contactFormFocusableFields}
       onRenderComplete={isFormContentRendered}
       closeIcon

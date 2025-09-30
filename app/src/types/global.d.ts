@@ -194,20 +194,18 @@ export type Skill = {
  *
  * @type {object} ContactFormModal
  * @property {string} id - The unique identifier for the form.
- * @property {string} urlFormContent - The URL to fetch the form content.
- * @property {string} urlApi - The URL to send the form data to.
  * @property {string} submitButtonName - The name of the submit button.
  * @property {string} title - The title of the form.
  * @property {string} subtitle - The subtitle of the form.
+ * @property {string} [srOnlyDescription] - Descriptive text for SR only.
  * @property {string[]} alertOnSubmit - An array of error messages to display in the alert modal.
  */
 export type ContactFormModal = {
   id: string;
-  // endpoint: string;
-  // urlApi: string;
   submitButtonName: string;
   title: string;
   subtitle: string;
+  srOnlyDescription?: string;
   alertOnSubmit: string[];
   dataFormContent: ContactFormInput[];
 };

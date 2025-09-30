@@ -29,7 +29,7 @@ function MemoizedAlert({
   closeParentModal,
 }: AlertProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
-  const modalId = useId();
+  const modalId = `modal-alert-${useId()}`;
 
   const handlePropsValidity = useCallback(
     async (checkCategory?: 'type') => {

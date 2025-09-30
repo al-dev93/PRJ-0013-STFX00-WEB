@@ -1,5 +1,5 @@
 import IonIcon from '@reacticons/ionicons';
-import React, { LegacyRef, memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
+import React, { LegacyRef, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 
 import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
@@ -10,7 +10,6 @@ import { createError } from '@modules/Error/utils/errorHandling';
 import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
 import { useContactFormSelector } from '@modules/ModalDialogContactForm/hooks/useContactFormSelector';
 import {
-  PREFIX_AUTO_COMPLETE_ITEM_ID,
   SET_ERROR_MESSAGE,
   SET_INPUT_HOVER,
   SET_INPUT_NODE,
@@ -42,8 +41,10 @@ export function MemoizedDialogFormInput({
   name,
   tooltipContent,
 }: DialogFormInputProps): React.JSX.Element {
-  const idTooltipContent = useId();
-  const idErrorMessage = useId();
+  const inputId = useMemo(() => `${name}-input`, [name]);
+  const tooltipContentId = useMemo(() => `input_${name}-tooltip`, [name]);
+  const errorMessageId = useMemo(() => `popover_${name}_message-error`, [name]);
+  const labelInputId = useMemo(() => `input_${name}-label`, [name]);
   const inputElementRef = useRef<DialogFormInputElement>(null);
 
   const handleError = useErrorHandler();
@@ -61,6 +62,8 @@ export function MemoizedDialogFormInput({
     ]);
   const contactFormAction = useContactFormDispatch();
   const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(name);
+  const isInput = useMemo(() => formInput.tag === 'input', [formInput.tag]);
+  const listId = useMemo(() => `input_${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}`, [name]);
 
   /**
    * The reference to the input element.
@@ -116,6 +119,55 @@ export function MemoizedDialogFormInput({
   );
 
   /**
+   * Memoized ARIA attributes for the input when it behaves as a combobox
+   * controlling a listbox of suggestions.
+   *
+   * Returns an empty object when the control is not an <input> (e.g., <textarea>),
+   * so callers can safely spread it unconditionally.
+   *
+   * Mapping:
+   * - role="combobox"               → exposes the input as a combobox.
+   * - aria-autocomplete="list"      → suggestions come from a list.
+   * - aria-expanded                 → reflects popup visibility state.
+   * - aria-controls                 → ID of the associated <ul role="listbox">.
+   * - aria-haspopup="listbox"       → declares the popup type.
+   * - aria-activedescendant         → ID of the focused <li role="option"> (if any).
+   *
+   * Dependencies:
+   * - isInput: whether the control is a single-line <input>.
+   * - shouldRenderSuggestions: whether suggestions are currently shown.
+   * - listId: DOM id of the <ul role="listbox">.
+   * - activeId: DOM id of the focused option (optional).
+   *
+   * @constant
+   * @returns {Readonly<{
+   *   role?: 'combobox';
+   *   'aria-autocomplete'?: 'list';
+   *   'aria-expanded'?: boolean;
+   *   'aria-controls'?: string;
+   *   'aria-haspopup'?: 'listbox';
+   *   'aria-activedescendant'?: string | undefined;
+   * }> | {}}
+   * A stable object of ARIA props to spread on the input (or an empty object for non-input controls).
+   */
+  const comboboxProps = useMemo(() => {
+    if (!isInput) return {};
+    const activeId =
+      isInput && listItemFocused !== null
+        ? `option_${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}${listItemFocused}`
+        : undefined;
+    return {
+      role: 'combobox' as const,
+      'aria-autocomplete': 'list' as const,
+      'aria-expanded': Boolean(popoverMode),
+      'aria-controls': listId,
+      'aria-owns': listId,
+      'aria-activedescendant': activeId,
+      'aria-haspopup': 'listbox' as const,
+    };
+  }, [isInput, listId, listItemFocused, name, popoverMode]);
+
+  /**
    * Handles the visibility of the tooltip by setting the tooltip's active state.
    * This function can be used for events like mouse enter, mouse leave, focus and blur.
    *
@@ -162,7 +214,7 @@ export function MemoizedDialogFormInput({
 
     return (
       <Tooltip
-        id={idTooltipContent}
+        id={tooltipContentId}
         content={tooltipContent as TooltipContent[]}
         direction='right'
         isVisible={isTooltipVisible as boolean}
@@ -174,7 +226,7 @@ export function MemoizedDialogFormInput({
         />
       </Tooltip>
     );
-  }, [idTooltipContent, inputNode?.required, isTooltipVisible, tooltipContent, tooltipIconName]);
+  }, [inputNode?.required, isTooltipVisible, tooltipContent, tooltipContentId, tooltipIconName]);
 
   /**
    * Renders the Tag component if the input status tag is provided.
@@ -189,8 +241,8 @@ export function MemoizedDialogFormInput({
       style.dialogFormInput__alertTag +
       (formInput.tag === 'textarea' ? ` ${style['dialogFormInput__alertTag--message']}` : '');
 
-    return <Tag className={alertTagClass} type='alerted' tag={inputStatusTag} />;
-  }, [inputStatusTag, formInput.tag]);
+    return <Tag className={alertTagClass} type='alerted' tag={inputStatusTag} ariaHidden />;
+  }, [formInput.tag, inputStatusTag]);
 
   /**
    * Formats the error message for the popover component.
@@ -209,9 +261,12 @@ export function MemoizedDialogFormInput({
       // Remove minLength and valid keys from errorState and format the error message
       const formattedMessage = errorState
         ? Object.entries(errorState)
-            .filter(([key, value]) => key !== 'minLength' && key !== 'maxLength' && key !== 'valid' && value)
-            .map(([key]) => unformattedMessage?.[key as keyof typeof unformattedMessage])
-            .join('\n')
+            .filter(([key, value]) => value && !['minLength', 'maxLength', 'valid'].includes(key))
+            .map(([key]) => {
+              const text = unformattedMessage?.[key as keyof typeof unformattedMessage]?.trim();
+              return text ? { key: `${name}-err-${key}`, text } : null;
+            })
+            .filter((x): x is { key: string; text: string } => Boolean(x))
         : undefined;
 
       contactFormAction({ type: SET_ERROR_MESSAGE, payload: { name, errorMessage: formattedMessage } });
@@ -274,7 +329,7 @@ export function MemoizedDialogFormInput({
         onBlur={tooltipContent?.length ? (event) => handleTooltipVisibility(event, false) : undefined}
       >
         <div className={style.dialogFormInput__label}>
-          <label className={style.dialogFormInput__label__content} htmlFor={name}>
+          <label id={labelInputId} className={style.dialogFormInput__label__content} htmlFor={name}>
             {label}
           </label>
           {renderTooltip}
@@ -285,8 +340,7 @@ export function MemoizedDialogFormInput({
           tag={formInput.tag}
           type={formInput.type}
           name={name}
-          id={name}
-          role={formInput.tag === 'input' ? 'combobox' : undefined}
+          id={inputId}
           maxLength={formInput.maxLength}
           minLength={formInput.minLength}
           pattern={formInput.pattern}
@@ -294,12 +348,9 @@ export function MemoizedDialogFormInput({
           required={formInput.required}
           autoComplete='off'
           ref={inputElementRef as LegacyRef<DialogFormInputElement>}
-          aria-expanded={popoverMode}
-          aria-controls={formInput.tag === 'input' ? `${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}` : undefined}
-          aria-activedescendant={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${listItemFocused}`}
-          // aria-label={name}
-          aria-describedby={(errorMessage ? idErrorMessage : '') + (tooltipContent ? ` ${idTooltipContent}` : '')}
-          aria-invalid={inputError?.valid ? 'true' : 'false'}
+          {...comboboxProps}
+          aria-describedby={`${errorMessage ? errorMessageId : undefined} ${tooltipContent ? tooltipContentId : undefined}`}
+          aria-invalid={inputError?.valid || undefined}
         />
         {renderAlertTag}
         {renderPopover}

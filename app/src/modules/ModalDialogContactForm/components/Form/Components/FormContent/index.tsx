@@ -65,7 +65,7 @@ export function FormContent({ dataFormContent, onRenderComplete }: FormContentPr
 
   return dataFormContent && isInitializedStateRef.current ? (
     <div className={style.contactForm}>
-      {dataFormContent.map(({ id, input, label, tooltipContent: tc }) =>
+      {dataFormContent.map(({ id, input, label, tooltipContent }) =>
         input.type !== 'checkbox' ? (
           <DialogFormInput
             key={id}
@@ -73,7 +73,7 @@ export function FormContent({ dataFormContent, onRenderComplete }: FormContentPr
             name={id}
             formInput={input}
             // Get the tooltip content from the form content
-            tooltipContent={tc as TooltipContent[] | undefined}
+            tooltipContent={tooltipContent as TooltipContent[] | undefined}
           />
         ) : (
           <DialogFormCheckBox key={id} label={label} name={id} formInput={input} />

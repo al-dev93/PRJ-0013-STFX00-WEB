@@ -19,11 +19,13 @@ import type { TagProps } from './types';
  * - 'thinned': indicates a thinned type tag.
  * @property {React.CSSProperties} [position] - Inline styles for positioning.
  * @property {string} [ariaLabel] - The aria-label for the tag.
+ * @property {string} [id] - Optional id for the tag.
+ * @property {boolean} [ariaHidden] - Masking from SR technologies.
  * @returns {React.JSX.Element} The rendered Tag component.
  *
  * @al-dev93
  */
-export function Tag({ className, tag, type, position, ariaLabel }: TagProps): React.JSX.Element {
+export function Tag({ className, tag, type, position, ariaLabel, id, ariaHidden }: TagProps): React.JSX.Element {
   const handleError = useErrorHandler();
 
   /**
@@ -93,8 +95,9 @@ export function Tag({ className, tag, type, position, ariaLabel }: TagProps): Re
     <span
       className={tag ? classNameTag : `${style.tag} ${style['tag--empty']}`}
       style={position}
-      aria-live={type === ALERTED_STYLE ? 'assertive' : 'polite'}
       aria-label={ariaLabel}
+      id={id}
+      aria-hidden={ariaHidden ? 'true' : undefined}
     >
       {tag}
     </span>

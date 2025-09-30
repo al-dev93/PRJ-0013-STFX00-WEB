@@ -10,6 +10,7 @@ const EMPTY_MODAL_DIALOG_CONTACT_FORM: ContactFormModal = {
   id: '',
   title: '',
   subtitle: '',
+  srOnlyDescription: '',
   submitButtonName: '',
   alertOnSubmit: [],
   dataFormContent: [],

@@ -1,4 +1,4 @@
-import React, { MouseEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAnimation } from '@hooks/useAnimation';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
@@ -7,7 +7,7 @@ import { createError } from '@modules/Error/utils/errorHandling';
 import style from './style.module.css';
 import { useContactFormSelector } from '../../hooks/useContactFormSelector';
 import type { PopoverProps } from '../../types';
-import { PREFIX_AUTO_COMPLETE_ITEM_ID, SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
+import { SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
 
 /**
  * Popover component that displays a list of autocomplete suggestions and error messages.
@@ -18,14 +18,15 @@ import { PREFIX_AUTO_COMPLETE_ITEM_ID, SUFFIX_AUTO_COMPLETE_LIST_ID } from '../.
  * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
  * @returns {(React.JSX.Element | null)} The rendered Popover component or null if no suggestions or errors.
- *
- * @al-dev93
+ * @author al-dev93
  */
 export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps): React.JSX.Element {
   const handleError = useErrorHandler();
   const popoverRef = useRef<HTMLDivElement>(null);
-  const messageRef = useRef<HTMLParagraphElement>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLUListElement>(null);
+
+  const messageId = useMemo<string>((): string => `popover_${name}_message-error`, [name]);
 
   // Partial state selector using keys
   const { autoComplete, isFocused, listItemFocused } = useContactFormSelector(name, [
@@ -33,6 +34,9 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     'isFocused',
     'listItemFocused',
   ]);
+
+  const [statusText, setStatusText] = useState<string>('');
+  const [activeText, setActiveText] = useState<string>('');
   const [showSuggestions, setShowSuggestions] = useState<string[]>();
 
   // Animations for suggestions and message popups
@@ -55,77 +59,14 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
   }, [autoComplete, isFocused]);
 
   /**
-   * Sets the width of the popover and its contents based on the provided references.
-   */
-  useEffect(() => {
-    if (!popoverRef.current || (!messageRef.current && !suggestionsRef.current)) return;
-
-    /**
-     * Adjusts the width of the popover and its contents based on the provided references.
-     * - Sets both the master and optional slave element widths to "max-content".
-     * - Compares scroll widths to determine which element's width should dictate
-     *   the popover's width.
-     * - If the master element's scroll width is greater, sets the popover's width
-     *   to match the master element and adjusts the slave element to 100%.
-     * - If the slave element's scroll width is greater, sets the popover's width
-     *   to match the slave element and adjusts the master element to 100%.
-     *
-     * @function setWidth
-     * @param {RefObject<HTMLParagraphElement | HTMLUListElement>} masterRef - The main element reference for width calculation.
-     * @param {RefObject<HTMLParagraphElement | HTMLUListElement>} [slaveRef] - An optional secondary element reference for comparative width calculation.
-     * @returns {void}
-     */
-    const setWidth = (
-      masterRef: RefObject<HTMLParagraphElement | HTMLUListElement>,
-      slaveRef?: RefObject<HTMLParagraphElement | HTMLUListElement>,
-    ): void => {
-      if (!popoverRef.current || !masterRef.current) return;
-      const masterElement = masterRef.current;
-      if (slaveRef && slaveRef.current) {
-        const slaveElement = slaveRef.current;
-        masterElement.style.width = 'max-content';
-        slaveElement.style.width = 'max-content';
-        if (masterElement.scrollWidth > slaveElement.scrollWidth) {
-          popoverRef.current.style.width = `${masterElement.scrollWidth}px`;
-          slaveElement.style.width = '100%';
-          return;
-        }
-        popoverRef.current.style.width = `${slaveElement.scrollWidth}px`;
-        masterElement.style.width = '100%';
-        return;
-      }
-      popoverRef.current.style.width = `${masterElement.scrollWidth}px`;
-      masterElement.style.width = 'max-content';
-    };
-    try {
-      if (messageRef.current && suggestionsRef.current) {
-        setWidth(suggestionsRef, messageRef);
-        return;
-      }
-      if (messageRef.current && !suggestionsRef.current) {
-        setWidth(messageRef);
-        return;
-      }
-      if (!messageRef.current && suggestionsRef.current) setWidth(suggestionsRef);
-    } catch (err) {
-      handleError(
-        createError(1005, 'Error while adjusting popover width.', {
-          originalError: err,
-          component: 'Popover',
-          operation: 'adjustPopoverWidth',
-          category: 'UI COmponent',
-        }),
-      );
-    }
-  }, [showSuggestions, shouldRenderSuggestions, handleError]);
-
-  /**
    * Scrolls the focused item into view when the list of autocomplete suggestions is updated.
    * If the list is not rendered or the focused item index is undefined, the function does nothing.
    */
   useEffect(() => {
     if (!suggestionsRef.current || listItemFocused === undefined) return;
-    const item = suggestionsRef.current.querySelector(`#${PREFIX_AUTO_COMPLETE_ITEM_ID}${listItemFocused}`);
+    const item = suggestionsRef.current.querySelector(
+      `#option_${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}${listItemFocused}`,
+    );
     if (item) {
       try {
         item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -140,25 +81,61 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
         );
       }
     }
-  }, [handleError, listItemFocused]);
+  }, [handleError, listItemFocused, name]);
+
+  useEffect(() => {
+    let timeoutId: number | undefined;
+
+    const numberOfSuggestions = showSuggestions?.length ?? 0;
+
+    if (isFocused && shouldRenderSuggestions && numberOfSuggestions > 0) {
+      const text =
+        `${numberOfSuggestions} suggestion${numberOfSuggestions > 1 ? 's' : ''} disponibles. ` +
+        `Utilisez Flèche haut/bas pour naviguer, Entrée pour valider.`;
+
+      timeoutId = window.setTimeout(() => setStatusText(text), 0);
+    } else {
+      setStatusText('');
+    }
+
+    return () => {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, [isFocused, shouldRenderSuggestions, showSuggestions?.length]);
+
+  useEffect(() => {
+    const n = showSuggestions?.length ?? 0;
+    if (!shouldRenderSuggestions || !n || listItemFocused === undefined) {
+      setActiveText('');
+      return () => {};
+    }
+    const label = showSuggestions?.[listItemFocused] ?? '';
+    // Ad example : "Name, 2 sur 5"
+    const txt = `${label}, ${listItemFocused + 1} sur ${n}`;
+    // micro latency
+    const id = window.setTimeout(() => setActiveText(txt), 0);
+    return () => window.clearTimeout(id);
+  }, [listItemFocused, showSuggestions, shouldRenderSuggestions]);
 
   /**
-   * Handles click events for selecting autocomplete items. Prevents the default
-   * behavior and stops the propagation of the event. Calls the `inputAutocomplete` function
-   * with the selected item's text content.
+   * Selects an autocomplete option via a single unified handler (pointer devices).
    *
-   * @function handleClick
-   * @param {MouseEvent<HTMLLIElement>} event - The mouse event.
+   * Prevents default so the input/combobox keeps focus (avoids popup collapse and
+   * preserves screen reader announcements). Reads the option text and forwards it
+   * to `inputAutocomplete`. No-ops on empty text.
+   *
+   * Use as: onPointerDown={handleOptionSelect}
+   *
+   * @param {React.SyntheticEvent<HTMLLIElement>} event
    * @returns {void}
    */
-  const handleClick = useCallback(
-    (event: MouseEvent<HTMLLIElement>): void => {
+  const handleOptionSelect = useCallback(
+    (event: React.SyntheticEvent<HTMLLIElement>): void => {
       try {
         event.preventDefault();
-        event.stopPropagation();
-
-        const value = event.currentTarget.textContent;
-
+        const value = (event.currentTarget.textContent ?? '').trim();
         if (!value) {
           handleError(
             createError(1001, 'Empty value selected from autocomplete list.', {
@@ -169,11 +146,10 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
           );
           return;
         }
-
-        inputAutocomplete(event.currentTarget.textContent ?? '');
+        inputAutocomplete(value);
       } catch (err) {
         handleError(
-          createError(1003, 'Failed to handle autocomplete item click.', {
+          createError(1003, 'Failed to handle autocomplete item select.', {
             originalError: err,
             component: 'Popover',
             operation: 'autocompleteSelection',
@@ -185,6 +161,12 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     [handleError, inputAutocomplete],
   );
 
+  const errorAnnounceText = useMemo(() => {
+    if (!errorMessage?.length) return '';
+    const parts = errorMessage.map(({ text }) => text.trim()).filter(Boolean);
+    return parts.length ? `Erreur : ${parts.join('. ')}` : '';
+  }, [errorMessage]);
+
   /**
    * Renders the message that is displayed when there are validation errors.
    * If `shouldRenderMessage` is `false`, the message will not be rendered.
@@ -192,7 +174,7 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
    * @constant renderMessage
    */
   const renderMessage: React.JSX.Element | null = useMemo(() => {
-    if (!errorMessage) return null;
+    if (!errorMessage?.length) return null;
 
     /**
      * Determines the class name for the message element.
@@ -206,11 +188,15 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
       (!shouldRenderSuggestions ? ` ${style['popover__message--withoutSuggestions']}` : '');
 
     return shouldRenderMessage ? (
-      <p ref={messageRef} className={classNameMessage}>
-        {errorMessage}
-      </p>
+      <div id={messageId} ref={messageRef} className={classNameMessage} aria-hidden='true'>
+        <ul aria-label={`Erreurs pour ${name}`}>
+          {errorMessage.map(({ key, text }) => (
+            <li key={key}>{text}</li>
+          ))}
+        </ul>
+      </div>
     ) : null;
-  }, [errorMessage, isAnimatingMessage, shouldRenderMessage, shouldRenderSuggestions]);
+  }, [errorMessage, isAnimatingMessage, messageId, name, shouldRenderMessage, shouldRenderSuggestions]);
 
   /**
    * Determines the class name for the autocomplete suggestions.
@@ -219,9 +205,7 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
    * @constant classNameSuggestions
    */
   const classNameSuggestions: string =
-    style.popover__autocomplete +
-    (isAnimatingSuggestions ? ` ${style['popover__autocomplete--visible']}` : '') +
-    (!errorMessage ? ` ${style['popover__autocomplete--withoutMessage']}` : '');
+    style.popover__autocomplete + (isAnimatingSuggestions ? ` ${style['popover__autocomplete--visible']}` : '');
 
   /**
    * Renders the list of autocomplete suggestions.
@@ -230,11 +214,14 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
    * @constant renderSuggestions
    */
   const renderSuggestions: React.JSX.Element | null = useMemo(() => {
+    const hasPointer = typeof window !== 'undefined' && 'PointerEvent' in window;
+
     return shouldRenderSuggestions ? (
       <ul
         id={`${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}`}
         className={classNameSuggestions}
         role='listbox'
+        aria-labelledby={`input_${name}-label`}
         hidden={!showSuggestions?.length}
         ref={suggestionsRef}
       >
@@ -250,15 +237,18 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
             style.popover__autocomplete__item +
             (listItemFocused === index ? ` ${style['popover__autocomplete__item--focused']}` : '');
 
+          const optionId = `option_${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}${index}`;
+
           return (
             <li
-              key={value}
-              id={`${PREFIX_AUTO_COMPLETE_ITEM_ID}${index}`}
+              key={`${optionId}::${value}`}
+              id={optionId}
               className={classNameSuggestionsItem}
               role='option'
               aria-selected={listItemFocused === index}
               tabIndex={-1}
-              onMouseDown={handleClick}
+              onMouseDown={!hasPointer ? handleOptionSelect : undefined}
+              onPointerDown={hasPointer ? handleOptionSelect : undefined}
             >
               {value}
             </li>
@@ -266,12 +256,38 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
         })}
       </ul>
     ) : null;
-  }, [classNameSuggestions, listItemFocused, handleClick, name, shouldRenderSuggestions, showSuggestions]);
+  }, [classNameSuggestions, handleOptionSelect, listItemFocused, name, shouldRenderSuggestions, showSuggestions]);
 
   return (
     <div className={style.popover} ref={popoverRef}>
       {renderMessage}
       {renderSuggestions}
+      {/* Global list status */}
+      <div
+        id={`${name}-status`}
+        role='status'
+        aria-live='polite'
+        aria-atomic='true'
+        aria-relevant='additions text'
+        className='visually-hidden'
+      >
+        {statusText}
+      </div>
+      {/* Active item status */}
+      <div id={`${name}-active-status`} role='status' aria-live='polite' aria-atomic='true' className='visually-hidden'>
+        {activeText}
+      </div>
+      {/* Error status */}
+      <div
+        id={`announce_${name}_error`}
+        role='status'
+        aria-live='polite'
+        aria-atomic='true'
+        aria-relevant='text'
+        className='visually-hidden'
+      >
+        {isFocused ? errorAnnounceText : ''}
+      </div>
     </div>
   );
 }

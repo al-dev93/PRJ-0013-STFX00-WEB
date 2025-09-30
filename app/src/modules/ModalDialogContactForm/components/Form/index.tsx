@@ -116,7 +116,7 @@ function MemoizedForm({
   return (
     <form
       className={style.contactForm}
-      aria-label='formulaire de contact'
+      // aria-label='formulaire de contact'
       action=''
       id={idForm}
       method='dialog'
