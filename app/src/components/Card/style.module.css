@@ -16,8 +16,12 @@
     background-color 220ms ease-out;
 }
 
-.card:hover,
-.card:has(:focus-visible) {
+.card:is(:hover, :focus-visible) {
+  --link: #bfe3ff;
+  --link-hover: var(--white);
+
+  --focus-ring: var(--white);
+
   background-color: var(--decorative-dark);
   box-shadow: 5px 5px 8px -1px var(--dark-bg-menu);
   transform: translate3d(8px, -9px, 0);
@@ -58,10 +62,22 @@
 }
 
 .card__description {
-  flex: 1 0 130px;
+  flex: 1 0 150px;
   overflow: hidden;
+  text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
   font-size: var(--fs-xs);
   color: var(--tertiary-color);
+  display: flow-root;
+  line-height: 1.45;
+}
+
+/* Link to open the detailled project sheet in PDF format */
+.card__description__projectLink {
+  float: right;
+  margin-left: 1em;
+  margin-top: 1em;
 }
 
 .card__skillsList,

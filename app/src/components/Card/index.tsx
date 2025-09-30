@@ -11,6 +11,7 @@ import { isObjectOfType } from '@utils/typeHelpers';
 import { optionalCardSchema, requiredCardSchema } from './cardSchema';
 import style from './style.module.css';
 import type { CardProps } from './types';
+import { ProjectSheetLink } from '../ProjectSheetLink';
 
 /**
  * Card component that displays project data including title, description, skills, and social media links.
@@ -114,7 +115,14 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
       </header>
       <div className={style.card__main}>
         <h3 id={`card-title-${cardData.id}`}>{cardData.title}</h3>
-        <p className={style.card__description}>{cardData.description}</p>
+        <p className={style.card__description}>
+          {cardData.description}
+          <ProjectSheetLink
+            projectSheet={cardData.projectSheet}
+            title={cardData.title}
+            className={style.card__description__projectLink}
+          />
+        </p>
       </div>
       <footer className={style.card__footer}>
         <SkillsList tagColor={style.card__skillsList} lineBreak list={cardData.tags} />
