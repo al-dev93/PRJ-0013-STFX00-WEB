@@ -63,23 +63,22 @@
 .section__cardsWrapper {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 10px;
-  row-gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 br {
   margin-bottom: 15px;
 }
-
-@media (max-width: 768px) {
+/* 1200px */
+@media (max-width: 75rem) {
   .section__cardsWrapper {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
-@media (max-width: 480px) {
+/* 768px */
+@media (max-width: 48rem) {
   .section__cardsWrapper {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
