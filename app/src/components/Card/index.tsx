@@ -8,7 +8,7 @@ import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { isObjectOfType } from '@utils/typeHelpers';
 
-import { optionalCardSchema, requiredCardSchema } from './cardSchema';
+import { optionalCardSchema, requiredCardSchema } from './deliverableSchema';
 import style from './style.module.css';
 import type { CardProps } from './types';
 import { ProjectSheetLink } from '../ProjectSheetLink';
