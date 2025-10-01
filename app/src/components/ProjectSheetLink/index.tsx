@@ -67,7 +67,7 @@ function MemoizedProjectSheetLink({
         <path d='M9 17h6' />
       </svg>
       {linkLabel}
-      <span className='visually-hidden'> — ouvre dans un nouvel onglet</span>
+      <span className='visually-hidden'> — ouvre le fichier (PDF) dans un nouvel onglet</span>
     </a>
   );
 }

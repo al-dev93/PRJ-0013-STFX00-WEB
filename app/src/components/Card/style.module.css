@@ -1,4 +1,15 @@
 .card {
+  /* Default theme (clear rest) */
+  --text: #05334a;
+  --muted: #0a192f;
+
+  --link: #0b57d0;
+  --link-hover: #063a8a;
+
+  --focus-ring: #003554;
+
+  --nav-idle: #0a192f;
+
   margin: 0;
   padding: 32px 28px;
   display: flex;
@@ -6,6 +17,7 @@
   gap: 10px;
   border-radius: var(--br-sm);
   background-color: var(--panel-bg);
+  color: var(--text);
   transform: translate3d(0, 0, 0);
   box-shadow: 0 0 0 0 transparent;
 
@@ -13,14 +25,22 @@
   transition:
     transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
     box-shadow 320ms ease-out,
-    background-color 220ms ease-out;
+    background-color 220ms ease-out,
+    color 180ms ease-out;
 }
 
 .card:is(:hover, :focus-visible) {
-  --link: #bfe3ff;
+  /* Active state theme (dark background) */
+  --text: var(--white);
+  --muted: var(--dark-primary);
+
+  --link: #e0f2ff;
   --link-hover: var(--white);
 
   --focus-ring: var(--white);
+
+  --nav-active: #e0f2ff;
+  --nav-active-hover: var(--white);
 
   background-color: var(--decorative-dark);
   box-shadow: 5px 5px 8px -1px var(--dark-bg-menu);
@@ -33,6 +53,19 @@
     background-color 180ms ease;
 }
 
+/* Respecte prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+    transform: none;
+    box-shadow: none;
+  }
+  .card:is(:hover, :focus-visible) {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 .card__header {
   margin: 0;
   padding: 0 10px;
@@ -43,16 +76,20 @@
 
 .card__folderIcon {
   font-size: 32px;
-  color: var(--decorative-dark);
-}
-.card:hover .card__additionalNav,
-.card:has(:focus-visible) .card__additionalNav {
-  color: var(--dark-primary);
+  color: var(--muted);
 }
 
-.card:hover .card__additionalNav:hover,
-.card:has(:focus-visible) .card__additionalNav:focus-visible {
-  color: var(--white);
+.card__additionalNav {
+  color: var(--nav-idle);
+  transition: color 0.18s ease;
+}
+
+.card:is(:hover, :focus-visible) .card__additionalNav {
+  color: var(--nav-active);
+}
+
+.card:is(:hover, :focus-visible) .card__additionalNav :is(a, button):is(:hover, :focus-visible) {
+  color: var(--nav-active-hover);
 }
 
 .card__main {
@@ -62,44 +99,59 @@
 }
 
 .card__description {
-  flex: 1 0 150px;
-  overflow: hidden;
-  text-align: justify;
-  text-align-last: left;
-  hyphens: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  overflow: visible;
   font-size: var(--fs-xs);
-  color: var(--tertiary-color);
-  display: flow-root;
   line-height: 1.45;
+  color: var(--text);
+}
+
+.card__description > span {
+  min-width: 0;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  line-clamp: 4;
+
+  overflow: hidden;
 }
 
 /* Link to open the detailled project sheet in PDF format */
 .card__description__projectLink {
-  float: right;
-  margin-left: 1em;
-  margin-top: 1em;
+  flex: 0 0 auto;
+  align-self: flex-end;
 }
 
-.card__skillsList,
-.card__additionalNav {
-  color: var(--decorative-dark);
+.card__skillsList {
+  color: var(--muted);
+  transition: color 180ms ease;
 }
 
-.card:hover .card__folderIcon,
-.card:has(:focus-visible) .card__folderIcon,
-.card:hover .card__skillsList,
-.card:has(:focus-visible) .card__skillsList {
-  color: var(--dark-primary);
+.card:is(:hover, :focus-visible) .card__folderIcon,
+.card:is(:hover, :focus-visible) .card__skillsList {
+  color: var(--muted);
 }
 
-.card:hover .card__description,
-.card:has(:focus-visible) .card__description,
-.card:hover h3,
-.card:has(:focus-visible) h3 {
+.card:is(:hover, :focus-visible) .card__description,
+.card:is(:hover, :focus-visible) h3 {
+  color: var(--text);
+}
+
+.card:is(:hover, :focus-visible) .card__additionalNav:is(a, button):is(:hover, :focus-visible) {
   color: var(--white);
 }
 
 .card__footer {
   margin: 0;
   padding: 0;
+}
+
+.card :is(a, button):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: 6px;
 }
