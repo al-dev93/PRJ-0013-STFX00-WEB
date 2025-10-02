@@ -98,7 +98,7 @@ export type SectionsRef = 'home' | 'work' | 'about' | 'services';
  *
  * @al-dev93
  */
-export type IndexPageSection = Omit<MenuItemType, 'label', 'anchor'> & {
+export type IndexPageSection = Omit<MenuItemType, 'label' | 'anchor'> & {
   title?: string;
   content: DetailSection[];
   order: number;
