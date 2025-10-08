@@ -1,10 +1,36 @@
+:root {
+  /* Space under the collapsible header */
+  --hero-offset: 254px;
+}
+
 .section {
   height: auto;
   min-height: 100vh;
 }
 
 .section--hero {
-  padding-top: 254px;
+  /* Layout */
+  --hero-max-width: 78rem;
+  --hero-gutter-inline: clamp(1rem, 2vw, 1.6rem);
+
+  /* path stroke (inherits palette) */
+  --hero-stroke-color: color-mix(in oklab, var(--brand, #2456a6) 78%, var(--white) 28%);
+  --hero-stroke-width: 3.25px;
+  --hero-stroke-opacity: 0.95;
+
+  /* Default radii to draw rounded corners via CSS only (optional)*/
+  --hero-radius: 18px;
+
+  /* Locale typo */
+  --hero-text-color: var(--ink, #0f172a);
+
+  --hero-kicker-fg: var(--muted, #667085);
+  --hero-kicker-bg: color-mix(in oklab, var(--accent) 12%, var(--white) 88%);
+  --hero-kicker-border: color-mix(in oklab, var(--accent) 35%, var(--white) 65%);
+
+  position: relative;
+  padding-block-start: var(--hero-offset);
+  color: var(--hero-text-color);
 }
 
 .section--hero:hover .section--hero:focus {
@@ -28,25 +54,107 @@
   gap: 20px;
 }
 
-.section__catchPhrase,
-.section__slogan {
-  font-weight: 500;
+.section--hero__path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  image-rendering: -webkit-optimize-contrast;
 }
 
-.section__catchPhrase {
-  line-height: var(--lh-titration);
-  color: var(--secondary-color);
-  padding-bottom: 30px;
+.section--hero__stroke {
+  stroke: transparent;
+  stroke-width: var(--hero-stroke-width);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: var(--hero-dash, 1069);
+  stroke-dashoffset: var(--hero-dash, 1069);
+  will-change: stroke-dashoffset, stroke;
+  animation: none;
 }
 
-.section__slogan {
-  font-size: var(--fs-xl);
-  line-height: var(--lh-small);
-  padding-top: 5px;
-  color: var(--secondary-color);
+.is-visible {
+  animation:
+    drawOffset 930ms ease-out 120ms forwards,
+    drawStroke 250ms ease-out forwards;
 }
 
-.section__businessOverview,
+@keyframes drawOffset {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drawStroke {
+  to {
+    stroke: var(--hero-stroke-color);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-visible {
+    animation: none !important;
+  }
+  .section--hero__stroke {
+    stroke: var(--hero-stroke-color);
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+.section--hero__strokeHalo {
+  stroke: black;
+  opacity: 0.06;
+  stroke-width: calc(var(--hero-stroke-width) + 4px);
+  filter: blur(1px);
+}
+
+.section--hero__endcap {
+  fill: currentColor;
+  opacity: 0.35;
+}
+
+.section--hero > .section__bodySection {
+  position: relative;
+  z-index: 1;
+  max-width: var(--hero-max-width);
+  margin-inline: auto;
+  padding-inline: var(--hero-gutter-inline);
+}
+
+.section--hero__kicker {
+  display: inline-block;
+  padding: 0.25rem 0.55rem;
+  /* background: color-mix(in oklab, var(--brand) 8%, white 92%); */
+  font: 650 clamp(0.95rem, 1.1vw, 1.1rem) / 1.15 var(--font-accessories, system-ui);
+  letter-spacing: 0.03em;
+  background: var(--hero-kicker-bg);
+  color: var(--hero-kicker-fg);
+  border: 1px solid var(--kicker-border);
+  border-radius: 7px;
+}
+
+.section--hero__pitch {
+  margin-block: 0.9rem 0;
+  margin-inline-end: 10rem;
+  font-size: clamp(1.05rem, 1.15vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--hero-text-color);
+}
+
+.section--hero__brand {
+  font-size: clamp(2.5rem, 10vw, 6rem);
+  font-weight: 900;
+  opacity: 0.08;
+  line-height: 1;
+  margin-top: clamp(2rem, 6vw, 4rem);
+  user-select: none;
+}
+
 .section__description {
   padding-top: 20px;
   color: var(--tertiary-color);
@@ -70,6 +178,12 @@
 br {
   margin-bottom: 15px;
 }
+
+.section__button {
+  margin-left: auto;
+  margin-right: 48px;
+}
+
 /* 1200px */
 @media (max-width: 75rem) {
   .section__cardsWrapper {

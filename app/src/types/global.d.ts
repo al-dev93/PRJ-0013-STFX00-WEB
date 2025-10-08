@@ -141,6 +141,7 @@ export type DetailSection = {
   name?: string;
   content?: string;
   endpoint?: string;
+  orderInSection: number;
   boldContent?: DetailSection[];
 };
 

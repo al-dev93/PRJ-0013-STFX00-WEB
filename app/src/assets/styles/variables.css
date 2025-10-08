@@ -47,12 +47,28 @@
   --primary-bg-alert-color: rgba(201, 24, 31, 0.15);
   --panel-bg: rgba(139, 108, 80, 0.16);
   --modal-backdrop-color: rgba(0, 53, 84, 0.7);
-  --link: #2456a6;
-  --link-hover: #1a3f7a;
+  /* New color --------------------------------- */
+  /* Marque (niveau) */
+  --brand: #2456a6; /* #2456a6 : H1, accents majeurs, icônes actives */
+  --brand-strong: #1a3f7a; /* hover/survol foncé cohérent */
+  --brand-deep: #003554; /* appuis très sombres (bordures, separators) */
+  --accent: var(--primary-color);
+
+  --link: var(--brand);
+  --link-hover: var(--brand-strong);
   --link-visited: #6a2bbf;
+
+  --focus-ring: #2257e6;
+  --focus-ring-on-dark: var(--white);
+
+  /* Texte & neutres */
+  --ink: #0f172a; /* couleur de texte principale (titres + body) */
+  --muted: color-mix(in oklab, var(--ink) 70%, white 30%); /* sous-texte, légendes */
+  --subtle: color-mix(in oklab, var(--ink) 50%, white 50%); /* métadonnées, placeholders */
+  --faint: color-mix(in oklab, var(--ink) 30%, white 70%); /* séparateurs fins, lignes */
+  /* New decoration */
   --link-underline-thickness: 2px;
   --link-underline-offset: 0.14em;
-  --focus-ring: #2257e6; /* couleur du ring */
   /* border */
   --br-xxs: 4px;
   --br-xs: 6px;
