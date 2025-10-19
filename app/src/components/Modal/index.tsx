@@ -33,6 +33,7 @@ function setFocusToElement(event: KeyboardEventDiv, index: number, elements: HTM
  *
  * @remarks Full props in {@link ModalProps | ModalProps (standard vs alert)}.
  *
+ * @component
  * @param props - Component props.
  * @param props.children - Modal content.
  * @param props.className - Extra class names applied to the root <dialog>.

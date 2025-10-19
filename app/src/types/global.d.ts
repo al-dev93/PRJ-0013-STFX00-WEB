@@ -145,6 +145,15 @@ export type DetailSection = {
   boldContent?: DetailSection[];
 };
 
+export type Point = { x: number; y: number };
+
+export type ViewBoxRect = {
+  minX: number;
+  minY: number;
+  width: number;
+  height: number;
+};
+
 // TODO add comments
 /**
  * @description Represents a deliverable of a project.

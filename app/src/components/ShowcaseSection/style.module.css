@@ -13,14 +13,6 @@
   --hero-max-width: 78rem;
   --hero-gutter-inline: clamp(1rem, 2vw, 1.6rem);
 
-  /* path stroke (inherits palette) */
-  --hero-stroke-color: color-mix(in oklab, var(--brand, #2456a6) 78%, var(--white) 28%);
-  --hero-stroke-width: 3.25px;
-  --hero-stroke-opacity: 0.95;
-
-  /* Default radii to draw rounded corners via CSS only (optional)*/
-  --hero-radius: 18px;
-
   /* Locale typo */
   --hero-text-color: var(--ink, #0f172a);
 
@@ -57,33 +49,55 @@
 .section--hero__path {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   z-index: 0;
+  /* width: 100%;
+  height: 100%;
+  color: var(--hero-stroke-color);
   pointer-events: none;
-  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -webkit-optimize-contrast; */
 }
 
-.section--hero__stroke {
-  stroke: transparent;
-  stroke-width: var(--hero-stroke-width);
+/* .section--hero__path .glow {
   fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  stroke: var(--hero-glow-color);
+  opacity: var(--hero-glow-opacity);
+  stroke-width: calc(var(--hero-stroke-width) + var(--hero-glow-extra));
+  stroke-linecap: var(--hero-stroke-linecap);
+  vector-effect: non-scaling-stroke;
+  filter: blur(1px);
+} */
+
+/* .section--hero__path .stroke {
+  fill: none;
+  stroke: var(--hero-stroke-color, currentColor);
+  opacity: var(--hero-stroke-opacity);
+  stroke-width: var(--hero-stroke-width);
+  stroke-linecap: var(--hero-stroke-linecap);
+  stroke-linejoin: var(--hero-stroke-linejoin);
   vector-effect: non-scaling-stroke;
   stroke-dasharray: var(--hero-dash, 1069);
   stroke-dashoffset: var(--hero-dash, 1069);
   will-change: stroke-dashoffset, stroke;
   animation: none;
-}
+} */
 
-.is-visible {
+/* .section--hero__path[data-animated='true'] .stroke {
+  stroke-dasharray: var(--hero-dash) 1600;
+  stroke-dashoffset: var(--hero-dash-offset-start, var(--hero-dash));
+  transition: stroke-dashoffset var(--hero-anim-duration) var(--hero-anim-ease);
+} */
+
+/* .section--hero__path.is-revealed .stroke {
+  stroke-dashoffset: 0;
+} */
+
+/* .is-visible {
   animation:
     drawOffset 930ms ease-out 120ms forwards,
     drawStroke 250ms ease-out forwards;
-}
+} */
 
-@keyframes drawOffset {
+/* @keyframes drawOffset {
   to {
     stroke-dashoffset: 0;
   }
@@ -93,9 +107,9 @@
   to {
     stroke: var(--hero-stroke-color);
   }
-}
+} */
 
-@media (prefers-reduced-motion: reduce) {
+/* @media (prefers-reduced-motion: reduce) {
   .is-visible {
     animation: none !important;
   }
@@ -104,19 +118,20 @@
     stroke-dasharray: none;
     stroke-dashoffset: 0;
   }
-}
+} */
 
-.section--hero__strokeHalo {
-  stroke: black;
-  opacity: 0.06;
-  stroke-width: calc(var(--hero-stroke-width) + 4px);
-  filter: blur(1px);
-}
+/* @media (prefers-reduced-motion: reduce) {
+  .section--hero__path .stroke {
+    stroke-dasharray: none;
+    transition: none;
+  }
+} */
 
-.section--hero__endcap {
-  fill: currentColor;
-  opacity: 0.35;
-}
+/* .section--hero__path .dot {
+  r: var(--hero-dot-r);
+  fill: var(--hero-stroke-color, currentColor);
+  opacity: var(--hero-glow-opacity);
+} */
 
 .section--hero > .section__bodySection {
   position: relative;
