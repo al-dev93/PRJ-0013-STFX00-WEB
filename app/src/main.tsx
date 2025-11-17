@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
 import { router } from '@/router';
-import './assets/styles/global.css';
-import './assets/styles/variables.css';
+import './assets/styles/root.css';
+
+// import './assets/styles/global.css';
+// import './assets/styles/variables.css';
 
 // Global handler for synchronous errors
 window.onerror = (message, source, lineno, colno, error) => {

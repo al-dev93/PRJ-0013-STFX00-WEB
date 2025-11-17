@@ -3,7 +3,7 @@ import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, 
 import type { DetailSection, MenuSectionsVisibility, Point, ViewBoxRect } from '@/types';
 import { ModalFormButton } from '@components/ModalFormButton';
 import { useOnScreen } from '@hooks/useOnScreen';
-import titleLine from '@images/decorations/title_line.svg';
+// import titleLine from '@images/decorations/title_line.svg';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { INTERSECTION_OPTIONS_ROOTMARGIN } from '@utils/constants';
@@ -13,6 +13,7 @@ import type { HeroElementsRect, ShowcaseSectionProps } from './types';
 import {
   CORNER_RADII_DEFAULT,
   CTA_CLEAR,
+  DISPLAY_BRAND_ELEMENT,
   LEFT_GUTTER_MIN,
   MIN_AFTER_H1,
   MIN_OBLIQUE_DX,
@@ -142,6 +143,8 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
         )
       : [sortContent, undefined];
   }, [content, isHero]);
+
+  const shouldRenderBrandContent = Boolean(brandContent) && DISPLAY_BRAND_ELEMENT;
 
   /**
    * Updates the visibility of the section in the page sections context.
@@ -327,12 +330,12 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
   const showcaseSectionTitle = useMemo((): React.JSX.Element | null => {
     if (!title) return null;
     return (
-      <div className={style.section__titleSection}>
-        <h2 id={`${anchor}-title`} aria-live='polite'>
-          {title}
-        </h2>
-        <img src={titleLine} alt='Decorative line' />
-      </div>
+      // <div className={style.section__titleSection}>
+      <h2 id={`${anchor}-title`} className={style.section__titleSection} aria-live='polite'>
+        <span className={style.section__titleSection__inner}>{title}</span>
+      </h2>
+      // <img src={titleLine} alt='Decorative line' />
+      // </div>
     );
   }, [anchor, title]);
 
@@ -450,7 +453,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
         ariaControls={modalId}
         ref={isHero ? buttonRef : undefined}
       />
-      {brandContent ? brandContent.map((renderNode) => renderDynamicElement(renderNode)) : null}
+      {shouldRenderBrandContent ? brandContent?.map((renderNode) => renderDynamicElement(renderNode)) : null}
     </section>
   );
 });

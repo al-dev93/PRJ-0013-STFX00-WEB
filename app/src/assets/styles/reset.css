@@ -1,0 +1,103 @@
+/* src/styles/reset.css
+   --------------------------------------------------------------------------
+   Purpose: neutral foundation (no visual opinion).
+   Keep it small: normalize layout primitives and font faces.
+   -------------------------------------------------------------------------- */
+
+@layer reset {
+  /* Font faces (use 'swap' to avoid FOIT) */
+  @font-face {
+    font-family: 'Oswald';
+    src:
+      url('../fonts/oswald/Oswald-Medium.woff2') format('woff2'),
+      url('../fonts/oswald/Oswald-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Roboto';
+    src:
+      url('../fonts/roboto/Roboto-Regular.woff2') format('woff2'),
+      url('../fonts/roboto/Roboto-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Roboto';
+    src:
+      url('../fonts/roboto/Roboto-Medium.woff2') format('woff2'),
+      url('../fonts/roboto/Roboto-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Roboto';
+    src:
+      url('../fonts/roboto/Roboto-Bold.woff2') format('woff2'),
+      url('../fonts/roboto/Roboto-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Roboto Condensed';
+    src:
+      url('../fonts/roboto-condensed/RobotoCondensed-Regular.woff2') format('woff2'),
+      url('../fonts/roboto-condensed/RobotoCondensed-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Neutralize default box model and text adjustments */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    color-scheme: light dark; /* allow UA to adapt form controls */
+  }
+
+  body {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  /* Media & form primitives */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  /* Lists & paragraphs without default spacing */
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+  }
+  p {
+    margin: 0;
+  }
+
+  /* Defer focus outline to :focus-visible at higher layers */
+  :focus {
+    outline: none;
+  }
+}

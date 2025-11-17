@@ -1,0 +1,11 @@
+/* src/styles/overrides.css
+   --------------------------------------------------------------------------
+   Purpose: last-resort overrides for edge cases. Use sparingly.
+   Keep a comment per rule linking to the related issue/ticket.
+   -------------------------------------------------------------------------- */
+
+@layer overrides {
+  /* Example:
+  .some-page .third-party-widget > div { ... }  // ISSUE-1234
+  */
+}

@@ -1,4 +1,4 @@
-import { LegacyRef, memo, useMemo } from 'react';
+import { LegacyRef, memo, useEffect, useMemo } from 'react';
 
 import type { Point } from '@/types';
 
@@ -160,6 +160,7 @@ export const HeroConnector = memo(function HeroConnector({
   bloomEnabled,
   brightSpotMode,
   isRevealed,
+  onPathComputed,
   className,
 }: HeroConnectorProps): React.JSX.Element {
   // Compute a stable SVG path (`d`) from the polyline.
@@ -168,6 +169,10 @@ export const HeroConnector = memo(function HeroConnector({
     const poly = [from, ...(via ?? []), to];
     return buildRoundedPath(poly, cornerRadius, radiiXY);
   }, [from, to, via, cornerRadius, radiiXY]);
+
+  useEffect(() => {
+    onPathComputed?.(d);
+  }, [d, onPathComputed]);
 
   // Feature flags derived from props:
   // - bright spot is enabled only if animation is on AND a mode is provided.
@@ -207,6 +212,8 @@ export const HeroConnector = memo(function HeroConnector({
           data-bloom={isBloomed ? 'true' : 'false'}
           preserveAspectRatio='none'
         >
+          <path className={style.heroConnector__track} d={d} pathLength={100} />
+
           {/* Optional halo under the stroke; shown when `data-glow="true"` */}
           <path className={style.heroConnector__glow} d={d} pathLength={100} />
 

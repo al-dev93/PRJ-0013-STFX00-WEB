@@ -7,6 +7,7 @@ const MIN_AFTER_H1 = 28; // “air” après le bord droit du H1 si besoin
 const TAN_60 = Math.tan(Math.PI / 3); // ≈ 1.732 (oblique 60°)
 const MIN_OBLIQUE_DX = 60; // longueur min de l’oblique en x
 const CORNER_RADII_DEFAULT = 18; // rayon d’arrondi par défaut
+const DISPLAY_BRAND_ELEMENT = false;
 
 export {
   CORNER_RADII_DEFAULT,
@@ -18,4 +19,5 @@ export {
   OFFSET_UNDER_H1,
   RAIL_MARGIN_FROM_TEXT,
   TAN_60,
+  DISPLAY_BRAND_ELEMENT,
 };

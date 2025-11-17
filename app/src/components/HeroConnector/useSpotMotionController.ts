@@ -162,11 +162,26 @@ export function useSpotMotionController({
     if (!root) return undefined;
 
     const layer = root.querySelector('[data-spot-layer]') as HTMLDivElement | null;
+
+    // Empêche les réécritures identiques dues aux micro-variations sub-pixel
+    let px = -1;
+    let py = -1;
+    const EPS = 1e-3;
+
     const apply = () => {
       const sx = root.clientWidth / width || 1;
       const sy = root.clientHeight / height || 1;
-      if (layer) layer.style.transform = `translateZ(0) scale(${sx},${sy})`;
+
+      // n’écrit le transform que si ça a vraiment changé
+      const dx = Math.abs(sx - px);
+      const dy = Math.abs(sy - py);
+      if (dx > EPS || dy > EPS) {
+        px = sx;
+        py = sy;
+        if (layer) layer.style.transform = `translateZ(0) scale(${sx},${sy})`;
+      }
     };
+
     apply();
     const ro = new ResizeObserver(apply);
     ro.observe(root);
@@ -251,7 +266,7 @@ export function useSpotMotionController({
       }
 
       // Wait for the pulse to finish, then finalize.
-      root.addEventListener('animationend', handleAnimEnd, true);
+      root.addEventListener('animationend', handleAnimEnd, { capture: true, once: true });
 
       // Fallback cleanup in case the CSS animation never emits an event.
       if (brightSpotMode) {
@@ -287,7 +302,6 @@ export function useSpotMotionController({
       const spot = root.querySelector(selectors.spot) as HTMLElement | null;
       if (spot) {
         // Stage a clean run: force initial state, then let CSS drive to 100%.
-        root.dataset.spotVisible = 'true';
         root.dataset.spotVisible = 'true';
         spot.style.transition = 'none';
         spot.style.setProperty('offset-distance', '0%');

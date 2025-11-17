@@ -1,0 +1,22 @@
+/* src/styles/root.css
+   --------------------------------------------------------------------------
+   Entry point for global CSS. Declares layer order and imports each slice.
+   Keep this file minimal; do not place rules here.
+   -------------------------------------------------------------------------- */
+
+@layer reset, tokens, theme, base, components, utilities, overrides;
+
+/* Imports mapped to their intended layers */
+@import url('./reset.css') layer(reset);
+@import url('./tokens.css') layer(tokens);
+@import url('./theme.css') layer(theme);
+@import url('./base.css') layer(base);
+@import url('./utilities.css') layer(utilities);
+
+/* Optional add-ons (compatibility + themes + print) */
+@import url('./compat.css') layer(theme); /* legacy variable aliases */
+/*@import url('./high-contrast.css') layer(theme); /* accessibility theme */
+/*@import url('./print.css');                      /* print-only media rules */
+
+/* Top-most escape hatch (use sparingly) */
+@import url('./overrides.css') layer(overrides);

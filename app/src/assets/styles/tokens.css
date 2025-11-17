@@ -1,0 +1,173 @@
+/* src/styles/tokens.css
+   --------------------------------------------------------------------------
+   Purpose: raw, semantic-free primitives (aka design tokens foundation).
+   Everything else (themes/base/components) should read from these.
+   Keep values configurable via a small set of "knobs".
+   -------------------------------------------------------------------------- */
+
+@layer tokens {
+  :root {
+    /* ==== Global knobs (tune density/speed/roundness in one place) ==== */
+    --space-base: 4px; /* adjust 4px → 6px for airier layouts */
+    --dur-unit: 80ms; /* base unit for motion */
+    --radius-base: 8px; /* base corner radius */
+
+    /* ==== Brand color in OKLCH (parametric) - Cyan AI+ ~205-210 ==== */
+    --brand-h: 208; /* cyan - Cyan AI+ hue  210 -> 230*/
+    --brand-l: 0.76; /* lightness pivot = ref-brand-500 -> 0.62 */
+    --brand-c: 0.22; /* chroma (perceptual saturation) 0.08 -> 0.07 */
+    --brand-step-l: 0.06; /* lightness step per level -> 0.08 */
+    --brand-step-c: 0.02; /* chroma step per level -> 0.01 */
+
+    /* Derived brand scale (consistent perceptually) */
+    --ref-brand-200: oklch(
+      calc(var(--brand-l) + var(--brand-step-l) * 3) calc(var(--brand-c) - var(--brand-step-c) * 1) var(--brand-h)
+    );
+    --ref-brand-300: oklch(
+      calc(var(--brand-l) + var(--brand-step-l) * 2) calc(var(--brand-c) - var(--brand-step-c) * 0.5) var(--brand-h)
+    );
+    --ref-brand-400: oklch(calc(var(--brand-l) + var(--brand-step-l) * 1) var(--brand-c) var(--brand-h));
+    --ref-brand-500: oklch(var(--brand-l) var(--brand-c) var(--brand-h)); /* = 0.76 / 0.22 / 208 */
+    --ref-brand-600: oklch(calc(var(--brand-l) - var(--brand-step-l) * 0.5) var(--brand-c) var(--brand-h));
+    --ref-brand-700: oklch(calc(var(--brand-l) - var(--brand-step-l) * 1) var(--brand-c) var(--brand-h));
+    --ref-brand-800: oklch(
+      calc(var(--brand-l) - var(--brand-step-l) * 1.75) calc(var(--brand-c) - var(--brand-step-c) * 0.25) var(--brand-h)
+    );
+    --ref-brand-900: oklch(
+      calc(var(--brand-l) - var(--brand-step-l) * 2.5) calc(var(--brand-c) - var(--brand-step-c) * 0.5) var(--brand-h)
+    );
+
+    /* Neutral ramp (solid, alpha-free for structural surfaces) */
+    --ref-neutral-0: oklch(1 0 0);
+    --ref-neutral-50: oklch(0.98 0 0);
+    --ref-neutral-100: oklch(0.96 0 0);
+    --ref-neutral-200: oklch(0.9 0 0);
+    --ref-neutral-800: oklch(0.26 0 0);
+    --ref-neutral-900: oklch(0.16 0 0);
+
+    /* Status colors */
+    --ref-success: oklch(0.68 0.12 150);
+    --ref-warning: oklch(0.8 0.16 80);
+    --ref-danger: oklch(0.62 0.12 25);
+
+    /* Typography families */
+    --ref-font-body: 'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --ref-font-display: 'Oswald', 'Roboto Condensed', 'Roboto', ui-sans-serif, system-ui, Arial, sans-serif;
+
+    /* Spacing scale (modular) */
+    --space-ratio: 1.25;
+    --space-1: var(--space-base);
+    --space-2: calc(var(--space-1) * var(--space-ratio));
+    --space-3: calc(var(--space-2) * var(--space-ratio));
+    --space-4: calc(var(--space-3) * var(--space-ratio));
+    --space-6: calc(var(--space-4) * var(--space-ratio) * var(--space-ratio));
+    --space-8: calc(var(--space-6) * var(--space-ratio) * var(--space-ratio));
+
+    /* Fluid type scale */
+    --fs-base: 1rem; /* 16px root */
+    --fs-ratio: 1.2;
+
+    --ref-fs-step--1: calc(var(--fs-base) / var(--fs-ratio));
+    --ref-fs-step-0: var(--fs-base);
+    --ref-fs-step-1: calc(var(--fs-base) * var(--fs-ratio));
+    --ref-fs-step-2: calc(var(--ref-fs-step-1) * var(--fs-ratio));
+    --ref-fs-step-3: calc(var(--ref-fs-step-2) * var(--fs-ratio));
+
+    /* Line-heights (unitless) */
+    --ref-lh-body: 1.55;
+    --ref-lh-heading: 1.2;
+    --ref-lh-tight: 1.15;
+
+    /* Radii (derived) */
+    --ref-radius-1: var(--radius-base);
+    --ref-radius-2: calc(var(--radius-base) * 1.5);
+    --ref-radius-3: calc(var(--radius-base) * 2);
+
+    /* Neutral shadows (avoid color-cast) */
+    --ref-shadow-1: 0 1px 2px rgb(0 0 0 / 0.12);
+    --ref-shadow-2: 0 6px 18px rgb(0 0 0 / 0.16);
+
+    /* Durations */
+    --ref-dur-fast: var(--dur-unit);
+    --ref-dur-med: calc(var(--dur-unit) * 2.75);
+
+    /* Wash hero section */
+    --ref-wash-size-x: 60vw; /*90vw;*/
+    --ref-wash-size-y: 40vh;
+    --ref-wash-pos-x: 90%; /*75%;*/
+    --ref-wash-pos-y: 70%; /*110%;*/
+    --ref-wash-strength: 7%;
+    /* --ref-wash-strength: 3.5%; */
+
+    /*--------------------------------------------------------------------------
+       Layout API: viewport-based lateral margin (legacy-accurate + clamped).
+       New public names to avoid self-references or shadowing across layers.
+    -------------------------------------------------------------------------- */
+
+    /* Layout containers */
+    --ref-container-max: 81.25rem; /* 1300px / 16 = 81.25rem */
+    --ref-section-max: 62.5rem; /* ≈1000px */
+
+    /* Pixel anchors to reproduce the legacy math exactly */
+    --ref-container-max-px: 1300px;
+    --ref-section-max-px: 1000px;
+
+    /* Design knobs (edit these) */
+    --lateral-delta-slope: 0.25; /* growth slope (¼) */
+    --lateral-delta-offset: 30px; /* legacy offset (can be 0) */
+
+    /* Legacy-accurate raw value (can be negative between 1000–1119px vw) */
+    --layout-lateral-margin-raw: calc(
+      ((100vw - var(--ref-section-max-px)) * var(--lateral-delta-slope)) - var(--lateral-delta-offset)
+    );
+
+    /* Upper cap when <main> hits its max width */
+    --layout-lateral-cap: calc(
+      ((var(--ref-container-max-px) - var(--ref-section-max-px)) * var(--lateral-delta-slope)) -
+        var(--lateral-delta-offset)
+    );
+
+    /* Public variables (new names) */
+    --layout-lateral-margin: var(--layout-lateral-margin-raw); /* exact legacy */
+    --layout-lateral-margin-clamped: clamp(0px, var(--layout-lateral-margin-raw), var(--layout-lateral-cap)); /* safe */
+
+    /*--------------------------------------------------------------------------
+      Connector primitives: widths and mix coefficients (viewport-responsive).
+      Keep the same behavior you had, but as DS primitives.
+    -------------------------------------------------------------------------- */
+
+    /* Stroke width (was: clamp(2px, 0.25vw, 6px)) */
+    --ref-connector-stroke-w-min: 2px;
+    --ref-connector-stroke-w-vw: 0.25vw;
+    --ref-connector-stroke-w-max: 6px;
+    --ref-connector-stroke-width: clamp(
+      var(--ref-connector-stroke-w-min),
+      var(--ref-connector-stroke-w-vw),
+      var(--ref-connector-stroke-w-max)
+    );
+
+    /* Glow width (was: clamp(8px, 0.9vw, 14px)) */
+    --ref-connector-glow-w-min: 8px;
+    --ref-connector-glow-w-vw: 0.9vw;
+    --ref-connector-glow-w-max: 14px;
+    --ref-connector-glow-width: clamp(
+      var(--ref-connector-glow-w-min),
+      var(--ref-connector-glow-w-vw),
+      var(--ref-connector-glow-w-max)
+    );
+
+    /* Mix coefficients (tunable knobs; percentages) */
+    --coef-stroke-emphasis: 1; /* Stroke width multiplier */
+    --coef-glow-cover: 2; /* Anti-overlap by stroke path 1.6*/
+    --coef-glow-opacity: 0.26; /* Default halo opacity 0.22*/
+    --coef-glow-blur: 3px; /* Blur intensity 2.5px*/
+
+    --coef-track-width: 0.9; /* track = % of the width of the stroke 0.35*/
+    --coef-track-opacity: 0.28; /* track opacity (very discreet) 0.12 -> 0.18 */
+
+    --coef-stroke-darken: 30%; /* accent → black amount for stroke */
+    --coef-glow-tint: 12%; /* accent → black/white weighting for glow base color 22%*/
+    --coef-bright-spot: 40%; /* accent → white mix for bright spot */
+    --coef-stroke-weak: 35%; /* accent → white amount for stroke-weak */
+  }
+}

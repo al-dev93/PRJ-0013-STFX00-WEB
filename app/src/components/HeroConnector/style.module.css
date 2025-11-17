@@ -19,10 +19,12 @@
   width: 100%;
   aspect-ratio: var(--connector-aspect-ratio, 1800 / 400);
   contain: layout paint style;
+  pointer-events: none !important;
 
   /* ─ Stroke tokens (order: color → geometry → opacity/effects) ─ */
-  --connector-stroke-color: color-mix(in oklab, var(--brand, #2456a6) 78%, var(--white) 28%);
-  --connector-stroke-width: clamp(2px, 0.25vw, 6px);
+  --connector-stroke-emphasis: 1.3;
+  --connector-stroke-color: var(--semantic-connector-stroke);
+  --connector-stroke-width: calc(var(--semantic-connector-stroke-width) * var(--connector-stroke-emphasis));
   --connector-stroke-linecap: round;
   --connector-stroke-linejoin: round;
   --connector-stroke-opacity: 1;
@@ -34,14 +36,19 @@
   /* Endcap dot size derived from stroke width for coherent scale */
   --connector-dot-r: calc(var(--connector-stroke-width) * 0.9);
 
+  /* Track */
+  --connector-track-color: var(--semantic-connector-track);
+  --connector-track-width: var(--semantic-connector-track-width);
+  --connector-track-opacity: var(--semantic-connector-track-opacity);
+
   /* ─ Glow / underlay tokens (optional halo below the stroke) ─ */
-  --connector-glow-color: color-mix(in oklab, var(--connector-bright-spot-color) 40%, var(--white) 60%);
-  --connector-glow-width: clamp(8px, 0.9vw, 14px);
-  --connector-glow-opacity: 0.35;
-  --connector-glow-blur: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
+  --connector-glow-color: color-mix(in oklch, var(--connector-stroke-color) 88%, white);
+  --connector-glow-width: var(--semantic-connector-glow-width);
+  --connector-glow-opacity: var(--semantic-connector-glow-opacity);
+  --connector-glow-blur: var(--semantic-connector-glow-blur);
 
   /* ─ Bright-spot tokens (moving light traveling along the path) ─ */
-  --connector-bright-spot-color: var(--primary-color);
+  --connector-bright-spot-color: var(--semantic-connector-bright-spot);
   --connector-bright-spot-size: 15px;
   --connector-bright-spot-intensity: 1.1;
   --connector-bright-spot-bloom: 23px;
@@ -75,6 +82,7 @@
    Shared path primitives
    - Consistent geometry across glow/bloom/stroke.
    ─────────────────────────────────────────────────────────────── */
+.heroConnector__track,
 .heroConnector__glow,
 .heroConnector__bloomTrail,
 .heroConnector__stroke {
@@ -85,15 +93,24 @@
 }
 
 /* ───────────────────────────────────────────────────────────────
+   Track
+
+   ─────────────────────────────────────────────────────────────── */
+.heroConnector__track {
+  stroke: var(--connector-track-color);
+  stroke-width: var(--connector-track-width);
+  opacity: var(--connector-track-opacity);
+}
+
+/* ───────────────────────────────────────────────────────────────
    Glow (optional underlay)
    - Toggled via data attribute on SVG.
    ─────────────────────────────────────────────────────────────── */
 .heroConnector__glow {
   display: none;
   stroke: var(--connector-glow-color);
-  opacity: var(--connector-glow-opacity);
   stroke-width: var(--connector-glow-width);
-  filter: var(--connector-glow-blur);
+  opacity: var(--connector-glow-opacity);
 }
 
 /* ───────────────────────────────────────────────────────────────
@@ -103,10 +120,9 @@
    ─────────────────────────────────────────────────────────────── */
 .heroConnector__bloomTrail {
   display: none;
-  stroke: color-mix(in oklab, var(--connector-bright-spot-color) 40%, var(--white) 60%);
+  stroke: color-mix(in oklch, var(--connector-bright-spot-color) 40%, var(--white) 60%);
   stroke-width: clamp(14px, 1.4vw, 22px); /* plus large que le trait */
   opacity: 0.22;
-  filter: blur(6px);
   pointer-events: none;
   stroke-dasharray: var(--connector-dash);
   stroke-dashoffset: var(--connector-dash-offset-start);
@@ -119,9 +135,7 @@
    ─────────────────────────────────────────────────────────────── */
 .heroConnector__stroke {
   stroke: var(--connector-stroke-color, currentColor);
-  opacity: var(--connector-stroke-opacity);
-  stroke-width: var(--connector-stroke-width);
-  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--connector-bright-spot-color) 50%, var(--white) 50%));
+  stroke-width: calc(var(--connector-stroke-width) * var(--connector-stroke-emphasis, 1));
 }
 
 /* ───────────────────────────────────────────────────────────────
@@ -159,24 +173,24 @@
     circle,
     var(--white) 0%,
     var(--white) 34%,
-    color-mix(in oklab, var(--connector-bright-spot-color) 90%, var(--white) 10%) 52%,
-    color-mix(in oklab, var(--connector-bright-spot-color) 85%, var(--white) 15%) 63%,
+    color-mix(in oklch, var(--connector-bright-spot-color) 90%, var(--white) 10%) 52%,
+    color-mix(in oklch, var(--connector-bright-spot-color) 85%, var(--white) 15%) 63%,
     transparent 68%
   );
   box-shadow:
-    0 0 14px 0 color-mix(in oklab, var(--connector-bright-spot-color) 90%, var(--white) 10%),
-    0 0 32px 0 color-mix(in oklab, var(--connector-bright-spot-color) 75%, var(--white) 25%),
-    0 0 64px 0 color-mix(in oklab, var(--connector-bright-spot-color) 55%, var(--white) 45%);
+    0 0 14px 0 color-mix(in oklch, var(--connector-bright-spot-color) 90%, var(--white) 10%),
+    0 0 32px 0 color-mix(in oklch, var(--connector-bright-spot-color) 75%, var(--white) 25%),
+    0 0 64px 0 color-mix(in oklch, var(--connector-bright-spot-color) 55%, var(--white) 45%);
   mix-blend-mode: normal;
 
   /* Lightweight drop-shadows (avoid heavy blur stacks) */
   filter: drop-shadow(
       0 0 calc(var(--connector-bright-spot-bloom) * 0.45 * var(--pulse))
-        color-mix(in oklab, var(--connector-bright-spot-color) 90%, var(--white) 10%)
+        color-mix(in oklch, var(--connector-bright-spot-color) 90%, var(--white) 10%)
     )
     drop-shadow(
       0 0 calc(var(--connector-bright-spot-bloom) * 0.9 * var(--pulse))
-        color-mix(in oklab, var(--connector-bright-spot-color) 75%, var(--white) 25%)
+        color-mix(in oklch, var(--connector-bright-spot-color) 75%, var(--white) 25%)
     );
 
   /* Motion path (injected by the hook as --connector-path) */
@@ -202,7 +216,7 @@
   inset: -65%;
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--connector-bright-spot-color) 80%, var(--white) 20%) 0%,
+    color-mix(in oklch, var(--connector-bright-spot-color) 80%, var(--white) 20%) 0%,
     transparent 70%
   );
   filter: blur(calc(var(--connector-bright-spot-bloom) * 0.56 * var(--pulse)));
@@ -212,7 +226,7 @@
   inset: -80%;
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--connector-bright-spot-color) 60%, var(--white) 40%) 0%,
+    color-mix(in oklch, var(--connector-bright-spot-color) 60%, var(--white) 40%) 0%,
     transparent 70%
   );
   filter: blur(calc(var(--connector-bright-spot-aura) * 0.65 * var(--pulse)));
@@ -227,7 +241,7 @@
   pointer-events: none;
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--connector-bright-spot-color) 50%, var(--white) 50%) 0%,
+    color-mix(in oklch, var(--connector-bright-spot-color) 50%, var(--white) 50%) 0%,
     transparent 70%
   );
   filter: blur(calc(var(--connector-bright-spot-aura) * 0.75 * var(--pulse)));
@@ -240,7 +254,7 @@
 .heroConnector__dot {
   r: var(--connector-dot-r);
   fill: var(--connector-stroke-color, currentColor);
-  opacity: var(--connector-glow-opacity);
+  opacity: var(--connector-track-opacity);
 }
 
 /* ───────────────────────────────────────────────────────────────
@@ -250,6 +264,21 @@
    - utility classes like `.is-revealed` / `.is-complete`
    ─────────────────────────────────────────────────────────────── */
 
+/* Progressive enhancement: if Motion Path/OKLCH not supported, hides what would be invisible or strange */
+@supports not (offset-path: path('M0,0 L10,10')) {
+  .heroConnector__brightSpot,
+  .heroConnector__bloomTrail {
+    display: none !important;
+  }
+}
+
+@supports not (color: oklch(0.7 0.2 200)) {
+  .heroConnector__glow,
+  .heroConnector__bloomTrail {
+    display: none !important;
+  }
+}
+
 /* Structural rendering of the bright spot only if the SVG declares `data-spot="true"` */
 .heroConnector[data-spot='true'] ~ .heroConnector__spotLayer .heroConnector__brightSpot {
   display: block;
@@ -258,11 +287,14 @@
 /* Glow on/off via data attribute */
 .heroConnector[data-glow='true'] .heroConnector__glow {
   display: block;
+  filter: blur(var(--connector-glow-blur)) drop-shadow(0 1px 2px rgb(0 0 0 / 0.08));
+  mix-blend-mode: multiply;
 }
 
 /* Bloom trail on/off via data attribute */
 .heroConnector[data-bloom='true'] .heroConnector__bloomTrail {
   display: block;
+  filter: blur(6px);
 }
 
 /* Stroke animation enabled via data attribute */

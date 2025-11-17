@@ -1,0 +1,179 @@
+/* src/styles/theme.css
+   --------------------------------------------------------------------------
+   Purpose: map semantic tokens for themes (light as default, dark via MQ).
+   Components must consume only --semantic-* (never --ref-* directly).
+   -------------------------------------------------------------------------- */
+
+@layer theme {
+  /* LIGHT (default) */
+  :root,
+  :root[data-theme='light'] {
+    /* Tone coefficients (percentages) */
+    --tone-soften: 12%;
+    --tone-strong: 8%;
+
+    /* Surfaces */
+    --semantic-bg: var(--ref-neutral-50);
+    --semantic-surface-1: var(--ref-neutral-0);
+    --semantic-surface-2: var(--ref-neutral-100);
+    --semantic-surface-3: var(--ref-neutral-200);
+
+    /* Hero wash: very light tinted accent */
+    --semantic-wash-hero: radial-gradient(
+      var(--ref-wash-size-x) var(--ref-wash-size-y) at var(--ref-wash-pos-x) var(--ref-wash-pos-y),
+      color-mix(in oklab, var(--semantic-accent) var(--ref-wash-strength), transparent),
+      transparent 70%
+    );
+
+    /* Text */
+    --semantic-text: var(--ref-neutral-900);
+    --semantic-text-muted: oklch(0.45 0 0);
+    /* Text variants derived from semantic text */
+    --semantic-text-soft: color-mix(
+      in oklch,
+      var(--semantic-text) calc(100% - var(--tone-soften)),
+      var(--semantic-bg) var(--tone-soften)
+    );
+    --semantic-text-strong: color-mix(
+      in oklch,
+      var(--semantic-text) calc(100% - var(--tone-strong)),
+      black var(--tone-strong)
+    );
+
+    /* Accent & derivatives (cyan AI+) */
+    --semantic-accent: var(--ref-brand-600);
+    --semantic-accent-weak: var(--ref-brand-400);
+    --semantic-accent-strong: var(--ref-brand-700);
+
+    /* Links & focus */
+    --semantic-link: color-mix(in oklch, var(--ref-brand-600) 90%, black);
+    --semantic-ring: var(--ref-brand-500); /* oklch(0.75 0.09 230) */
+
+    /* Underline form of section headings */
+    --semantic-title-section-underline-thickness: clamp(4px, 0.5vw, 8px);
+    --semantic-title-section-underline-length: min(22ch, 68%);
+    --semantic-title-section-underline-overhang: 3ch;
+
+    /* Structure & status */
+    --semantic-border: color-mix(in oklch, var(--ref-neutral-900) 14%, white);
+    --semantic-shadow: var(--ref-shadow-1);
+    --semantic-success: var(--ref-success);
+    --semantic-warning: var(--ref-warning);
+    --semantic-danger: var(--ref-danger);
+
+    /* Typography & rhythm */
+    --semantic-font-body: var(--ref-font-body);
+    --semantic-font-display: var(--ref-font-display);
+    --semantic-fs-kicker: var(--ref-fs-step--1);
+    --semantic-fs-body: var(--ref-fs-step-0);
+    --semantic-fs-lead: var(--ref-fs-step-1);
+    --semantic-fs-title: var(--ref-fs-step-2);
+    --semantic-fs-hero: var(--ref-fs-step-3);
+    --semantic-fw-kicker: 600;
+    --semantic-lh-kicker: var(--ref-lh-tight);
+    --semantic-lh-body: var(--ref-lh-body);
+    --semantic-lh-heading: var(--ref-lh-heading);
+
+    --semantic-space-sm: var(--space-3);
+    --semantic-space-md: var(--space-4);
+    --semantic-space-lg: var(--space-6);
+    --semantic-radius: var(--ref-radius-3);
+    --semantic-dur: var(--ref-dur-med);
+
+    /* Link decorations */
+    --semantic-link-underline-thickness: 2px;
+    --semantic-link-underline-offset: 0.14em;
+
+    /*--------------------------------------------------------------------------
+      Connector semantics: colors, shadows, and widths derived from accent.
+      No raw colors in components; only --semantic-* here.
+    -------------------------------------------------------------------------- */
+
+    /* Widths straight from primitives */
+    --semantic-connector-stroke-width: calc(var(--ref-connector-stroke-width) * var(--coef-stroke-emphasis, 1));
+    --semantic-connector-track-width: calc(var(--semantic-connector-stroke-width) * var(--coef-track-width));
+    --semantic-connector-glow-width: max(
+      var(--ref-connector-glow-width),
+      calc(var(--semantic-connector-stroke-width) * var(--coef-glow-cover))
+    );
+
+    /* Colors derived from the accent (OKLCH for perceptual consistency) */
+    --semantic-connector-stroke: var(--semantic-accent);
+    --semantic-connector-track: color-mix(in oklch, var(--semantic-bg) 60%, var(--semantic-accent) 40%);
+    --semantic-connector-glow-color: color-mix(in oklch, var(--semantic-accent) 82%, white);
+    --semantic-connector-bloom-color: color-mix(in oklch, var(--semantic-accent) 20%, white);
+
+    --semantic-connector-stroke-weak: color-mix(
+      in oklch,
+      var(--semantic-accent) calc(100% - var(--coef-stroke-weak)),
+      white var(--coef-stroke-weak)
+    );
+
+    /* Bright spot (your legacy "connector-bright-spot-color") */
+    --semantic-connector-bright-spot: color-mix(
+      in oklch,
+      var(--semantic-accent) var(--coef-bright-spot),
+      white calc(100% - var(--coef-bright-spot))
+    );
+
+    /* Intensity */
+    --semantic-connector-track-opacity: var(--coef-track-opacity);
+    --semantic-connector-glow-opacity: var(--coef-glow-opacity);
+    --semantic-connector-glow-blur: var(--coef-glow-blur);
+  }
+
+  /* DARK (auto if user prefers dark and data-theme is not forced to "light") */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      /* In dark, soften towards bg (dark) and strong towards white for legibility */
+      --tone-soften: 10%;
+      --tone-strong: 10%;
+
+      --semantic-bg: var(--ref-neutral-900);
+      --semantic-surface-1: var(--ref-neutral-800);
+      --semantic-surface-2: oklch(0.23 0 0);
+      --semantic-surface-3: oklch(0.2 0 0);
+
+      --semantic-text: oklch(0.96 0 0);
+      --semantic-text-muted: oklch(0.78 0 0);
+
+      /* Text variants derived from semantic text */
+      --semantic-text-soft: color-mix(
+        in oklch,
+        var(--semantic-text) calc(100% - var(--tone-soften)),
+        var(--semantic-bg) var(--tone-soften)
+      );
+      --semantic-text-strong: color-mix(
+        in oklch,
+        var(--semantic-text) calc(100% - var(--tone-strong)),
+        white var(--tone-strong)
+      );
+
+      --semantic-accent: var(--ref-brand-500);
+      --semantic-accent-weak: var(--ref-brand-900);
+      --semantic-link: var(--ref-brand-400);
+      --semantic-ring: oklch(0.8 0.09 240);
+      --semantic-title-section-underline-thickness: clamp(3px, 0.45vw, 7px);
+
+      --semantic-border: color-mix(in oklch, white 14%, black);
+      --semantic-shadow: var(--ref-shadow-2);
+
+      /*--------------------------------------------------------------------------
+        Connector semantics: colors and shadows, derived from accent.
+        No raw colors in components; only --semantic-* here.
+      -------------------------------------------------------------------------- */
+
+      /* Adjust mixes for dark backgrounds (prefer white lifts over black) */
+      --semantic-connector-stroke: var(--ref-brand-400);
+      --semantic-connector-track: color-mix(in oklch, var(--semantic-accent) 15%, white 85%);
+      --semantic-connector-glow-color: color-mix(in oklch, var(--semantic-accent) 18%, black 82%);
+      --semantic-connector-bloom-color: color-mix(in oklch, var(--semantic-accent) 28%, white);
+      --semantic-connector-stroke-weak: color-mix(in oklch, var(--semantic-accent) 70%, white 30%);
+      --semantic-connector-bright-spot: color-mix(in oklch, var(--semantic-accent) 50%, white 50%);
+
+      --semantic-connector-track-opacity: var(--coef-track-opacity, 0.14);
+      --semantic-connector-glow-opacity: var(--coef-glow-opacity, 0.26);
+      --semantic-connector-glow-blur: var(--coef-glow-blur, 3px);
+    }
+  }
+}
