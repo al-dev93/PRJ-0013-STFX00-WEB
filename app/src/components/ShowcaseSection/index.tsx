@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { AppButton } from '@/components/AppButton';
 import type { DetailSection, MenuSectionsVisibility, Point, ViewBoxRect } from '@/types';
-import { ModalFormButton } from '@components/ModalFormButton';
 import { useOnScreen } from '@hooks/useOnScreen';
 // import titleLine from '@images/decorations/title_line.svg';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
@@ -126,6 +126,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
   const [animTick, setAnimTick] = useState<number>(0);
   const [vb, setVb] = useState<ViewBoxRect>({ minX: 0, minY: 0, width: 1000, height: 420 });
   const [points, setPoints] = useState<Point[]>([]);
+  const [hasConnectorAnimationPlayed, setHasConnectorAnimationPlayed] = useState<boolean>(false);
 
   const { isIntersecting, observerError } = useOnScreen(isHero ? titleRef : sectionRef, {
     threshold: isHero ? [0.45] : undefined,
@@ -145,6 +146,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
   }, [content, isHero]);
 
   const shouldRenderBrandContent = Boolean(brandContent) && DISPLAY_BRAND_ELEMENT;
+  const buttonState = hasConnectorAnimationPlayed ? 'ready' : 'pending';
 
   /**
    * Updates the visibility of the section in the page sections context.
@@ -287,6 +289,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
   useEffect(() => {
     if (!isHero || !isIntersecting) {
       setDrawPath(false);
+      setHasConnectorAnimationPlayed(false);
       return undefined;
     }
 
@@ -424,6 +427,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
           isRevealed={drawPath}
           className={style['section--hero__path']}
           onPathComputed={handlePathComputed}
+          setHasConnectorAnimationPlayed={setHasConnectorAnimationPlayed}
         />
       ) : null}
       <div className={style.section__bodySection}>
@@ -443,9 +447,11 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
           ),
         )}
       </div>
-      <ModalFormButton
+      <AppButton
         className={style.section__button}
         name='Contact'
+        variant={isHero ? 'hero' : undefined}
+        state={isHero ? buttonState : undefined}
         onClick={openModalFormDialog}
         ariaLabel='Open contact form'
         ariaExpanded={showModalFormDialog}

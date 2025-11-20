@@ -1,6 +1,6 @@
 import { RefObject } from 'react';
 
-import type { Point } from '@/types';
+import type { Point, SetStateBoolean } from '@/types';
 
 /**
  * Props for the {@link HeroConnector} component.
@@ -106,6 +106,12 @@ export interface HeroConnectorProps {
    * @param d - The computed SVG path data string.
    */
   onPathComputed?: (d: string) => void;
+
+  /**
+   * Description placeholder
+   *
+   */
+  setHasConnectorAnimationPlayed?: SetStateBoolean;
 }
 
 /**

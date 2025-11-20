@@ -1,0 +1,120 @@
+.appButton {
+  --btn-bg: var(--semantic-accent);
+  --btn-fg: #fff;
+  --btn-hover-bg: color-mix(in oklab, var(--semantic-accent) 88%, black);
+  --btn-active-bg: color-mix(in oklab, var(--semantic-accent) 80%, black);
+  --btn-ring: var(--ref-brand-500); /* Cyan AI+ focus */
+  --btn-bd: transparent; /* utile pour outline */
+  --btn-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+
+  /* display: block;
+  width: 150px;
+  padding: 12px;
+  border: 1px solid;
+  border-color: var(--quaternary-color);
+  border-radius: var(--br-md);
+  line-height: var(--lh-regular);
+  font-weight: bold;
+  background: var(--button-bg) var(--button-gradient);
+  color: var(--white);
+  font-family: var(--font-accessories);
+  font-size: var(--fs-xs);
+  cursor: pointer; */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  inline-size: fit-content;
+  min-inline-size: 10.5rem;
+  padding: 0.72rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid var(--btn-bd);
+  box-shadow: var(--btn-shadow);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+/* .appButton:enabled:hover,
+.appButton:enabled:focus {
+  background-color: var(--element-bg-hovered);
+  border-color: var(--secondary-color);
+  outline: none;
+} */
+.appButton:enabled:hover {
+  background: var(--btn-hover-bg);
+  transform: translateY(-1px);
+}
+.appButton:enabled:active {
+  background: var(--btn-active-bg);
+  transform: translateY(0);
+}
+.appButton:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px var(--btn-ring),
+    var(--btn-shadow);
+}
+
+.appButton:disabled,
+.appButton[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appButton {
+    transition: none;
+  }
+}
+
+.appButton[data-variant='hero'][data-state='ready'] {
+  --btn-bg: var(--ref-neutral-900);
+  --btn-fg: var(--ref-neutral-0);
+  --btn-hover-bg: color-mix(in oklab, var(--ref-neutral-900) 88%, white);
+  --btn-active-bg: color-mix(in oklab, var(--ref-neutral-900) 80%, white);
+  --btn-ring: var(--ref-brand-500);
+  --btn-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.appButton[data-variant='outline'] {
+  --btn-bg: transparent;
+  --btn-fg: var(--semantic-accent);
+  --btn-bd: color-mix(in oklab, var(--semantic-accent) 55%, white);
+  --btn-hover-bg: color-mix(in oklab, var(--semantic-accent) 10%, white);
+  --btn-active-bg: color-mix(in oklab, var(--semantic-accent) 16%, white);
+  --btn-ring: var(--ref-brand-500);
+  --btn-shadow: none;
+}
+
+.appButton[data-variant='ghost'] {
+  --btn-bg: transparent;
+  --btn-fg: color-mix(in oklab, var(--semantic-accent) 40%, var(--semantic-text));
+  --btn-bd: transparent;
+  --btn-hover-bg: color-mix(in oklab, var(--semantic-accent) 12%, white);
+  --btn-active-bg: color-mix(in oklab, var(--semantic-accent) 18%, white);
+  --btn-ring: var(--ref-brand-500);
+  --btn-shadow: none;
+}
+
+.appButton[data-variant='hero'][data-state='pending'] {
+  --btn-bg: transparent;
+  --btn-fg: color-mix(in oklab, var(--semantic-text) 82%, var(--semantic-accent));
+  --btn-bd: color-mix(in oklab, var(--semantic-accent) 45%, var(--surface-page));
+  --btn-hover-bg: transparent;
+  --btn-active-bg: transparent;
+  --btn-ring: color-mix(in oklab, var(--ref-brand-500) 60%, white);
+  --btn-shadow: none;
+
+  opacity: 0.65;
+  filter: saturate(0.6) brightness(0.98);
+  pointer-events: none; /* enlève si tu veux garder cliquable */
+}

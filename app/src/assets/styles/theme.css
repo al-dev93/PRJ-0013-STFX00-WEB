@@ -28,6 +28,7 @@
     /* Text */
     --semantic-text: var(--ref-neutral-900);
     --semantic-text-muted: oklch(0.45 0 0);
+
     /* Text variants derived from semantic text */
     --semantic-text-soft: color-mix(
       in oklch,
@@ -48,6 +49,10 @@
     /* Links & focus */
     --semantic-link: color-mix(in oklch, var(--ref-brand-600) 90%, black);
     --semantic-ring: var(--ref-brand-500); /* oklch(0.75 0.09 230) */
+
+    /* Link decorations */
+    --semantic-link-underline-thickness: 2px;
+    --semantic-link-underline-offset: 0.14em;
 
     /* Underline form of section headings */
     --semantic-title-section-underline-thickness: clamp(4px, 0.5vw, 8px);
@@ -80,9 +85,40 @@
     --semantic-radius: var(--ref-radius-3);
     --semantic-dur: var(--ref-dur-med);
 
-    /* Link decorations */
-    --semantic-link-underline-thickness: 2px;
-    --semantic-link-underline-offset: 0.14em;
+    /*--------------------------------------------------------------------------
+      Buttons and the different variants
+      primary : Cyan AI+, neutral to contrast with cyan, outline, ghost
+    -------------------------------------------------------------------------- */
+
+    /* Primary */
+    --btn-primary-bg: var(--semantic-accent); /* Cyan AI+ */
+    --btn-primary-fg: white;
+    --btn-primary-hover: color-mix(in oklab, var(--semantic-accent) 88%, black);
+    --btn-primary-active: color-mix(in oklab, var(--semantic-accent) 80%, black);
+    --btn-primary-ring: var(--ref-brand-500); /* Cyan AI+ focus */
+    --btn-outline-bd: color-mix(in oklab, var(--semantic-accent) 55%, white);
+    --btn-outline-fg: var(--semantic-accent);
+
+    /* Neutral variant */
+    --btn-hero-bg: var(--ref-neutral-900);
+    --btn-hero-fg: var(--ref-neutral-0);
+    --btn-hero-hover: color-mix(in oklab, var(--ref-neutral-900) 88%, white);
+    --btn-hero-ring: var(--ref-brand-500);
+
+    /* Outline variant */
+    --btn-outline-fg: var(--semantic-accent);
+    --btn-outline-bd: color-mix(in oklab, var(--semantic-accent) 55%, white);
+    --btn-outline-bg: transparent;
+    --btn-outline-hover-bg: color-mix(in oklab, var(--semantic-accent) 10%, white);
+    --btn-outline-active-bg: color-mix(in oklab, var(--semantic-accent) 16%, white);
+    --btn-outline-ring: var(--ref-brand-500);
+
+    /* Ghost variant */
+    --btn-ghost-fg: color-mix(in oklab, var(--semantic-accent) 40%, var(--semantic-text));
+    --btn-ghost-bg: transparent;
+    --btn-ghost-hover-bg: color-mix(in oklab, var(--semantic-accent) 12%, white);
+    --btn-ghost-active-bg: color-mix(in oklab, var(--semantic-accent) 18%, white);
+    --btn-ghost-ring: var(--ref-brand-500);
 
     /*--------------------------------------------------------------------------
       Connector semantics: colors, shadows, and widths derived from accent.
@@ -157,6 +193,43 @@
 
       --semantic-border: color-mix(in oklch, white 14%, black);
       --semantic-shadow: var(--ref-shadow-2);
+
+      /*--------------------------------------------------------------------------
+      Buttons and the different variants for dark mode
+
+      -------------------------------------------------------------------------- */
+
+      /* Primary */
+      --btn-primary-bg: var(--ref-brand-500);
+      --btn-primary-fg: white;
+      --btn-primary-hover: color-mix(in oklab, var(--ref-brand-500) 88%, black);
+      --btn-primary-active: color-mix(in oklab, var(--ref-brand-500) 80%, black);
+      --btn-primary-shadow: 0 6px 20px rgba(0, 0, 0, 0.32);
+      --btn-primary-shadow-h: 0 10px 28px rgba(0, 0, 0, 0.42);
+      --btn-primary-ring: var(--ref-brand-500);
+
+      /* Neutral variant */
+      --btn-hero-bg: var(--ref-neutral-100);
+      --btn-hero-fg: var(--ref-neutral-900);
+      --btn-hero-hover: var(--ref-neutral-200);
+      --btn-hero-active: color-mix(in oklab, var(--ref-neutral-200) 60%, var(--ref-neutral-100));
+      --btn-hero-ring: var(--ref-brand-500);
+      --btn-hero-shadow: 0 6px 20px rgba(0, 0, 0, 0.42);
+
+      /* Outline variant */
+      --btn-outline-fg: var(--ref-brand-500);
+      --btn-outline-bd: color-mix(in oklab, var(--ref-brand-500) 65%, black);
+      --btn-outline-bg: transparent;
+      --btn-outline-hover-bg: color-mix(in oklab, var(--ref-brand-500) 12%, black);
+      --btn-outline-active-bg: color-mix(in oklab, var(--ref-brand-500) 18%, black);
+      --btn-outline-ring: var(--ref-brand-500);
+
+      /* Ghost variant */
+      --btn-ghost-fg: color-mix(in oklab, var(--ref-brand-500) 65%, white);
+      --btn-ghost-bg: transparent;
+      --btn-ghost-hover-bg: color-mix(in oklab, var(--ref-brand-500) 14%, black);
+      --btn-ghost-active-bg: color-mix(in oklab, var(--ref-brand-500) 20%, black);
+      --btn-ghost-ring: var(--ref-brand-500);
 
       /*--------------------------------------------------------------------------
         Connector semantics: colors and shadows, derived from accent.

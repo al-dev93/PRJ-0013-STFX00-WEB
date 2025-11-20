@@ -2,8 +2,8 @@ import IonIcon from '@reacticons/ionicons';
 import React, { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { AppButton } from '@/components/AppButton';
 import type { KeyboardEventButton, KeyboardEventDiv } from '@/types';
-import { ModalFormButton } from '@components/ModalFormButton';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 
@@ -392,7 +392,7 @@ export function Modal({
         )}
         {button && (
           <footer className={style.modal__footer}>
-            <ModalFormButton
+            <AppButton
               className={style.buttonForm}
               name={button.name}
               form={button.form}

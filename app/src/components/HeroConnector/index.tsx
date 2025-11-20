@@ -161,6 +161,7 @@ export const HeroConnector = memo(function HeroConnector({
   brightSpotMode,
   isRevealed,
   onPathComputed,
+  setHasConnectorAnimationPlayed,
   className,
 }: HeroConnectorProps): React.JSX.Element {
   // Compute a stable SVG path (`d`) from the polyline.
@@ -183,13 +184,17 @@ export const HeroConnector = memo(function HeroConnector({
   // Wire the motion controller:
   // - injects `--connector-path`, aspect ratio, and data flags on the wrapper
   // - manages reveal/completion and bright-spot playthrough
-  const { ref } = useSpotMotionController({
+  const { ref, hasPlayed } = useSpotMotionController({
     pathD: d,
     width,
     height,
     isRevealed,
     brightSpotMode,
   });
+
+  useEffect(() => {
+    if (setHasConnectorAnimationPlayed) setHasConnectorAnimationPlayed(hasPlayed);
+  }, [hasPlayed, setHasConnectorAnimationPlayed]);
 
   return (
     <div className={className ?? ''}>

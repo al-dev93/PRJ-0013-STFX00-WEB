@@ -1,11 +1,15 @@
 .section {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: flex-end; */
+  /* gap: 12px;
+  padding-inline-end: 48px; */
+  height: auto;
+  /* min-height: 100vh; */
   /* Accent */
   --title-section-underline-length: var(--semantic-title-section-underline-length);
   --title-section-underline-thickness: var(--semantic-title-section-underline-thickness);
   --title-section-underline-overhang: var(--semantic-title-section-underline-overhang);
-
-  height: auto;
-  /* min-height: 100vh; */
 }
 
 .section--hero {
