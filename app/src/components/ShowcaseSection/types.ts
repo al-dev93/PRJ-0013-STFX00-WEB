@@ -20,7 +20,9 @@ import type { FetchErrorContext } from '@modules/Error/types';
 export interface ShowcaseSectionProps {
   content: DetailSection[];
   anchor?: SectionsRef;
+  isAnchored?: boolean;
   title?: string;
+  introduction?: string;
   MenuSectionsVisibility: MutableRefObject<MenuSectionsVisibility>;
   openModalFormDialog?: () => void;
   showModalFormDialog: boolean;

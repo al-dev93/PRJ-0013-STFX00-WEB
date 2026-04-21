@@ -1,11 +1,12 @@
 .skillsCloud {
   position: relative;
+  /* margin-top: calc(var(--semantic-space-xl) * 1.2); */
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--panel-bg);
+  /* background-color: var(--panel-bg);
   border-radius: var(--br-lg);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 .skillsCloud--contrastMode {

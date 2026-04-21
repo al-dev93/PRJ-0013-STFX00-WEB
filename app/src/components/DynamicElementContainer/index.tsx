@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react';
 
-import type { FetchData } from '@/types';
+import type { ProjectData } from '@/types';
+import { isProjectDataArray } from '@/utils/typeHelpers';
 import { DynamicElement } from '@components/DynamicElement';
 import { useFetchData } from '@hooks/useFetchData';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
-import { handleFetchError } from '@utils/fetchDataHelpers';
 
 import type { DynamicElementContainerProps } from './types';
 /**
@@ -25,23 +25,25 @@ import type { DynamicElementContainerProps } from './types';
 export function DynamicElementContainer({
   tag,
   className,
-  filterValue,
+  // filterValue,
   endpoint: dynamicElementContainerEndpoint,
-  method = 'GET',
+  method,
   ...props
 }: DynamicElementContainerProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
   // Fetch data using useFetchData custom hook.
   const endpoint = useMemo(() => dynamicElementContainerEndpoint || null, [dynamicElementContainerEndpoint]);
-  const { data: fetchedData, fetchError, isLoaded } = useFetchData({ endpoint, initialOptions: { method } });
+  const body = tag === 'Card' ? { p_display: 'card' } : undefined;
+  const { data: fetchedData, fetchError, isLoaded } = useFetchData({ endpoint, method, body });
+  const data = tag === 'Card' ? (fetchedData as ProjectData | ProjectData[]) : fetchedData;
 
   // Handle errors from data fetching.
-  useEffect(() => {
-    if (fetchError) {
-      // eslint-disable-next-line no-void
-      void handleFetchError('DynamicElementContainer', fetchError, handleError);
-    }
-  }, [fetchError, handleError]);
+  // useEffect(() => {
+  //   if (fetchError) {
+  //     // eslint-disable-next-line no-void
+  //     void handleFetchError('DynamicElementContainer', fetchError, handleError);
+  //   }
+  // }, [fetchError, handleError]);
 
   /**
    * Filter fetched data based on the 'display' property. If no filterValue is provided, return the fetched data.
@@ -49,15 +51,17 @@ export function DynamicElementContainer({
    * @constant
    * @type {(FetchData | undefined)}
    */
-  const filteredData: FetchData | undefined = useMemo(() => {
-    const simpleFetchedData = fetchedData as FetchData;
-    return filterValue
-      ? simpleFetchedData?.filter((item) => item?.['display' as keyof typeof item] === filterValue)
-      : simpleFetchedData;
-  }, [fetchedData, filterValue]);
+  // const processedData: FetchData | undefined = useMemo(() => {
+  //   const simpleFetchedData = filterValue
+  //     ? (fetchedData as FetchData)?.filter((item) => item?.['display' as keyof typeof item] === filterValue)
+  //     : (fetchedData as FetchData);
+  //   return isProjectDataArray(simpleFetchedData)
+  //     ? (simpleFetchedData as ProjectData[]).sort((a, b) => a.orderInDisplay - b.orderInDisplay)
+  //     : simpleFetchedData;
+  // }, [fetchedData, filterValue]);
 
   useEffect(() => {
-    if (isLoaded && !filteredData?.length) {
+    if (isLoaded && !fetchedData) {
       // eslint-disable-next-line no-void
       void handleError(
         createError(2202, 'no usable data for dynamic rendering', {
@@ -68,11 +72,11 @@ export function DynamicElementContainer({
         }),
       );
     }
-  }, [endpoint, filteredData, handleError, isLoaded]);
+  }, [endpoint, handleError, isLoaded, fetchedData]);
 
-  return !fetchError && !!filteredData?.length ? (
+  return !fetchError && isProjectDataArray(data) ? (
     <div className={className}>
-      {filteredData?.map((item) => <DynamicElement key={item.id} tag={tag} data={item} {...props} />)}
+      {data?.map((item) => <DynamicElement key={item.id} tag={tag} data={item} {...props} />)}
     </div>
   ) : null;
 }

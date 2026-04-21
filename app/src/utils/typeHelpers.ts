@@ -1,4 +1,16 @@
+import {
+  AccountLink,
+  Deliverable,
+  DetailSection,
+  DisplayMode,
+  IconType,
+  IndexPageSection,
+  ProjectData,
+  SectionsRef,
+} from '@/types';
 import { ApplicationError } from '@modules/Error/error';
+
+import { ICON_VALUES } from './constants';
 
 /**
  * Utility type that extracts the keys of T which are required (i.e. non-optional).
@@ -11,6 +23,16 @@ import { ApplicationError } from '@modules/Error/error';
 type RequiredKeys<T> = {
   [K in keyof T]-?: NonNullable<unknown> extends Pick<T, K> ? never : K;
 }[keyof T];
+
+const isString = (x: unknown): x is string => typeof x === 'string';
+const isNumber = (x: unknown): x is number => typeof x === 'number';
+const isBoolean = (x: unknown): x is boolean => typeof x === 'boolean';
+const isDisplayMode = (x: unknown): x is DisplayMode => x === 'slideshow' || x === 'card';
+const isIconType = (x: unknown): x is IconType =>
+  typeof x === 'string' && (ICON_VALUES as readonly string[]).includes(x);
+const isRecord = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null;
+const isSectionsRef = (x: unknown): x is SectionsRef =>
+  (typeof x === 'string' && ['home', 'about', 'work', 'more'].includes(x)) || typeof x === 'undefined';
 
 /**
  * Runtime type guard to check whether a value is an object matching the shape of T,
@@ -29,7 +51,7 @@ type RequiredKeys<T> = {
  * passing their guards, and if `optionalSchema` is provided, all present optional
  * properties also pass; otherwise `false`.
  */
-export function isObjectOfType<T extends object>(
+function isObjectOfType<T extends object>(
   value: unknown,
   requiredschema: { [K in RequiredKeys<T>]: (x: unknown) => x is T[K] },
   optionalSchema?: { [K in keyof T]?: (x: unknown) => x is T[K] },
@@ -62,12 +84,18 @@ export function isObjectOfType<T extends object>(
  *   An object mapping each optional property key of T to a type-guard function for that property.
  * @returns {value is T[]} True if `value` is an array and every element satisfies the required (and, if present, optional) schemas.
  */
-export function isArrayOfType<T extends object>(
+function isArrayOfType<T extends object>(
   value: unknown,
   requiredSchema: { [K in RequiredKeys<T>]: (x: unknown) => x is T[K] },
   optionalSchema?: { [K in keyof T]?: (x: unknown) => x is T[K] },
 ): value is T[] {
   return Array.isArray(value) && value.every((item) => isObjectOfType<T>(item, requiredSchema, optionalSchema));
+}
+
+export function isPrimitiveType(value: unknown): boolean {
+  if (isString(value)) return true;
+  if (isNumber(value)) return true;
+  return isBoolean(value);
 }
 
 /**
@@ -82,27 +110,11 @@ export function isArrayOfType<T extends object>(
  * @returns {boolean} `true` if `value` is an array and every element matches the specified
  * primitive type; otherwise `false`.
  */
-export function isPrimitiveArray(value: unknown, expectedType: string): boolean {
+export function isPrimitiveArray(value: unknown): boolean {
   if (!Array.isArray(value)) {
     return false;
   }
-
-  return value.every((item) => {
-    switch (expectedType) {
-      case 'string':
-        if (typeof item !== 'string') return false;
-        break;
-      case 'number':
-        if (typeof item !== 'number') return false;
-        break;
-      case 'boolean':
-        if (typeof item !== 'boolean') return false;
-        break;
-      default:
-        break;
-    }
-    return true;
-  });
+  return value.every((item) => isPrimitiveType(item));
 }
 
 /**
@@ -123,3 +135,111 @@ export function validateBooleanOrUndefined(value: unknown, propertyName: string)
     });
   }
 }
+
+/**
+ * Type guard to validate that a value conforms to the `DetailSection` shape.
+ *
+ * @param x – The value to validate.
+ * @returns True if `x` has the required `id` and `tag` strings,
+ *   optional fields are correctly typed, and nested `boldContent`
+ *   (if present) is an array of valid `DetailSection` objects.
+ */
+function isDetailSection(x: unknown): x is DetailSection {
+  // Must be an object
+  if (!isRecord(x)) return false;
+  const { id, tag, wrapped, name, content, endpoint, boldContent } = x;
+
+  // Validate required string fields
+  if (typeof id !== 'string') return false;
+  if (typeof tag !== 'string') return false;
+
+  // Validate optional primitive fields
+  if (wrapped !== undefined && typeof wrapped !== 'boolean') return false;
+  if (name !== undefined && typeof name !== 'string') return false;
+  if (content !== undefined && typeof content !== 'string') return false;
+  if (endpoint !== undefined && typeof endpoint !== 'string') return false;
+
+  // If boldContent is present, it must be an array of valid DetailSection
+  if (boldContent !== undefined) {
+    if (!Array.isArray(boldContent)) return false;
+    if (!boldContent.every(isDetailSection)) return false;
+  }
+
+  return true;
+}
+
+const isDetailSectionArray = (x: unknown): x is DetailSection[] => Array.isArray(x) && x.every(isDetailSection);
+
+// Deliverable type
+const requiredDeliverableSchema = {
+  id: isString,
+  service: isString,
+  icon: isIconType,
+  address: isString,
+} satisfies { [K in RequiredKeys<Deliverable>]: (x: unknown) => x is Deliverable[K] };
+
+const optionalDeliverableSchema = {
+  path: isString,
+} satisfies { [K in keyof Deliverable]?: (x: unknown) => x is Deliverable[K] };
+
+export const isDeliverable = (x: unknown): x is Deliverable =>
+  isObjectOfType<Deliverable>(x, requiredDeliverableSchema, optionalDeliverableSchema);
+export const isDeliverableArray = (x: unknown): x is Deliverable[] =>
+  isArrayOfType<Deliverable>(x, requiredDeliverableSchema, optionalDeliverableSchema);
+
+// ProjectData type
+const requiredProjectDataSchema = {
+  id: isString,
+  title: isString,
+  description: isString,
+  isCore: isBoolean,
+  orderInDisplay: isNumber,
+  deliverables: isDeliverableArray,
+} satisfies { [K in RequiredKeys<ProjectData>]: (x: unknown) => x is ProjectData[K] };
+
+const optionalProjectDataSchema = {
+  tags: (x: unknown): x is string[] => isPrimitiveArray(x),
+  picture: isString,
+  display: isDisplayMode,
+  projectSheet: isString,
+  subtitle: isString,
+} satisfies { [K in keyof ProjectData]?: (x: unknown) => x is ProjectData[K] };
+
+export const isProjectData = (x: unknown): x is ProjectData =>
+  isObjectOfType<ProjectData>(x, requiredProjectDataSchema, optionalProjectDataSchema);
+export const isProjectDataArray = (x: unknown): x is ProjectData[] =>
+  isArrayOfType<ProjectData>(x, requiredProjectDataSchema, optionalProjectDataSchema);
+
+// SocialMediaNavBar type
+const requiredAccountLinkSchema = {
+  id: isString,
+  service: isString,
+  icon: isIconType,
+} satisfies { [K in RequiredKeys<AccountLink>]: (x: unknown) => x is AccountLink[K] };
+
+const optionalAccountLinkSchema = {
+  onPage: isBoolean,
+  address: isString,
+} satisfies { [K in keyof AccountLink]?: (x: unknown) => x is AccountLink[K] };
+
+export const isAccountLink = (x: unknown): x is AccountLink =>
+  isObjectOfType<AccountLink>(x, requiredAccountLinkSchema, optionalAccountLinkSchema);
+
+// IndexPageSection type
+
+const requiredIndexPageSectionSchema = {
+  id: isString,
+  content: isDetailSectionArray,
+  order: isNumber,
+} satisfies { [K in RequiredKeys<IndexPageSection>]: (x: unknown) => x is IndexPageSection[K] };
+
+const optionalIndexPageSectionSchema = {
+  anchor: isSectionsRef,
+  isAnchored: isBoolean,
+  title: isString,
+} satisfies { [K in keyof IndexPageSection]?: (x: unknown) => x is IndexPageSection[K] };
+
+export const isIndexPageSection = (x: unknown): x is IndexPageSection =>
+  isObjectOfType<IndexPageSection>(x, requiredIndexPageSectionSchema, optionalIndexPageSectionSchema);
+export const isIndexPageSectionArray = (x: unknown): x is IndexPageSection[] =>
+  isArrayOfType<IndexPageSection>(x, requiredIndexPageSectionSchema, optionalIndexPageSectionSchema);

@@ -17,7 +17,7 @@ import type { AccountLink, Deliverable } from '@/types';
 export type SocialMediaNavBarProps = {
   className?: string;
   changeLinkColor?: string;
-  type?: 'left-nav' | 'right-nav' | 'card';
+  type?: 'left-nav' | 'right-nav' | 'card' | 'slideshow';
   buttons?: AccountLink[] | Deliverable[];
 };
 
@@ -50,3 +50,5 @@ export interface SocialMediaButtonErrorContext extends FetchErrorContext {
   operation: string;
   address: string | undefined;
 }
+
+export type ServiceType = 'gmail' | 'linkedin' | 'github' | 'npm' | 'external' | 'document' | 'figma';

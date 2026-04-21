@@ -5,6 +5,7 @@ import { createError } from '@modules/Error/utils/errorHandling';
 
 import style from './style.module.css';
 import type { FormButtonProps } from './types';
+
 /**
  * ModalFormButton component that renders a button for open modal or for forms,
  * with memoization and ref forwarding.
@@ -28,13 +29,14 @@ import type { FormButtonProps } from './types';
  *
  * @al-dev93
  */
-// function MemoizedModalFormButtonRef(props: FormButtonProps, ref?: LegacyRef<HTMLButtonElement>): React.JSX.Element {
 export const AppButton = memo(
   forwardRef(function AppButton(
-    { variant = 'primary', state = 'pending', className = '', ...rest }: FormButtonProps,
+    { variant, state, className = '', ...rest }: FormButtonProps,
     ref?: React.ForwardedRef<HTMLButtonElement>,
   ): React.JSX.Element {
     const { form, onClick, name, disabled, ariaHasPopup, ariaExpanded, ariaControls, ariaLabel } = rest;
+    const isDisabled = state ? state === 'pending' || disabled === false : disabled;
+
     const handleError = useErrorHandler();
 
     /**
@@ -65,8 +67,8 @@ export const AppButton = memo(
         data-state={state}
         onClick={handleClick}
         ref={ref}
-        disabled={disabled || undefined}
-        aria-disabled={disabled || undefined}
+        disabled={isDisabled}
+        aria-disabled={isDisabled ? 'true' : 'false'}
         aria-haspopup={ariaHasPopup}
         aria-expanded={ariaExpanded}
         aria-controls={ariaControls}
@@ -77,5 +79,3 @@ export const AppButton = memo(
     );
   }),
 );
-
-// export const ModalFormButton = memo(forwardRef(MemoizedModalFormButtonRef));

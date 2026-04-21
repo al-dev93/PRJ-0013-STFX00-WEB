@@ -1,9 +1,9 @@
 import IonIcon from '@reacticons/ionicons';
-import React, { KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { AppButton } from '@/components/AppButton';
-import type { KeyboardEventButton, KeyboardEventDiv } from '@/types';
+import type { KeyboardEventDiv } from '@/types';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 
@@ -101,18 +101,17 @@ export function Modal({
   /**
    * Close helper shared by click, key, cancel and backdrop flows.
    */
-  const setOpenFalse = useCallback(
-    (event: KeyboardEvent | MouseEvent | Event): void => {
-      event.preventDefault();
-      event.stopPropagation();
-      setOpen(false);
-    },
-    [setOpen],
-  );
+  const setOpenFalse = useCallback((): void => {
+    setOpen(false);
+  }, [setOpen]);
 
-  const handleCloseClick = (e: MouseEvent<HTMLButtonElement>): void => setOpenFalse(e);
-  const handleCloseKeyDown = (e: KeyboardEventButton): void => {
-    if (e.code === 'Enter') setOpenFalse(e);
+  const handleCloseClick = (): void => setOpenFalse();
+  const handleCloseKeyDown = (e: KeyboardEvent): void => {
+    if (e.code === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      setOpenFalse();
+    }
   };
 
   /**
@@ -170,7 +169,7 @@ export function Modal({
     const handleOutsideClick = async (e: Event): Promise<void> => {
       try {
         // Treat clicks on the dialog backdrop (event target === dialog) as a dismiss action.
-        if (e.target === dialogNode) setOpenFalse(e);
+        if (e.target === dialogNode) setOpenFalse();
       } catch (err) {
         await handleError(createError(1003, 'Error in click event outside modal window'), {
           component: 'Modal',
@@ -300,9 +299,9 @@ export function Modal({
     const dialogNode = dialogRef.current;
     if (!dialogNode) return undefined;
 
-    const handleCancel = async (e: Event): Promise<void> => {
+    const handleCancel = async (): Promise<void> => {
       try {
-        setOpenFalse(e);
+        setOpenFalse();
       } catch (err) {
         await handleError(createError(1003, 'Error closing modal window with escape key'), {
           component: 'Modal',

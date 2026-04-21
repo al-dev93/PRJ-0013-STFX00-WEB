@@ -99,14 +99,14 @@
     --popover-suggestions-bg: color-mix(in oklch, var(--semantic-surface-1) 90%, black);
 
     /* Social navbar */
-    --button-link-size: 48px;
+    /* --button-link-size: 48px;
     --button-link-color: color-mix(in oklch, var(--semantic-accent) 70%, black);
     --button-link-transition: color var(--semantic-dur), background-color var(--semantic-dur),
       transform var(--semantic-dur);
     --button-link-transform-scale: 1.1;
     --button-link-transform-rotate: 10deg;
     --button-link-icon-size: 2rem;
-    --button-link-outline: 2px solid var(--semantic-accent);
+    --button-link-outline: 2px solid var(--semantic-accent); */
 
     /* Your previously added aliases */
     --brand: var(--ref-brand-700);
@@ -118,8 +118,8 @@
     --link-hover: color-mix(in oklch, var(--semantic-link) 90%, black);
     --link-visited: #6a2bbf;
 
-    --focus-ring: var(--semantic-ring);
-    --focus-ring-on-dark: var(--ref-neutral-0);
+    /* --focus-ring: var(--semantic-ring);
+    --focus-ring-on-dark: var(--ref-neutral-0); */
 
     --ink: var(--semantic-text);
     --muted: var(--semantic-text-muted);

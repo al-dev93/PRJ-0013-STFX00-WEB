@@ -12,4 +12,5 @@ export type ProjectSheetLinkProps = {
   title: string;
   linkLabel: string;
   className?: string;
+  variant?: string;
 };

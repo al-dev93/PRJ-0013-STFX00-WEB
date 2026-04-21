@@ -1,21 +1,15 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
-import type { AccountLink, Deliverable } from '@/types';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
-import { ICON_VALUES } from '@utils/constants';
-import { isObjectOfType } from '@utils/typeHelpers';
+import { ICON_VALUES, SERVICE_LABEL } from '@utils/constants';
+import { isAccountLink, isDeliverable } from '@utils/typeHelpers';
 import { isValidUrl } from '@utils/urlHelpers';
 
-import {
-  optionalAccountLinkButtonSchema,
-  optionalDeliverableButtonSchema,
-  requiredAccountLinkButtonSchema,
-  requiredDeliverableButtonSchema,
-} from './socialMediaButtonSchema';
 import style from './style.module.css';
-import type { SocialMediaButtonProps } from '../../types';
+import type { ServiceType, SocialMediaButtonProps } from '../../types';
+
 /**
  * SocialMediaButton component for rendering a button with a social media link.
  * For mail links, the address is encrypted to avoid being displayed in plain text.
@@ -31,6 +25,7 @@ import type { SocialMediaButtonProps } from '../../types';
  */
 export function SocialMediaButton({ className, button }: SocialMediaButtonProps): React.JSX.Element | null {
   const { icon, address, service, id } = useMemo(() => button, [button]);
+  const buttonDescription = service in SERVICE_LABEL ? SERVICE_LABEL[service as ServiceType] : undefined;
   const handleError = useErrorHandler();
 
   /**
@@ -86,11 +81,7 @@ export function SocialMediaButton({ className, button }: SocialMediaButtonProps)
   useEffect(() => {
     if (!button || (button && (!icon || !service || !id))) {
       handlePropsValidity();
-    } else if (
-      button &&
-      !isObjectOfType<AccountLink>(button, requiredAccountLinkButtonSchema, optionalAccountLinkButtonSchema) &&
-      !isObjectOfType<Deliverable>(button, requiredDeliverableButtonSchema, optionalDeliverableButtonSchema)
-    ) {
+    } else if (button && !isAccountLink(button) && !isDeliverable(button)) {
       handlePropsValidity('type');
     }
   }, [button, handlePropsValidity, icon, id, service]);
@@ -98,20 +89,12 @@ export function SocialMediaButton({ className, button }: SocialMediaButtonProps)
   return service.length ? (
     <a
       className={`${style.buttonLink} ${className ?? ''}`}
-      href={
-        isObjectOfType<Deliverable>(button, requiredDeliverableButtonSchema, optionalDeliverableButtonSchema) &&
-        button.path
-          ? `${button.address}${button.path}`
-          : button.address
-      }
+      href={isDeliverable(button) && button.path ? `${button.address}${button.path}` : button.address}
       target={button.service === 'gmail' ? undefined : '_blank'}
       rel='noopener noreferrer'
-      // type='button'
-      aria-label={`Link to ${service}`}
-      // role='button'
-      // tabIndex={0}
+      aria-label={buttonDescription}
+      title={buttonDescription}
     >
-      {/* <IonIcon className={`${className} ${style.buttonLink__icon}`} name={icon} aria-hidden='true' /> */}
       <IonIcon className={style.buttonLink__icon} name={icon} aria-hidden='true' />
     </a>
   ) : null;

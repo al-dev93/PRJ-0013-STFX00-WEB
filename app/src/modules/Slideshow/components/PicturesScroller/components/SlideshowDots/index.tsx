@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, memo, useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { ACTIVE_STATUS, NOT_ACTIVE_STATUS } from '@utils/constants';
 
@@ -16,10 +16,8 @@ import { CHANGE_SCROLLING_DOT, START } from '../../../../utils/constants';
  * @property {Dispatch} slideshowDispatch - Dispatch function to update the slideshow state.
  * @property {SlideshowState} slideshowState - The current state of the slideshow.
  * @returns {React.JSX.Element} JSX element representing the slideshow dots.
- *
- * @al-dev93
  */
-function MemoizedSlideshowDots({
+export const SlideshowDots = memo(function SlideshowDots({
   slidesIndex,
   slideshowDispatch,
   slideshowState,
@@ -40,42 +38,35 @@ function MemoizedSlideshowDots({
    * @param {number} value - The index of the selected slide.
    */
   const handleClick = (value: number): void => {
-    slideshowDispatch({ type: CHANGE_SCROLLING_DOT, payload: { dot: value, transition: START } });
+    if (activeSlideIndex !== value) {
+      slideshowDispatch({ type: CHANGE_SCROLLING_DOT, payload: { dot: value, transition: START } });
+    }
   };
 
   /**
    * Handles the keydown event to navigate between slides using the keyboard.
-   * Only resoonds to Enter and Space keys.
+   * Only responds to Enter and Space keys.
    *
    * @function
    * @param {KeyboardEvent<HTMLDivElement>} event - The keyboard event triggered by pressing a key.
    * @param {number} value - The index of the slide to navigate to.
    */
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>, value: number): void => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    event.stopPropagation();
-    handleClick(value);
-  };
 
   return (
     <div className={style.slideshowDots} role='navigation' aria-label='Slide navigation'>
       {slidesIndex.map((value) => {
         const status = activeSlideIndex === value ? ACTIVE_STATUS : NOT_ACTIVE_STATUS;
         return (
-          <div
+          <button
             key={value}
-            className={`${style.slideshowDots__dot} ${style[`slideshowDots__dot--${status}`]} ${style['slideshowDots__dot--transition']}`}
-            role='button'
-            aria-label={`Go to slide ${value + 1}`}
+            className={`${style.slideshowDots__dot} ${status === 'active' ? style[`slideshowDots__dot--${status}`] : ''}`}
+            type='button'
+            aria-label={`Aller à la diapositive ${value + 1}`}
+            aria-current={status === 'active' ? 'page' : undefined}
             onClick={() => handleClick(value)}
-            onKeyDown={(e) => handleKeyDown(e, value)}
-            tabIndex={0}
           />
         );
       })}
     </div>
   );
-}
-
-export const SlideshowDots = memo(MemoizedSlideshowDots);
+});

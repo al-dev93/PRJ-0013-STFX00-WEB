@@ -38,10 +38,10 @@ import {
  *
  * @al-dev93
  */
-function MemoizedSkillsCloud({
+const SkillsCloud = memo(function SkillsCloud({
   data: skillsData,
   width = 1000,
-  height = 400,
+  height = 320,
   endpoint: skillsCloudEndpoint,
 }: SkillsCloudProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
@@ -53,7 +53,7 @@ function MemoizedSkillsCloud({
   const shouldFetch = !skillsData;
   // Use useFetchData hook if shouldFetch is true
   const endpoint = useMemo(() => (shouldFetch ? skillsCloudEndpoint : null), [shouldFetch, skillsCloudEndpoint]);
-  const { data: fetchedData, fetchError, isLoaded } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
+  const { data: fetchedData, fetchError, isLoaded } = useFetchData({ endpoint, method: 'POST' });
 
   // Use skillsData if provided, otherwise use fetched data.
   const data = useMemo((): Skill[] => skillsData || (fetchedData as Skill[]), [fetchedData, skillsData]);
@@ -182,7 +182,7 @@ function MemoizedSkillsCloud({
         Nuage de compétences
       </h3>
       <p id='skillsCloud-description' className='visually-hidden'>
-        AlgoNetDesign possède les compétences suivantes, classées de la plus mobilisée à la moins mobilisée:{' '}
+        Stack-Flex possède les compétences suivantes, classées de la plus mobilisée à la moins mobilisée:{' '}
         {data
           ?.sort((a, b) => b.value - a.value)
           .map((skill) => skill.text)
@@ -247,7 +247,6 @@ function MemoizedSkillsCloud({
       </fieldset>
     </div>
   ) : null;
-}
+});
 
-const SkillsCloud = memo(MemoizedSkillsCloud);
 export default SkillsCloud;

@@ -1,4 +1,4 @@
-import { FetchMode, FetchOptions, UseFetchDataParams } from '@/types';
+import { ApiConfigParams, FetchMode, FetchOptions, UseFetchDataParams } from '@/types';
 
 /**
  * Validates if the provided string is a valid URL.
@@ -130,10 +130,7 @@ function getRuntimeEnv(): {
  *   options: FetchOptions;
  * }} An object containing the full URL(s) and corresponding fetch options.
  */
-function getRestApiConfig(
-  endpoint: string | string[],
-  method: string,
-): {
+function getRestApiConfig({ endpoint, method, body }: ApiConfigParams): {
   apiEndpoint: string | string[];
   apiOptions: FetchOptions;
 } {
@@ -144,16 +141,19 @@ function getRestApiConfig(
 
   const apiEndpoint = Array.isArray(endpoint) ? endpoint.map(withRpc) : withRpc(endpoint);
 
-  return {
-    apiEndpoint,
-    apiOptions: {
-      method,
-      headers: {
-        apikey: rest.apikey,
-        Authorization: `Bearer ${rest.token}`,
-      },
-    },
+  const headers: HeadersInit = {
+    apikey: rest.apikey,
+    Authorization: `Bearer ${rest.token}`,
+    ...(body ? { 'Content-Type': 'application/json' } : {}),
   };
+
+  const apiOptions: FetchOptions = {
+    method,
+    headers,
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  };
+
+  return { apiEndpoint, apiOptions };
 }
 
 /**
@@ -169,10 +169,7 @@ function getRestApiConfig(
  *   options: FetchOptions;
  * }} An object containing the full URL and corresponding fetch options.
  */
-function getEdgeFunctionConfig(
-  endpoint: string | string[],
-  method: string,
-): {
+function getEdgeFunctionConfig({ endpoint, method, body }: ApiConfigParams): {
   apiEndpoint: string | string[];
   apiOptions: FetchOptions;
 } {
@@ -181,16 +178,18 @@ function getEdgeFunctionConfig(
     ? endpoint.map((ep: string) => `${edge.baseUrl}/${ep}`)
     : `${edge.baseUrl}/${endpoint}`;
 
-  return {
-    apiEndpoint,
-    apiOptions: {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    },
+  const headers: HeadersInit = {
+    ...(body ? { 'Content-Type': 'application/json' } : {}),
   };
+
+  const apiOptions: FetchOptions = {
+    method,
+    headers,
+    credentials: 'include',
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  };
+
+  return { apiEndpoint, apiOptions };
 }
 
 /**
@@ -215,14 +214,18 @@ function getEdgeFunctionConfig(
  */
 export function getFetchUrlOrUrls({
   endpoint,
-  initialOptions,
+  method = 'GET',
+  body,
   edgeFunction,
-}: Omit<UseFetchDataParams, 'shouldRefetch'>): { apiEndpoint: string | string[] | null; apiOptions: FetchOptions } {
-  if (!endpoint) return { apiEndpoint: null, apiOptions: initialOptions };
+}: Omit<UseFetchDataParams, 'shouldRefetch'>): {
+  apiEndpoint: string | string[] | null;
+  apiOptions: FetchOptions;
+} {
+  if (!endpoint) return { apiEndpoint: null, apiOptions: { method } };
 
   return edgeFunction
-    ? getEdgeFunctionConfig(endpoint as string, initialOptions.method ?? 'GET')
-    : getRestApiConfig(endpoint, initialOptions.method ?? 'GET');
+    ? getEdgeFunctionConfig({ endpoint, method, body })
+    : getRestApiConfig({ endpoint, method, body });
 }
 
 export function getUrlBase(): { isRemote: boolean; urlBase: string } {

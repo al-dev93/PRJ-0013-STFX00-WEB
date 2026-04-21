@@ -1,6 +1,7 @@
 import { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
 
 import { FetchErrorContext } from '@/modules/Error/types';
+import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@/utils/constants';
 
 import type { IconType } from '.';
 
@@ -81,12 +82,13 @@ export type AccountLink = {
 /**
  * @description The type of tag to determine its style.
  */
-export type TagType = 'alerted' | 'filled' | 'thinned';
+// export type TagType = 'alerted' | 'filled' | 'thinned';
+export type TagType = typeof TAG_CARD | typeof TAG_FORM | typeof TAG_SLIDESHOW;
 
 /**
  * @description
  */
-export type SectionsRef = 'home' | 'work' | 'about' | 'services';
+export type SectionsRef = 'home' | 'work' | 'about' | 'services' | 'more';
 
 /**
  * @description
@@ -103,6 +105,8 @@ export type IndexPageSection = Omit<MenuItemType, 'label' | 'anchor'> & {
   content: DetailSection[];
   order: number;
   anchor?: SectionsRef;
+  isAnchored?: boolean;
+  introduction?: string;
 };
 
 /**
@@ -185,10 +189,14 @@ type DisplayMode = 'slideshow' | 'card';
 export type ProjectData = {
   id: string;
   title: string;
+  subtitle?: string;
   description: string;
+  primaryTag?: number;
   tags?: string[];
+  isCore: boolean;
   picture?: string;
   display?: DisplayMode;
+  orderInDisplay: number;
   deliverables: Deliverable[];
   projectSheet?: string;
 };
@@ -277,24 +285,57 @@ export type ContactMessage = {
 
 // NOTE: data fetched via the useFetchData hook
 
-/**
- * Defines the type of parameters used by the custom hook useFetchData
- *
- * @export
- * @type {object} UseFetchDataParams
- * @property {(string | string[] | null)} [endpoint] - final part of the API URL or an array
- * of final part.
- * @property {FetchOptions} initialOptions - The options to use for the fetch request.
- * @property {boolean} [shouldRefetch] - A flag indicating if the data should be refetched.
- * @property {boolean} [edgeFunction] - Whether to target a serverless edge function (true)
- * or the standard API (false).
- */
-export type UseFetchDataParams = {
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
+export type JsonObject = { [key: string]: JsonValue };
+
+export type FetchOptions = Omit<RequestInit, 'body'> & {
+  /**
+   * Body of the request.
+   * Must be serialized manually (e.g. JSON.stringify).
+   */
+  body?: BodyInit | null;
+};
+
+export type ApiConfigParams = {
+  endpoint: string | string[];
+  method: HttpMethod;
+  body?: JsonObject;
+};
+
+export type UseFetchDataParams<TBody extends JsonObject = JsonObject> = {
+  /**
+   * Final part of the API URL or an array of final parts.
+   * If null or undefined, the hook exits early.
+   */
   endpoint?: string | string[] | null;
-  initialOptions: FetchOptions;
+
+  /**
+   * HTTP method used for the request.
+   * Optional ̶ defaults to get if not specified.
+   */
+  method?: HttpMethod;
+
+  /**
+   * JSON body (object) that will be serialized by getFetchUrlOrUrls.
+   * For RPC: e.g. { p_display: 'card' }
+   */
+  body?: TBody;
+
+  /**
+   * Whether the hook should refetch when dependencies change.
+   */
   shouldRefetch?: boolean;
+
+  /**
+   * Whether the endpoint targets a Supabase Edge Function.
+   */
   edgeFunction?: boolean;
 };
+
+export type GetProjectSummaryBody = { p_display: DisplayMode };
 
 // TODO: add comment
 /**
@@ -342,11 +383,6 @@ export type CsrfRecord = {
   token: string;
   fetchedAt: number;
 };
-
-/**
- * Options for the fetch request.
- */
-export type FetchOptions = RequestInit;
 
 // NOTE: setting up the application operation
 

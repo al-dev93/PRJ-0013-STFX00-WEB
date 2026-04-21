@@ -1,17 +1,17 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { memo, useEffect } from 'react';
 
-import type { Deliverable } from '@/types';
 import { SkillsList } from '@components/SkillsList';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
-import { isObjectOfType } from '@utils/typeHelpers';
+import { isDeliverableArray } from '@utils/typeHelpers';
 
-import { optionalDeliverableSchema, requiredDeliverableSchema } from './deliverableSchema';
 import style from './style.module.css';
 import type { CardProps } from './types';
 import { ProjectSheetLink } from '../ProjectSheetLink';
+
+// import { optionalDeliverableSchema, requiredDeliverableSchema } from './deliverableSchema';
 
 /**
  * Card component that displays project data including title, description, skills, and social media links.
@@ -26,6 +26,7 @@ import { ProjectSheetLink } from '../ProjectSheetLink';
 function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
   const isDev = import.meta.env.MODE !== 'production';
+  const variant = cardData.isCore ? 'root' : 'default';
 
   useEffect(() => {
     if (!isDev) return;
@@ -38,9 +39,7 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
       typeof cardData.id !== 'string' ||
       typeof cardData.title !== 'string' ||
       typeof cardData.description !== 'string' ||
-      !cardData.deliverables.every((deliverable) =>
-        isObjectOfType<Deliverable>(deliverable, requiredDeliverableSchema, optionalDeliverableSchema),
-      );
+      !isDeliverableArray(cardData.deliverables);
 
     if (wrongType) {
       handleError(
@@ -78,10 +77,17 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
   if (cardData.display !== 'card') return null;
 
   return (
-    <article className={style.card} aria-labelledby={`card-title-${cardData.id}`}>
+    <article className={style.card} data-variant={variant} aria-labelledby={`card-title-${cardData.id}`}>
       <header className={style.card__header}>
-        <IonIcon className={style.card__folderIcon} name='folder-open-sharp' aria-hidden='true' />
-        <SocialMediaNavBar changeLinkColor={style.card__additionalNav} type='card' buttons={cardData.deliverables} />
+        <div className={style.card__header__meta}>
+          <IonIcon
+            className={style.card__folderIcon}
+            name={variant === 'root' ? 'layers' : 'folder-open-sharp'}
+            aria-hidden='true'
+          />
+          {variant === 'root' ? <span className={style.card__badge}>Projet socle</span> : null}
+        </div>
+        <SocialMediaNavBar changeLinkColor={style.card__additionalNav} buttons={cardData.deliverables} />
       </header>
       <div className={style.card__main}>
         <h3 id={`card-title-${cardData.id}`}>{cardData.title}</h3>
@@ -90,13 +96,13 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
           <ProjectSheetLink
             projectSheet={cardData.projectSheet}
             title={cardData.title}
-            linkLabel='Voir la fiche projet'
+            linkLabel="Voir l'étude de cas"
             className={style.card__description__projectLink}
           />
         </p>
       </div>
       <footer className={style.card__footer}>
-        <SkillsList tagColor={style.card__skillsList} lineBreak list={cardData.tags} />
+        <SkillsList className={style.card__tag} layoutType='card' list={cardData.tags} />
       </footer>
     </article>
   );

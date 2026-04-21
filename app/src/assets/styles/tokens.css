@@ -79,9 +79,13 @@
     --ref-lh-tight: 1.15;
 
     /* Radii (derived) */
-    --ref-radius-1: var(--radius-base);
-    --ref-radius-2: calc(var(--radius-base) * 1.5);
-    --ref-radius-3: calc(var(--radius-base) * 2);
+    --ref-radius-1: var(--radius-base); /* xs */
+    --ref-radius-2: calc(var(--radius-base) * 1.5); /* sm */
+    --ref-radius-3: calc(var(--radius-base) * 2); /* md */
+    --ref-radius-4: calc(var(--radius-base) * 2.5); /* lg */
+    --ref-radius-5: calc(var(--radius-base) * 3); /* x1 */
+    --ref-radius-6: calc(var(--radius-base) * 3.5); /* 2xl */
+    --ref-radias-7: calc(var(--radius-base) * 4); /* 3xl */
 
     /* Neutral shadows (avoid color-cast) */
     --ref-shadow-1: 0 1px 2px rgb(0 0 0 / 0.12);
@@ -92,11 +96,12 @@
     --ref-dur-med: calc(var(--dur-unit) * 2.75);
 
     /* Wash hero section */
-    --ref-wash-size-x: 60vw; /*90vw;*/
-    --ref-wash-size-y: 40vh;
-    --ref-wash-pos-x: 90%; /*75%;*/
-    --ref-wash-pos-y: 70%; /*110%;*/
-    --ref-wash-strength: 7%;
+    --ref-wash-size-x: 530px; /*40vw 90vw;*/
+    --ref-wash-size-y: 350px; /* 40vh */
+    --ref-wash-pos-x: 72%; /* 50% 75%;*/
+    --ref-wash-pos-y: 72%; /* 50% 110%;*/
+    --ref-wash-strength: 6%;
+    --ref-wash-color: var(--ref-brand-500);
     /* --ref-wash-strength: 3.5%; */
 
     /*--------------------------------------------------------------------------
@@ -130,44 +135,5 @@
     /* Public variables (new names) */
     --layout-lateral-margin: var(--layout-lateral-margin-raw); /* exact legacy */
     --layout-lateral-margin-clamped: clamp(0px, var(--layout-lateral-margin-raw), var(--layout-lateral-cap)); /* safe */
-
-    /*--------------------------------------------------------------------------
-      Connector primitives: widths and mix coefficients (viewport-responsive).
-      Keep the same behavior you had, but as DS primitives.
-    -------------------------------------------------------------------------- */
-
-    /* Stroke width (was: clamp(2px, 0.25vw, 6px)) */
-    --ref-connector-stroke-w-min: 2px;
-    --ref-connector-stroke-w-vw: 0.25vw;
-    --ref-connector-stroke-w-max: 6px;
-    --ref-connector-stroke-width: clamp(
-      var(--ref-connector-stroke-w-min),
-      var(--ref-connector-stroke-w-vw),
-      var(--ref-connector-stroke-w-max)
-    );
-
-    /* Glow width (was: clamp(8px, 0.9vw, 14px)) */
-    --ref-connector-glow-w-min: 8px;
-    --ref-connector-glow-w-vw: 0.9vw;
-    --ref-connector-glow-w-max: 14px;
-    --ref-connector-glow-width: clamp(
-      var(--ref-connector-glow-w-min),
-      var(--ref-connector-glow-w-vw),
-      var(--ref-connector-glow-w-max)
-    );
-
-    /* Mix coefficients (tunable knobs; percentages) */
-    --coef-stroke-emphasis: 1; /* Stroke width multiplier */
-    --coef-glow-cover: 2; /* Anti-overlap by stroke path 1.6*/
-    --coef-glow-opacity: 0.26; /* Default halo opacity 0.22*/
-    --coef-glow-blur: 3px; /* Blur intensity 2.5px*/
-
-    --coef-track-width: 0.9; /* track = % of the width of the stroke 0.35*/
-    --coef-track-opacity: 0.28; /* track opacity (very discreet) 0.12 -> 0.18 */
-
-    --coef-stroke-darken: 30%; /* accent → black amount for stroke */
-    --coef-glow-tint: 12%; /* accent → black/white weighting for glow base color 22%*/
-    --coef-bright-spot: 40%; /* accent → white mix for bright spot */
-    --coef-stroke-weak: 35%; /* accent → white amount for stroke-weak */
   }
 }

@@ -1,3 +1,5 @@
+import { HttpMethod } from '@/types';
+
 import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
 
 /**
@@ -14,7 +16,7 @@ import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
 export type DynamicElementContainerProps = {
   tag: ValidHTMLTag | ValidComponentTag;
   className?: string;
-  filterValue?: string;
+  // filterValue?: string;
   endpoint?: string;
-  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  method?: HttpMethod;
 };

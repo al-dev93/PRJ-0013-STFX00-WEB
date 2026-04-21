@@ -40,9 +40,7 @@ function MemoizedAlert({
             message: 'wrong type of one of the message properties',
             context: {
               messageAlert:
-                typeof alertMessage === 'string' || isPrimitiveArray(alertMessage, 'string')
-                  ? alertMessage
-                  : 'unknown type',
+                typeof alertMessage === 'string' || isPrimitiveArray(alertMessage) ? alertMessage : 'unknown type',
             },
           };
         }
@@ -69,7 +67,7 @@ function MemoizedAlert({
   );
 
   const renderMessage: React.JSX.Element | null = useMemo(() => {
-    if (Array.isArray(alertMessage) && isPrimitiveArray(alertMessage, 'string')) {
+    if (Array.isArray(alertMessage) && isPrimitiveArray(alertMessage)) {
       return (
         <div className={style.wrapperAlert}>
           {alertMessage.map((value, index) => (
@@ -92,7 +90,7 @@ function MemoizedAlert({
 
   useEffect(() => {
     const isValueInvalid = !alertMessage || !alertMessage.length;
-    const isTypeInvalid = typeof alertMessage !== 'string' && !isPrimitiveArray(alertMessage, 'string');
+    const isTypeInvalid = typeof alertMessage !== 'string' && !isPrimitiveArray(alertMessage);
 
     if (isTypeInvalid) {
       handlePropsValidity('type');

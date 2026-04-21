@@ -1,58 +1,54 @@
 .buttonLink {
-  width: var(--button-link-size);
-  height: var(--button-link-size);
+  --buttonLink-focus-ring: var(--semantic-ring);
+  /* --buttonLink-hover-scale: scale(calc(1 + 0.1 * var(--motion-ok)));
+  --buttonLink-hover-rotate: rotate(calc(6deg * var(--motion-ok))); */
+  --buttonLink-icon-size: 2rem;
+  --buttonLink-size: 48px;
+
+  width: var(--buttonLink-size);
+  height: var(--buttonLink-size);
   display: flex;
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  /* color: var(--button-link-color); */
-  transform: none;
-  /* transition: var(--button-link-transition); */
-  transition: transform 200ms ease;
-  transform-origin: center;
+  /* transition: transform calc(200ms * var(--motion-ok)) ease;
+  transform-origin: center; */
 }
 
-/* feedback bref au press */
-.buttonLink:active {
-  transform: var(--button-link-transform-scale-active, scale(0.97));
-}
-
-/* focus clavier : anneau seulement (géré par le parent), pas de scale ici */
-.buttonLink:focus {
-  outline: none;
-  /* color: var(--decorative-dark); */
-}
-
-/* .buttonLink:hover,
-.buttonLink:focus {
-  color: var(--decorative-dark);
-  outline: none;
-  transform: var(--button-link-transform-scale); Slightly enlarge the button on hover/focus
-}
-
+/* Color of Button icon when focus with tab keyboard */
 .buttonLink:focus-visible {
-  outline: var(--button-link-outline);
-} */
+  outline: 3px solid var(--buttonLink-focus-ring);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
 
 .buttonLink__icon {
-  font-size: var(--button-link-icon-size);
+  font-size: var(--buttonLink-icon-size);
+  /*
   transition:
-    transform 200ms ease,
-    filter 200ms ease;
-}
-
-/* .buttonLink:hover .buttonLink__icon, */
-/* .buttonLink:focus .buttonLink__icon  */
-.buttonLink:active .buttonLink__icon {
-  transform: var(--button-link-transform-rotate); /* Slight rotation on hover/focus */
+    transform calc(200ms * var(--motion-ok)) ease,
+    filter calc(200ms * var(--motion-ok)) ease; */
 }
 
 /* Optionnel : limiter les effets hover aux pointeurs fins (desktop) */
-@media (hover: hover) and (pointer: fine) {
+/* @media (hover: hover) and (pointer: fine) {
   .buttonLink:hover {
-    transform: var(--button-link-transform-scale);
+    transform: var(--buttonLink-hover-scale);
   }
   .buttonLink:hover .buttonLink__icon {
-    transform: var(--button-link-transform-rotate);
+    transform: var(--buttonLink-hover-rotate);
+  }
+  .buttonLink:focus-visible:hover {
+    transform: none;
+  }
+  .buttonLink:focus-visible:hover .buttonLink__icon {
+    transform: none;
+  }
+} */
+
+@media (forced-colors: active) {
+  .buttonLink:focus-visible {
+    outline: 2px solid HighLight;
+    outline-offset: 2px;
   }
 }

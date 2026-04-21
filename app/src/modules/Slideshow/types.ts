@@ -24,6 +24,7 @@ import {
  */
 export type SlideshowProps = {
   children?: React.ReactNode;
+  introduction?: string;
 } & (
   | {
       data?: ProjectData[];
@@ -41,16 +42,14 @@ export type SlideshowProps = {
  *
  * @type {Object} PicturesScrollerProps
  * @property {ProjectData[]} slideContent - The content of the slides to display.
- * @property {number} [duration] - Duration of the slide transition.
  * @property {SlideshowState} slideshowState - Current state of the slideshow.
  * @property {Dispatch<SlideshowAction>} slideshowDispatch - Function to dispatch slideshow actions.
  */
-export type PicturesScrollerProps = {
+export interface PicturesScrollerProps {
   slideContent: ProjectData[];
-  duration?: number;
   slideshowState: SlideshowState;
   slideshowDispatch: Dispatch<SlideshowAction>;
-};
+}
 
 /**
  * Props for the SlideshowDots component.
@@ -61,11 +60,11 @@ export type PicturesScrollerProps = {
  * @property {Dispatch<SlideshowAction>} slideshowDispatch - Function to dispatch slideshow actions.
  * @property {SlideshowState} slideshowState - Current state of the slideshow.
  */
-export type SlideshowDotsProps = {
+export interface SlideshowDotsProps {
   slidesIndex: number[];
   slideshowDispatch: Dispatch<SlideshowAction>;
   slideshowState: SlideshowState;
-};
+}
 
 /**
  * ARIA labels for the scroll buttons in the slideshow.
@@ -88,11 +87,11 @@ export type AriaLabelScrollButtons = {
  * @property {SlideshowState} slideshowState - Current state of the slideshow.
  * @property {AriaLabelScrollButtons} ariaLabels - ARIA labels for the buttons.
  */
-export type ScrollButtonsProps = {
+export interface ScrollButtonsProps {
   slideshowDispatch: Dispatch<SlideshowAction>;
   slideshowState: SlideshowState;
   ariaLabels: AriaLabelScrollButtons;
-};
+}
 
 /**
  * Props for the SlidePicture component.
@@ -106,9 +105,8 @@ export type ScrollButtonsProps = {
  * @property {boolean} isAdjacent - Whether the slide is adjacent to the current slide.
  * @property {boolean} [isCurrent] - Whether the slide is currently active.
  * @property {boolean} ariaHidden - Whether the slide is hidden for accessibility purposes.
- * @property {string} [ariaLabel] - ARIA label for the slide.
  */
-export type SlidePictureProps = {
+export interface SlidePictureProps {
   slide: ProjectData;
   index: number;
   totalSlides: number;
@@ -116,8 +114,8 @@ export type SlidePictureProps = {
   isAdjacent: boolean;
   isCurrent?: boolean;
   ariaHidden: boolean;
-  ariaLabel?: string;
-};
+  isClone?: boolean;
+}
 
 /**
  * Props for the Fade component.
@@ -128,11 +126,11 @@ export type SlidePictureProps = {
  * @property {SlideshowState} state - The current state of the slideshow.
  * @property {number} [duration] - Duration of the fade transition.
  */
-export type FadeProps = {
+export interface FadeProps {
   children: React.JSX.Element;
   state: SlideshowState;
   duration?: number;
-};
+}
 
 /**
  * State for the slideshow component.
@@ -244,7 +242,7 @@ export type SlideshowAction =
  */
 export type SlideStyle =
   | {
-      transform: string;
+      transform?: string;
       transition: string;
     }
   | undefined;

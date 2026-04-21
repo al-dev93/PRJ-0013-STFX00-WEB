@@ -1,10 +1,11 @@
 import React, { memo, useCallback, useEffect, useMemo, useReducer } from 'react';
 
-import type { AccountLink, ProjectData } from '@/types';
+import type { AccountLink, GetProjectSummaryBody, ProjectData } from '@/types';
+import { renderFormattedText } from '@/utils/stylizedString';
+import { isProjectDataArray } from '@/utils/typeHelpers';
 import { SkillsList } from '@components/SkillsList';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import { useFetchData } from '@hooks/useFetchData';
-import { FILLED_STYLE } from '@utils/constants';
 
 import { Fade } from './components/Fade';
 import { PicturesScroller } from './components/PicturesScroller';
@@ -12,8 +13,8 @@ import { slideshowInitialState } from './reducer/slideshowInitialState';
 import { slideshowReducer } from './reducer/slideshowReducer';
 import style from './style.module.css';
 import type { SlideshowProps } from './types';
-import { INIT_MAX_INDEX_SLIDE, PENDING, SLIDE_TRANSITION, START, STOP } from './utils/constants';
-import { ProjectSheetLink } from '../../components/ProjectSheetLink';
+import { ANIMATION_DURATION, INIT_MAX_INDEX_SLIDE, PENDING, SLIDE_TRANSITION, START, STOP } from './utils/constants';
+
 /**
  * This component displays a slideshow of projects using either provided data or fetched data.
  *
@@ -24,26 +25,23 @@ import { ProjectSheetLink } from '../../components/ProjectSheetLink';
  *
  * @al-dev93
  */
-function MemoizedSlideshow({
+const Slideshow = memo(function Slideshow({
   data: slideshowData,
   endpoint: slideshowEndpoint,
+  introduction,
 }: SlideshowProps): React.JSX.Element | null {
   // Determine if needs to be fetched based on presence of data in props.
   const shouldFetch = !slideshowData;
 
   // Fetch data only if necessary (when no slideshowData is provided)
-  // const projectsEndpoint = shouldFetch ? import.meta.env.VITE_API_PROJECTS_DATA_ENDPOINT : null;
   const endpoint = useMemo(() => (shouldFetch ? slideshowEndpoint : null), [shouldFetch, slideshowEndpoint]);
-  const { data: fetchedData } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
+  const { data: fetchedData } = useFetchData<GetProjectSummaryBody>({
+    endpoint,
+    method: 'POST',
+    body: { p_display: 'slideshow' },
+  });
 
-  /**
-   * Memoize the slideshow data by filtering out projects that are set to display in the slideshow.
-   *
-   * @type {ProjectData[]}
-   */
-  const data: ProjectData[] = useMemo(() => {
-    return (slideshowData || (fetchedData as ProjectData[]))?.filter((item) => item.display === 'slideshow');
-  }, [fetchedData, slideshowData]);
+  const data = fetchedData as ProjectData | ProjectData[];
 
   // useReducer to manage the slideshow's state.
   const [slideshowState, slideshowDispatch] = useReducer(slideshowReducer, slideshowInitialState);
@@ -52,7 +50,12 @@ function MemoizedSlideshow({
    * Initialize the slideshow by setting the maximum index of slides based on the data length.
    */
   const initializeSlideshow = useCallback(() => {
-    if (data) slideshowDispatch({ type: INIT_MAX_INDEX_SLIDE, payload: { maxIndexSlide: data.length - 1 } });
+    if (data) {
+      slideshowDispatch({
+        type: INIT_MAX_INDEX_SLIDE,
+        payload: { maxIndexSlide: isProjectDataArray(data) ? data.length - 1 : 1 },
+      });
+    }
   }, [data]);
 
   // Run initialization when the data is available.
@@ -65,17 +68,18 @@ function MemoizedSlideshow({
    * Updates the slideshow stage (pending, stop) based on time intervals.
    */
   useEffect(() => {
+    const startupTime = 50;
+    const pendingTime = ANIMATION_DURATION - startupTime;
+
     let timer: NodeJS.Timeout;
     if (slideshowState.slideTransition === START) {
-      timer = setTimeout(() => slideshowDispatch({ type: SLIDE_TRANSITION, payload: PENDING }), 50);
+      timer = setTimeout(() => slideshowDispatch({ type: SLIDE_TRANSITION, payload: PENDING }), startupTime);
     }
     if (slideshowState.slideTransition === PENDING) {
-      timer = setTimeout(() => slideshowDispatch({ type: SLIDE_TRANSITION, payload: STOP }), 550);
+      timer = setTimeout(() => slideshowDispatch({ type: SLIDE_TRANSITION, payload: STOP }), pendingTime);
     }
     return () => clearTimeout(timer);
   }, [slideshowState.slideTransition]);
-
-  // const { isRemote, urlBase } = getUrlBase();
 
   /**
    * Determines the active slide based on the current transition state.
@@ -83,7 +87,8 @@ function MemoizedSlideshow({
    * @type {ProjectData}
    */
   const activeSlide: ProjectData = useMemo(
-    () => data?.[slideshowState.slideTransition === START ? slideshowState.current : slideshowState.new],
+    () =>
+      (data as ProjectData[])?.[slideshowState.slideTransition === START ? slideshowState.current : slideshowState.new],
     [data, slideshowState],
   );
 
@@ -93,23 +98,42 @@ function MemoizedSlideshow({
   return (
     activeSlide && (
       <article className={style.slideshow} aria-roledescription='carousel'>
-        <PicturesScroller slideContent={data} slideshowState={slideshowState} slideshowDispatch={slideshowDispatch} />
+        <header className={style.slideshow__header}>
+          {introduction ? <p className={style.slideshow__introduction}>{renderFormattedText(introduction)}</p> : null}
+          <p className='visually-hidden' aria-live='polite' aria-atomic='true'>
+            Projet {slideshowState.new + 1} sur {slideshowState.maxIndexSlide + 1} : {activeSlide.title}
+          </p>
+          {/* <div className={style.slideshow__titleRow}>
+            <h3 className={style.slideshow__title}>
+              <span className={style.slideshow__project}>{activeSlide.title}</span>
+              <span className={style.slideshow__dash} aria-hidden='true'>
+                {' '}
+                —{' '}
+              </span>
+              <span className={style.slideshow__subtitle}>{activeSlide.subtitle}</span>
+            </h3>
+            <ProjectSheetLink
+              projectSheet={activeSlide.projectSheet}
+              title={activeSlide.title}
+              linkLabel="Voir l'étude de cas (PDF)"
+              className={style.projectLink}
+              variant='slideshow'
+            />
+          </div> */}
+        </header>
+        <PicturesScroller
+          slideContent={data as ProjectData[]}
+          slideshowState={slideshowState}
+          slideshowDispatch={slideshowDispatch}
+        />
         <Fade state={slideshowState}>
           <div className={style.slideshowWrapper}>
-            <p className={style.description}>
-              {activeSlide.description}
-              <ProjectSheetLink
-                projectSheet={activeSlide.projectSheet}
-                title={activeSlide.title}
-                linkLabel='Voir la fiche projet (PDF)'
-                className={style.projectLink}
-              />
-            </p>
+            <p className={style.description}>{activeSlide.description}</p>
             <footer className={style.footer}>
-              <SkillsList list={activeSlide.tags} tagType={FILLED_STYLE} />
+              <SkillsList primaryTag={activeSlide.primaryTag} list={activeSlide.tags} layoutType='slideshow' />
               <SocialMediaNavBar
-                className={style.navButtons}
                 changeLinkColor={style.externalLinks}
+                type='slideshow'
                 buttons={activeSlide.deliverables as AccountLink[]}
               />
             </footer>
@@ -118,7 +142,6 @@ function MemoizedSlideshow({
       </article>
     )
   );
-}
+});
 
-const Slideshow = memo(MemoizedSlideshow);
 export default Slideshow;

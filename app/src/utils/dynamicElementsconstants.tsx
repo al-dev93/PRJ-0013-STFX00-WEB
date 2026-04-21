@@ -28,6 +28,7 @@ export const COMPONENT_MAP = {
 export const HTML_TAGS = [
   'a',
   'article',
+  'aside',
   'b',
   'br',
   'button',

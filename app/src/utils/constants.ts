@@ -1,5 +1,5 @@
-const ENABLED_STATUS = 'enabled';
-const DISABLED_STATUS = 'disabled';
+// const ENABLED_STATUS = 'enabled';
+// const DISABLED_STATUS = 'disabled';
 const HIDDEN_STATUS = 'hidden';
 const VISIBLE_STATUS = 'visible';
 const ON_STATUS = 'On';
@@ -8,10 +8,20 @@ const ACTIVE_STATUS = 'active';
 const NOT_ACTIVE_STATUS = 'notActive';
 const EAGER_STATUS = 'eager';
 const LAZY_STATUS = 'lazy';
-const FILLED_STYLE = 'filled';
-const THINNED_STYLE = 'thinned';
-const ALERTED_STYLE = 'alerted';
+const TAG_SLIDESHOW = 'slideshow-tag';
+const TAG_CARD = 'card-tag';
+const TAG_FORM = 'warning-tag';
 const INTERSECTION_OPTIONS_ROOTMARGIN = { rootMargin: '-100px' };
+
+const SERVICE_LABEL = {
+  gmail: 'Envoyer un mail à StackFlex',
+  linkedin: 'Voir mon profil Linkedin',
+  github: 'Code source',
+  npm: 'Package npm',
+  external: 'Démo en ligne',
+  document: 'Analyse de performance',
+  figma: 'Maquette Figma',
+};
 
 /**
  * Constants used for contact form field length
@@ -45,11 +55,9 @@ const ICON_VALUES = [
 
 export {
   ACTIVE_STATUS,
-  ALERTED_STYLE,
-  DISABLED_STATUS,
+  // DISABLED_STATUS,
   EAGER_STATUS,
-  ENABLED_STATUS,
-  FILLED_STYLE,
+  // ENABLED_STATUS,
   HIDDEN_STATUS,
   ICON_VALUES,
   INTERSECTION_OPTIONS_ROOTMARGIN,
@@ -63,6 +71,9 @@ export {
   NOT_ACTIVE_STATUS,
   OFF_STATUS,
   ON_STATUS,
-  THINNED_STYLE,
+  SERVICE_LABEL,
+  TAG_CARD,
+  TAG_FORM,
+  TAG_SLIDESHOW,
   VISIBLE_STATUS,
 };

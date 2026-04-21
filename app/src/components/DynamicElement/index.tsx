@@ -23,7 +23,10 @@ import type { DynamicElementProps, ValidComponentTag, ValidHTMLTag } from './typ
  *
  * @al-dev93
  */
-function DynamicElementRef<T extends ValidComponentTag | ValidHTMLTag>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const DynamicElement = forwardRef<DialogFormElement, DynamicElementProps<any>>(function DynamicElementRef<
+  T extends ValidComponentTag | ValidHTMLTag,
+>(
   { tag, children, ...props }: DynamicElementProps<T>,
   ref?: React.LegacyRef<DialogFormElement>,
 ): React.JSX.Element | null {
@@ -59,7 +62,4 @@ function DynamicElementRef<T extends ValidComponentTag | ValidHTMLTag>(
     return createElement(tag, { ...props, ref }, children);
   }
   return null;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const DynamicElement = forwardRef<DialogFormElement, DynamicElementProps<any>>(DynamicElementRef);
+});

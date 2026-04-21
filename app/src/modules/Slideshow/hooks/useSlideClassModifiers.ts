@@ -34,10 +34,10 @@ export function useSlideClassModifiers(slideshowState: SlideshowState, slideCont
 
       // Assign CSS classes based on conditions
       if (isCurrentSlide) {
-        return [...styles, `picturesToScroll--visible`, `picturesToScroll--parallaxOff`];
+        return [...styles, `picturesToScroll--visible`];
       }
       if (isAdjacentSlide || isEdgeLooping) {
-        return [...styles, `picturesToScroll--adjacent`, `picturesToScroll--parallaxOn`];
+        return [...styles, `picturesToScroll--adjacent`];
       }
       return [...styles, `picturesToScroll--hidden`];
     },
@@ -51,9 +51,16 @@ export function useSlideClassModifiers(slideshowState: SlideshowState, slideCont
    * @returns {((index: number) => boolean)} A function that checks if a slide is adjacent.
    */
   const isAdjacent = useMemo((): ((index: number) => boolean) => {
-    const currentIndex = slideshowState.current;
-    return (index: number) => index === currentIndex - 1 || index === currentIndex + 1;
-  }, [slideshowState]);
+    const n = slideContent.length;
+
+    // ✅ index logique de référence : le slide cible
+    const currentIndex = slideshowState.new;
+
+    const prev = (currentIndex - 1 + n) % n;
+    const next = (currentIndex + 1) % n;
+
+    return (index: number) => index === prev || index === next;
+  }, [slideContent.length, slideshowState.new]);
 
   // Returns the modified style classes and adjacency checking
   return { getClassModifier, isAdjacent };

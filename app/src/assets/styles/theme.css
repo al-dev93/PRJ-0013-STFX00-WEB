@@ -8,6 +8,9 @@
   /* LIGHT (default) */
   :root,
   :root[data-theme='light'] {
+    /* Activate motion */
+    --motion-ok: 1;
+
     /* Tone coefficients (percentages) */
     --tone-soften: 12%;
     --tone-strong: 8%;
@@ -18,10 +21,12 @@
     --semantic-surface-2: var(--ref-neutral-100);
     --semantic-surface-3: var(--ref-neutral-200);
 
+    --semantic-surface-1-tinted: oklch(1 0.01 var(--brand-h));
+
     /* Hero wash: very light tinted accent */
     --semantic-wash-hero: radial-gradient(
       var(--ref-wash-size-x) var(--ref-wash-size-y) at var(--ref-wash-pos-x) var(--ref-wash-pos-y),
-      color-mix(in oklab, var(--semantic-accent) var(--ref-wash-strength), transparent),
+      color-mix(in oklab, var(--ref-wash-color) var(--ref-wash-strength), transparent),
       transparent 70%
     );
 
@@ -46,6 +51,11 @@
     --semantic-accent-weak: var(--ref-brand-400);
     --semantic-accent-strong: var(--ref-brand-700);
 
+    --elevation-0: none;
+    --elevation-1: 0 2px 10px rgba(0, 0, 0, 0.06);
+    --elevation-2: 0 6px 20px rgba(0, 0, 0, 0.08);
+    --elevation-3: 0 10px 30px rgba(0, 0, 0, 0.12);
+
     /* Links & focus */
     --semantic-link: color-mix(in oklch, var(--ref-brand-600) 90%, black);
     --semantic-ring: var(--ref-brand-500); /* oklch(0.75 0.09 230) */
@@ -61,6 +71,7 @@
 
     /* Structure & status */
     --semantic-border: color-mix(in oklch, var(--ref-neutral-900) 14%, white);
+    --semantic-dot-border: color-mix(in oklch, var(--ref-neutral-900) 30%, white);
     --semantic-shadow: var(--ref-shadow-1);
     --semantic-success: var(--ref-success);
     --semantic-warning: var(--ref-warning);
@@ -82,7 +93,10 @@
     --semantic-space-sm: var(--space-3);
     --semantic-space-md: var(--space-4);
     --semantic-space-lg: var(--space-6);
-    --semantic-radius: var(--ref-radius-3);
+    --semantic-space-xl: var(--space-8);
+    --semantic-md-radius: var(--ref-radius-3);
+    --semantic-lg-radius: var(--ref-radius-4);
+    --semantic-2xl-radius: var(--ref-radius-6);
     --semantic-dur: var(--ref-dur-med);
 
     /*--------------------------------------------------------------------------
@@ -91,11 +105,11 @@
     -------------------------------------------------------------------------- */
 
     /* Primary */
-    --btn-primary-bg: var(--semantic-accent); /* Cyan AI+ */
+    --btn-primary-bg: var(--semantic-accent);
     --btn-primary-fg: white;
     --btn-primary-hover: color-mix(in oklab, var(--semantic-accent) 88%, black);
     --btn-primary-active: color-mix(in oklab, var(--semantic-accent) 80%, black);
-    --btn-primary-ring: var(--ref-brand-500); /* Cyan AI+ focus */
+    --btn-primary-ring: var(--semantic-ring);
     --btn-outline-bd: color-mix(in oklab, var(--semantic-accent) 55%, white);
     --btn-outline-fg: var(--semantic-accent);
 
@@ -121,41 +135,12 @@
     --btn-ghost-ring: var(--ref-brand-500);
 
     /*--------------------------------------------------------------------------
-      Connector semantics: colors, shadows, and widths derived from accent.
-      No raw colors in components; only --semantic-* here.
+      hero signature semantics: colors for brand and bright spot
     -------------------------------------------------------------------------- */
 
-    /* Widths straight from primitives */
-    --semantic-connector-stroke-width: calc(var(--ref-connector-stroke-width) * var(--coef-stroke-emphasis, 1));
-    --semantic-connector-track-width: calc(var(--semantic-connector-stroke-width) * var(--coef-track-width));
-    --semantic-connector-glow-width: max(
-      var(--ref-connector-glow-width),
-      calc(var(--semantic-connector-stroke-width) * var(--coef-glow-cover))
-    );
-
-    /* Colors derived from the accent (OKLCH for perceptual consistency) */
-    --semantic-connector-stroke: var(--semantic-accent);
-    --semantic-connector-track: color-mix(in oklch, var(--semantic-bg) 60%, var(--semantic-accent) 40%);
-    --semantic-connector-glow-color: color-mix(in oklch, var(--semantic-accent) 82%, white);
-    --semantic-connector-bloom-color: color-mix(in oklch, var(--semantic-accent) 20%, white);
-
-    --semantic-connector-stroke-weak: color-mix(
-      in oklch,
-      var(--semantic-accent) calc(100% - var(--coef-stroke-weak)),
-      white var(--coef-stroke-weak)
-    );
-
-    /* Bright spot (your legacy "connector-bright-spot-color") */
-    --semantic-connector-bright-spot: color-mix(
-      in oklch,
-      var(--semantic-accent) var(--coef-bright-spot),
-      white calc(100% - var(--coef-bright-spot))
-    );
-
-    /* Intensity */
-    --semantic-connector-track-opacity: var(--coef-track-opacity);
-    --semantic-connector-glow-opacity: var(--coef-glow-opacity);
-    --semantic-connector-glow-blur: var(--coef-glow-blur);
+    /* Brand logo */
+    --semantic-brand: oklch(0.62 0.18 235);
+    --semantic-brand-muted: color-mix(in oklch, var(--ref-neutral-900) 70%, white 20%);
   }
 
   /* DARK (auto if user prefers dark and data-theme is not forced to "light") */
@@ -187,6 +172,11 @@
 
       --semantic-accent: var(--ref-brand-500);
       --semantic-accent-weak: var(--ref-brand-900);
+
+      --elevation-1: 0 2px 10px rgba(0, 0, 0, 0.5);
+      --elevation-2: 0 6px 20px rgba(0, 0, 0, 0.6);
+      --elevation-3: 0 10px 30px rgba(0, 0, 0, 0.7);
+
       --semantic-link: var(--ref-brand-400);
       --semantic-ring: oklch(0.8 0.09 240);
       --semantic-title-section-underline-thickness: clamp(3px, 0.45vw, 7px);
@@ -230,23 +220,11 @@
       --btn-ghost-hover-bg: color-mix(in oklab, var(--ref-brand-500) 14%, black);
       --btn-ghost-active-bg: color-mix(in oklab, var(--ref-brand-500) 20%, black);
       --btn-ghost-ring: var(--ref-brand-500);
-
-      /*--------------------------------------------------------------------------
-        Connector semantics: colors and shadows, derived from accent.
-        No raw colors in components; only --semantic-* here.
-      -------------------------------------------------------------------------- */
-
-      /* Adjust mixes for dark backgrounds (prefer white lifts over black) */
-      --semantic-connector-stroke: var(--ref-brand-400);
-      --semantic-connector-track: color-mix(in oklch, var(--semantic-accent) 15%, white 85%);
-      --semantic-connector-glow-color: color-mix(in oklch, var(--semantic-accent) 18%, black 82%);
-      --semantic-connector-bloom-color: color-mix(in oklch, var(--semantic-accent) 28%, white);
-      --semantic-connector-stroke-weak: color-mix(in oklch, var(--semantic-accent) 70%, white 30%);
-      --semantic-connector-bright-spot: color-mix(in oklch, var(--semantic-accent) 50%, white 50%);
-
-      --semantic-connector-track-opacity: var(--coef-track-opacity, 0.14);
-      --semantic-connector-glow-opacity: var(--coef-glow-opacity, 0.26);
-      --semantic-connector-glow-blur: var(--coef-glow-blur, 3px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-ok: 0;
     }
   }
 }

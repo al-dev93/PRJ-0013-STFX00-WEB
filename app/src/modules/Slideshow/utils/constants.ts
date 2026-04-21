@@ -53,7 +53,7 @@ const APPEND_IMAGE_ID = -2;
  *
  * @constant {number} ANIMATION_DURATION - The duration of the transition between slides.
  */
-const ANIMATION_DURATION = 600;
+const ANIMATION_DURATION = 800;
 
 /**
  * Transition effect used in the slideshow.
@@ -104,13 +104,12 @@ const PROJECT_SHEET_EXTENSION = '.pdf';
  * @constant {Object} ARIA_LABEL_SCROLL_BUTTONS - ARIA labels for the scroll buttons.
  * @constant {function(string): string} ARIA_LABEL_SLIDE - ARIA label for each individual slide.
  */
-const ARIA_LABEL_NEXT = 'Next Slide';
-const ARIA_LABEL_PREVIOUS = 'Previous Slide';
+const ARIA_LABEL_NEXT = 'Diapo suivante';
+const ARIA_LABEL_PREVIOUS = 'Diapo précédente';
 const ARIA_LABEL_SCROLL_BUTTONS = {
   leftButton: ARIA_LABEL_PREVIOUS,
   rightButton: ARIA_LABEL_NEXT,
 };
-const ARIA_LABEL_SLIDE = (title: string) => `Link to ${title} website`;
 
 export {
   ADJACENT_VISIBILITY,
@@ -119,7 +118,6 @@ export {
   ARIA_LABEL_NEXT,
   ARIA_LABEL_PREVIOUS,
   ARIA_LABEL_SCROLL_BUTTONS,
-  ARIA_LABEL_SLIDE,
   CHANGE_SCROLLING_DOT,
   CHANGE_SLIDE,
   FIRST_SLIDE_INDEX,

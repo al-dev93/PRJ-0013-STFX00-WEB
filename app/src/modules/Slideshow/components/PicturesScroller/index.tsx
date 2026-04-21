@@ -10,13 +10,7 @@ import { usePicturesScroller } from '../../hooks/usePicturesScroller';
 import { useSlideClassModifiers } from '../../hooks/useSlideClassModifiers';
 import { useSlideNavigation } from '../../hooks/useSlideNavigation';
 import type { PicturesScrollerProps } from '../../types';
-import {
-  ANIMATION_DURATION,
-  ARIA_LABEL_SCROLL_BUTTONS,
-  ARIA_LABEL_SLIDE,
-  FIRST_SLIDE_INDEX,
-  LAST_SLIDE_INDEX,
-} from '../../utils/constants';
+import { ARIA_LABEL_SCROLL_BUTTONS, FIRST_SLIDE_INDEX, LAST_SLIDE_INDEX } from '../../utils/constants';
 /**
  * Component to scroll through pictures in a slideshow with buttons and pagination dots.
  *
@@ -24,16 +18,14 @@ import {
  * @param {PicturesScrollerProps} props - The props for the scroller component.
  * @property {ProjectData[]} slideContent - The content of the slides to be displayed.
  * @property {SlideshowState} slideshowState - The current state of the slideshow.
- * @property {number} [duration=600] - The duration of the transition between slides.
  * @returns {React.JSX.Element} A JSX element representing the picture scroller.
  *
  * @al-dev93
  */
-function MemoizedPicturesScroller({
+export const PicturesScroller = memo(function PicturesScroller({
   slideContent,
   slideshowState,
   slideshowDispatch,
-  duration = ANIMATION_DURATION,
 }: PicturesScrollerProps): React.JSX.Element {
   // props validation
   if (!slideContent || !slideshowState) {
@@ -47,7 +39,7 @@ function MemoizedPicturesScroller({
    */
   const { getClassModifier, isAdjacent } = useSlideClassModifiers(slideshowState, slideContent);
   const { slideshowRef } = useSlideNavigation(slideshowDispatch);
-  const { slideEffectStyle } = usePicturesScroller(slideshowState, duration);
+  const { slideEffectStyle } = usePicturesScroller(slideshowState);
 
   /**
    * Extracts the slides before the first and after the last used to createthe illusion of an infinite slideshow
@@ -55,7 +47,9 @@ function MemoizedPicturesScroller({
    * @type {ProjectData}
    */
   const prependSlide: ProjectData = useMemo(() => slideContent[LAST_SLIDE_INDEX(slideContent)], [slideContent]);
+  const isPrependCurrent: boolean = slideshowState.new === slideContent.length - 1 && slideshowState.loopSlide;
   const appendSlide: ProjectData = useMemo(() => slideContent[FIRST_SLIDE_INDEX], [slideContent]);
+  const isAppendCurrent: boolean = slideshowState.new === 0 && slideshowState.loopSlide;
 
   return (
     <div
@@ -71,16 +65,16 @@ function MemoizedPicturesScroller({
         ariaLabels={ARIA_LABEL_SCROLL_BUTTONS}
       />
       <div className={style.picturesScroller__body}>
-        <div className={style.picturesScroller__body__main} style={slideEffectStyle.current}>
+        <div className={style.picturesScroller__body__main} style={slideEffectStyle}>
           <SlidePicture
             slide={prependSlide}
             index={slideContent.length - 1}
             totalSlides={slideContent.length}
             getClassModifier={getClassModifier}
             isAdjacent={false}
-            isCurrent={slideshowState.new === slideContent.length - 1 && slideshowState.loopSlide}
+            isCurrent={isPrependCurrent}
             ariaHidden
-            ariaLabel={prependSlide.title}
+            isClone
           />
           {slideContent.map((slide, index, array) => (
             <SlidePicture
@@ -92,7 +86,6 @@ function MemoizedPicturesScroller({
               isAdjacent={isAdjacent(index)}
               isCurrent={index === slideshowState.new}
               ariaHidden={index !== slideshowState.new}
-              ariaLabel={ARIA_LABEL_SLIDE(slide.title)}
             />
           ))}
           <SlidePicture
@@ -101,19 +94,17 @@ function MemoizedPicturesScroller({
             totalSlides={slideContent.length}
             getClassModifier={getClassModifier}
             isAdjacent={false}
-            isCurrent={slideshowState.new === 0 && slideshowState.loopSlide}
+            isCurrent={isAppendCurrent}
             ariaHidden
-            ariaLabel={appendSlide.title}
+            isClone
           />
         </div>
+        <SlideshowDots
+          slidesIndex={[...slideContent.keys()]}
+          slideshowState={slideshowState}
+          slideshowDispatch={slideshowDispatch}
+        />
       </div>
-      <SlideshowDots
-        slidesIndex={[...slideContent.keys()]}
-        slideshowState={slideshowState}
-        slideshowDispatch={slideshowDispatch}
-      />
     </div>
   );
-}
-
-export const PicturesScroller = memo(MemoizedPicturesScroller);
+});

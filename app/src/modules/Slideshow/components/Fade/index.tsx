@@ -1,9 +1,8 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useLayoutEffect, useMemo, useRef } from 'react';
 
 import style from './style.module.css';
 import type { FadeProps } from '../../types';
 import { ANIMATION_DURATION, STOP } from '../../utils/constants';
-
 /**
  * Component to handle fade transitions between slides.
  *
@@ -16,13 +15,23 @@ import { ANIMATION_DURATION, STOP } from '../../utils/constants';
  *
  * @al-dev93
  */
-function MemoizedFade({ children, state, duration = ANIMATION_DURATION }: FadeProps): React.JSX.Element {
+export const Fade = memo(function Fade({
+  children,
+  state,
+  duration = ANIMATION_DURATION,
+}: FadeProps): React.JSX.Element {
+  const fadeRef = useRef<HTMLDivElement>(null);
   // Validates the presence of both `children` and `state` props. If either is missing, it logs an error on error page.
   if (!children || !state) {
     // TODO sortir l'erreur
     console.error("Missing 'children' or 'state' props in Fade component");
   }
 
+  useLayoutEffect(() => {
+    const root = fadeRef.current;
+    if (!root) return;
+    root.style.setProperty('--fade-duration', `${duration}ms`);
+  }, [duration]);
   /**
    * Apply the fade class conditionally, only when the slideshow's transition state is different from STOP.
    *
@@ -31,10 +40,8 @@ function MemoizedFade({ children, state, duration = ANIMATION_DURATION }: FadePr
   const className = useMemo(() => (state.slideTransition !== STOP ? style.fade : ''), [state.slideTransition]);
 
   return (
-    <div className={className} style={{ animationDuration: `${duration}ms` }}>
+    <div className={className} ref={fadeRef}>
       {children}
     </div>
   );
-}
-
-export const Fade = memo(MemoizedFade);
+});

@@ -1,30 +1,40 @@
 .tag {
+  --tag-font-display: 'Roboto Condensed', 'Roboto', ui-sans-serif, system-ui, Arial, sans-serif;
+
   display: flex;
   align-items: center;
   padding: 5px 8px;
-  font-family: var(--font-accessories);
+  font-family: var(--tag-font-display);
   font-size: var(--fs-xxs);
   font-weight: 500;
   color: var(--rich-black);
 }
 
-.tag--thinned {
+.tag[data-variant='card-tag'] {
   padding: 2px 0px;
 }
 
-.tag--alerted {
+.tag[data-variant='warning-tag'] {
   position: absolute;
   line-height: var(--lh-small);
   font-weight: 600;
   color: var(--primary-alert-color);
 }
 
-.tag--filled {
-  color: var(--rich-black);
+.tag[data-variant='slideshow-tag'] {
+  /* color: var(--rich-black);
   background-color: var(--light-primary-color);
-  border-radius: var(--br-xs);
+  border-radius: var(--br-xs); */
+
+  font-size: calc(var(--semantic-fs-body) * 0.92);
+  line-height: 1;
+  padding: 0.42rem 0.62rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--semantic-border) 70%, transparent);
+  background: color-mix(in oklch, var(--semantic-surface-1) 85%, transparent);
+  color: var(--semantic-text-muted);
 }
 
-.tag--empty {
+/* .tag--empty {
   padding: 0px;
-}
+} */

@@ -1,16 +1,11 @@
 import React, { memo, useMemo, useRef } from 'react';
 
+import { ProjectSheetLink } from '@/components/ProjectSheetLink';
 import { encodePath, getUrlBase } from '@/utils/urlHelpers';
-import { useOnScreen } from '@hooks/useOnScreen';
-import { EAGER_STATUS, LAZY_STATUS } from '@utils/constants';
 
 import style from './style.module.css';
 import type { FetchPriorityAttr, SlidePictureProps } from '../../../../types';
-import {
-  INTERSECTION_OPTIONS_THRESHOLD,
-  PICTURE_EXTENSION,
-  PROJECT_SHEET_EXTENSION,
-} from '../../../../utils/constants';
+import { PICTURE_EXTENSION, PROJECT_SHEET_EXTENSION } from '../../../../utils/constants';
 /**
  * Component to display an individual slide picture in the slideshow.
  *
@@ -26,12 +21,11 @@ import {
  * @property {boolean} isAdjacent - Whether the slide is adjacent to the current one.
  * @property {boolean} isCurrent - Whether the slide is the current active one.
  * @property {boolean} ariaHidden - Indicates if the slide is hidden for accessibility.
- * @property {string} ariaLabel - The accessible label for the slide.
  * @returns {React.JSX.Element} JSX element representing a slide picture.
  *
  * @al-dev93
  */
-function MemoizedSlidePicture({
+export const SlidePicture = memo(function SlidePicture({
   slide,
   index,
   totalSlides,
@@ -39,9 +33,9 @@ function MemoizedSlidePicture({
   isAdjacent,
   isCurrent,
   ariaHidden,
-  ariaLabel,
+  isClone = false,
 }: SlidePictureProps): React.JSX.Element {
-  const { picture, title, projectSheet } = slide;
+  const { picture, title, subtitle, projectSheet } = slide;
 
   /**
    * useRef to keep track of the image DOM element.
@@ -49,7 +43,6 @@ function MemoizedSlidePicture({
    *
    * @type {React.MutableRefObject<HTMLImageElement | null>}
    */
-  // const imgRef = useRef<HTMLImageElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   /**
@@ -57,12 +50,6 @@ function MemoizedSlidePicture({
    *
    * @type {{isIntersecting: boolean; observerError: AppError | undefined;}}
    */
-  // const inView = useOnScreen(imgRef, INTERSECTION_OPTIONS_THRESHOLD);
-  const inView = useOnScreen(wrapperRef, INTERSECTION_OPTIONS_THRESHOLD);
-
-  const shouldLoad = inView || isAdjacent;
-  const loading = shouldLoad ? EAGER_STATUS : LAZY_STATUS;
-
   const { src, href } = useMemo(() => {
     const { isRemote, urlBase } = getUrlBase();
 
@@ -75,21 +62,36 @@ function MemoizedSlidePicture({
     };
   }, [picture, projectSheet]);
 
-  const renderImg =
-    shouldLoad && src ? (
+  const renderImg = src ? (
+    <>
+      <div className={style.slideshowOverlay} aria-hidden={isCurrent ? 'false' : 'true'}>
+        <h3 className={style.slideshowOverlay__title}>
+          <span className={style.slideshowOverlay__project}>{title}</span>
+        </h3>
+        <p className={style.slideshowOverlay__subtitle}>{subtitle}</p>
+        {href ? (
+          <ProjectSheetLink
+            title={title}
+            linkLabel="Voir l'étude de cas (PDF)"
+            className={style.slideshowOverlay__cta}
+            variant='slideshow'
+          />
+        ) : null}
+      </div>
       <img
         className={style.picturesToScroll__img}
         src={src}
-        alt={ariaLabel ? '' : `Project ${title}`}
-        loading={loading}
+        alt={`Aperçu du projet ${title}`}
+        loading={(isCurrent || isAdjacent) && !isClone ? 'eager' : 'lazy'}
         decoding='async'
         width={1600}
         height={900}
         tabIndex={-1}
         sizes='(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 100vw'
-        {...({ fetchpriority: isCurrent ? 'high' : 'auto' } satisfies FetchPriorityAttr)}
+        {...({ fetchpriority: isCurrent && !isClone ? 'high' : 'auto' } satisfies FetchPriorityAttr)}
       />
-    ) : null;
+    </>
+  ) : null;
 
   const classes = getClassModifier(index)
     .map((name) => style[name])
@@ -100,17 +102,22 @@ function MemoizedSlidePicture({
       ref={wrapperRef}
       className={`${classes} ${style.picturesToScroll}`}
       aria-hidden={ariaHidden || undefined}
-      aria-disabled={ariaHidden || undefined}
-      aria-label={`Slide ${index + 1} of ${totalSlides}`}
+      {...(!isClone && !ariaHidden
+        ? {
+            role: 'group' as const,
+            'aria-roledescription': 'slide',
+            'aria-label': `Projet ${index + 1} sur ${totalSlides}`,
+          }
+        : {})}
     >
-      {isCurrent && href ? (
+      {isCurrent && !isClone ? (
         <a
           href={href}
           target='_blank'
           rel='noopener noreferrer'
           className={style.picturesToScroll__link}
-          aria-label={ariaLabel ?? `Voir la fiche PDF détaillée du project ${title}`}
           aria-current='true'
+          aria-label={`Ouvrir l'étude de cas « ${title} » (PDF) dans un nouvel onglet`}
         >
           <div className={style.picturesToScroll__frame}>{renderImg}</div>
         </a>
@@ -124,6 +131,4 @@ function MemoizedSlidePicture({
       )}
     </div>
   );
-}
-
-export const SlidePicture = memo(MemoizedSlidePicture);
+});

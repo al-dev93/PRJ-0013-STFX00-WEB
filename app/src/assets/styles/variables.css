@@ -58,8 +58,8 @@
   --link-hover: var(--brand-strong);
   --link-visited: #6a2bbf;
 
-  --focus-ring: #2257e6;
-  --focus-ring-on-dark: var(--white);
+  /* --focus-ring: #2257e6;
+  --focus-ring-on-dark: var(--white); */
 
   /* Texte & neutres */
   --ink: #0f172a; /* couleur de texte principale (titres + body) */
@@ -93,13 +93,13 @@
   --popover-message-bg: #0a182ef2;
   --popover-suggestions-bg: rgba(10, 25, 47, 0.9);
   /* socialnavbar */
-  --button-link-size: 48px;
+  /* --button-link-size: 48px;
   --button-link-color: rgba(0, 53, 84, 0.7);
   --button-link-transition: color 0.3s, background-color 0.3s, transform 0.3s;
   --button-link-transform-scale: scale(1.1);
   --button-link-transform-rotate: rotate(10deg);
   --button-link-icon-size: 2rem;
-  --button-link-outline: 2px solid var(--decorative-dark);
+  --button-link-outline: 2px solid var(--decorative-dark); */
 }
 
 /* @media (prefers-color-scheme: dark) {

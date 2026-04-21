@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 
+import { TagType } from '@/types';
+import { TAG_FORM } from '@/utils/constants';
 import { Tag } from '@components/Tag';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
@@ -12,17 +14,16 @@ import type { SkillsListProps } from './types';
  *
  * @component
  * @param {SkillsListProps} props - The properties for the SkillsList component.
- * @property {string} [tagColor] - The color color class for the tags.
  * @property {(string[] | undefined)} list - The list of skills to display.
- * @property {boolean} [lineBreak] - Indicates whether skills are listed on one line or several.
- * @property {('filled' | 'thinned')} [tagType] - Type of the tag which determines its style.
  * @returns {React.JSX.Element} The rendered skills list component.
  *
  * @al-dev93
  */
-export function SkillsList({ tagColor, list, lineBreak, tagType }: SkillsListProps): React.JSX.Element {
+export function SkillsList({ primaryTag, list, layoutType }: SkillsListProps): React.JSX.Element {
   const handleError = useErrorHandler();
-  const classNameTag = style.skillsRow + (lineBreak ? ` ${style['skillsRow--wrapp']}` : '');
+  // const classNameTag = style.skillsRow + (lineBreak ? ` ${style['skillsRow--wrapp']}` : '');
+  const classNameTag = `${style.skills} ${style[`skills${layoutType ? `--${layoutType}` : ``}`]}`;
+  const variant: Exclude<TagType, typeof TAG_FORM> | undefined = layoutType ? `${layoutType}-tag` : undefined;
 
   const handlePropsValidity = useCallback(
     async (checkCategory?: 'type') => {
@@ -32,7 +33,7 @@ export function SkillsList({ tagColor, list, lineBreak, tagType }: SkillsListPro
             code: 1002,
             message: 'The skill list type is not correct.',
             context: {
-              list: isPrimitiveArray(list, 'string') ? list : 'unknown',
+              list: isPrimitiveArray(list) ? list : 'unknown',
             },
           };
         }
@@ -61,16 +62,21 @@ export function SkillsList({ tagColor, list, lineBreak, tagType }: SkillsListPro
       handlePropsValidity();
     }
     // Checking data type
-    else if (!isPrimitiveArray(list, 'string')) {
+    else if (!isPrimitiveArray(list)) {
       handlePropsValidity('type');
     }
   }, [handlePropsValidity, list]);
 
   return (
-    <ul className={classNameTag} aria-label='Skills list'>
+    <ul className={classNameTag} aria-label='Liste de compétences'>
       {list?.map((value, index) => (
         <li key={value}>
-          <Tag className={tagColor} tag={value} type={tagType} ariaLabel={`Skill ${index + 1} : ${value}`} />
+          <Tag
+            className={primaryTag === index + 1 ? style.primaryTag : undefined}
+            tag={value}
+            variant={variant}
+            ariaLabel={`compétence ${index + 1} : ${value}`}
+          />
         </li>
       ))}
     </ul>

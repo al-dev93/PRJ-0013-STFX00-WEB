@@ -1,29 +1,39 @@
 /* Main container for the PicturesScroller component */
 .picturesScroller {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 0 80px;
-  align-items: center;
+  --scroller-transition-duration: 0.6s;
+
+  display: grid;
+  gap: var(--semantic-space-md);
 }
 
 /* Body container for scrolling the images */
 .picturesScroller__body {
-  overflow: hidden;
-  will-change: scroll-position;
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--sl-media-radius);
+  overflow: clip;
+
+  border: 1px solid var(--sl-media-border);
+  background: var(--sl-media-bg);
+  box-shadow: var(--sl-media-shadow);
+}
+
+.picturesScroller__body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--sl-vignette);
+  opacity: var(--sl-vignette-opacity);
+  z-index: 0;
 }
 
 /* Flexbox for images, handling the scroll transition */
 .picturesScroller__body__main {
+  position: relative;
   display: flex;
   align-items: center;
   will-change: transform;
-  transition: transform 0.6s ease-in-out;
-}
-
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .picturesScroller__body__main {
-    transition: none;
-  }
+  transition: transform calc(var(--scroller-transition-duration) * var(--motion-ok)) ease-in-out;
+  z-index: 1;
 }

@@ -1,12 +1,10 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { memo, MouseEvent, useCallback } from 'react';
 
-import { DISABLED_STATUS, ENABLED_STATUS } from '@utils/constants';
-
+// import { DISABLED_STATUS, ENABLED_STATUS } from '@utils/constants';
 import style from './style.module.css';
 import type { AriaLabelScrollButtons, ScrollButtonsProps, SlideDirection } from '../../../../types';
 import { CHANGE_SLIDE, NEXT_SLIDE, PREVIOUS_SLIDE, START, STOP } from '../../../../utils/constants';
-
 /**
  * Component for the scroll buttons in the slideshow.
  *
@@ -21,7 +19,7 @@ import { CHANGE_SLIDE, NEXT_SLIDE, PREVIOUS_SLIDE, START, STOP } from '../../../
  *
  * @al-dev93
  */
-function MemoizedScrollButtons({
+export const ScrollButtons = memo(function ScrollButtons({
   slideshowState,
   slideshowDispatch,
   ariaLabels,
@@ -52,12 +50,12 @@ function MemoizedScrollButtons({
         type='button'
         className={`${
           style.scrollButtons__button
-        } ${style[`scrollButtons__button--${slideshowState.slideTransition !== STOP ? DISABLED_STATUS : ENABLED_STATUS}`]}`}
+        } ${slideshowState.slideTransition !== STOP ? style[`scrollButtons__button--disabled`] : ''}`}
         aria-label={ariaLabels[direction]}
         aria-controls='picturesScroller'
         onClick={handleClick}
       >
-        <IonIcon name={name} aria-hidden='true' />
+        <IonIcon className={style.scrollButtons__button__icon} name={name} aria-hidden='true' />
       </button>
     ),
     [ariaLabels, handleClick, slideshowState.slideTransition],
@@ -69,6 +67,4 @@ function MemoizedScrollButtons({
       {renderScrollButton('rightButton', NEXT_SLIDE)}
     </div>
   );
-}
-
-export const ScrollButtons = memo(MemoizedScrollButtons);
+});

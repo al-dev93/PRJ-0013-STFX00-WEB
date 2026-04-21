@@ -1,12 +1,36 @@
-.skillsRow {
-  width: auto;
+.skills {
+  --skills-slideshow-gap: var(--semantic-space-xl);
+  --skills-slideshow-padding: var(--space-2) calc(var(--space-2) * 2);
+  --skills-card-lh: var(--ref-lh-body);
+  --skills-card-lines: 2;
+  --skills-card-row-gap: var(--semantic-space-sm);
+  --skills-card-col-gap: var(--semantic-space-md);
+  --skills-slideshow-primary-bg: color-mix(in oklch, var(--semantic-accent-weak) 38%, var(--semantic-surface-1-tinted));
+  --skills-slideshow-primary-bc: color-mix(in oklch, var(--semantic-accent) 55%, var(--semantic-border));
+  --skills-slideshow-primary-color: var(--semantic-text);
+  --skills-slideshow-primary-fw: 500;
+
   display: flex;
-  gap: 14px;
-  padding: 5px 10px;
 }
 
-.skillsRow--wrapp {
+.skills--slideshow {
+  gap: var(--skills-slideshow-gap);
+  padding: var(--skills-slideshow-padding);
+}
+
+.skills--slideshow .primaryTag {
+  background: var(--skills-slideshow-primary-bg);
+  border-color: var(--skills-slideshow-primary-bc);
+  color: var(--skills-slideshow-primary-color);
+  font-weight: var(--skills-slideshow-primary-fw);
+}
+
+.skills--card {
+  max-height: calc(
+    (var(--skills-card-lh) * 1em * var(--skills-card-lines)) +
+      (var(--skills-card-row-gap) * (var(--skills-card-lines) - 1))
+  );
   flex-wrap: wrap;
-  gap: 0px;
   padding: 0;
+  overflow: hidden;
 }

@@ -1,87 +1,192 @@
 /* Main container for the slideshow component */
 .slideshow {
+  --sl-card-radius: var(--semantic-lg-radius);
+  --sl-card-pad: clamp(var(--semantic-space-md), 1.4vw, var(--semantic-space-lg));
+  --sl-gap: clamp(var(--semantic-space-md), 1.6vw, var(--semantic-space-xl));
+
+  --sl-border: var(--semantic-border);
+  --sl-bg: color-mix(in oklch, var(--semantic-surface-2) 92%, var(--semantic-accent) 2%);
+  --sl-shadow: var(--elevation-2);
+
+  --sl-wash-opacity: 0.55;
+  --sl-wash: radial-gradient(
+    90% 70% at 12% 0%,
+    color-mix(in oklch, var(--semantic-accent) 18%, transparent),
+    transparent 62%
+  );
+
+  --sl-header-radius: var(--semantic-md-radius);
+  --sl-header-pad: clamp(var(--semantic-space-md), 1.2vw, var(--semantic-space-lg));
+  --sl-header-bg: color-mix(in oklch, var(--semantic-surface-1) 92%, var(--semantic-accent) 2%);
+  --sl-header-border: color-mix(in oklch, var(--semantic-border) 75%, transparent);
+  --sl-header-shadow: var(--elevation-1);
+  --sl-header-introduction-color: color-mix(in oklch, var(--semantic-text) 72%, transparent);
+  --sl-header-introduction-fs: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+  --sl-header-introduction-lh: calc(var(--semantic-lh-heading) * 1.15);
+  --sl-header-introduction-bold-fw: 550;
+
+  --sl-media-radius: var(--semantic-lg-radius);
+  --sl-media-bg: color-mix(in oklch, var(--semantic-surface-1) 86%, transparent);
+  --sl-media-border: color-mix(in oklch, var(--semantic-border) 72%, transparent);
+  --sl-media-shadow: var(--elevation-3);
+
+  --sl-vignette-opacity: 0.18;
+  --sl-vignette: radial-gradient(120% 90% at 50% 10%, transparent 40%, color-mix(in oklch, black 25%, transparent)),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklch, black 10%, transparent),
+      transparent 35%,
+      color-mix(in oklch, black 18%, transparent)
+    );
+
+  --sl-control-size: clamp(2.6rem, 2.8vw, 3rem);
+  --sl-control-bg: color-mix(in oklch, var(--semantic-surface-1) 78%, transparent);
+  --sl-control-border: color-mix(in oklch, var(--semantic-border) 72%, transparent);
+  --sl-control-hover-bg: color-mix(in oklch, var(--semantic-surface-1-tinted) 82%, transparent 6%);
+  --sl-control-hover-border: color-mix(in oklch, var(--semantic-accent) 40%, var(--semantic-border));
+  --sl-control-shadow: var(--elevation-2);
+
+  --sl-dot-target-size: 32px;
+  --sl-dot-size: 10px;
+  --sl-dot-gap: calc(var(--semantic-space-sm) * 0.9);
+  --sl-dot-bg: color-mix(in oklch, var(--semantic-text) 16%, transparent);
+  --sl-dot-border: color-mix(in oklch, var(--semantic-border) 70%, transparent);
+  --sl-dot-active-bg: color-mix(in oklch, var(--semantic-accent-weak) 38%, var(--semantic-surface-1-tinted));
+  --sl-dot-active-border: color-mix(in oklch, var(--semantic-accent) 55%, var(--semantic-border));
+
+  --sl-focus-ring: color-mix(in oklch, var(--semantic-ring) 45%, transparent);
+  --sl-focus-shadow: var(--elevation-2);
+
+  --action-size: 40px;
+  --action-border-size: 1px;
+  --action-focus-size: 3px;
+  --action-hover-bg: color-mix(in oklch, var(--semantic-surface-1) 82%, var(--semantic-accent) 6%);
+
   position: relative;
-  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  isolation: isolate;
+
+  display: grid;
+  gap: var(--sl-gap);
+
+  padding: var(--sl-card-pad);
+  border-radius: var(--sl-card-radius);
+  border: 1px solid var(--sl-border);
+  background: var(--sl-bg);
+  box-shadow: var(--sl-shadow);
+
+  color: var(--semantic-text);
 }
 
-/* Wrapper for the slideshow content, with flexbox for layout */
-.slideshowWrapper {
+.slideshow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--sl-wash);
+  opacity: var(--sl-wash-opacity);
+  z-index: -1;
+}
+
+.slideshow__header {
+  max-inline-size: min(100%, 1000px);
+  margin-inline: auto;
+  padding-inline: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding-block: clamp(0.4rem, 1vw, 0.7rem);
+
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-  background-color: var(--white);
-  padding: 20px;
-  border-radius: var(--br-sm);
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
+  justify-content: center;
 }
 
-/* On hover, the box shadow increases to give a lift effect */
-.slideshowWrapper:hover {
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+.slideshow__introduction {
+  margin: 0 auto;
+  max-inline-size: 72ch;
+  text-align: center;
+  font-size: var(--sl-header-introduction-fs);
+  line-height: var(--sl-header-introduction-lh);
+  color: var(--sl-header-introduction-color);
+}
+
+.slideshow__introduction > strong {
+  font-weight: var(--sl-header-introduction-bold-fw);
+}
+
+.slideshowWrapper {
+  position: relative;
+  display: grid;
+  gap: var(--semantic-space-md);
 }
 
 /* Text style for the description below the slideshow */
 .description {
-  padding: 8px 20px 5px;
-  text-align: justify;
-  text-align-last: left;
-  font-size: var(--fs-xs);
-  color: var(--tertiary-color);
-  display: flow-root;
-  line-height: 1.45;
-}
-
-/* Link to open the detailled project sheet in PDF format */
-.projectLink {
-  float: right;
-  margin-left: 1em;
-}
-
-/* Styles for navigation buttons */
-.navButtons {
-  margin-right: 24px;
+  margin: 0;
+  color: var(--semantic-text-soft);
+  font-size: var(--semantic-fs-body);
+  line-height: var(--semantic-lh-body);
 }
 
 /* Button icon styling */
 .externalLinks {
-  color: var(--primary-color);
-}
+  inline-size: var(--action-size);
+  block-size: var(--action-size);
 
-/* Color of Button icon when focus with tab keyboard */
-.externalLinks:focus-visible {
-  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: var(--sl-control-bg);
+  border: var(--action-border-size) solid var(--sl-control-border);
+  box-shadow: var(--sl-control-shadow);
+
+  color: var(--semantic-text);
+
+  transition:
+    transform calc(160ms * var(--motion-ok)) ease,
+    box-shadow calc(160ms * var(--motion-ok)) ease,
+    border-color calc(160ms * var(--motion-ok)) ease,
+    background-color calc(160ms * var(--motion-ok)) ease;
 }
 
 /* Footer section with flex layout for alignment */
 .footer {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  background-color: var(--quaternary-color);
+  gap: var(--semantic-space-lg);
+  flex-wrap: wrap;
+
+  padding-top: var(--semantic-space-md);
+  border-top: 1px solid color-mix(in oklch, var(--semantic-border) 60%, transparent);
 }
 
-@media (forced-colors: active) {
-  .linkPdf:focus-visible {
-    outline: 2px solid ButtonText;
-    outline-offset: 2px;
+@media (hover: hover) and (pointer: fine) {
+  .externalLinks:hover {
+    background: var(--action-hover-bg);
+    transform: translateY(calc(-1px * var(--motion-ok)));
+    border-color: var(--semantic-ring);
+    box-shadow:
+      var(--sl-media-shadow),
+      0 0 0 1px color-mix(in oklch, var(--semantic-ring) 35%, transparent);
   }
 }
 
-/* Mouse only */
-@media (hover: hover) and (pointer: fine) {
-  .externalLinks:hover {
-    color: var(--white);
+/* option : sur desktop tu peux aligner à gauche si tu préfères “éditorial” */
+@media (min-width: 900px) {
+  .slideshow__header {
+    justify-content: flex-start;
+  }
+  .slideshow__introduction {
+    text-align: left;
   }
 }
 
 @media (max-width: 480px) {
+  .projectLinkRow {
+    justify-content: flex-start;
+  }
   .projectLink {
-    float: none;
-    display: inline-block;
+    display: inline-flex;
     margin-left: 0.5rem;
     margin-top: 0.4rem;
   }

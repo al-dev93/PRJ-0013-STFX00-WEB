@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { SlideStyle, SlideshowState } from '../types';
 import { STOP, TRANSFORM_TRANSITION } from '../utils/constants';
@@ -8,20 +8,19 @@ import { STOP, TRANSFORM_TRANSITION } from '../utils/constants';
  *
  * @function
  * @param {SlideshowState} slideshowState - The current state of the slideshow.
- * @param {number} duration - The duration of the transition between slides.
  * @returns {{slideEffectStyle: React.MutableRefObject<SlideStyle>}} Object containing reference for managing
  * the slideshow behavior.
  *
  * @al-dev93
  */
-export function usePicturesScroller(slideshowState: SlideshowState, duration: number) {
+export function usePicturesScroller(slideshowState: SlideshowState) {
   /**
-   * Ref for managing the style of slides during the scroll effect.
+   * State for managing the style of slides during the scroll effect.
    * It tracks the current transform and transition styles applied to the slides.
    *
    * @type {React.MutableRefObject<SlideStyle>}
    */
-  const slideEffectStyle = useRef<SlideStyle>({
+  const [slideEffectStyle, setSlideEffectStyle] = useState<SlideStyle>({
     transform: `translate3d(-100%, 0, 0)`,
     transition: `none`,
   });
@@ -31,12 +30,23 @@ export function usePicturesScroller(slideshowState: SlideshowState, duration: nu
    * The hook ensures that the slide's position is updated correctly without triggering a transition.
    */
   useEffect(() => {
-    if (slideshowState.loopSlide && slideshowState.slideTransition === STOP) {
-      slideEffectStyle.current = {
-        transform: `translate3d(${-(slideshowState.new + 1) * 100}%, 0, 0)`,
-        transition: 'none',
-      };
-    }
+    if (!slideshowState.loopSlide) return;
+    if (slideshowState.slideTransition !== STOP) return;
+
+    // Snap vers la vraie slide logique (prepend + reals + append => real index i = -(i+1)*100)
+    setSlideEffectStyle({
+      transform: `translate3d(${-(slideshowState.new + 1) * 100}%, 0, 0)`,
+      transition: 'none',
+    });
+
+    // Optionnel mais souvent utile : réactiver la transition au frame suivant
+    // (pour éviter que la prochaine navigation parte de "none" si ton reducer ne rerender pas assez vite)
+    requestAnimationFrame(() => {
+      setSlideEffectStyle((prev) => ({
+        ...prev,
+        transition: TRANSFORM_TRANSITION,
+      }));
+    });
   }, [slideshowState.loopSlide, slideshowState.new, slideshowState.slideTransition]);
 
   /**
@@ -44,6 +54,7 @@ export function usePicturesScroller(slideshowState: SlideshowState, duration: nu
    * This hook applies the correct CSS transform and transition for the current slide index.
    */
   useEffect(() => {
+    if (slideshowState.loopSlide && slideshowState.slideTransition === STOP) return;
     /**
      * Function to calculate an offset when the user moves from the first to the last slide or
      * from the last to the first. The offset is used to calculate the movement and give an
@@ -60,11 +71,11 @@ export function usePicturesScroller(slideshowState: SlideshowState, duration: nu
       return -1;
     };
 
-    slideEffectStyle.current = {
+    setSlideEffectStyle({
       transform: `translate3d(${(-slideshowState.new + offsetSlide()) * 100}%, 0, 0)`,
       transition: TRANSFORM_TRANSITION,
-    };
-  }, [duration, slideshowState.loopSlide, slideshowState.maxIndexSlide, slideshowState.new]);
+    });
+  }, [slideshowState.loopSlide, slideshowState.maxIndexSlide, slideshowState.new, slideshowState.slideTransition]);
 
   return { slideEffectStyle };
 }

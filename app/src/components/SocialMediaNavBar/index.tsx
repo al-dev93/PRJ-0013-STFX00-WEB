@@ -26,7 +26,7 @@ import type { SocialMediaNavBarProps } from './types';
  *
  * @al-dev93
  */
-function MemoizedSocialMediaNavBar({
+export const SocialMediaNavBar = memo(function SocialMediaNavBar({
   className,
   changeLinkColor,
   type,
@@ -40,7 +40,7 @@ function MemoizedSocialMediaNavBar({
   const endpoint = useMemo(() => (shouldFetch ? import.meta.env.VITE_API_ACCOUNTS_DATA_ENDPOINT : null), [shouldFetch]);
   const { data: fetchedData, fetchError } = useFetchData({
     endpoint,
-    initialOptions: { method: 'GET' },
+    // initialOptions: { method: 'GET' },
     edgeFunction: true,
   });
 
@@ -117,7 +117,7 @@ function MemoizedSocialMediaNavBar({
         {data?.map((element) => (
           <li key={`${element.service}`}>
             <SocialMediaButton
-              className={`${style.socialMediaNavBar__externalLink} ${changeLinkColor ?? ''}`}
+              className={`${type === 'slideshow' ? style.socialMediaNavBar__externalLink : ''} ${element.service === 'external' && type === 'slideshow' ? style['socialMediaNavBar__externalLink--primary'] : ''} ${changeLinkColor ?? ''}`}
               button={element}
             />
           </li>
@@ -130,6 +130,4 @@ function MemoizedSocialMediaNavBar({
       )}
     </nav>
   ) : null;
-}
-
-export const SocialMediaNavBar = memo(MemoizedSocialMediaNavBar);
+});

@@ -1,162 +1,200 @@
 .card {
-  /* Default theme (clear rest) */
-  --text: #05334a;
-  --muted: #0a192f;
+  --card-padding: var(--semantic-space-xl);
+  --card-gap: var(--semantic-space-md);
+  --card-main-gap: var(--semantic-space-sm);
+  --card-border-radius: var(--semantic-lg-radius);
+  --card-border-color: var(--semantic-border);
+  --card-border: 1px solid color-mix(in oklch, var(--card-border-color) 85%, transparent);
+  --card-bg: color-mix(in oklch, var(--semantic-surface-2) 92%, var(--semantic-accent) 2%);
+  --card-text: var(--semantic-text);
+  --card-muted: var(--semantic-brand-muted);
+  --card-ring: var(--semantic-ring);
+  --card-accent: var(--semantic-accent);
+  --card-folder-icon: color-mix(in oklch, var(--card-muted) 70%, var(--card-border-color));
+  --card-folder-icon-size: 26px;
+  --card-nav-color: color-mix(in oklch, var(--card-muted) 70%, var(--card-border-color));
+  --card-fs-description: var(--semantic-fs-body, var(--fs-base));
+  --card-lh-description: calc(var(--semantic-lh-body) * 1.208);
+  --card-tag-fs: calc(var(--semantic-fs-body) / 1.28);
+  --card-tag-fw: lighter;
+  --card-hover-border-color: color-mix(in oklch, var(--card-accent) 55%, var(--card-border-color));
+  --card-hover-box-shadow: 0 14px 34px -22px color-mix(in oklch, var(--card-border-color) 60%, transparent);
+  --card-hover-nav-active-color: color-mix(in oklch, var(--card-text) 85%, var(--card-muted));
+  --card-outline-width: 2px;
+  --card-outline-offset: 4px;
+  --card-focus-halo-strength: 35%;
+  --card-focus-border-color: color-mix(in oklch, var(--card-accent) 65%, var(--card-border-color));
+  --card-focus-box-shadow: 0 0 0 4px color-mix(in oklch, var(--card-ring) var(--card-focus-halo-strength), transparent);
 
-  --link: #0b57d0;
-  --link-hover: #063a8a;
-
-  --focus-ring: #003554;
-
-  --nav-idle: #0a192f;
-
-  min-width: 0;
-  margin: 0;
-  padding: 32px 28px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border-radius: var(--br-sm);
-  background-color: var(--panel-bg);
-  color: var(--text);
-  transform: translate3d(0, 0, 0);
-  box-shadow: 0 0 0 0 transparent;
+  min-width: 0;
+  height: 100%;
+  gap: var(--card-gap);
+  padding: var(--card-padding);
 
-  /* Control the "return" (hover-out) */
+  background: var(--card-bg);
+  color: var(--card-text);
+
+  border-radius: var(--card-border-radius);
+  border: var(--card-border);
   transition:
-    transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
-    box-shadow 320ms ease-out,
-    background-color 220ms ease-out,
-    color 180ms ease-out;
+    transform calc(220ms * var(--motion-ok)) cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow calc(220ms * var(--motion-ok)) ease,
+    border-color calc(160ms * var(--motion-ok)) ease;
 }
 
-.card:is(:hover, :focus-visible) {
-  /* Active state theme (dark background) */
-  --text: var(--white);
-  --muted: var(--dark-primary);
+.card[data-variant='root'] {
+  --card-accent: var(--semantic-accent-weak, var(--semantic-accent));
+  --card-ring: color-mix(in oklab, var(--semantic-ring) 65%, var(--card-text) 35%);
+  --card-outline-width: 3px;
+  --card-outline-offset: 3px;
+  --card-focus-halo-strength: 55%;
+  --card-hover-border-color: color-mix(in oklab, var(--card-border-color) 55%, var(--card-accent) 45%);
+  --card-hover-box-shadow: 0 0 0 3px color-mix(in oklab, transparent 70%, var(--card-accent) 30%);
+  --card-folder-icon: color-mix(in oklab, var(--card-text) 55%, var(--card-accent) 45%);
+  --card-root-badge-bg: color-mix(in oklab, var(--card-bg) 85%, var(--card-accent) 15%);
+  --card-root-badge-border: 1px solid color-mix(in oklab, var(--card-border-color) 70%, var(--card-accent) 30%);
+  --card-root-badge-text: color-mix(in oklab, var(--card-text) 75%, var(--card-accent) 25%);
+  --card-root-badge-fs: var(--semantic-fs-kicker);
+  --card-root-badge-inset: var(--space-1) calc(var(--semantic-space-md) * 1.28);
+  --card-root-opacity-additionalNav: 0.72;
+  --card-root-fw-bold: var(--semantic-fw-kicker);
+}
 
-  --link: #e0f2ff;
-  --link-hover: var(--white);
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: translateY(calc(-2px * var(--motion-ok)));
+    box-shadow: var(--card-hover-box-shadow);
+    border-color: var(--card-hover-border-color);
+  }
+}
 
-  --focus-ring: var(--white);
-
-  --nav-active: #e0f2ff;
-  --nav-active-hover: var(--white);
-
-  background-color: var(--decorative-dark);
-  box-shadow: 5px 5px 8px -1px var(--dark-bg-menu);
-  transform: translate3d(8px, -9px, 0);
-
-  /* Slightly faster entry (hover-in) */
-  transition:
-    transform 320ms cubic-bezier(0.3, 0.7, 0.4, 1),
-    box-shadow 200ms ease,
-    background-color 180ms ease;
+.card:focus-within {
+  border-color: var(--card-focus-border-color);
+  box-shadow: var(--card-focus-box-shadow);
 }
 
 /* Respecte prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .card {
-    transition: none;
-    transform: none;
-    box-shadow: none;
-  }
-  .card:is(:hover, :focus-visible) {
-    transform: none;
-    box-shadow: none;
+    --card-hover-box-shadow: none;
+    --card-hover-border-color: var(--card-border-color);
   }
 }
 
 .card__header {
-  min-width: 0;
-  margin: 0;
-  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0;
+}
+
+.card__header__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
 }
 
 .card__folderIcon {
-  font-size: 32px;
-  color: var(--muted);
+  font-size: var(--card-folder-icon-size);
+  color: var(--card-folder-icon);
+}
+
+.card[data-variant='root'] .card__folderIcon {
+  flex: 0 0 auto;
+}
+
+.card[data-variant='root'] .card__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--card-root-badge-inset);
+  border-radius: 999px;
+
+  font-size: var(--card-root-badge-fs);
+  font-weight: var(--card-root-fw-bold);
+  letter-spacing: 0.02em;
+
+  background: var(--card-root-badge-bg);
+  border: var(--card-root-badge-border);
+  color: var(--card-root-badge-text);
+  white-space: nowrap;
 }
 
 .card__additionalNav {
-  color: var(--nav-idle);
-  transition: color 0.18s ease;
+  color: var(--card-nav-color);
+  transition:
+    color calc(160ms * var(--motion-ok)) ease,
+    opacity calc(160ms * var(--motion-ok)) ease;
 }
 
-.card:is(:hover, :focus-visible) .card__additionalNav {
-  color: var(--nav-active);
+.card[data-variant='root'] .card__additionalNav {
+  opacity: var(--card-root-opacity-additionalNav);
 }
 
-.card:is(:hover, :focus-visible) .card__additionalNav :is(a, button):is(:hover, :focus-visible) {
-  color: var(--nav-active-hover);
+.card:hover .card__additionalNav,
+.card:focus-within .card__additionalNav {
+  color: var(--card-hover-nav-active-color);
+}
+
+.card[data-variant='root']:hover .card__additionalNav,
+.card[data-variant='root']:focus-within .card__additionalNav {
+  opacity: calc(
+    var(--card-root-opacity-additionalNav) + (1 - var(--card-root-opacity-additionalNav)) * var(--motion-ok)
+  );
 }
 
 .card__main {
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--card-main-gap);
+  min-width: 0;
 }
 
 .card__description {
+  display: grid;
+  gap: var(--card-main-gap);
+  font-size: var(--card-fs-description);
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
-  overflow: visible;
-  font-size: var(--fs-xs);
-  line-height: 1.45;
-  color: var(--text);
+  min-height: calc(1.45em * 4 + var(--card-main-gap) + 1.5em);
 }
 
 .card__description > span {
-  min-width: 0;
+  --lines: 5;
 
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  line-clamp: var(--lines);
+  -webkit-line-clamp: var(--lines);
   -webkit-box-orient: vertical;
-  line-clamp: 4;
-
+  line-height: var(--card-lh-description);
+  min-height: calc(var(--lines) * 1em * var(--card-lh-description));
   overflow: hidden;
 }
 
 /* Link to open the detailled project sheet in PDF format */
 .card__description__projectLink {
-  flex: 0 0 auto;
-  align-self: flex-end;
-}
-
-.card__skillsList {
-  color: var(--muted);
-  transition: color 180ms ease;
-}
-
-.card:is(:hover, :focus-visible) .card__folderIcon,
-.card:is(:hover, :focus-visible) .card__skillsList {
-  color: var(--muted);
-}
-
-.card:is(:hover, :focus-visible) .card__description,
-.card:is(:hover, :focus-visible) h3 {
-  color: var(--text);
-}
-
-.card:is(:hover, :focus-visible) .card__additionalNav:is(a, button):is(:hover, :focus-visible) {
-  color: var(--white);
+  justify-self: end;
 }
 
 .card__footer {
-  min-width: 0;
-  margin: 0;
-  padding: 0;
+  margin-top: auto;
 }
 
 .card :is(a, button):focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 4px;
-  border-radius: 6px;
+  outline: var(--card-outline-width) solid var(--card-ring);
+  outline-offset: var(--card-outline-offset);
+  border-radius: var(--semantic-sm-radius, 8px);
+}
+
+.card__tag {
+  font-size: var(--card-tag-fs);
+  font-weight: var(--card-tag-fw);
+}
+
+.card[data-variant='root'] .card__tag {
+  --card-tag-fw: var(--card-root-fw-bold);
+
+  padding-bottom: 0;
+  /* font-weight: ; */
 }

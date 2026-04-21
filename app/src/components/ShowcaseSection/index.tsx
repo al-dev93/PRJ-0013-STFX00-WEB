@@ -1,92 +1,58 @@
-import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AppButton } from '@/components/AppButton';
-import type { DetailSection, MenuSectionsVisibility, Point, ViewBoxRect } from '@/types';
+import type { DetailSection, MenuSectionsVisibility } from '@/types';
+import { renderFormattedText } from '@/utils/stylizedString';
 import { useOnScreen } from '@hooks/useOnScreen';
-// import titleLine from '@images/decorations/title_line.svg';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { INTERSECTION_OPTIONS_ROOTMARGIN } from '@utils/constants';
 
 import style from './style.module.css';
-import type { HeroElementsRect, ShowcaseSectionProps } from './types';
-import {
-  CORNER_RADII_DEFAULT,
-  CTA_CLEAR,
-  DISPLAY_BRAND_ELEMENT,
-  LEFT_GUTTER_MIN,
-  MIN_AFTER_H1,
-  MIN_OBLIQUE_DX,
-  OFFSET_TOP_KICKER,
-  OFFSET_UNDER_H1,
-  RAIL_MARGIN_FROM_TEXT,
-  TAN_60,
-} from './utils/constants';
+import type { ShowcaseSectionProps } from './types';
 import { DynamicElement } from '../DynamicElement';
 import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
 import { DynamicElementContainer } from '../DynamicElementContainer';
-import { HeroConnector } from '../HeroConnector';
+import { HeroSignature } from '../HeroSignature';
 
-function hasBox(el: Element | null | undefined) {
-  if (!el) return false;
-  const r = el.getBoundingClientRect();
-  return r.width > 0 && r.height > 0;
-}
+// function toRealNewLines(s: string) {
+//   return s.replaceAll('\\r\\n', '\n').replaceAll('\\n', '\n');
+// }
 
-function computeHeroGeometry({ sectionRect, kickerRect, titleRect, buttonRect }: HeroElementsRect): {
-  connectorPoints: Point[];
-  viewBox: ViewBoxRect;
-} {
-  // 1) mesures de base
-  const w = Math.max(1, sectionRect.width);
-  const h0 = Math.max(1, sectionRect.height);
-  const ox = sectionRect.left;
-  const oy = sectionRect.top;
+// function renderFormattedText(text?: string) {
+//   if (!text) return undefined;
 
-  // A : départ au niveau du kicker (haut)
-  const xRail = Math.max(LEFT_GUTTER_MIN, titleRect.left - ox - RAIL_MARGIN_FROM_TEXT);
-  const A: Point = { x: Math.round(xRail), y: Math.round(kickerRect.top - oy + OFFSET_TOP_KICKER) };
+//   // On split avec groupe capturant => parts = [seg, **bold**, seg, **bold**, seg, ...]
+//   const parts = toRealNewLines(text).split(/(\*\*[^*]+\*\*)/g);
 
-  // B : fin du vertical, sous le H1
-  const yRail = titleRect.bottom - oy + OFFSET_UNDER_H1;
-  const B: Point = { x: Math.round(xRail), y: Math.round(yRail) };
+//   // On parcourt fonctionnellement en maintenant un offset cumulatif
+//   let offset = 0;
+//   return parts.map((part) => {
+//     // si part est un segment gras **…**
+//     const m = part.match(/^\*\*([^*]+)\*\*$/);
+//     if (m) {
+//       const raw = m[0]; // ex: **Mot**
+//       const inner = m[1]; // ex: Mot
+//       const start = offset; // position du début du ** dans le texte reconstruit
+//       const end = start + raw.length;
+//       offset = end; // avance l’offset pour la suite
+//       return <strong key={`b:${start}-${end}`}>{inner}</strong>;
+//     }
 
-  // CTA : centre X et ligne au-dessus
-  const xMidCTA = buttonRect.left - ox + buttonRect.width / 2;
-  const yE = buttonRect.top - oy - CTA_CLEAR; // 5) ligne où on s’arrête au-dessus du CTA
+//     // segment normal : clé = début de segment
+//     const start = offset;
+//     const end = start + part.length;
+//     offset = end;
+//     return <React.Fragment key={`n:${start}`}>{part}</React.Fragment>;
+//   });
+// }
 
-  // 4) D : point d’arrivée de l’oblique, aligné sur le centre X du CTA
-  //    D.y sera déterminé par la 60° → il ne doit pas dépasser yE
-  // 2)–3) C : fin de l’horizontale (début oblique), à choisir pour garantir la 60° et l’arrêt avant yE
-  //    tan(60) = (D.y - yRail) / (D.x - C.x)
-  //    Si on veut D.y <= yE, alors C.x >= D.x - (yE - yRail)/tan(60)
-  const minCxFromE = xMidCTA - Math.max(1, yE - yRail) / TAN_60;
-  const minAfterH1 = titleRect.right - ox + MIN_AFTER_H1;
-
-  // C.x ne peut pas dépasser D.x - MIN_OBLIQUE_DX (sinon oblique trop courte)
-  let Cx = Math.max(minAfterH1, minCxFromE, LEFT_GUTTER_MIN);
-  const maxCx = xMidCTA - MIN_OBLIQUE_DX;
-  if (Cx > maxCx) Cx = maxCx;
-
-  const C: Point = { x: Math.round(Cx), y: Math.round(yRail) };
-
-  // 3) & 4) D : oblique à 60°, jusqu’à l’alignement vertical du centre du CTA
-  const Dy = yRail + TAN_60 * (xMidCTA - Cx);
-  // if (Dy > yE) Dy = yE;
-  const D: Point = { x: Math.round(xMidCTA), y: Math.min(Dy, yE) }; // sécurité : ne pas descendre sous yE
-
-  // 4)–5) E : verticale qui rejoint la ligne au-dessus du CTA (même X que D)
-  const E: Point = { x: Math.round(xMidCTA), y: Math.round(yE) };
-
-  const connectorPoints: Point[] = [A, B, C, D, E];
-
-  // 5) viewBox : largeur = w ; hauteur = max(hauteur actuelle, point le plus bas + marge)
-  const deepestY = Math.max(...connectorPoints.map((p) => p.y));
-  const strokePad = 16; // petite marge pour ne pas clipper le trait arrondi
-  const hNeeded = Math.ceil(Math.max(h0, deepestY + strokePad));
-
-  return { connectorPoints, viewBox: { minX: 0, minY: 0, width: w, height: hNeeded } };
-}
+const isRenderNode = (node: DetailSection) =>
+  node.id &&
+  node.tag &&
+  (typeof node.content === 'string' || typeof node.content === 'undefined') &&
+  typeof node.id === 'string' &&
+  typeof node.tag === 'string';
 
 /**
  * ShowcaseSection component that displays a section with dynamic content and a modal form button.
@@ -104,10 +70,12 @@ function computeHeroGeometry({ sectionRect, kickerRect, titleRect, buttonRect }:
  *
  * @al-dev93
  */
-export const ShowcaseSection = memo(function MemoizedShowcaseSection({
+export const ShowcaseSection = memo(function ShowcaseSection({
   content,
   anchor,
+  isAnchored,
   title,
+  introduction,
   MenuSectionsVisibility,
   openModalFormDialog,
   showModalFormDialog,
@@ -115,44 +83,45 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
 }: ShowcaseSectionProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
 
-  const isHero = !title;
+  const isHero = anchor === 'home';
+  const isAbout = anchor === 'about';
 
   const sectionRef = useRef<HTMLElement>(null);
   const kickerRef = useRef<HTMLParagraphElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const [drawPath, setDrawPath] = useState<boolean>(false);
-  const [animTick, setAnimTick] = useState<number>(0);
-  const [vb, setVb] = useState<ViewBoxRect>({ minX: 0, minY: 0, width: 1000, height: 420 });
-  const [points, setPoints] = useState<Point[]>([]);
-  const [hasConnectorAnimationPlayed, setHasConnectorAnimationPlayed] = useState<boolean>(false);
+  const [hasBrandSignaturePlayed, setHasBrandSignaturePlayed] = useState<boolean>(false);
 
   const { isIntersecting, observerError } = useOnScreen(isHero ? titleRef : sectionRef, {
     threshold: isHero ? [0.45] : undefined,
     ...INTERSECTION_OPTIONS_ROOTMARGIN,
   });
 
-  const [mainContent, brandContent] = useMemo<[DetailSection[], DetailSection[] | undefined]>(() => {
+  const [mainContent, summaryContent, skillsContent] = useMemo<
+    [DetailSection[], DetailSection[], DetailSection[]] | [DetailSection[]]
+  >(() => {
     const sortContent = content.sort((a, b) => a.orderInSection - b.orderInSection);
 
-    return isHero
+    return isAbout
       ? sortContent.reduce(
-          (prev: [DetailSection[], DetailSection[]], curr) =>
-            curr.name === 'brand' ? [prev[0], [...prev[1], curr]] : [[...prev[0], curr], prev[1]],
-          [[], []],
+          (prev: [DetailSection[], DetailSection[], DetailSection[]], curr) => {
+            if (curr.name?.includes('description')) return [[...prev[0], curr], prev[1], prev[2]];
+            if (curr.name?.includes('summary')) return [prev[0], [...prev[1], curr], prev[2]];
+            return [prev[0], prev[1], [...prev[2], curr]];
+          },
+          [[], [], []],
         )
-      : [sortContent, undefined];
-  }, [content, isHero]);
+      : [sortContent];
+  }, [content, isAbout]);
 
-  const shouldRenderBrandContent = Boolean(brandContent) && DISPLAY_BRAND_ELEMENT;
-  const buttonState = hasConnectorAnimationPlayed ? 'ready' : 'pending';
+  const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
+  // const idSection = anchor ?? `${content}`;
 
   /**
    * Updates the visibility of the section in the page sections context.
    */
   useEffect(() => {
-    if (!anchor) return;
+    if (!anchor || !isAnchored) return;
     if (observerError) {
       // eslint-disable-next-line no-void
       void handleError(
@@ -168,7 +137,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
     }
     const section = MenuSectionsVisibility;
     (section.current as MenuSectionsVisibility)[anchor as keyof MenuSectionsVisibility] = isIntersecting;
-  }, [anchor, isIntersecting, MenuSectionsVisibility, observerError, handleError]);
+  }, [anchor, isIntersecting, MenuSectionsVisibility, observerError, handleError, isAnchored]);
 
   /**
    * Handling errors in props.
@@ -225,83 +194,6 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
     });
   }, [content, handleError]);
 
-  useLayoutEffect(() => {
-    if (!isHero || !sectionRef.current) return undefined;
-
-    const section = sectionRef.current;
-    const kicker = kickerRef.current;
-    const heroTitle = titleRef.current;
-    const button = buttonRef.current;
-
-    if (!kicker || !heroTitle || !button) return undefined;
-
-    const updateHeroConnectorGeometry = (): void => {
-      if (!hasBox(section) || !hasBox(kicker) || !hasBox(heroTitle) || !hasBox(button)) return;
-      const { connectorPoints, viewBox } = computeHeroGeometry({
-        sectionRect: section.getBoundingClientRect(),
-        kickerRect: kicker.getBoundingClientRect(),
-        titleRect: heroTitle.getBoundingClientRect(),
-        buttonRect: button.getBoundingClientRect(),
-      });
-      setPoints(connectorPoints);
-      setVb(viewBox);
-    };
-
-    let raf = 0;
-    const schedule = () => {
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        updateHeroConnectorGeometry();
-      });
-    };
-
-    const ro = new ResizeObserver(schedule);
-
-    ro.observe(section);
-
-    let cancelled = false;
-    const r1 = requestAnimationFrame(() => {
-      if (!cancelled) updateHeroConnectorGeometry();
-    });
-    const onLoad = () => {
-      if (!cancelled) updateHeroConnectorGeometry();
-    };
-    window.addEventListener('load', onLoad, { once: true });
-
-    if ('fonts' in document && document.fonts?.ready?.then) {
-      document.fonts.ready.then(() => {
-        if (!cancelled) updateHeroConnectorGeometry();
-      });
-    }
-
-    updateHeroConnectorGeometry();
-
-    return () => {
-      cancelled = true;
-      if (raf) cancelAnimationFrame(raf);
-      cancelAnimationFrame(r1);
-      window.removeEventListener('load', onLoad);
-      ro.disconnect();
-    };
-  }, [isHero]);
-
-  useEffect(() => {
-    if (!isHero || !isIntersecting) {
-      setDrawPath(false);
-      setHasConnectorAnimationPlayed(false);
-      return undefined;
-    }
-
-    setDrawPath(false);
-
-    const id = requestAnimationFrame(() => setDrawPath(true));
-
-    return () => cancelAnimationFrame(id);
-  }, [isHero, isIntersecting, animTick]);
-
-  const handlePathComputed = useCallback(() => setAnimTick((t) => t + 1), []);
-
   /**
    * Retrieves a CSS class name based on the provided DetailSection object.
    * If the name is provided, it returns a formatted class name using a predefined style.
@@ -314,13 +206,18 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
    * @al-dev93
    */
   const getElementClassName = useCallback(
-    (node: DetailSection): string => {
-      if (!node.name) return '';
+    (node: DetailSection): string | undefined => {
+      // if (!node.name || !['p', 'ul'].includes(node.tag)) return undefined;
+      if (!node.name) return undefined;
       const { name } = node;
 
-      return style[`section${isHero ? '--hero' : ''}__${name}`];
+      if (isHero) return style[`hero__${name}`];
+      if (!anchor) return style[`${name}`];
+      if (anchor && name.includes('kicker')) return style[`${anchor}__kicker`];
+
+      return style[`${anchor}__${name}`];
     },
-    [isHero],
+    [anchor, isHero],
   );
 
   /**
@@ -333,14 +230,17 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
   const showcaseSectionTitle = useMemo((): React.JSX.Element | null => {
     if (!title) return null;
     return (
-      // <div className={style.section__titleSection}>
-      <h2 id={`${anchor}-title`} className={style.section__titleSection} aria-live='polite'>
+      <h2 id={`${anchor}-title`} className={style.section__titleSection}>
         <span className={style.section__titleSection__inner}>{title}</span>
       </h2>
-      // <img src={titleLine} alt='Decorative line' />
-      // </div>
     );
   }, [anchor, title]);
+
+  const getHeroNodeRef = (renderNode: DetailSection): React.RefObject<HTMLParagraphElement> | undefined => {
+    if (!renderNode.name || !['kicker', 'title'].includes(renderNode.name)) return undefined;
+    if (renderNode.name === 'kicker') return kickerRef;
+    return titleRef;
+  };
 
   /**
    * Renders the DynamicElement bloc. If the definition data is missing,
@@ -352,18 +252,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
    */
   const renderDynamicElement = useCallback(
     (renderNode: DetailSection): React.JSX.Element | null => {
-      const isRenderNode = (node: DetailSection) =>
-        node.id &&
-        node.tag &&
-        (typeof node.content === 'string' || typeof node.content === 'undefined') &&
-        typeof node.id === 'string' &&
-        typeof node.tag === 'string';
       if (!isRenderNode(renderNode)) return null;
-      const getNodeRef = () => {
-        if (!renderNode.name || !['kicker', 'title'].includes(renderNode.name)) return undefined;
-        if (renderNode.name === 'kicker') return kickerRef;
-        return titleRef;
-      };
 
       return (
         <DynamicElement
@@ -371,11 +260,12 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
           id={renderNode.tag === 'h1' ? `${anchor}-title` : undefined}
           tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
           endpoint={renderNode.endpoint}
+          introduction={renderNode.tag === 'Slideshow' ? introduction : undefined}
           className={getElementClassName(renderNode)}
           aria-hidden={renderNode.name === 'brand' ? 'true' : undefined}
-          ref={isHero ? getNodeRef() : undefined}
+          ref={isHero ? getHeroNodeRef(renderNode) : undefined}
         >
-          {renderNode.content}
+          {renderFormattedText(renderNode.content)}
           {renderNode.boldContent?.length
             ? renderNode.boldContent.map((item) => {
                 return isRenderNode(item) ? (
@@ -384,7 +274,7 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
                     tag={item.tag as ValidHTMLTag | ValidComponentTag}
                     className={getElementClassName(item)}
                   >
-                    {item.content}
+                    {renderFormattedText(item.content)}
                   </DynamicElement>
                 ) : null;
               })
@@ -392,74 +282,89 @@ export const ShowcaseSection = memo(function MemoizedShowcaseSection({
         </DynamicElement>
       );
     },
-    [anchor, getElementClassName, isHero],
+    [anchor, getElementClassName, introduction, isHero],
   );
+
+  const renderSectionContent = (): (React.JSX.Element | null)[] =>
+    mainContent.map((renderNode: DetailSection) =>
+      renderNode.wrapped ? (
+        <DynamicElementContainer
+          key={renderNode.id}
+          tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
+          className={getElementClassName(renderNode)}
+          // filterValue='card'
+          endpoint={renderNode.endpoint}
+          method='POST'
+        />
+      ) : (
+        renderDynamicElement(renderNode)
+      ),
+    );
+
+  const renderAboutSectionContent = (): React.JSX.Element | null => {
+    console.log(skillsContent);
+    return (
+      <>
+        <div className={style.about__layout}>
+          <div className={style.about__content}>
+            {mainContent.map((renderNode) => renderDynamicElement(renderNode))}
+          </div>
+          <aside className={style.summary}>
+            <div className={style.summary__inner}>
+              {summaryContent?.map((renderNode) => renderDynamicElement(renderNode))}
+              <AppButton
+                className={style.about__summary__cta}
+                variant='outline'
+                state='ready'
+                name='Parlons de votre projet'
+                onClick={openModalFormDialog}
+                ariaExpanded={showModalFormDialog}
+                ariaHasPopup='dialog'
+                ariaControls={modalId}
+              />
+            </div>
+          </aside>
+        </div>
+        {skillsContent?.map((renderNode) => renderDynamicElement(renderNode))}
+      </>
+    );
+  };
 
   return (
     <section
-      className={style.section + (isHero ? ` ${style['section--hero']}` : '')}
+      className={style.section}
+      data-variant={anchor ? `${anchor}` : undefined}
       ref={sectionRef}
-      id={anchor}
+      id={isAnchored ? anchor : undefined}
       tabIndex={-1}
       aria-labelledby={`${anchor}-title`}
     >
-      {isHero && points.length >= 5 ? (
-        <HeroConnector
-          from={{ x: points[0].x, y: points[0].y }}
-          via={[
-            { x: points[1].x, y: points[1].y },
-            { x: points[2].x, y: points[2].y },
-            { x: points[3].x, y: points[3].y },
-          ]}
-          to={{ x: points[4].x, y: points[4].y }}
-          width={vb.width}
-          height={vb.height}
-          radiiXY={[
-            [12, 12],
-            [18, 10],
-            [8, 18],
-          ]}
-          cornerRadius={CORNER_RADII_DEFAULT}
-          glow
-          animated
-          brightSpotMode='replay'
-          bloomEnabled
-          isRevealed={drawPath}
-          className={style['section--hero__path']}
-          onPathComputed={handlePathComputed}
-          setHasConnectorAnimationPlayed={setHasConnectorAnimationPlayed}
-        />
-      ) : null}
       <div className={style.section__bodySection}>
-        {showcaseSectionTitle}
-        {mainContent.map((renderNode) =>
-          !renderNode.wrapped ? (
-            renderDynamicElement(renderNode)
-          ) : (
-            <DynamicElementContainer
-              key={renderNode.id}
-              tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
-              className={getElementClassName(renderNode)}
-              filterValue='card'
-              endpoint={renderNode.endpoint}
-              method='POST'
-            />
-          ),
-        )}
+        {title ? (
+          <header className={style[`${anchor}__header`]}>
+            {showcaseSectionTitle}
+            {/* {anchor === 'work' ? <p className={style.work__header__intro}>4 projets clés</p> : null} */}
+          </header>
+        ) : null}
+
+        {isAbout ? renderAboutSectionContent() : renderSectionContent()}
       </div>
       <AppButton
-        className={style.section__button}
-        name='Contact'
+        // className={style.section__button}
+        name={isHero ? 'Parlons de votre projet' : 'Me contacter'}
         variant={isHero ? 'hero' : undefined}
         state={isHero ? buttonState : undefined}
         onClick={openModalFormDialog}
-        ariaLabel='Open contact form'
         ariaExpanded={showModalFormDialog}
         ariaHasPopup='dialog'
         ariaControls={modalId}
         ref={isHero ? buttonRef : undefined}
       />
-      {shouldRenderBrandContent ? brandContent?.map((renderNode) => renderDynamicElement(renderNode)) : null}
+      {isHero ? (
+        <div className={style.hero__signature}>
+          <HeroSignature setHasBrandSignaturePlayed={setHasBrandSignaturePlayed} />
+        </div>
+      ) : null}
     </section>
   );
 });

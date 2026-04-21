@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { FetchData, FetchOptions, FetchResultData, UseFetchDataParams } from '@/types';
+import type { FetchData, FetchOptions, FetchResultData, JsonObject, UseFetchDataParams } from '@/types';
 import { getFetchUrlOrUrls } from '@/utils/urlHelpers';
 import { ApplicationError } from '@modules/Error/error';
 import type { FetchErrorContext } from '@modules/Error/types';
@@ -25,13 +25,14 @@ import type { FetchErrorContext } from '@modules/Error/types';
  *
  * @al-dev93
  */
-export function useFetchData({
+export function useFetchData<TBody extends JsonObject = JsonObject>({
   endpoint,
-  initialOptions = {},
+  method = 'GET',
+  body,
   shouldRefetch = false,
   edgeFunction = false,
-}: UseFetchDataParams): FetchResultData {
-  const { apiEndpoint: urlOrUrls, apiOptions } = getFetchUrlOrUrls({ endpoint, initialOptions, edgeFunction });
+}: UseFetchDataParams<TBody>): FetchResultData {
+  const { apiEndpoint: urlOrUrls, apiOptions } = getFetchUrlOrUrls({ endpoint, method, body, edgeFunction });
 
   const [data, setData] = useState<FetchData | FetchData[] | null>(null);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);

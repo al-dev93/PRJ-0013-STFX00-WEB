@@ -44,7 +44,6 @@ function MemoizedForm({
   // Prepare for submitting form data via POST
   const { refetch, fetchError } = useFetchData({
     endpoint: null,
-    initialOptions: {},
     shouldRefetch: true,
   });
 
@@ -65,8 +64,8 @@ function MemoizedForm({
   const createContactEntry = useCallback(
     async (payload: { [x: string]: unknown }): Promise<void> => {
       const endpoint = import.meta.env.VITE_API_FORM_RESPONSES_ENDPOINT;
-      const initialOptions = { method: 'POST' };
-      const { apiEndpoint, apiOptions } = getFetchUrlOrUrls({ endpoint, initialOptions, edgeFunction: true });
+      const method = 'POST';
+      const { apiEndpoint, apiOptions } = getFetchUrlOrUrls({ endpoint, method, edgeFunction: true });
       let isFetched = false;
 
       apiOptions.body = payload ? JSON.stringify(payload) : null;

@@ -1,12 +1,11 @@
 import React, { useMemo } from 'react';
 
 import type { IndexPageSection } from '@/types';
-import { isArrayOfType } from '@/utils/typeHelpers';
+import { isIndexPageSectionArray } from '@/utils/typeHelpers';
 import { ShowcaseSection } from '@components/ShowcaseSection';
 import { useFetchData } from '@hooks/useFetchData';
 import { usePageSection } from '@hooks/usePageSection';
 
-import { optionalIndexSchema, requiredIndexSchema } from './indexSchema';
 import style from './style.module.css';
 
 /**
@@ -33,7 +32,7 @@ export function Index(): React.JSX.Element | null {
    *
    * @constant {Object} data - The data fetched from the server.
    */
-  const { data } = useFetchData({ endpoint, initialOptions: { method: 'POST' } });
+  const { data } = useFetchData({ endpoint, method: 'POST' });
 
   /**
    * Memoized and sorted list of page sections.
@@ -47,13 +46,15 @@ export function Index(): React.JSX.Element | null {
    */
   const sortedAndValidatedData = useMemo<IndexPageSection[] | undefined>(() => {
     // Only sort if we actually have data and it passes our runtime guard
-    if (data && isArrayOfType<IndexPageSection>(data, requiredIndexSchema, optionalIndexSchema)) {
+    console.log(isIndexPageSectionArray(data));
+    if (isIndexPageSectionArray(data)) {
       // Clone + sort to avoid mutating the original array
       return [...data].sort((a, b) => a.order - b.order);
     }
     // Fallback: either no data yet or invalid data shape
     return undefined;
   }, [data]);
+  console.log(data);
 
   /**
    * Handles the click event to open or close the contact form dialog.
@@ -65,12 +66,14 @@ export function Index(): React.JSX.Element | null {
 
   return sortedAndValidatedData ? (
     <div className={style.wrapperIndex}>
-      {sortedAndValidatedData.map(({ id, content, anchor, title }) => (
+      {sortedAndValidatedData.map(({ id, content, anchor, isAnchored, title, introduction }) => (
         <ShowcaseSection
           key={id}
           content={content}
           anchor={anchor}
+          isAnchored={isAnchored}
           title={title}
+          introduction={introduction}
           MenuSectionsVisibility={viewSectionContext}
           openModalFormDialog={handleClick}
           showModalFormDialog={openContactFormDialog}

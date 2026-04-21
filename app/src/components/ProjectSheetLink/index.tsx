@@ -27,11 +27,12 @@ import { PROJECT_SHEET_EXTENSION } from '../../modules/Slideshow/utils/constants
  * - `encodePath()` is applied segment-wise to preserve slashes while encoding.
  * - The visible text is intentionally concise; the `aria-label` carries fuller context.
  */
-function MemoizedProjectSheetLink({
+export const ProjectSheetLink = memo(function MemoizedProjectSheetLink({
   projectSheet,
   title,
   linkLabel,
   className,
+  variant,
 }: ProjectSheetLinkProps): React.JSX.Element | null {
   const { isRemote, urlBase } = useMemo(() => getUrlBase(), []);
 
@@ -40,20 +41,12 @@ function MemoizedProjectSheetLink({
     return `${urlBase}/project-sheets/${encodePath(projectSheet)}${PROJECT_SHEET_EXTENSION}`;
   }, [projectSheet, isRemote, urlBase]);
 
-  if (!href) return null;
-
-  return (
-    <a
-      href={href}
-      target='_blank'
-      rel='noopener noreferrer'
-      className={className ? `${className} ${styles.linkPdf}` : styles.linkPdf}
-      aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
-    >
+  const content = () => (
+    <>
       <svg
         aria-hidden='true'
         focusable='false'
-        className={styles.icon}
+        className={styles.linkPdf__icon}
         viewBox='0 0 24 24'
         fill='none'
         stroke='currentColor'
@@ -67,9 +60,61 @@ function MemoizedProjectSheetLink({
         <path d='M9 17h6' />
       </svg>
       {linkLabel}
-      <span className='visually-hidden'> — ouvre le fichier (PDF) dans un nouvel onglet</span>
-    </a>
+    </>
   );
-}
+  if (!href && variant !== 'slideshow') return null;
 
-export const ProjectSheetLink = memo(MemoizedProjectSheetLink);
+  return (
+    // <a
+    //   href={href}
+    //   target='_blank'
+    //   rel='noopener noreferrer'
+    //   className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
+    //   data-variant={variant || undefined}
+    //   aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
+    // >
+    //   <svg
+    //     aria-hidden='true'
+    //     focusable='false'
+    //     className={styles.linkPdf__icon}
+    //     viewBox='0 0 24 24'
+    //     fill='none'
+    //     stroke='currentColor'
+    //     strokeWidth='1.6'
+    //     strokeLinecap='round'
+    //     strokeLinejoin='round'
+    //   >
+    //     <path d='M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z' />
+    //     <path d='M14 3v5h5' />
+    //     <path d='M9 13h6' />
+    //     <path d='M9 17h6' />
+    //   </svg>
+    //   {linkLabel}
+    //   <span className='visually-hidden'> — ouvre le fichier (PDF) dans un nouvel onglet</span>
+    // </a>
+    variant !== 'slideshow' ? (
+      <a
+        href={href}
+        target='_blank'
+        rel='noopener noreferrer'
+        className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
+        data-variant={variant || undefined}
+        aria-hidden='true'
+        // aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
+      >
+        {content()}
+        <span className='visually-hidden'> — ouvre la fiche projet « {title} » (PDF) dans un nouvel onglet</span>
+      </a>
+    ) : (
+      <span
+        className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
+        data-variant={variant || undefined}
+        aria-hidden='true'
+        // aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
+      >
+        {content()}
+        <span className='visually-hidden'> — lien via l&apos;image</span>
+      </span>
+    )
+  );
+});

@@ -22,28 +22,32 @@
 }
 
 /* Style for the navigation bar button */
-.socialMediaNavBar__externalLink {
-  color: var(--decorative-light);
-  text-decoration: none;
+a.socialMediaNavBar__externalLink span {
+  /* color: var(--decorative-light); */
+  /* text-decoration: none; */
   /* transition: color 0.3s; */
-  transition: color 200ms ease;
+  /* transition: color 200ms ease; */
+  font-size: 1.34rem;
+  line-height: 1;
 }
 
-/* .socialMediaNavBar__externalLink:hover, */
-.socialMediaNavBar__externalLink:focus {
-  /* color: var(--decorative-dark); */
-  outline: none;
-}
-
-.socialMediaNavBar__externalLink:focus-visible {
-  color: var(--decorative-dark);
-  outline: 2px solid var(--decorative-dark);
-  outline-offset: 2px;
+a.socialMediaNavBar__externalLink--primary {
+  --sl-control-border: color-mix(in oklch, var(--semantic-border) 85%, transparent);
+  --semantic-surface-1: oklch(1 0.01 200);
+  /* background: color-mix(in oklch, var(--sl-media-bg) 78%, var(--semantic-accent) 10%);
+  border-color: color-mix(in oklch, var(--sl-media-border) 60%, var(--semantic-accent) 40%); */
+  /* background: color-mix(in oklch, oklch(1 0.01 200) 80%, var(--semantic-accent-weak) 5%); */
+  /* border-color: color-mix(in oklch, var(--semantic-border) 80%, transparent); */
+  background: color-mix(in oklch, var(--semantic-surface-1) 80%, var(--semantic-accent-weak) 5%);
 }
 
 /* Mouse only */
 @media (hover: hover) and (pointer: fine) {
   .socialMediaNavBar__externalLink:hover {
     color: var(--decorative-dark);
+  }
+  a.socialMediaNavBar__externalLink--primary:hover {
+    border-color: var(--semantic-ring);
+    transform: translateY(calc(-2px * var(--motion-ok))) scale(calc(1 + 0.04 * var(--motion-ok)));
   }
 }

@@ -38,12 +38,10 @@ export function useCsrfToken(): string {
   useEffect(() => {
     const { apiEndpoint: secretEndpoint } = getFetchUrlOrUrls({
       endpoint: import.meta.env.VITE_API_CSRF_SECRET_ENDPOINT,
-      initialOptions: {},
       edgeFunction: true,
     });
     const { apiEndpoint: tokenEndpoint } = getFetchUrlOrUrls({
       endpoint: import.meta.env.VITE_API_CSRF_TOKEN_ENDPOINT,
-      initialOptions: {},
       edgeFunction: true,
     });
 

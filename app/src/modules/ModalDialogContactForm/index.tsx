@@ -54,7 +54,7 @@ export function ModalDialogContactForm({
     () => (shouldFetch ? import.meta.env.VITE_API_CONTACT_FORM_DATA_ENDPOINT : null),
     [shouldFetch],
   );
-  const { data: fetchedData, fetchError } = useFetchData({ endpoint, initialOptions: { method: 'GET' } });
+  const { data: fetchedData, fetchError } = useFetchData({ endpoint });
 
   // Use formModalData if provided, otherwise use fetched data.
   const data = useMemo(

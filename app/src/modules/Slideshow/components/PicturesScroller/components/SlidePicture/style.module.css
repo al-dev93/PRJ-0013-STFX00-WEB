@@ -1,79 +1,209 @@
 /* Container for each individual picture */
 .picturesToScroll {
+  --frame-pad-x: clamp(12px, 2vw, 32px);
+  --frame-max-h: clamp(320px, 45dvh, 520px);
+  /* --frame-outline-design-size: 3px;
+  --frame-focus-outline: var(--frame-outline-design-size) solid var(--s); */
+  /* --frame-transition-transform-duration: 0.3s; */
+  --frame-transition-opacity-duration: 0.15s;
+  --frame-hover-scale: 0.03;
+  /* --frame-hover-transform: scale(calc(1 + var(--frame-hover-scale) * var(--motion-ok))); */
+
+  --focus-gap: 8px;
+
+  --scroll-transition-opacity-duration: 0.3s;
+  --scroll-transition-opacity-delay: 0.05s;
+  --scroll-transition-transform-duration: 0.5s;
+  --scroll-transition-transform-fonction: cubic-bezier(0.4, 0, 0.2, 1);
+  --scroll-translate-length: -30px;
+  --scroll-transition-translate-parallax: translateY(calc(var(--scroll-translate-length) * var(--motion-ok)));
+
+  position: relative;
   flex: 1 0 100%;
-  will-change: transform, opacity;
-  transition:
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.3s ease-in-out;
+
+  /* will-change: auto; */
+  transition: opacity calc(var(--scroll-transition-opacity-duration) * var(--motion-ok)) ease-in-out;
+  /* transform calc(var(--scroll-transition-transform-duration) * var(--motion-ok))
+      var(--scroll-transition-transform-fonction); */
 }
 
 /* Visible picture styling */
 .picturesToScroll--visible {
   opacity: 1;
-  transform: translateY(0);
+  /* transform: translateY(0); */
 }
 
 /* Hidden picture styling */
 .picturesToScroll--hidden {
   opacity: 0;
-  transform: translateY(0);
+  /* transform: translateY(0); */
+}
+
+.picturesToScroll[aria-hidden='true'] {
+  pointer-events: none;
 }
 
 /* Adjacent picture with reduced opacity */
 .picturesToScroll.picturesToScroll--adjacent {
+  will-change: transform;
   opacity: 0.6;
   transition:
-    opacity 0.3s ease-in-out 0.05s,
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity calc(var(--scroll-transition-opacity-duration) * var(--motion-ok)) ease-in-out
+      var(--scroll-transition-opacity-delay),
+    transform calc(var(--scroll-transition-transform-duration) * var(--motion-ok))
+      var(--scroll-transition-transform-fonction);
 }
 
-/* Parallax effect for pictures */
-.picturesToScroll--parallaxOn {
-  transform: translateY(-30px);
-  transition: transform 0.5s ease-in-out;
+.picturesToScroll--adjacent .slideshowOverlay {
+  opacity: 0;
+  transform: translateY(6px);
 }
 
-.picturesToScroll--parallaxOff {
+.picturesToScroll--visible .slideshowOverlay {
+  opacity: 1;
   transform: translateY(0);
+}
+
+.slideshowOverlay {
+  --sl-overlay-y: 67%;
+  --sl-overlay-max: 23ch;
+  --sl-overlay-pad-y: var(--semantic-space-md);
+  --sl-overlay-pad-x: var(--semantic-space-lg);
+
+  position: absolute;
+  left: 3%;
+  top: var(--sl-overlay-y);
+  max-inline-size: min(var(--sl-overlay-max), calc(100% - (var(--semantic-space-lg) * 2)));
+  padding-left: calc(var(--sl-overlay-pad-x) + 0.6rem);
+
+  z-index: 2;
+
+  color: var(--semantic-text-strong);
+
+  pointer-events: none;
+
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 250ms ease-out 120ms,
+    transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1) 120ms;
+  /* will-change: transform, opacity; */
+}
+
+.slideshowOverlay::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.4em;
+  bottom: 0.4em;
+  width: 2px;
+  border-radius: 2px;
+  background: color-mix(in oklch, var(--semantic-accent) 65%, transparent);
+  opacity: 0.6;
+}
+
+.slideshowOverlay__title {
+  margin: 0;
+  color: inherit;
+  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
+  line-height: 1.02;
+}
+
+.slideshowOverlay__project {
+  font-weight: 600;
+}
+
+.slideshowOverlay__subtitle {
+  font-weight: 450;
+  color: var(--semantic-text-muted);
+  margin-top: 0.45rem;
+  max-width: 30ch;
+}
+
+.slideshowOverlay__cta {
+  position: relative;
+  font-weight: 500;
+  /* cursor: pointer; */
+  text-decoration: underline;
+  text-decoration-color: transparent; /* underline invisible au repos */
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: var(--linkPdf-underline-thickness);
+}
+
+.slideshowOverlay__cta::after {
+  content: '→';
+  margin-left: 0.35ch;
+  transition: transform 180ms ease;
 }
 
 /* Wrapper de ratio : empêche le CLS */
 .picturesToScroll__frame {
-  --frame-pad-x: 45px;
-  --focus-gap: 6px;
   position: relative;
   isolation: isolate;
   aspect-ratio: 16 / 9;
   width: 100%;
+  max-block-size: var(--frame-max-h);
+  max-inline-size: min(100%, 1000px);
+  margin-inline: auto;
   padding: 0 var(--frame-pad-x);
-  background: transparent;
-  border-radius: var(--br-sm);
+
+  background: var(--semantic-surface-1);
+  border-radius: var(--semantic-lg-radius);
   overflow: hidden;
-  overflow: clip;
-  transition: transform 0.3s ease-in-out;
+  outline: none;
+
+  /* transition: transform calc(var(--frame-transition-transform-duration) * var(--motion-ok)) ease-in-out; */
+  transform-origin: center;
+  transition:
+    transform 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    /* filter 520ms cubic-bezier(0.2, 0.9, 0.2, 1), */ opacity 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
+  will-change: transform;
 }
 
 /* ring dessiné AU-DESSUS de l'image, avec marge égale partout */
 .picturesToScroll__frame::after {
   content: '';
   position: absolute;
-  z-index: 1; /* au-dessus de l'image */
-  pointer-events: none;
+  inset: 6px;
+  z-index: 4; /* au-dessus de l'image */
+
   border-radius: inherit;
   opacity: 0;
-  transition: opacity 0.15s ease-in-out;
 
-  /* Écart identique : top/bottom = --focus-gap
-     left/right   = padding horizontal + --focus-gap  */
-  inset: var(--focus-gap) calc(var(--frame-pad-x) - var(--focus-gap));
+  transition: opacity calc(var(--frame-transition-opacity-duration) * var(--motion-ok)) ease-in-out;
+  pointer-events: none;
+}
 
-  /* anneau visible et net */
-  border: 2px solid var(--focus-ring);
+/* 3) ACTIVE slide: subtle premium lift */
+.picturesToScroll--visible .picturesToScroll__frame {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.16),
+    0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 4) ADJACENT slides: depth retreat */
+.picturesToScroll--adjacent .picturesToScroll__frame {
+  transform: translateY(12px) scale(0.955);
+  opacity: 0.9;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.1),
+    0 1px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 5) HIDDEN slides: keep very low visual noise */
+.picturesToScroll--hidden .picturesToScroll__frame {
+  opacity: 0.35;
+  transform: translateY(16px) scale(0.94);
+  box-shadow: none;
 }
 
 /* Élément interactif (lien ou span fallback) */
 .picturesToScroll__link {
   display: block;
+  cursor: pointer;
 }
 
 .picturesToScroll__link:focus-visible {
@@ -83,45 +213,79 @@
 /* affichage du ring quand le LIEN a le focus clavier */
 .picturesToScroll__link:focus-visible .picturesToScroll__frame::after {
   opacity: 1;
+  box-shadow: 0 0 0 3px var(--sl-focus-ring);
+}
+
+.picturesToScroll__link:focus-visible .slideshowOverlay__cta {
+  outline: var(--linkPdf-outline);
+  outline-offset: 2.5px;
+  border-radius: var(--linkPdf-radius);
 }
 
 .picturesToScroll__link--disabled {
   pointer-events: none;
 }
 
-/* optionnel : la même ombre que le hover quand focus clavier */
-.picturesToScroll__link:focus-visible .picturesToScroll__img {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-}
-
 /* Effets hover/focus seulement si pointeur fin et pas reduced motion */
 @media (hover: hover) and (pointer: fine) {
-  .picturesToScroll--visible:hover .picturesToScroll__frame,
-  .picturesToScroll__link:focus-visible .picturesToScroll__frame {
-    transform: scale(1.03);
+  .picturesToScroll--visible:hover .picturesToScroll__frame {
+    transform: translateY(0) scale(calc(1 + var(--frame-hover-scale) * var(--motion-ok)));
   }
-  .picturesToScroll--visible:hover .picturesToScroll__img,
-  .picturesToScroll__link:focus-visible .picturesToScroll__img {
-    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.16));
+  .picturesToScroll--visible .picturesToScroll__link:hover .slideshowOverlay__cta::after {
+    transform: translateX(3px);
   }
-}
+  .picturesToScroll--visible .picturesToScroll__link:hover .slideshowOverlay__cta {
+    color: var(--semantic-text-strong);
+    text-decoration-color: currentColor;
+    text-decoration-thickness: calc(var(--linkPdf-underline-thickness) * 2);
+  }
 
-/* Image */
-.picturesToScroll__img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* ou cover selon rendu souhaité */
-  display: block;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
-  transition: filter 0.25s ease;
-}
+  .picturesToScroll--visible .picturesToScroll__link:focus-visible .picturesToScroll__frame {
+    transform: none;
+  }
 
-/* Smartphones */
-@media (max-width: 768px) {
-  .picturesToScroll--parallaxOn {
+  .picturesToScroll--visible .picturesToScroll__link:focus-visible .slideshowOverlay__cta {
+    color: var(--semantic-text-muted);
+    text-decoration-color: initial;
+    text-decoration-thickness: initial;
+  }
+  .picturesToScroll--visible:hover .picturesToScroll__link:focus-visible .slideshowOverlay__cta::after {
     transform: none;
   }
 }
+
+.picturesToScroll--visible .picturesToScroll__img {
+  transform: scale(1);
+  filter: saturate(1) contrast(1);
+}
+
+.picturesToScroll__img {
+  width: 100%;
+  height: 100%;
+  /* object-fit: contain;
+  transform: translateZ(0); */
+  object-fit: cover;
+
+  /* scale(1.04);
+  filter: saturate(0.95) contrast(1.02);
+  transition:
+    transform 800ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    filter 500ms ease;
+  will-change: transform; */
+}
+
+@media (min-width: 1024px) {
+  .picturesToScroll {
+    --frame-max-h: clamp(420px, 55dvh, 720px);
+  }
+}
+
+/* Smartphones */
+/* @media (max-width: 768px) {
+  .picturesToScroll--parallaxOn {
+    transform: none;
+  }
+} */
 
 /* Tablet */
 /* @media (max-width: 1024px) {
@@ -130,12 +294,3 @@
     margin-inline: auto;
   }
 } */
-
-/* Respect des préférences d’accessibilité (réduction d’animations) */
-@media (prefers-reduced-motion: reduce) {
-  .picturesToScroll,
-  .picturesToScroll__frame,
-  .picturesToScroll__img {
-    transition: none !important;
-  }
-}
