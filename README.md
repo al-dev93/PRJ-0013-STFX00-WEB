@@ -1,29 +1,29 @@
 # PRJ-0013-STFX00-WEB
 
-## Rôle
+## Purpose
 
-Repository du projet interne "Site vitrine" de Stack-Flex.
+Repository of the internal project "Showcase Site" of Stack-Flex.
 
-## Statut
+## Status
 
 - Type : internal-prj
-- Formalisation : `Light`
+- Formalisation : `Standard`
 - Workflow Git : GitHub Flow
 - Branche stable : `main`
 
-## Liens
+## Public resources
 
-- Coda (Projet) : [Lien Table Projects](https://coda.io/d/_dI6Ilo2y-4u/03-1-Projects_suRyl8kb#Projects-New_tuXHYuYO/r13)
-- Obsidian : [Lien dans SPGHICO](obsidian://open?vault=SFx-stack-spghico&file=ops%2Fprojects%2FPRJ-0013-STFX00-WEB%2FREADME)
+- Live site: {{LIVE_URL_OR_NA}}
+- Public documentation: {{PUBLIC_DOC_URL_OR_NA}}
 
-## Règles
+## Rules
 
-- `main` reste stable et livrable
-- Pas de travail significatif sans issue
-- Chaque PR référence une issue
-- Les micro-tâches vivent dans Super Productivity
+- `main` remains stable and releasable
+- No significant work without an issue
+- Every PR references an issue
+- Micro-tasks are managed outside this public repository
 
-## Convention de branches
+## Branch naming convention
 
 - `feat/{{ISSUE_ID}}-{{SLUG}}`
 - `fix/{{ISSUE_ID}}-{{SLUG}}`
@@ -32,8 +32,8 @@ Repository du projet interne "Site vitrine" de Stack-Flex.
 
 ---
 
-**🗃️ Historique des versions du README**
+**🗃️ README version history**
 
-| Version | Date       | Auteur     | Description                                                                                     |
-| ------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------- |
-| v1.0    | 2026-04-03 | Stack-Flex | Première version du README utilisé<br>dans un repo de développement<br>inter (ex: site vitrine) |
+| Version | Date       | Author     | Description                    |
+| ------- | ---------- | ---------- | ------------------------------ |
+| v1.0    | 2026-04-03 | Stack-Flex | Initial public README template |

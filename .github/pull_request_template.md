@@ -1,35 +1,40 @@
-## Résumé
-Décrire brièvement le changement apporté par cette PR.
+## Summary
 
-## Références
-- Closes #<numéro>
-- Coda (Projet) : <url> *(optionnel si déjà porté par l’issue)*
-- Obsidian (note / ADR) : <url> *(optionnel)*
+Briefly describe the change introduced by this PR.
 
-## Type de changement
+## References
+
+- Closes #<issue-number>
+
+## Change type
+
 - [ ] Feature
 - [ ] Bug
 - [ ] Documentation
 - [ ] QA
 - [ ] Refactor
-- [ ] Tech debt
+- [ ] Technical debt
 - [ ] Chore
 
-## Vérifications minimales
-- [ ] Branche conforme à la convention
-- [ ] PR ouverte vers `main`
-- [ ] Issue liée et cohérente avec le contenu de la PR
-- [ ] Critères d’acceptation vérifiés ou mis à jour si nécessaire
-- [ ] Changement testé localement
-- [ ] Pas de régression identifiée
+## Minimum checks
+
+- [ ] Branch follows the naming convention
+- [ ] PR is opened against `main`
+- [ ] Related issue is linked and consistent with the PR content
+- [ ] Acceptance criteria have been checked or updated if needed
+- [ ] Change has been tested locally
+- [ ] No regression has been identified
 
 ## Impact
-Préciser s'il y a un impact particulier :
-- technique
-- visuel
-- accessibilité
+
+Specify whether this PR has any specific impact:
+
+- technical
+- visual
+- accessibility
 - performance
-- déploiement
+- deployment
 
 ## Notes
-Informations complémentaires, points d’attention, limites éventuelles.
+
+Additional information, points of attention, or known limitations.
