@@ -2,7 +2,7 @@
 name: Standard Issue
 about: Standard issue template for public repositories
 title: ""
-labels: ["prio:P2-important"]
+labels: prio:P2-important
 assignees: []
 ---
 
