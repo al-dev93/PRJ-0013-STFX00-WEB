@@ -26,6 +26,14 @@
   --card-focus-border-color: color-mix(in oklch, var(--card-accent) 65%, var(--card-border-color));
   --card-focus-box-shadow: 0 0 0 4px color-mix(in oklch, var(--card-ring) var(--card-focus-halo-strength), transparent);
 
+  --sl-media-shadow: var(--elevation-3);
+  --sl-control-bg: color-mix(in oklch, var(--semantic-surface-1) 78%, transparent);
+  --sl-control-border: color-mix(in oklch, var(--semantic-border) 72%, transparent);
+  --sl-control-shadow: var(--elevation-2);
+  --action-size: 40px;
+  --action-border-size: 1px;
+  --action-hover-bg: color-mix(in oklch, var(--semantic-surface-1) 82%, var(--semantic-accent) 6%);
+
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -123,15 +131,36 @@
 }
 
 .card__additionalNav {
-  color: var(--card-nav-color);
+  /* color: var(--card-nav-color);
   transition:
     color calc(160ms * var(--motion-ok)) ease,
     opacity calc(160ms * var(--motion-ok)) ease;
-}
+ */
 
+  inline-size: var(--action-size);
+  block-size: var(--action-size);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: var(--sl-control-bg);
+  border: var(--action-border-size) solid var(--sl-control-border);
+  box-shadow: var(--sl-control-shadow);
+
+  color: var(--semantic-text);
+
+  transition:
+    transform calc(160ms * var(--motion-ok)) ease,
+    box-shadow calc(160ms * var(--motion-ok)) ease,
+    border-color calc(160ms * var(--motion-ok)) ease,
+    background-color calc(160ms * var(--motion-ok)) ease;
+}
+/*
 .card[data-variant='root'] .card__additionalNav {
   opacity: var(--card-root-opacity-additionalNav);
-}
+} */
 
 .card:hover .card__additionalNav,
 .card:focus-within .card__additionalNav {

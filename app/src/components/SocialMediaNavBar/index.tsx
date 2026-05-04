@@ -117,7 +117,7 @@ export const SocialMediaNavBar = memo(function SocialMediaNavBar({
         {data?.map((element) => (
           <li key={`${element.service}`}>
             <SocialMediaButton
-              className={`${type === 'slideshow' ? style.socialMediaNavBar__externalLink : ''} ${element.service === 'external' && type === 'slideshow' ? style['socialMediaNavBar__externalLink--primary'] : ''} ${changeLinkColor ?? ''}`}
+              className={`${type === 'slideshow' || type === 'card' ? style.socialMediaNavBar__externalLink : ''} ${element.service === 'external' && (type === 'slideshow' || type === 'card') ? style['socialMediaNavBar__externalLink--primary'] : ''} ${changeLinkColor ?? ''}`}
               button={element}
             />
           </li>

@@ -87,7 +87,7 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
           />
           {variant === 'root' ? <span className={style.card__badge}>Projet socle</span> : null}
         </div>
-        <SocialMediaNavBar changeLinkColor={style.card__additionalNav} buttons={cardData.deliverables} />
+        <SocialMediaNavBar changeLinkColor={style.card__additionalNav} type='card' buttons={cardData.deliverables} />
       </header>
       <div className={style.card__main}>
         <h3 id={`card-title-${cardData.id}`}>{cardData.title}</h3>
