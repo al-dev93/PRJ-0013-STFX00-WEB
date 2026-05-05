@@ -1,12 +1,12 @@
 /* Base appearance and layout */
 .linkPdf {
   --linkPdf-fs: var(--ref-fs-step--1);
-  --linkPdf-color: var(--semantic-accent);
+  --linkPdf-color: var(--btn-primary-bg);
   --linkPdf-color-hover: var(--btn-primary-hover);
   --linkPdf-fw: 650;
-  --linkPdf-underline-thickness: calc(var(--semantic-link-underline-thickness) * 0.5);
+  --linkPdf-underline-thickness: var(--semantic-link-underline-thickness);
   --linkPdf-underline-offset: calc(var(--semantic-link-underline-offset) * 1.286);
-  --linkPdf-underline-color: color-mix(in oklch, var(--linkPdf-color) 70%, transparent);
+  --linkPdf-underline-color: transparent;
   --linkPdf-focus-ring: var(--semantic-ring);
   --linkPdf-radius: calc(var(--ref-radius-2) * 0.5);
   --linkPdf-outline: 2px solid var(--linkPdf-focus-ring);
@@ -31,25 +31,7 @@
 
 .linkPdf[data-variant='slideshow'] {
   --linkPdf-color: var(--semantic-text-muted);
-  --linkPdf-underline-thickness: 0.08em;
   --linkPdf-underline-offset: 0.18em;
-  --linkPdf-underline-color: color-mix(in oklch, currentColor 55%, transparent);
-}
-
-.linkPdf:hover {
-  color: var(--linkPdf-color-hover);
-  text-decoration-thickness: calc(var(--linkPdf-underline-thickness) * 2);
-}
-
-/* .linkPdf[data-variant='slideshow']:hover {
-  color: var(--semantic-text-strong);
-  text-decoration-color: currentColor;
-} */
-
-.linkPdf:focus-visible {
-  outline: var(--linkPdf-outline);
-  outline-offset: var(--linkPdf-outline-offset);
-  border-radius: var(--linkPdf-radius);
 }
 
 /* Icon sizing follows the text color via currentColor */
