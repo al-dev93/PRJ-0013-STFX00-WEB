@@ -2,12 +2,8 @@
 .picturesToScroll {
   --frame-pad-x: clamp(12px, 2vw, 32px);
   --frame-max-h: clamp(320px, 45dvh, 520px);
-  /* --frame-outline-design-size: 3px;
-  --frame-focus-outline: var(--frame-outline-design-size) solid var(--s); */
-  /* --frame-transition-transform-duration: 0.3s; */
   --frame-transition-opacity-duration: 0.15s;
   --frame-hover-scale: 0.03;
-  /* --frame-hover-transform: scale(calc(1 + var(--frame-hover-scale) * var(--motion-ok))); */
 
   --focus-gap: 8px;
 
@@ -20,23 +16,17 @@
 
   position: relative;
   flex: 1 0 100%;
-
-  /* will-change: auto; */
   transition: opacity calc(var(--scroll-transition-opacity-duration) * var(--motion-ok)) ease-in-out;
-  /* transform calc(var(--scroll-transition-transform-duration) * var(--motion-ok))
-      var(--scroll-transition-transform-fonction); */
 }
 
 /* Visible picture styling */
 .picturesToScroll--visible {
   opacity: 1;
-  /* transform: translateY(0); */
 }
 
 /* Hidden picture styling */
 .picturesToScroll--hidden {
   opacity: 0;
-  /* transform: translateY(0); */
 }
 
 .picturesToScroll[aria-hidden='true'] {
@@ -87,7 +77,6 @@
   transition:
     opacity 250ms ease-out 120ms,
     transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1) 120ms;
-  /* will-change: transform, opacity; */
 }
 
 .slideshowOverlay::before {
@@ -120,16 +109,6 @@
   max-width: 30ch;
 }
 
-.slideshowOverlay__cta {
-  position: relative;
-  font-weight: 500;
-  /* cursor: pointer; */
-  text-decoration: underline;
-  text-decoration-color: transparent; /* underline invisible au repos */
-  text-underline-offset: 0.18em;
-  text-decoration-thickness: var(--linkPdf-underline-thickness);
-}
-
 .slideshowOverlay__cta::after {
   content: '→';
   margin-left: 0.35ch;
@@ -152,11 +131,10 @@
   overflow: hidden;
   outline: none;
 
-  /* transition: transform calc(var(--frame-transition-transform-duration) * var(--motion-ok)) ease-in-out; */
   transform-origin: center;
   transition:
     transform 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    /* filter 520ms cubic-bezier(0.2, 0.9, 0.2, 1), */ opacity 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    opacity 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
     box-shadow 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
   will-change: transform;
 }
@@ -231,13 +209,14 @@
   .picturesToScroll--visible:hover .picturesToScroll__frame {
     transform: translateY(0) scale(calc(1 + var(--frame-hover-scale) * var(--motion-ok)));
   }
+
   .picturesToScroll--visible .picturesToScroll__link:hover .slideshowOverlay__cta::after {
     transform: translateX(3px);
   }
+
   .picturesToScroll--visible .picturesToScroll__link:hover .slideshowOverlay__cta {
     color: var(--semantic-text-strong);
     text-decoration-color: currentColor;
-    text-decoration-thickness: calc(var(--linkPdf-underline-thickness) * 2);
   }
 
   .picturesToScroll--visible .picturesToScroll__link:focus-visible .picturesToScroll__frame {
@@ -246,9 +225,9 @@
 
   .picturesToScroll--visible .picturesToScroll__link:focus-visible .slideshowOverlay__cta {
     color: var(--semantic-text-muted);
-    text-decoration-color: initial;
-    text-decoration-thickness: initial;
+    text-decoration-color: transparent;
   }
+
   .picturesToScroll--visible:hover .picturesToScroll__link:focus-visible .slideshowOverlay__cta::after {
     transform: none;
   }
@@ -262,16 +241,7 @@
 .picturesToScroll__img {
   width: 100%;
   height: 100%;
-  /* object-fit: contain;
-  transform: translateZ(0); */
   object-fit: cover;
-
-  /* scale(1.04);
-  filter: saturate(0.95) contrast(1.02);
-  transition:
-    transform 800ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    filter 500ms ease;
-  will-change: transform; */
 }
 
 @media (min-width: 1024px) {

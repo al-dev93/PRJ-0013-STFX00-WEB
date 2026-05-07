@@ -15,16 +15,23 @@
   --card-nav-color: color-mix(in oklch, var(--card-muted) 70%, var(--card-border-color));
   --card-fs-description: var(--semantic-fs-body, var(--fs-base));
   --card-lh-description: calc(var(--semantic-lh-body) * 1.208);
-  --card-tag-fs: calc(var(--semantic-fs-body) / 1.28);
-  --card-tag-fw: lighter;
+  --card-tag-fs: calc(var(--semantic-fs-body) * 13 / 16);
+  --card-tag-fw: 500;
   --card-hover-border-color: color-mix(in oklch, var(--card-accent) 55%, var(--card-border-color));
   --card-hover-box-shadow: 0 14px 34px -22px color-mix(in oklch, var(--card-border-color) 60%, transparent);
-  --card-hover-nav-active-color: color-mix(in oklch, var(--card-text) 85%, var(--card-muted));
   --card-outline-width: 2px;
   --card-outline-offset: 4px;
   --card-focus-halo-strength: 35%;
   --card-focus-border-color: color-mix(in oklch, var(--card-accent) 65%, var(--card-border-color));
   --card-focus-box-shadow: 0 0 0 4px color-mix(in oklch, var(--card-ring) var(--card-focus-halo-strength), transparent);
+  --card-media-shadow: var(--elevation-3);
+  --card-control-bg: color-mix(in oklch, var(--semantic-surface-1) 78%, transparent);
+  --card-control-border: color-mix(in oklch, var(--semantic-border) 72%, transparent);
+  --card-control-shadow: var(--elevation-2);
+
+  --action-size: 40px;
+  --action-border-size: 1px;
+  --action-hover-bg: color-mix(in oklch, var(--semantic-surface-1) 82%, var(--semantic-accent) 6%);
 
   display: flex;
   flex-direction: column;
@@ -58,8 +65,9 @@
   --card-root-badge-text: color-mix(in oklab, var(--card-text) 75%, var(--card-accent) 25%);
   --card-root-badge-fs: var(--semantic-fs-kicker);
   --card-root-badge-inset: var(--space-1) calc(var(--semantic-space-md) * 1.28);
-  --card-root-opacity-additionalNav: 0.72;
   --card-root-fw-bold: var(--semantic-fw-kicker);
+  --card-tag-fs: calc(var(--semantic-fs-body) * 14 / 16);
+  --card-tag-fw: var(--card-root-fw-bold);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -123,26 +131,25 @@
 }
 
 .card__additionalNav {
-  color: var(--card-nav-color);
+  inline-size: var(--action-size);
+  block-size: var(--action-size);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: var(--card-control-bg);
+  border: var(--action-border-size) solid var(--card-control-border);
+  box-shadow: var(--card-control-shadow);
+
+  color: var(--semantic-text);
+
   transition:
-    color calc(160ms * var(--motion-ok)) ease,
-    opacity calc(160ms * var(--motion-ok)) ease;
-}
-
-.card[data-variant='root'] .card__additionalNav {
-  opacity: var(--card-root-opacity-additionalNav);
-}
-
-.card:hover .card__additionalNav,
-.card:focus-within .card__additionalNav {
-  color: var(--card-hover-nav-active-color);
-}
-
-.card[data-variant='root']:hover .card__additionalNav,
-.card[data-variant='root']:focus-within .card__additionalNav {
-  opacity: calc(
-    var(--card-root-opacity-additionalNav) + (1 - var(--card-root-opacity-additionalNav)) * var(--motion-ok)
-  );
+    transform calc(160ms * var(--motion-ok)) ease,
+    box-shadow calc(160ms * var(--motion-ok)) ease,
+    border-color calc(160ms * var(--motion-ok)) ease,
+    background-color calc(160ms * var(--motion-ok)) ease;
 }
 
 .card__main {
@@ -177,6 +184,12 @@
   justify-self: end;
 }
 
+.card__description__projectLink::after {
+  content: '→';
+  margin-left: 0.35ch;
+  transition: transform 180ms ease;
+}
+
 .card__footer {
   margin-top: auto;
 }
@@ -193,8 +206,35 @@
 }
 
 .card[data-variant='root'] .card__tag {
-  --card-tag-fw: var(--card-root-fw-bold);
-
   padding-bottom: 0;
-  /* font-weight: ; */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card__additionalNav:hover {
+    background: var(--action-hover-bg);
+    transform: translateY(calc(-1px * var(--motion-ok)));
+    border-color: var(--semantic-ring);
+    box-shadow:
+      var(--card-media-shadow),
+      0 0 0 1px color-mix(in oklch, var(--semantic-ring) 35%, transparent);
+  }
+
+  .card__description__projectLink:hover::after {
+    transform: translateX(3px);
+  }
+
+  .card__description__projectLink:hover {
+    color: var(--linkPdf-color-hover);
+    text-decoration-color: currentColor;
+  }
+
+  .card__description__projectLink:focus-visible {
+    color: var(--linkPdf-color);
+    text-decoration-color: transparent;
+  }
+
+  .card__description__projectLink:hover:focus-visible::after {
+    transform: none;
+    color: currentColor;
+  }
 }

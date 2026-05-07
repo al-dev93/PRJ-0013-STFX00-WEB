@@ -6,6 +6,7 @@ import { createError } from '@modules/Error/utils/errorHandling';
 
 import style from './style.module.css';
 import type { TagProps } from './types';
+
 /**
  * Tag component that displays a tag with various style.
  *
@@ -64,32 +65,9 @@ export function Tag({ className, tag, variant, id, ariaHidden }: TagProps): Reac
     }
   }, [handleTagValidity, tag, variant]);
 
-  /**
-   * Returns the class name for the tag based on its type.
-   *
-   * @param {string | undefined} typeKey - The type of the tag.
-   * @returns {string} The class name for the tag.
-   */
-  // const getClassName = useCallback((typeKey: string | undefined): string => {
-  //   if (!typeKey) return '';
-  //   const alertTag = typeKey === ALERTED_STYLE ? style[`tag--${THINNED_STYLE}`] : '';
-  //   return `${alertTag} ${style[`tag--${typeKey}`]}`;
-  // }, []);
-
-  /**
-   * Memoized class name for the tag based on its type.
-   *
-   * @constant
-   * @type {string}
-   */
-  // const classNameTag: string = useMemo(
-  //   () => [style.tag, className, getClassName(variant)].filter(Boolean).join(' '),
-  //   [className, getClassName, variant],
-  // );
-
   return (
     <span
-      className={`${style.tag}${className ? ` ${className}` : ''}`}
+      className={`${style.tag} ${className || ''}`}
       data-variant={variant}
       id={id}
       aria-hidden={ariaHidden ? 'true' : undefined}
