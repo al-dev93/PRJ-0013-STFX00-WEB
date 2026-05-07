@@ -1,6 +1,7 @@
 import IonIcon from '@reacticons/ionicons';
 import React, { memo, useEffect } from 'react';
 
+import { ProjectSheetLink } from '@components/ProjectSheetLink';
 import { SkillsList } from '@components/SkillsList';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
@@ -9,9 +10,6 @@ import { isDeliverableArray } from '@utils/typeHelpers';
 
 import style from './style.module.css';
 import type { CardProps } from './types';
-import { ProjectSheetLink } from '../ProjectSheetLink';
-
-// import { optionalDeliverableSchema, requiredDeliverableSchema } from './deliverableSchema';
 
 /**
  * Card component that displays project data including title, description, skills, and social media links.
@@ -102,7 +100,12 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
         </p>
       </div>
       <footer className={style.card__footer}>
-        <SkillsList className={style.card__tag} layoutType='card' list={cardData.tags} />
+        <SkillsList
+          className={style.card__tag}
+          primaryTag={cardData.primaryTag}
+          layoutType='card'
+          list={cardData.tags}
+        />
       </footer>
     </article>
   );

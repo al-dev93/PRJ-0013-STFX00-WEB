@@ -15,8 +15,8 @@
   --card-nav-color: color-mix(in oklch, var(--card-muted) 70%, var(--card-border-color));
   --card-fs-description: var(--semantic-fs-body, var(--fs-base));
   --card-lh-description: calc(var(--semantic-lh-body) * 1.208);
-  --card-tag-fs: calc(var(--semantic-fs-body) / 1.28);
-  --card-tag-fw: lighter;
+  --card-tag-fs: calc(var(--semantic-fs-body) * 13 / 16);
+  --card-tag-fw: 500;
   --card-hover-border-color: color-mix(in oklch, var(--card-accent) 55%, var(--card-border-color));
   --card-hover-box-shadow: 0 14px 34px -22px color-mix(in oklch, var(--card-border-color) 60%, transparent);
   --card-outline-width: 2px;
@@ -66,6 +66,8 @@
   --card-root-badge-fs: var(--semantic-fs-kicker);
   --card-root-badge-inset: var(--space-1) calc(var(--semantic-space-md) * 1.28);
   --card-root-fw-bold: var(--semantic-fw-kicker);
+  --card-tag-fs: calc(var(--semantic-fs-body) * 14 / 16);
+  --card-tag-fw: var(--card-root-fw-bold);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -204,8 +206,6 @@
 }
 
 .card[data-variant='root'] .card__tag {
-  --card-tag-fw: var(--card-root-fw-bold);
-
   padding-bottom: 0;
 }
 

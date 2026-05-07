@@ -9,6 +9,7 @@ import { isPrimitiveArray } from '@utils/typeHelpers';
 
 import style from './style.module.css';
 import type { SkillsListProps } from './types';
+
 /**
  * SkillsList component that displays a list of skills as tags.
  *
@@ -19,9 +20,8 @@ import type { SkillsListProps } from './types';
  *
  * @al-dev93
  */
-export function SkillsList({ primaryTag, list, layoutType }: SkillsListProps): React.JSX.Element {
+export function SkillsList({ className, primaryTag, list, layoutType }: SkillsListProps): React.JSX.Element {
   const handleError = useErrorHandler();
-  // const classNameTag = style.skillsRow + (lineBreak ? ` ${style['skillsRow--wrapp']}` : '');
   const classNameTag = `${style.skills} ${style[`skills${layoutType ? `--${layoutType}` : ``}`]}`;
   const variant: Exclude<TagType, typeof TAG_FORM> | undefined = layoutType ? `${layoutType}-tag` : undefined;
 
@@ -72,7 +72,7 @@ export function SkillsList({ primaryTag, list, layoutType }: SkillsListProps): R
       {list?.map((value, index) => (
         <li key={value}>
           <Tag
-            className={primaryTag === index + 1 ? style.primaryTag : undefined}
+            className={`${primaryTag === index + 1 ? style.primaryTag : ''} ${className}`}
             tag={value}
             variant={variant}
             ariaLabel={`compétence ${index + 1} : ${value}`}

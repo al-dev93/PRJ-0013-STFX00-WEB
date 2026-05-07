@@ -5,32 +5,35 @@
   --skills-card-lines: 2;
   --skills-card-row-gap: var(--semantic-space-sm);
   --skills-card-col-gap: var(--semantic-space-md);
+  --skill-card-primary-tag-color: var(--semantic-accent);
   --skills-slideshow-primary-bg: color-mix(in oklch, var(--semantic-accent-weak) 38%, var(--semantic-surface-1-tinted));
   --skills-slideshow-primary-bc: color-mix(in oklch, var(--semantic-accent) 55%, var(--semantic-border));
   --skills-slideshow-primary-color: var(--semantic-text);
   --skills-slideshow-primary-fw: 500;
 
   display: flex;
+  gap: var(--skills-slideshow-gap);
 }
 
-.skills--slideshow {
-  gap: var(--skills-slideshow-gap);
+.skills.skills--slideshow {
   padding: var(--skills-slideshow-padding);
 }
 
-.skills--slideshow .primaryTag {
+.skills.skills--slideshow li > .primaryTag {
   background: var(--skills-slideshow-primary-bg);
   border-color: var(--skills-slideshow-primary-bc);
   color: var(--skills-slideshow-primary-color);
   font-weight: var(--skills-slideshow-primary-fw);
 }
 
-.skills--card {
-  max-height: calc(
-    (var(--skills-card-lh) * 1em * var(--skills-card-lines)) +
-      (var(--skills-card-row-gap) * (var(--skills-card-lines) - 1))
-  );
+.skills.skills--card {
+  --skills-slideshow-gap: var(--semantic-space-lg);
   flex-wrap: wrap;
   padding: 0;
   overflow: hidden;
+}
+
+.skills.skills--card li > .primaryTag {
+  text-decoration: solid underline var(--skill-card-primary-tag-color) 2px;
+  text-underline-offset: 2px;
 }

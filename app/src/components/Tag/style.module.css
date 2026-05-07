@@ -22,10 +22,6 @@
 }
 
 .tag[data-variant='slideshow-tag'] {
-  /* color: var(--rich-black);
-  background-color: var(--light-primary-color);
-  border-radius: var(--br-xs); */
-
   font-size: calc(var(--semantic-fs-body) * 0.92);
   line-height: 1;
   padding: 0.42rem 0.62rem;
@@ -34,7 +30,3 @@
   background: color-mix(in oklch, var(--semantic-surface-1) 85%, transparent);
   color: var(--semantic-text-muted);
 }
-
-/* .tag--empty {
-  padding: 0px;
-} */
