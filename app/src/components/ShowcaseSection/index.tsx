@@ -1,19 +1,19 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { AppButton } from '@/components/AppButton';
 import type { DetailSection, MenuSectionsVisibility } from '@/types';
-import { renderFormattedText } from '@/utils/stylizedString';
+import { AppButton } from '@components/AppButton';
+import { DynamicElement } from '@components/DynamicElement';
+import type { ValidComponentTag, ValidHTMLTag } from '@components/DynamicElement/types';
+import { DynamicElementContainer } from '@components/DynamicElementContainer';
+import { HeroSignature } from '@components/HeroSignature';
 import { useOnScreen } from '@hooks/useOnScreen';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { INTERSECTION_OPTIONS_ROOTMARGIN } from '@utils/constants';
+import { renderFormattedText } from '@utils/stylizedString';
 
 import style from './style.module.css';
 import type { ShowcaseSectionProps } from './types';
-import { DynamicElement } from '../DynamicElement';
-import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
-import { DynamicElementContainer } from '../DynamicElementContainer';
-import { HeroSignature } from '../HeroSignature';
 
 const isRenderNode = (node: DetailSection) =>
   node.id &&
@@ -23,20 +23,32 @@ const isRenderNode = (node: DetailSection) =>
   typeof node.tag === 'string';
 
 /**
- * ShowcaseSection component that displays a section with dynamic content and a modal form button.
+ * Renders a dynamic showcase section for anchored page content and the hero area.
  *
- * @component
- * @param {ShowcaseSectionProps} props - The properties for the ShowcaseSection component.
- * @property {DetailSection[]} content - Data to produce the content of the section.
- * @property {SectionsRef} [anchor] - Name of the Id assigned to the section.
- * @property {string} [title] - Section title.
- * @property {MutableRefObject<MenuSectionsVisibility>} MenuSectionsVisibility - Indicates the name of the visible displayed.
- * @property {function} [openModalFormDialog] - Trigger for opening the contact modal to use button in the section.
- * @property {boolean} showModalFormDialog - The current state of the contact form dialog.
- * @property {string} modalId - The id of the modal.
- * @returns {React.JSX.Element} The rendered Tag component.
+ * @remarks
+ * - Builds the section from backend-driven content nodes while preserving semantic headings and dynamic rendering.
+ * - Uses `aria-labelledby` on the root section, a stable title id, and dialog-related ARIA attributes on the contact CTA.
+ * - Updates the page menu visibility state when the section is anchored and observed on screen.
+ * - Exposes styling hooks through the root `data-variant` attribute and CSS module classes derived from `anchor` and node names.
+ * - Handles the hero-specific brand signature, CTA readiness state, and intersection target without duplicating prop documentation.
+ * - Keep runtime defaults aligned with `@defaultValue` in {@link ShowcaseSectionProps}.
  *
- * @al-dev93
+ * @example
+ * ```tsx
+ * <ShowcaseSection
+ *   content={content}
+ *   anchor="home"
+ *   isAnchored
+ *   title="Stack-Flex"
+ *   introduction={introduction}
+ *   MenuSectionsVisibility={menuSectionsVisibility}
+ *   openModalFormDialog={openModalFormDialog}
+ *   showModalFormDialog={showModalFormDialog}
+ *   modalId="contact-dialog"
+ * />
+ * ```
+ *
+ * @see {@link ShowcaseSectionProps}
  */
 export const ShowcaseSection = memo(function ShowcaseSection({
   content,
