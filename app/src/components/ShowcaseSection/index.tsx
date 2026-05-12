@@ -15,38 +15,6 @@ import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
 import { DynamicElementContainer } from '../DynamicElementContainer';
 import { HeroSignature } from '../HeroSignature';
 
-// function toRealNewLines(s: string) {
-//   return s.replaceAll('\\r\\n', '\n').replaceAll('\\n', '\n');
-// }
-
-// function renderFormattedText(text?: string) {
-//   if (!text) return undefined;
-
-//   // On split avec groupe capturant => parts = [seg, **bold**, seg, **bold**, seg, ...]
-//   const parts = toRealNewLines(text).split(/(\*\*[^*]+\*\*)/g);
-
-//   // On parcourt fonctionnellement en maintenant un offset cumulatif
-//   let offset = 0;
-//   return parts.map((part) => {
-//     // si part est un segment gras **…**
-//     const m = part.match(/^\*\*([^*]+)\*\*$/);
-//     if (m) {
-//       const raw = m[0]; // ex: **Mot**
-//       const inner = m[1]; // ex: Mot
-//       const start = offset; // position du début du ** dans le texte reconstruit
-//       const end = start + raw.length;
-//       offset = end; // avance l’offset pour la suite
-//       return <strong key={`b:${start}-${end}`}>{inner}</strong>;
-//     }
-
-//     // segment normal : clé = début de segment
-//     const start = offset;
-//     const end = start + part.length;
-//     offset = end;
-//     return <React.Fragment key={`n:${start}`}>{part}</React.Fragment>;
-//   });
-// }
-
 const isRenderNode = (node: DetailSection) =>
   node.id &&
   node.tag &&
@@ -84,7 +52,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
   const handleError = useErrorHandler();
 
   const isHero = anchor === 'home';
-  const isAbout = anchor === 'about';
+  // const isAbout = anchor === 'about';
 
   const sectionRef = useRef<HTMLElement>(null);
   const kickerRef = useRef<HTMLParagraphElement>(null);
@@ -97,22 +65,22 @@ export const ShowcaseSection = memo(function ShowcaseSection({
     ...INTERSECTION_OPTIONS_ROOTMARGIN,
   });
 
-  const [mainContent, summaryContent, skillsContent] = useMemo<
-    [DetailSection[], DetailSection[], DetailSection[]] | [DetailSection[]]
-  >(() => {
-    const sortContent = content.sort((a, b) => a.orderInSection - b.orderInSection);
+  // const [mainContent, summaryContent, skillsContent] = useMemo<
+  //   [DetailSection[], DetailSection[], DetailSection[]] | [DetailSection[]]
+  // >(() => {
+  //   const sortContent = content.sort((a, b) => a.orderInSection - b.orderInSection);
 
-    return isAbout
-      ? sortContent.reduce(
-          (prev: [DetailSection[], DetailSection[], DetailSection[]], curr) => {
-            if (curr.name?.includes('description')) return [[...prev[0], curr], prev[1], prev[2]];
-            if (curr.name?.includes('summary')) return [prev[0], [...prev[1], curr], prev[2]];
-            return [prev[0], prev[1], [...prev[2], curr]];
-          },
-          [[], [], []],
-        )
-      : [sortContent];
-  }, [content, isAbout]);
+  //   return isAbout
+  //     ? sortContent.reduce(
+  //         (prev: [DetailSection[], DetailSection[], DetailSection[]], curr) => {
+  //           if (curr.name?.includes('description')) return [[...prev[0], curr], prev[1], prev[2]];
+  //           if (curr.name?.includes('summary')) return [prev[0], [...prev[1], curr], prev[2]];
+  //           return [prev[0], prev[1], [...prev[2], curr]];
+  //         },
+  //         [[], [], []],
+  //       )
+  //     : [sortContent];
+  // }, [content, isAbout]);
 
   const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
   // const idSection = anchor ?? `${content}`;
@@ -265,7 +233,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
           aria-hidden={renderNode.name === 'brand' ? 'true' : undefined}
           ref={isHero ? getHeroNodeRef(renderNode) : undefined}
         >
-          {renderFormattedText(renderNode.content)}
+          {typeof renderNode.content === 'string' ? renderFormattedText(renderNode.content) : null}
           {renderNode.boldContent?.length
             ? renderNode.boldContent.map((item) => {
                 return isRenderNode(item) ? (
@@ -274,7 +242,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
                     tag={item.tag as ValidHTMLTag | ValidComponentTag}
                     className={getElementClassName(item)}
                   >
-                    {renderFormattedText(item.content)}
+                    {typeof item.content === 'string' ? renderFormattedText(item.content) : null}
                   </DynamicElement>
                 ) : null;
               })
@@ -286,7 +254,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
   );
 
   const renderSectionContent = (): (React.JSX.Element | null)[] =>
-    mainContent.map((renderNode: DetailSection) =>
+    content.map((renderNode: DetailSection) =>
       renderNode.wrapped ? (
         <DynamicElementContainer
           key={renderNode.id}
@@ -301,34 +269,34 @@ export const ShowcaseSection = memo(function ShowcaseSection({
       ),
     );
 
-  const renderAboutSectionContent = (): React.JSX.Element | null => {
-    console.log(skillsContent);
-    return (
-      <>
-        <div className={style.about__layout}>
-          <div className={style.about__content}>
-            {mainContent.map((renderNode) => renderDynamicElement(renderNode))}
-          </div>
-          <aside className={style.summary}>
-            <div className={style.summary__inner}>
-              {summaryContent?.map((renderNode) => renderDynamicElement(renderNode))}
-              <AppButton
-                className={style.about__summary__cta}
-                variant='outline'
-                state='ready'
-                name='Parlons de votre projet'
-                onClick={openModalFormDialog}
-                ariaExpanded={showModalFormDialog}
-                ariaHasPopup='dialog'
-                ariaControls={modalId}
-              />
-            </div>
-          </aside>
-        </div>
-        {skillsContent?.map((renderNode) => renderDynamicElement(renderNode))}
-      </>
-    );
-  };
+  // const renderAboutSectionContent = (): React.JSX.Element | null => {
+  //   console.log(skillsContent);
+  //   return (
+  //     <>
+  //       <div className={style.about__layout}>
+  //         <div className={style.about__content}>
+  //           {mainContent.map((renderNode) => renderDynamicElement(renderNode))}
+  //         </div>
+  //         <aside className={style.summary}>
+  //           <div className={style.summary__inner}>
+  //             {summaryContent?.map((renderNode) => renderDynamicElement(renderNode))}
+  //             <AppButton
+  //               className={style.about__summary__cta}
+  //               variant='outline'
+  //               state='ready'
+  //               name='Parlons de votre projet'
+  //               onClick={openModalFormDialog}
+  //               ariaExpanded={showModalFormDialog}
+  //               ariaHasPopup='dialog'
+  //               ariaControls={modalId}
+  //             />
+  //           </div>
+  //         </aside>
+  //       </div>
+  //       {skillsContent?.map((renderNode) => renderDynamicElement(renderNode))}
+  //     </>
+  //   );
+  // };
 
   return (
     <section
@@ -347,7 +315,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
           </header>
         ) : null}
 
-        {isAbout ? renderAboutSectionContent() : renderSectionContent()}
+        {renderSectionContent()}
       </div>
       <AppButton
         // className={style.section__button}
