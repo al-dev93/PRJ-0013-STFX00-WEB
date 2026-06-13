@@ -1,6 +1,4 @@
-import { HttpMethod } from '@/types';
-
-import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
+import { HttpMethod, TagKind, ValidComponentTag, ValidHTMLTag } from '@/types';
 
 /**
  * The props for the DynamicElementContainer component.
@@ -15,8 +13,10 @@ import type { ValidComponentTag, ValidHTMLTag } from '../DynamicElement/types';
  */
 export type DynamicElementContainerProps = {
   tag: ValidHTMLTag | ValidComponentTag;
+  tagKind: TagKind;
   className?: string;
   // filterValue?: string;
   endpoint?: string;
+  introduction?: string;
   method?: HttpMethod;
 };

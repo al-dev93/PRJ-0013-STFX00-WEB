@@ -24,9 +24,11 @@ import type { DynamicElementContainerProps } from './types';
  */
 export function DynamicElementContainer({
   tag,
+  tagKind,
   className,
   // filterValue,
   endpoint: dynamicElementContainerEndpoint,
+  introduction,
   method,
   ...props
 }: DynamicElementContainerProps): React.JSX.Element | null {
@@ -76,7 +78,8 @@ export function DynamicElementContainer({
 
   return !fetchError && isProjectDataArray(data) ? (
     <div className={className}>
-      {data?.map((item) => <DynamicElement key={item.id} tag={tag} data={item} {...props} />)}
+      {introduction ? <p>{introduction}</p> : null}
+      {data?.map((item) => <DynamicElement key={item.id} tag={tag} tagKind={tagKind} data={item} {...props} />)}
     </div>
   ) : null;
 }

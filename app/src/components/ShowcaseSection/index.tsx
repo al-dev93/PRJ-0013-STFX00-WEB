@@ -1,9 +1,8 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { DetailSection, MenuSectionsVisibility } from '@/types';
+import type { DetailSection, Item, MenuSectionsVisibility, ValidComponentTag, ValidHTMLTag } from '@/types';
 import { AppButton } from '@components/AppButton';
 import { DynamicElement } from '@components/DynamicElement';
-import type { ValidComponentTag, ValidHTMLTag } from '@components/DynamicElement/types';
 import { DynamicElementContainer } from '@components/DynamicElementContainer';
 import { HeroSignature } from '@components/HeroSignature';
 import { useOnScreen } from '@hooks/useOnScreen';
@@ -15,7 +14,7 @@ import { renderFormattedText } from '@utils/stylizedString';
 import style from './style.module.css';
 import type { ShowcaseSectionProps } from './types';
 
-const isRenderNode = (node: DetailSection) =>
+const isRenderNode = (node: DetailSection | Item) =>
   node.id &&
   node.tag &&
   (typeof node.content === 'string' || typeof node.content === 'undefined') &&
@@ -51,7 +50,7 @@ const isRenderNode = (node: DetailSection) =>
  * @see {@link ShowcaseSectionProps}
  */
 export const ShowcaseSection = memo(function ShowcaseSection({
-  content,
+  detailSections,
   anchor,
   isAnchored,
   title,
@@ -64,7 +63,6 @@ export const ShowcaseSection = memo(function ShowcaseSection({
   const handleError = useErrorHandler();
 
   const isHero = anchor === 'home';
-  // const isAbout = anchor === 'about';
 
   const sectionRef = useRef<HTMLElement>(null);
   const kickerRef = useRef<HTMLParagraphElement>(null);
@@ -77,25 +75,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
     ...INTERSECTION_OPTIONS_ROOTMARGIN,
   });
 
-  // const [mainContent, summaryContent, skillsContent] = useMemo<
-  //   [DetailSection[], DetailSection[], DetailSection[]] | [DetailSection[]]
-  // >(() => {
-  //   const sortContent = content.sort((a, b) => a.orderInSection - b.orderInSection);
-
-  //   return isAbout
-  //     ? sortContent.reduce(
-  //         (prev: [DetailSection[], DetailSection[], DetailSection[]], curr) => {
-  //           if (curr.name?.includes('description')) return [[...prev[0], curr], prev[1], prev[2]];
-  //           if (curr.name?.includes('summary')) return [prev[0], [...prev[1], curr], prev[2]];
-  //           return [prev[0], prev[1], [...prev[2], curr]];
-  //         },
-  //         [[], [], []],
-  //       )
-  //     : [sortContent];
-  // }, [content, isAbout]);
-
   const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
-  // const idSection = anchor ?? `${content}`;
 
   /**
    * Updates the visibility of the section in the page sections context.
@@ -124,7 +104,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
    */
   useEffect(() => {
     // Verification of mandatory data
-    if (!content || content.length === 0) {
+    if (!detailSections || detailSections.length === 0) {
       // eslint-disable-next-line no-void
       void handleError(
         createError(1001, 'Invalid content: No data provided', {
@@ -138,7 +118,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
       return;
     }
 
-    content.forEach((renderNode) => {
+    detailSections.forEach((renderNode) => {
       // Checking required properties of child node
       if (!renderNode.id || !renderNode.tag) {
         // eslint-disable-next-line no-void
@@ -172,7 +152,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
         );
       }
     });
-  }, [content, handleError]);
+  }, [detailSections, handleError]);
 
   /**
    * Retrieves a CSS class name based on the provided DetailSection object.
@@ -186,8 +166,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
    * @al-dev93
    */
   const getElementClassName = useCallback(
-    (node: DetailSection): string | undefined => {
-      // if (!node.name || !['p', 'ul'].includes(node.tag)) return undefined;
+    (node: DetailSection | Item): string | undefined => {
       if (!node.name) return undefined;
       const { name } = node;
 
@@ -239,19 +218,21 @@ export const ShowcaseSection = memo(function ShowcaseSection({
           key={renderNode.id}
           id={renderNode.tag === 'h1' ? `${anchor}-title` : undefined}
           tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
+          tagKind={renderNode.tagKind}
           endpoint={renderNode.endpoint}
-          introduction={renderNode.tag === 'Slideshow' ? introduction : undefined}
+          introduction={renderNode.sectionIntroduction}
           className={getElementClassName(renderNode)}
           aria-hidden={renderNode.name === 'brand' ? 'true' : undefined}
           ref={isHero ? getHeroNodeRef(renderNode) : undefined}
         >
           {typeof renderNode.content === 'string' ? renderFormattedText(renderNode.content) : null}
-          {renderNode.boldContent?.length
-            ? renderNode.boldContent.map((item) => {
+          {renderNode.items?.length
+            ? renderNode.items.map((item) => {
                 return isRenderNode(item) ? (
                   <DynamicElement
                     key={item.id}
                     tag={item.tag as ValidHTMLTag | ValidComponentTag}
+                    tagKind={item.tagKind}
                     className={getElementClassName(item)}
                   >
                     {typeof item.content === 'string' ? renderFormattedText(item.content) : null}
@@ -262,53 +243,27 @@ export const ShowcaseSection = memo(function ShowcaseSection({
         </DynamicElement>
       );
     },
-    [anchor, getElementClassName, introduction, isHero],
+    [anchor, getElementClassName, isHero],
   );
 
   const renderSectionContent = (): (React.JSX.Element | null)[] =>
-    content.map((renderNode: DetailSection) =>
-      renderNode.wrapped ? (
-        <DynamicElementContainer
-          key={renderNode.id}
-          tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
-          className={getElementClassName(renderNode)}
-          // filterValue='card'
-          endpoint={renderNode.endpoint}
-          method='POST'
-        />
-      ) : (
-        renderDynamicElement(renderNode)
-      ),
-    );
-
-  // const renderAboutSectionContent = (): React.JSX.Element | null => {
-  //   console.log(skillsContent);
-  //   return (
-  //     <>
-  //       <div className={style.about__layout}>
-  //         <div className={style.about__content}>
-  //           {mainContent.map((renderNode) => renderDynamicElement(renderNode))}
-  //         </div>
-  //         <aside className={style.summary}>
-  //           <div className={style.summary__inner}>
-  //             {summaryContent?.map((renderNode) => renderDynamicElement(renderNode))}
-  //             <AppButton
-  //               className={style.about__summary__cta}
-  //               variant='outline'
-  //               state='ready'
-  //               name='Parlons de votre projet'
-  //               onClick={openModalFormDialog}
-  //               ariaExpanded={showModalFormDialog}
-  //               ariaHasPopup='dialog'
-  //               ariaControls={modalId}
-  //             />
-  //           </div>
-  //         </aside>
-  //       </div>
-  //       {skillsContent?.map((renderNode) => renderDynamicElement(renderNode))}
-  //     </>
-  //   );
-  // };
+    detailSections?.length
+      ? detailSections.map((renderNode: DetailSection) =>
+          renderNode.wrapped ? (
+            <DynamicElementContainer
+              key={renderNode.id}
+              tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
+              tagKind={renderNode.tagKind}
+              className={getElementClassName(renderNode)}
+              endpoint={renderNode.endpoint}
+              introduction={renderNode.sectionIntroduction}
+              method='POST'
+            />
+          ) : (
+            renderDynamicElement(renderNode)
+          ),
+        )
+      : [];
 
   return (
     <section
@@ -320,17 +275,11 @@ export const ShowcaseSection = memo(function ShowcaseSection({
       aria-labelledby={`${anchor}-title`}
     >
       <div className={style.section__bodySection}>
-        {title ? (
-          <header className={style[`${anchor}__header`]}>
-            {showcaseSectionTitle}
-            {/* {anchor === 'work' ? <p className={style.work__header__intro}>4 projets clés</p> : null} */}
-          </header>
-        ) : null}
-
+        {title ? <header className={style[`${anchor}__header`]}>{showcaseSectionTitle}</header> : null}
+        {introduction ? <p>{introduction}</p> : null}
         {renderSectionContent()}
       </div>
       <AppButton
-        // className={style.section__button}
         name={isHero ? 'Parlons de votre projet' : 'Me contacter'}
         variant={isHero ? 'hero' : undefined}
         state={isHero ? buttonState : undefined}

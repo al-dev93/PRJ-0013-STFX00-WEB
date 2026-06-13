@@ -1,12 +1,55 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import type { IndexPageSection } from '@/types';
 import { isIndexPageSectionArray } from '@/utils/typeHelpers';
 import { ShowcaseSection } from '@components/ShowcaseSection';
 import { useFetchData } from '@hooks/useFetchData';
 import { usePageSection } from '@hooks/usePageSection';
 
 import style from './style.module.css';
+
+// const test = [
+//   {
+//     id: 'aaa',
+//     anchor: 'home',
+//     title: 'test-titre',
+//     introduction: 'introduction de test',
+//     order: 1,
+//     isAnchored: true,
+//     detailSections: [
+//       {
+//         id: 'aa0-001',
+//         blockKey: 'block de test',
+//         tag: 'div',
+//         tagKind: 'html',
+//         // 'variant' : ,
+//         wrapped: false,
+//         name: 'titre du test',
+//         // 'content' : ,
+//         // 'sectionIntroduction' : ,
+//         // 'endpoint' : ,
+//         // 'iconName' : ,
+//         orderInSection: 1,
+//         isVisible: true,
+//         items: [
+//           {
+//             id: 'aa0-001-001',
+//             itemKey: 'item de test',
+//             tag: 'p',
+//             tagKind: 'html',
+//             // 'variant' : ,
+//             wrapped: false,
+//             // 'name' : ,
+//             content: "contenu de l'item de test",
+//             // 'endpoint' : ,
+//             iconName: 'logo-github',
+//             orderInBlock: 1,
+//             isVisible: true,
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// ];
 
 /**
  *
@@ -33,28 +76,7 @@ export function Index(): React.JSX.Element | null {
    * @constant {Object} data - The data fetched from the server.
    */
   const { data } = useFetchData({ endpoint, method: 'POST' });
-
-  /**
-   * Memoized and sorted list of page sections.
-   *
-   * @remarks
-   * - Validates that `data` is a non-null array of `IndexPageSection` before sorting.
-   * - Returns `undefined` if `data` is missing or fails the schema check.
-   * - Sorts by the numeric `order` property in ascending order.
-   *
-   * @type {IndexPageSection[] | undefined}
-   */
-  const sortedAndValidatedData = useMemo<IndexPageSection[] | undefined>(() => {
-    // Only sort if we actually have data and it passes our runtime guard
-    console.log(isIndexPageSectionArray(data));
-    if (isIndexPageSectionArray(data)) {
-      // Clone + sort to avoid mutating the original array
-      return [...data].sort((a, b) => a.order - b.order);
-    }
-    // Fallback: either no data yet or invalid data shape
-    return undefined;
-  }, [data]);
-  console.log(data);
+  const isValidData = isIndexPageSectionArray(data);
 
   /**
    * Handles the click event to open or close the contact form dialog.
@@ -64,12 +86,12 @@ export function Index(): React.JSX.Element | null {
    */
   const handleClick = (): void => setOpenContactFormDialog((formState) => !formState);
 
-  return sortedAndValidatedData ? (
+  return isValidData ? (
     <div className={style.wrapperIndex}>
-      {sortedAndValidatedData.map(({ id, content, anchor, isAnchored, title, introduction }) => (
+      {data.map(({ id, detailSections, anchor, isAnchored, title, introduction }) => (
         <ShowcaseSection
           key={id}
-          content={content}
+          detailSections={detailSections}
           anchor={anchor}
           isAnchored={isAnchored}
           title={title}

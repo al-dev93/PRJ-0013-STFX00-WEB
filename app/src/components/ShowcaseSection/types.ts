@@ -19,7 +19,7 @@ export interface ShowcaseSectionProps {
    * Each item is expected to describe one dynamic render node, including its identifier,
    * HTML or component tag, textual content, optional endpoint, and optional nested bold content.
    */
-  content: DetailSection[];
+  detailSections?: DetailSection[];
 
   /**
    * Optional section anchor used as the root `id`, styling variant, and menu visibility key.

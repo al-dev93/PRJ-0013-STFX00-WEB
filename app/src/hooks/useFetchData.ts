@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { FetchData, FetchOptions, FetchResultData, JsonObject, UseFetchDataParams } from '@/types';
-import { getFetchUrlOrUrls } from '@/utils/urlHelpers';
 import { ApplicationError } from '@modules/Error/error';
 import type { FetchErrorContext } from '@modules/Error/types';
+import { getFetchUrlOrUrls } from '@utils/urlHelpers';
 
 /**
  * Custom hook to fetch data from one or multiple URLs with specified options.

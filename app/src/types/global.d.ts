@@ -1,7 +1,8 @@
 import { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
 
-import { FetchErrorContext } from '@/modules/Error/types';
-import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@/utils/constants';
+import { FetchErrorContext } from '@modules/Error/types';
+import { ICON_VALUES, TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
+import { COMPONENT_TAGS, HTML_TAGS } from '@utils/dynamicElementsconstants';
 
 import type { IconType } from '.';
 
@@ -34,6 +35,22 @@ export type KeyboardEventButton = KeyboardEvent<HTMLButtonElement>;
  * to an HTML div element and contains details about the keyboard interaction.
  */
 export type KeyboardEventDiv = KeyboardEvent<HTMLDivElement>;
+
+/**
+ * Represents the type of component that can be rendered.
+ *
+ * @exports
+ * @type {keyof typeof COMPONENT_MAP} ValidComponentTag
+ */
+export type ValidComponentTag = (typeof COMPONENT_TAGS)[number];
+
+/**
+ * Represents the type of HTML element
+ *
+ * @exports
+ * @type {typeof HTML_TAGS[number]} ValidHTMLTag
+ */
+export type ValidHTMLTag = (typeof HTML_TAGS)[number];
 
 /**
  * @description
@@ -101,12 +118,12 @@ export type SectionsRef = 'home' | 'work' | 'about' | 'services' | 'more';
  * @al-dev93
  */
 export type IndexPageSection = Omit<MenuItemType, 'label' | 'anchor'> & {
-  title?: string;
-  content: DetailSection[];
-  order: number;
   anchor?: SectionsRef;
-  isAnchored?: boolean;
+  title?: string;
   introduction?: string;
+  order: number;
+  isAnchored?: boolean;
+  detailSections?: DetailSection[];
 };
 
 /**
@@ -138,25 +155,53 @@ export type OutletContextPage = {
  */
 export type MenuSectionsVisibility = Record<string, boolean>;
 
-export type DetailSection = {
+export type TagKind = 'html' | 'react_component';
+
+interface DetailNodeBase {
   id: string;
-  tag: string;
-  wrapped?: boolean;
+  tag: ValidComponentTag | ValidHTMLTag;
+  tagKind: TagKind;
+  variant?: string;
+  wrapped: boolean;
   name?: string;
   content?: string;
   endpoint?: string;
+  iconName?: (typeof ICON_VALUES)[number];
+  isVisible: boolean;
+}
+
+export interface Item extends DetailNodeBase {
+  itemKey?: string;
+  orderInBlock: number;
+}
+
+export interface DetailSection extends DetailNodeBase {
+  blockKey?: string;
   orderInSection: number;
-  boldContent?: DetailSection[];
-};
+  sectionIntroduction?: string;
+  items?: Item[];
+}
 
-export type Point = { x: number; y: number };
+// export type DetailSection = {
+//   id: string;
+//   tag: string;
+//   tagKind: TagKind;
+//   wrapped?: boolean;
+//   name?: string;
+//   content?: string;
+//   endpoint?: string;
+//   orderInSection: number;
+//   boldContent?: DetailSection[];
+// };
 
-export type ViewBoxRect = {
-  minX: number;
-  minY: number;
-  width: number;
-  height: number;
-};
+// export type Point = { x: number; y: number };
+
+// export type ViewBoxRect = {
+//   minX: number;
+//   minY: number;
+//   width: number;
+//   height: number;
+// };
 
 // TODO add comments
 /**
