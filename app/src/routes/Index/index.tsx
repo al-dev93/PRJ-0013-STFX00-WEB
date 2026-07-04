@@ -7,50 +7,6 @@ import { usePageSection } from '@hooks/usePageSection';
 
 import style from './style.module.css';
 
-// const test = [
-//   {
-//     id: 'aaa',
-//     anchor: 'home',
-//     title: 'test-titre',
-//     introduction: 'introduction de test',
-//     order: 1,
-//     isAnchored: true,
-//     detailSections: [
-//       {
-//         id: 'aa0-001',
-//         blockKey: 'block de test',
-//         tag: 'div',
-//         tagKind: 'html',
-//         // 'variant' : ,
-//         wrapped: false,
-//         name: 'titre du test',
-//         // 'content' : ,
-//         // 'sectionIntroduction' : ,
-//         // 'endpoint' : ,
-//         // 'iconName' : ,
-//         orderInSection: 1,
-//         isVisible: true,
-//         items: [
-//           {
-//             id: 'aa0-001-001',
-//             itemKey: 'item de test',
-//             tag: 'p',
-//             tagKind: 'html',
-//             // 'variant' : ,
-//             wrapped: false,
-//             // 'name' : ,
-//             content: "contenu de l'item de test",
-//             // 'endpoint' : ,
-//             iconName: 'logo-github',
-//             orderInBlock: 1,
-//             isVisible: true,
-//           },
-//         ],
-//       },
-//     ],
-//   },
-// ];
-
 /**
  *
  * @description home page content inserted into the layout

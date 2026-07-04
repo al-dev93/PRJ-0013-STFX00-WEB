@@ -1,4 +1,4 @@
-import { MutableRefObject } from 'react';
+import { MutableRefObject, RefObject } from 'react';
 
 import type { DetailSection, SectionsRef, MenuSectionsVisibility } from '@/types';
 // import type { FetchErrorContext } from '@modules/Error/types';
@@ -19,7 +19,7 @@ export interface ShowcaseSectionProps {
    * Each item is expected to describe one dynamic render node, including its identifier,
    * HTML or component tag, textual content, optional endpoint, and optional nested bold content.
    */
-  detailSections?: DetailSection[];
+  detailSections: DetailSection[];
 
   /**
    * Optional section anchor used as the root `id`, styling variant, and menu visibility key.
@@ -115,3 +115,13 @@ export interface ShowcaseSectionProps {
 //   titleRect: DOMRect;
 //   buttonRect: DOMRect;
 // };
+
+export interface RenderContext {
+  anchor?: string;
+  isHero?: boolean;
+  kickerRef?: RefObject<HTMLParagraphElement>;
+  titleRef?: RefObject<HTMLHeadingElement>;
+  style: CSSModuleClasses;
+}
+
+// React.RefObject<HTMLHeadingElement>

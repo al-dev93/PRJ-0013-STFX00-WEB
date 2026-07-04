@@ -58,6 +58,35 @@ function getSeverity(status: number): AppError['severity'] {
   }
 }
 
+function isValidHttpStatus(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 200 && value <= 599;
+}
+
+function getNumberFromContext(context: Record<string, unknown> | undefined, key: string): number | undefined {
+  const value = context?.[key];
+
+  return typeof value === 'number' && Number.isInteger(value) ? value : undefined;
+}
+
+function getFallbackHttpStatus(appCode: number): number {
+  if (appCode >= 1000 && appCode < 2000) {
+    return 422;
+  }
+
+  if (appCode >= 2000 && appCode < 4000) {
+    return 500;
+  }
+
+  return 500;
+}
+
+function getHttpStatus(status: number, context?: Record<string, unknown>): number {
+  const contextHttpStatus = getNumberFromContext(context, 'httpStatus');
+  if (isValidHttpStatus(contextHttpStatus)) return contextHttpStatus;
+  if (isValidHttpStatus(status)) return status;
+  return getFallbackHttpStatus(status);
+}
+
 /**
  * Creates a standardized `AppError` object.
  * This function is used to generate consistent error objects with a `code`, `message`,
@@ -80,20 +109,33 @@ export function createError(
   originalError?: unknown,
 ): ResponseError {
   // const severity = (): 'critical' | 'medium' | 'low' => getSeverity(status);
+  // const contextHttpStatus = getNumberFromContext(context, 'httpStatus');
+  const contextAppCode = getNumberFromContext(context, 'appCode');
+  // const validHttpStatus = isValidHttpStatus(status) ? status : getFallbackHttpStatus(status);
+
+  // const httpStatus = isValidHttpStatus(contextHttpStatus)
+  //   ? contextHttpStatus
+  //   : isValidHttpStatus(status)
+  //     ? status
+  //     : getFallbackHttpStatus(status);
+
+  const httpStatus = getHttpStatus(status, context);
+
+  const appCode = contextAppCode ?? status;
 
   const error: AppError = {
     name: 'HttpError',
-    message: message || getDefaultMessage(status),
-    code: status,
-    severity: getSeverity(status),
-    context,
+    message: message || getDefaultMessage(appCode),
+    code: appCode,
+    severity: getSeverity(appCode),
+    context: { ...context, httpStatus },
     originalError,
     timestamp: Date.now(),
     stack: new Error().stack,
   };
 
   const response = new Response(JSON.stringify(error), {
-    status,
+    status: httpStatus,
     headers: { 'Content-Type': 'application/json' },
   });
 
@@ -152,9 +194,16 @@ export async function normalizeError(rawError: unknown, context?: FetchErrorCont
         name: 'ResponseError',
         message: data.message || getDefaultMessage(rawError.response.status),
         stack: rawError.stack,
-        code: rawError.response.status,
-        severity: data.severity || getSeverity(rawError.response.status),
-        context: { ...data.context, ...context },
+        // code: rawError.response.status,
+        code: typeof data.code === 'number' ? data.code : rawError.response.status,
+        // severity: data.severity || getSeverity(rawError.response.status),
+        severity: data.severity || getSeverity(typeof data.code === 'number' ? data.code : rawError.response.status),
+        // context: { ...data.context, ...context },
+        context: {
+          ...data.context,
+          httpStatus: rawError.response.status,
+          ...context,
+        },
         originalError: rawError,
         timestamp: Date.now(),
       };
@@ -179,9 +228,16 @@ export async function normalizeError(rawError: unknown, context?: FetchErrorCont
         name: 'HTTPError',
         message: data.message || getDefaultMessage(rawError.status),
         stack: new Error().stack,
-        code: rawError.status,
-        severity: data.severity || getSeverity(rawError.status),
-        context: { ...data.context, ...context },
+        // code: rawError.status,
+        code: typeof data.code === 'number' ? data.code : rawError.status,
+        // severity: data.severity || getSeverity(rawError.status),
+        severity: data.severity || getSeverity(typeof data.code === 'number' ? data.code : rawError.status),
+        // context: { ...data.context, ...context },
+        context: {
+          ...data.context,
+          httpStatus: rawError.status,
+          ...context,
+        },
         originalError: rawError,
         timestamp: Date.now(),
       };

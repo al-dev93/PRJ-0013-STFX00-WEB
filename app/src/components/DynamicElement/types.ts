@@ -10,14 +10,6 @@ import { ValidComponentTag, ValidHTMLTag } from '@/types';
  * @property {React.ReactNode} [children] - Optional child nodes to be rendered inside the element or component.
  * @property {Object} [props] - Any additional props or attributes specific to the chosen tag.
  */
-// export type DynamicElementProps<T extends ValidComponentTag | ValidHTMLTag> = {
-//   tag: T;
-//   children?: ReactNode;
-// } & (T extends ValidComponentTag
-//   ? ComponentProps<(typeof COMPONENT_MAP)[T]>
-//   : T extends (typeof HTML_TAGS)[number]
-//     ? JSX.IntrinsicElements[T]
-//     : never);
 
 interface DynamicElementBaseProps {
   children?: React.ReactNode;

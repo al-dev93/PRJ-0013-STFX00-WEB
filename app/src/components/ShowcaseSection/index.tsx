@@ -1,9 +1,7 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { DetailSection, Item, MenuSectionsVisibility, ValidComponentTag, ValidHTMLTag } from '@/types';
+import type { MenuSectionsVisibility } from '@/types';
 import { AppButton } from '@components/AppButton';
-import { DynamicElement } from '@components/DynamicElement';
-import { DynamicElementContainer } from '@components/DynamicElementContainer';
 import { HeroSignature } from '@components/HeroSignature';
 import { useOnScreen } from '@hooks/useOnScreen';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
@@ -13,13 +11,7 @@ import { renderFormattedText } from '@utils/stylizedString';
 
 import style from './style.module.css';
 import type { ShowcaseSectionProps } from './types';
-
-const isRenderNode = (node: DetailSection | Item) =>
-  node.id &&
-  node.tag &&
-  (typeof node.content === 'string' || typeof node.content === 'undefined') &&
-  typeof node.id === 'string' &&
-  typeof node.tag === 'string';
+import { renderSectionContent } from './utils/renderSectionContent';
 
 /**
  * Renders a dynamic showcase section for anchored page content and the hero area.
@@ -64,16 +56,21 @@ export const ShowcaseSection = memo(function ShowcaseSection({
 
   const isHero = anchor === 'home';
 
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const kickerRef = useRef<HTMLParagraphElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [hasBrandSignaturePlayed, setHasBrandSignaturePlayed] = useState<boolean>(false);
 
-  const { isIntersecting, observerError } = useOnScreen(isHero ? titleRef : sectionRef, {
-    threshold: isHero ? [0.45] : undefined,
-    ...INTERSECTION_OPTIONS_ROOTMARGIN,
-  });
+  const intersectionOptions = useMemo<IntersectionObserverInit>(
+    () => ({
+      threshold: isHero ? [0.45] : undefined,
+      ...INTERSECTION_OPTIONS_ROOTMARGIN,
+    }),
+    [isHero],
+  );
+
+  const { isIntersecting, observerError } = useOnScreen(isHero ? titleRef : sectionRef, intersectionOptions);
 
   const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
 
@@ -100,86 +97,6 @@ export const ShowcaseSection = memo(function ShowcaseSection({
   }, [anchor, isIntersecting, MenuSectionsVisibility, observerError, handleError, isAnchored]);
 
   /**
-   * Handling errors in props.
-   */
-  useEffect(() => {
-    // Verification of mandatory data
-    if (!detailSections || detailSections.length === 0) {
-      // eslint-disable-next-line no-void
-      void handleError(
-        createError(1001, 'Invalid content: No data provided', {
-          url: window.location.href,
-          component: 'ShowcaseSection',
-          invalidProperty: 'content',
-          operation: 'render',
-          category: 'UI Component',
-        }),
-      );
-      return;
-    }
-
-    detailSections.forEach((renderNode) => {
-      // Checking required properties of child node
-      if (!renderNode.id || !renderNode.tag) {
-        // eslint-disable-next-line no-void
-        void handleError(
-          createError(1001, `Missing required properties in node ${renderNode.id}`, {
-            url: window.location.href,
-            component: 'ShowcaseSection',
-            invalidProperty: 'content',
-            invalidNodeId: renderNode.id,
-            operation: 'render',
-            category: 'UI Component',
-          }),
-        );
-      }
-      // Checking the type of the essential data of the child node
-      if (
-        typeof renderNode.id !== 'string' ||
-        typeof renderNode.tag !== 'string' ||
-        (typeof renderNode.content !== 'string' && typeof renderNode.content !== 'undefined')
-      ) {
-        // eslint-disable-next-line no-void
-        void handleError(
-          createError(1002, `Invalid data types in node ${renderNode.id}`, {
-            url: window.location.href,
-            component: 'ShowcaseSection',
-            invalidProperty: 'content',
-            invalidNodeId: renderNode.id,
-            operation: 'render',
-            category: 'UI Component',
-          }),
-        );
-      }
-    });
-  }, [detailSections, handleError]);
-
-  /**
-   * Retrieves a CSS class name based on the provided DetailSection object.
-   * If the name is provided, it returns a formatted class name using a predefined style.
-   * If no name is provided, it returns an empty string.
-   *
-   * @function
-   * @param {DetailSection} node - The DetailSection object representing a section.
-   * @returns {string} The corresponding class name or an empty string if no node is provided.
-   *
-   * @al-dev93
-   */
-  const getElementClassName = useCallback(
-    (node: DetailSection | Item): string | undefined => {
-      if (!node.name) return undefined;
-      const { name } = node;
-
-      if (isHero) return style[`hero__${name}`];
-      if (!anchor) return style[`${name}`];
-      if (anchor && name.includes('kicker')) return style[`${anchor}__kicker`];
-
-      return style[`${anchor}__${name}`];
-    },
-    [anchor, isHero],
-  );
-
-  /**
    * Renders the title section with a decorative line.
    *
    * @function
@@ -195,76 +112,6 @@ export const ShowcaseSection = memo(function ShowcaseSection({
     );
   }, [anchor, title]);
 
-  const getHeroNodeRef = (renderNode: DetailSection): React.RefObject<HTMLParagraphElement> | undefined => {
-    if (!renderNode.name || !['kicker', 'title'].includes(renderNode.name)) return undefined;
-    if (renderNode.name === 'kicker') return kickerRef;
-    return titleRef;
-  };
-
-  /**
-   * Renders the DynamicElement bloc. If the definition data is missing,
-   * returns null.
-   *
-   * @function
-   * @param {DetailSection} renderNode - DynamicElement bloc definition data
-   * @returns {(React.JSX.Element | null)}
-   */
-  const renderDynamicElement = useCallback(
-    (renderNode: DetailSection): React.JSX.Element | null => {
-      if (!isRenderNode(renderNode)) return null;
-
-      return (
-        <DynamicElement
-          key={renderNode.id}
-          id={renderNode.tag === 'h1' ? `${anchor}-title` : undefined}
-          tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
-          tagKind={renderNode.tagKind}
-          endpoint={renderNode.endpoint}
-          introduction={renderNode.sectionIntroduction}
-          className={getElementClassName(renderNode)}
-          aria-hidden={renderNode.name === 'brand' ? 'true' : undefined}
-          ref={isHero ? getHeroNodeRef(renderNode) : undefined}
-        >
-          {typeof renderNode.content === 'string' ? renderFormattedText(renderNode.content) : null}
-          {renderNode.items?.length
-            ? renderNode.items.map((item) => {
-                return isRenderNode(item) ? (
-                  <DynamicElement
-                    key={item.id}
-                    tag={item.tag as ValidHTMLTag | ValidComponentTag}
-                    tagKind={item.tagKind}
-                    className={getElementClassName(item)}
-                  >
-                    {typeof item.content === 'string' ? renderFormattedText(item.content) : null}
-                  </DynamicElement>
-                ) : null;
-              })
-            : null}
-        </DynamicElement>
-      );
-    },
-    [anchor, getElementClassName, isHero],
-  );
-
-  const renderSectionContent = (): (React.JSX.Element | null)[] =>
-    detailSections?.length
-      ? detailSections.map((renderNode: DetailSection) =>
-          renderNode.wrapped ? (
-            <DynamicElementContainer
-              key={renderNode.id}
-              tag={renderNode.tag as ValidHTMLTag | ValidComponentTag}
-              tagKind={renderNode.tagKind}
-              className={getElementClassName(renderNode)}
-              endpoint={renderNode.endpoint}
-              introduction={renderNode.sectionIntroduction}
-              method='POST'
-            />
-          ) : (
-            renderDynamicElement(renderNode)
-          ),
-        )
-      : [];
-
   return (
     <section
       className={style.section}
@@ -276,19 +123,23 @@ export const ShowcaseSection = memo(function ShowcaseSection({
     >
       <div className={style.section__bodySection}>
         {title ? <header className={style[`${anchor}__header`]}>{showcaseSectionTitle}</header> : null}
-        {introduction ? <p>{introduction}</p> : null}
-        {renderSectionContent()}
+        {introduction ? <p>{renderFormattedText(introduction)}</p> : null}
+        {detailSections && detailSections.length > 0
+          ? renderSectionContent(detailSections, { anchor, style, isHero, kickerRef, titleRef })
+          : null}
       </div>
-      <AppButton
-        name={isHero ? 'Parlons de votre projet' : 'Me contacter'}
-        variant={isHero ? 'hero' : undefined}
-        state={isHero ? buttonState : undefined}
-        onClick={openModalFormDialog}
-        ariaExpanded={showModalFormDialog}
-        ariaHasPopup='dialog'
-        ariaControls={modalId}
-        ref={isHero ? buttonRef : undefined}
-      />
+      <footer>
+        <AppButton
+          name={isHero ? 'Parlons de votre projet' : 'Me contacter'}
+          variant={isHero ? 'hero' : undefined}
+          state={isHero ? buttonState : undefined}
+          onClick={openModalFormDialog}
+          ariaExpanded={showModalFormDialog}
+          ariaHasPopup='dialog'
+          ariaControls={modalId}
+          ref={isHero ? buttonRef : undefined}
+        />
+      </footer>
       {isHero ? (
         <div className={style.hero__signature}>
           <HeroSignature setHasBrandSignaturePlayed={setHasBrandSignaturePlayed} />

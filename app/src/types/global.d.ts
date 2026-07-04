@@ -52,6 +52,8 @@ export type ValidComponentTag = (typeof COMPONENT_TAGS)[number];
  */
 export type ValidHTMLTag = (typeof HTML_TAGS)[number];
 
+export type ValidTag = ValidHTMLTag | ValidComponentTag;
+
 /**
  * @description
  */
@@ -87,13 +89,13 @@ export type MenuItemType = {
 /**
  * @description Type use to represent a link to a user account on an external service.
  */
-export type AccountLink = {
+export interface AccountLink {
   id: string;
   service: string;
   icon: IconType;
   onPage?: boolean;
   address?: string;
-};
+}
 
 // NOTE: on the index page
 /**
@@ -117,14 +119,17 @@ export type SectionsRef = 'home' | 'work' | 'about' | 'services' | 'more';
  *
  * @al-dev93
  */
-export type IndexPageSection = Omit<MenuItemType, 'label' | 'anchor'> & {
+export interface IndexPageSection {
+  id: string;
   anchor?: SectionsRef;
   title?: string;
   introduction?: string;
   order: number;
   isAnchored?: boolean;
-  detailSections?: DetailSection[];
-};
+  isVisible: boolean;
+  isRenderable: boolean;
+  detailSections: DetailSection[];
+}
 
 /**
  * @description Represents the context passed to the page sections from a React Router outlet.
@@ -155,53 +160,37 @@ export type OutletContextPage = {
  */
 export type MenuSectionsVisibility = Record<string, boolean>;
 
+export type DetailEntityLevel = 'section' | 'item';
 export type TagKind = 'html' | 'react_component';
 
-interface DetailNodeBase {
+interface DetailNodeBase<TLevel extends DetailEntityLevel = DetailEntityLevel> {
   id: string;
-  tag: ValidComponentTag | ValidHTMLTag;
+  level: TLevel;
+  tag: ValidTag;
   tagKind: TagKind;
   variant?: string;
   wrapped: boolean;
   name?: string;
+  styleKey?: string;
   content?: string;
   endpoint?: string;
   iconName?: (typeof ICON_VALUES)[number];
   isVisible: boolean;
 }
 
-export interface Item extends DetailNodeBase {
+export interface Item extends DetailNodeBase<'item'> {
   itemKey?: string;
   orderInBlock: number;
 }
 
-export interface DetailSection extends DetailNodeBase {
+export interface DetailSection extends DetailNodeBase<'section'> {
   blockKey?: string;
   orderInSection: number;
   sectionIntroduction?: string;
-  items?: Item[];
+  items: Item[];
 }
 
-// export type DetailSection = {
-//   id: string;
-//   tag: string;
-//   tagKind: TagKind;
-//   wrapped?: boolean;
-//   name?: string;
-//   content?: string;
-//   endpoint?: string;
-//   orderInSection: number;
-//   boldContent?: DetailSection[];
-// };
-
-// export type Point = { x: number; y: number };
-
-// export type ViewBoxRect = {
-//   minX: number;
-//   minY: number;
-//   width: number;
-//   height: number;
-// };
+export type DetailEntity = DetailSection | Item;
 
 // TODO add comments
 /**

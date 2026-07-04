@@ -9,8 +9,7 @@ import {
   ProjectData,
   SectionsRef,
   TagKind,
-  ValidComponentTag,
-  ValidHTMLTag,
+  ValidTag,
 } from '@/types';
 import { ApplicationError } from '@modules/Error/error';
 import { isComponentTag } from '@utils/componentElementHelpers';
@@ -39,7 +38,7 @@ const isIconType = (x: unknown): x is IconType =>
 const isRecord = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null;
 const isSectionsRef = (x: unknown): x is SectionsRef =>
   (typeof x === 'string' && ['home', 'about', 'work', 'more'].includes(x)) || typeof x === 'undefined';
-const isTag = (x: unknown): x is ValidHTMLTag | ValidComponentTag => isHtmlTag(x) || isComponentTag(x);
+const isTag = (x: unknown): x is ValidTag => isHtmlTag(x) || isComponentTag(x);
 const isTagKind = (x: unknown): x is TagKind => typeof x === 'string' && ['html', 'react_component'].includes(x);
 
 /**
@@ -147,10 +146,26 @@ export function validateBooleanOrUndefined(value: unknown, propertyName: string)
 function isItem(x: unknown): x is Item {
   // Must be an object
   if (!isRecord(x)) return false;
-  const { id, tag, tagKind, variant, wrapped, name, content, endpoint, iconName, isVisible, itemKey, orderInBlock } = x;
+  const {
+    id,
+    level,
+    tag,
+    tagKind,
+    variant,
+    wrapped,
+    name,
+    styleKey,
+    content,
+    endpoint,
+    iconName,
+    isVisible,
+    itemKey,
+    orderInBlock,
+  } = x;
 
   // Validate required string fields
   if (!isNonEmptyString(id)) return false;
+  if (level !== 'item') return false;
   if (!isTag(tag)) return false;
   if (!isTagKind(tagKind)) return false;
   if (!isBoolean(wrapped)) return false;
@@ -160,6 +175,7 @@ function isItem(x: unknown): x is Item {
   // Validate optional primitive fields
   if (variant !== undefined && !isNonEmptyString(variant)) return false;
   if (name !== undefined && !isString(name)) return false;
+  if (styleKey !== undefined && !isString(styleKey)) return false;
   if (content !== undefined && !isString(content)) return false;
   if (endpoint !== undefined && !isNonEmptyString(endpoint)) return false;
   if (iconName !== undefined && !isIconType(iconName)) return false;
@@ -181,11 +197,13 @@ function isDetailSection(x: unknown): x is DetailSection {
   if (!isRecord(x)) return false;
   const {
     id,
+    level,
     tag,
     tagKind,
     variant,
     wrapped,
     name,
+    styleKey,
     content,
     endpoint,
     iconName,
@@ -198,6 +216,7 @@ function isDetailSection(x: unknown): x is DetailSection {
 
   // Validate required string fields
   if (!isNonEmptyString(id)) return false;
+  if (level !== 'section') return false;
   if (!isTag(tag)) return false;
   if (!isTagKind(tagKind)) return false;
   if (!isBoolean(wrapped)) return false;
@@ -207,6 +226,7 @@ function isDetailSection(x: unknown): x is DetailSection {
   // Validate optional primitive fields
   if (variant !== undefined && !isNonEmptyString(variant)) return false;
   if (name !== undefined && !isString(name)) return false;
+  if (styleKey !== undefined && !isString(styleKey)) return false;
   if (content !== undefined && !isString(content)) return false;
   if (endpoint !== undefined && !isNonEmptyString(endpoint)) return false;
   if (iconName !== undefined && !isString(iconName)) return false;
@@ -285,6 +305,9 @@ const requiredIndexPageSectionSchema = {
   id: isString,
   // content: isDetailSectionArray,
   order: isNumber,
+  isVisible: isBoolean,
+  isRenderable: isBoolean,
+  detailSections: isDetailSectionArray,
 } satisfies { [K in RequiredKeys<IndexPageSection>]: (x: unknown) => x is IndexPageSection[K] };
 
 const optionalIndexPageSectionSchema = {
@@ -292,7 +315,6 @@ const optionalIndexPageSectionSchema = {
   isAnchored: isBoolean,
   title: isString,
   introduction: isString,
-  detailSections: isDetailSectionArray,
 } satisfies { [K in keyof IndexPageSection]?: (x: unknown) => x is IndexPageSection[K] };
 
 export const isIndexPageSection = (x: unknown): x is IndexPageSection =>

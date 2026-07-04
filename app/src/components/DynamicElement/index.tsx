@@ -29,7 +29,6 @@ const DYNAMIC_COMPONENT_MAP = COMPONENT_MAP as unknown as Record<ValidComponentT
  *
  * @al-dev93
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const DynamicElement = forwardRef<DialogFormElement, DynamicElementProps>(
   function DynamicElementRef(dynamicProps, ref): React.JSX.Element | null {
     const handleError = useErrorHandler();
