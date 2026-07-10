@@ -1,6 +1,7 @@
-import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { RefObject } from 'react';
 
-import { AppError } from '@/types';
+import type { AppError } from '@/types';
 
 const DEFAULT_THRESHOLD = 0;
 const DEFAULT_ROOT_MARGIN = '0px';

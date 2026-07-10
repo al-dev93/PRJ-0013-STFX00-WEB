@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react';
 
 import type { ProjectData } from '@/types';
-import { isProjectDataArray } from '@/utils/typeHelpers';
 import { DynamicElement } from '@components/DynamicElement';
 import { useFetchData } from '@hooks/useFetchData';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
+import { isProjectDataArray } from '@utils/typeHelpers';
 
 import type { DynamicElementContainerProps } from './types';
 /**

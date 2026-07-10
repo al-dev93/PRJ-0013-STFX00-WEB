@@ -1,4 +1,4 @@
-import { ValidComponentTag } from '@/types';
+import type { ValidComponentTag } from '@/types';
 
 import { COMPONENT_TAGS } from './dynamicElementsconstants';
 

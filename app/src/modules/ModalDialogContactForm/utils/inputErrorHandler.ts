@@ -1,8 +1,7 @@
 import type { DialogFormInputElement } from '@/types';
 
 import { DELETE_ERROR_TAG_NAME, SET_ERROR_TAG_NAME, SET_INPUT_BORDER_BOX } from './constants';
-import { FormInputName, InputBorderBox } from '../types';
-import type { ErrorTagComponent, InputComponent, Validity } from '../types';
+import type { FormInputName, InputBorderBox, ErrorTagComponent, InputComponent, Validity } from '../types';
 /**
  * sets the border style of the active input field to distinguish between an incorrect
  * input and a correctly edited input field.

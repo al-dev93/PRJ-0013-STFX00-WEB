@@ -1,4 +1,4 @@
-import { ApiConfigParams, FetchMode, FetchOptions, UseFetchDataParams } from '@/types';
+import type { ApiConfigParams, FetchMode, FetchOptions, UseFetchDataParams } from '@/types';
 
 /**
  * Validates if the provided string is a valid URL.

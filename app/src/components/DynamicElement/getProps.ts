@@ -1,4 +1,4 @@
-import { DynamicComponentRuntimeProps, DynamicElementComponentProps, DynamicElementHTMLProps } from './types';
+import type { DynamicComponentRuntimeProps, DynamicElementComponentProps, DynamicElementHTMLProps } from './types';
 
 export function getComponentProps(props: DynamicElementComponentProps): DynamicComponentRuntimeProps {
   return Object.fromEntries(

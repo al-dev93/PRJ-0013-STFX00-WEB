@@ -1,15 +1,15 @@
-import IonIcon from '@reacticons/ionicons';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { AppIcon } from '@components/AppIcon';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
-import { ICON_VALUES, SERVICE_LABEL } from '@utils/constants';
+import { APP_ICONS } from '@utils/appIconsMap';
+import { SERVICE_LABEL } from '@utils/constants';
 import { isAccountLink, isDeliverable } from '@utils/typeHelpers';
 import { isValidUrl } from '@utils/urlHelpers';
 
 import style from './style.module.css';
 import type { ServiceType, SocialMediaButtonProps } from '../../types';
-
 /**
  * SocialMediaButton component for rendering a button with a social media link.
  * For mail links, the address is encrypted to avoid being displayed in plain text.
@@ -45,7 +45,7 @@ export function SocialMediaButton({ className, button }: SocialMediaButtonProps)
             context: {
               id: typeof id === 'string' ? id : 'unknown',
               service: typeof service === 'string' ? service : 'unknown',
-              icon: typeof icon === 'string' && ICON_VALUES.includes(icon) ? icon : 'unknown',
+              icon: typeof icon === 'string' && Object.hasOwn(APP_ICONS, icon) ? icon : 'unknown',
               address:
                 typeof address === 'string' && isValidUrl(address) && service !== 'gmail' ? address : addressIsNotUrl,
             },
@@ -95,7 +95,8 @@ export function SocialMediaButton({ className, button }: SocialMediaButtonProps)
       aria-label={buttonDescription}
       title={buttonDescription}
     >
-      <IonIcon className={style.buttonLink__icon} name={icon} aria-hidden='true' />
+      {/* <IonIcon className={style.buttonLink__icon} name={icon} aria-hidden='true' /> */}
+      <AppIcon className={style.buttonLink__icon} iconName={icon} />
     </a>
   ) : null;
 }

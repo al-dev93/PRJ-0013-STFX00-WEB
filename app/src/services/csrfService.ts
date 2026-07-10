@@ -1,4 +1,4 @@
-import { CsrfRecord } from '@/types';
+import type { CsrfRecord } from '@/types';
 
 let csrfRecord: CsrfRecord | null = null;
 // In-progress promise (to dedupe simultaneous calls)

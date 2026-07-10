@@ -1,4 +1,4 @@
-import { Dispatch } from 'react';
+import type { Dispatch } from 'react';
 
 import type {
   ContactFormInput,
@@ -9,6 +9,7 @@ import type {
   SetStateBoolean,
   TooltipContent,
 } from '@/types';
+import { LOCAL_ICON_NAME } from '@utils/appIconsMap';
 
 import {
   AUTO_COMPLETION,
@@ -567,10 +568,16 @@ export type ModalDialogContactFormAction =
   | InitDialogContactFormState
   | InputComponent;
 
+export type TooltipIconName =
+  | typeof LOCAL_ICON_NAME.VALIDATED
+  | typeof LOCAL_ICON_NAME.EDIT
+  | typeof LOCAL_ICON_NAME.INFO;
+
 export type ContactForm = [
   // currentState: FieldState,
   (inputValue: string) => void,
-  tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle',
+  // tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle',
+  tooltipIconName: TooltipIconName,
   isTooltipVisible?: boolean,
 ];
 

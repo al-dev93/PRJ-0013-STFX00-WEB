@@ -28,7 +28,7 @@ import type { SocialMediaNavBarProps } from './types';
  */
 export const SocialMediaNavBar = memo(function SocialMediaNavBar({
   className,
-  changeLinkColor,
+  classNameButton,
   type,
   buttons,
 }: SocialMediaNavBarProps): React.JSX.Element | null {
@@ -117,7 +117,8 @@ export const SocialMediaNavBar = memo(function SocialMediaNavBar({
         {data?.map((element) => (
           <li key={`${element.service}`}>
             <SocialMediaButton
-              className={`${type === 'slideshow' || type === 'card' ? style.socialMediaNavBar__externalLink : ''} ${element.service === 'external' && (type === 'slideshow' || type === 'card') ? style['socialMediaNavBar__externalLink--primary'] : ''} ${changeLinkColor ?? ''}`}
+              // className={`${type === 'slideshow' || type === 'card' ? style.socialMediaNavBar__externalLink : ''} ${element.service === 'external' && (type === 'slideshow' || type === 'card') ? style['socialMediaNavBar__externalLink--primary'] : ''} ${changeLinkColor ?? ''}`}
+              className={`${classNameButton ?? ''} ${element.service === 'external' && (type === 'slideshow' || type === 'card') ? style['socialMediaNavBar__externalLink--primary'] : ''}`}
               button={element}
             />
           </li>

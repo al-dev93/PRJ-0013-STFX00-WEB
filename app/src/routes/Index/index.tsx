@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { isIndexPageSectionArray } from '@/utils/typeHelpers';
 import { ShowcaseSection } from '@components/ShowcaseSection';
 import { useFetchData } from '@hooks/useFetchData';
 import { usePageSection } from '@hooks/usePageSection';
+import { isIndexPageSectionArray } from '@utils/typeHelpers';
 
 import style from './style.module.css';
 
@@ -44,20 +44,23 @@ export function Index(): React.JSX.Element | null {
 
   return isValidData ? (
     <div className={style.wrapperIndex}>
-      {data.map(({ id, detailSections, anchor, isAnchored, title, introduction }) => (
-        <ShowcaseSection
-          key={id}
-          detailSections={detailSections}
-          anchor={anchor}
-          isAnchored={isAnchored}
-          title={title}
-          introduction={introduction}
-          MenuSectionsVisibility={viewSectionContext}
-          openModalFormDialog={handleClick}
-          showModalFormDialog={openContactFormDialog}
-          modalId={modalId}
-        />
-      ))}
+      {data.map(({ id, detailSections, anchor, isAnchored, title, introduction, isRenderable, hasSectionHeader }) =>
+        isRenderable ? (
+          <ShowcaseSection
+            key={id}
+            detailSections={detailSections}
+            anchor={anchor}
+            isAnchored={isAnchored}
+            hasSectionHeader={hasSectionHeader}
+            title={title}
+            introduction={introduction}
+            MenuSectionsVisibility={viewSectionContext}
+            openModalFormDialog={handleClick}
+            showModalFormDialog={openContactFormDialog}
+            modalId={modalId}
+          />
+        ) : null,
+      )}
     </div>
   ) : null;
 }

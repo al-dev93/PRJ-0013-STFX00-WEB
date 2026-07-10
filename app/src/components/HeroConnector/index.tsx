@@ -1,10 +1,11 @@
-import { LegacyRef, memo, useEffect, useMemo } from 'react';
-
-import type { Point } from '@/types';
+import { memo, useEffect, useMemo } from 'react';
+import type { LegacyRef } from 'react';
 
 import style from './style.module.css';
-import type { HeroConnectorProps } from './types';
+import type { HeroConnectorProps, Point } from './types';
 import { useSpotMotionController } from './useSpotMotionController';
+
+// import type { Point } from '@/types';
 
 /**
  * Builds an SVG path data string for a polyline with rounded joints.

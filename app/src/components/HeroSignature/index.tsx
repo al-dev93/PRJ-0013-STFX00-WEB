@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from 'react';
 
 import style from './style .module.css';
-import { HeroSignatureProps } from './types';
+import type { HeroSignatureProps } from './types';
 
 export const HeroSignature = memo(function HeroSignature({
   setHasBrandSignaturePlayed,

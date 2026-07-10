@@ -1,14 +1,17 @@
-import IonIcon from '@reacticons/ionicons';
-import React, { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
 
-import { AppButton } from '@/components/AppButton';
 import type { KeyboardEventDiv } from '@/types';
+import { AppButton } from '@components/AppButton';
+import { AppIcon } from '@components/AppIcon';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
+import { LOCAL_ICON_NAME } from '@utils/appIconsMap';
 
 import style from './style.module.css';
 import type { ModalProps } from './types';
+// import IonIcon from '@reacticons/ionicons';
 
 function setFocusToElement(event: KeyboardEventDiv, index: number, elements: HTMLElement[]): void {
   // Prevent default tab behavior so we can loop within the modal instead of letting focus escape.
@@ -368,7 +371,8 @@ export function Modal({
               // Consider externalizing this string for i18n; keep it concise and action-oriented.
               aria-label='Ferme le formulaire de contact'
             >
-              <IonIcon name='close' aria-hidden='true' />
+              {/* <IonIcon name='close' aria-hidden='true' /> */}
+              <AppIcon iconName={LOCAL_ICON_NAME.CLOSE} />
             </button>
           )}
           <div className={style.modal__titleWrapper} aria-hidden='true'>

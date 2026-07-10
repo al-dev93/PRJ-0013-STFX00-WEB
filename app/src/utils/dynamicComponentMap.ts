@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 
-import { ValidComponentTag } from '@/types';
+import type { ValidComponentTag } from '@/types';
 
 /**
  * A read-only mapping of component identifiers to their corresponding React components,
@@ -14,7 +14,9 @@ import { ValidComponentTag } from '@/types';
  * }>}
  */
 export const COMPONENT_MAP = {
-  Card: lazy(() => import('@/components/Card')),
-  Slideshow: lazy(() => import('@/modules/Slideshow')),
-  SkillsCloud: lazy(() => import('@/components/SkillsCloud')),
+  Card: lazy(() => import('@components/Card')),
+  Slideshow: lazy(() => import('@modules/Slideshow')),
+  SkillsCloud: lazy(() => import('@components/SkillsCloud')),
+  PresentationBlock: lazy(() => import('@components/PresentationBlock')),
+  PresentationCardItem: lazy(() => import('@components/PresentationBlock/components/PresentationCardItem')),
 } as const satisfies Record<ValidComponentTag, unknown>;

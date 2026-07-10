@@ -1,4 +1,5 @@
 import type { ProjectData } from '@/types';
+import { LOCAL_ICON_NAME } from '@utils/appIconsMap';
 
 /**
  * Slideshow states
@@ -36,8 +37,8 @@ const SLIDE_TRANSITION = 'SLIDE_TRANSITION';
  * @constant {string} NEXT_SLIDE - Icon for the next slide button.
  * @constant {string} PREVIOUS_SLIDE - Icon for the previous slide button.
  */
-const NEXT_SLIDE = 'chevron-forward-outline';
-const PREVIOUS_SLIDE = 'chevron-back-outline';
+const NEXT_SLIDE = LOCAL_ICON_NAME.NEXT_CHEVRON;
+const PREVIOUS_SLIDE = LOCAL_ICON_NAME.PREV_CHEVRON;
 
 /**
  * Special IDs for appending or prepending images in the slideshow.
@@ -104,19 +105,17 @@ const PROJECT_SHEET_EXTENSION = '.pdf';
  * @constant {Object} ARIA_LABEL_SCROLL_BUTTONS - ARIA labels for the scroll buttons.
  * @constant {function(string): string} ARIA_LABEL_SLIDE - ARIA label for each individual slide.
  */
-const ARIA_LABEL_NEXT = 'Diapo suivante';
-const ARIA_LABEL_PREVIOUS = 'Diapo précédente';
+const NEXT_SCROLL_BUTTON = 'rightButton';
+const PREV_SCROLL_BUTTON = 'leftButton';
 const ARIA_LABEL_SCROLL_BUTTONS = {
-  leftButton: ARIA_LABEL_PREVIOUS,
-  rightButton: ARIA_LABEL_NEXT,
-};
+  [PREV_SCROLL_BUTTON]: 'Diapo précédente',
+  [NEXT_SCROLL_BUTTON]: 'Diapo suivante',
+} as const;
 
 export {
   ADJACENT_VISIBILITY,
   ANIMATION_DURATION,
   APPEND_IMAGE_ID,
-  ARIA_LABEL_NEXT,
-  ARIA_LABEL_PREVIOUS,
   ARIA_LABEL_SCROLL_BUTTONS,
   CHANGE_SCROLLING_DOT,
   CHANGE_SLIDE,
@@ -125,9 +124,11 @@ export {
   INTERSECTION_OPTIONS_THRESHOLD,
   LAST_SLIDE_INDEX,
   NEXT_SLIDE,
+  NEXT_SCROLL_BUTTON,
   PENDING,
   PREPEND_IMAGE_ID,
   PREVIOUS_SLIDE,
+  PREV_SCROLL_BUTTON,
   SLIDE_TRANSITION,
   START,
   STOP,

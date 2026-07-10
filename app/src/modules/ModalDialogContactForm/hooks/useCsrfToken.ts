@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { getCsrfToken } from '@/services/csrfService';
-import { getFetchUrlOrUrls } from '@/utils/urlHelpers';
+import { getCsrfToken } from '@services/csrfService';
+import { getFetchUrlOrUrls } from '@utils/urlHelpers';
 
 /**
  * React hook that retrieves a valid CSRF token from the backend.

@@ -3,9 +3,8 @@ import React, { memo, useMemo } from 'react';
 import { encodePath, getUrlBase } from '@/utils/urlHelpers';
 
 import styles from './style.module.css';
-import { ProjectSheetLinkProps } from './types';
+import type { ProjectSheetLinkProps } from './types';
 import { PROJECT_SHEET_EXTENSION } from '../../modules/Slideshow/utils/constants';
-
 /**
  * Renders an accessible link to the project's PDF sheet when running in "remote" mode.
  * If no `projectSheet` is provided or the app is not remote, renders `null`.

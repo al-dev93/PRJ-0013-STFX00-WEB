@@ -1,6 +1,6 @@
-import { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
-import { DetailEntity, DetailSection, Item } from '@/types';
+import type { DetailEntity, DetailSection, Item } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
 import { DynamicElementContainer } from '@components/DynamicElementContainer';
 import { isComponentTag } from '@utils/componentElementHelpers';
@@ -8,7 +8,7 @@ import { isHtmlTag } from '@utils/htmlElementHelpers';
 import { renderFormattedText } from '@utils/stylizedString';
 
 import { resolveStyleClass } from './styleHelpers';
-import { RenderContext } from '../types';
+import type { RenderContext } from '../types';
 
 function isDetailSection(node: DetailEntity): node is DetailSection {
   return node.level === 'section';

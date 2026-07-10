@@ -1,4 +1,3 @@
-import IonIcon from '@reacticons/ionicons';
 import { Text } from '@visx/text';
 import Wordcloud from '@visx/wordcloud/lib/Wordcloud';
 import React, { KeyboardEvent, memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -9,15 +8,10 @@ import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { handleFetchError } from '@utils/fetchDataHelpers';
 
+// import IonIcon from '@reacticons/ionicons';
 import style from './style.module.css';
 import type { SkillsCloudProps } from './types';
 import {
-  ARIA_LABEL_CONTRAST_MODE,
-  ARIA_LABEL_ROTATE_MODE,
-  CONTRAST_MODE_ICON_OFF,
-  CONTRAST_MODE_ICON_ON,
-  ROTATE_MODE_ICON_OFF,
-  ROTATE_MODE_ICON_ON,
   SKILLS_BASE_FONT_SIZE,
   SKILLS_COLOURS,
   SKILLS_FIXED_VALUE_GENERATOR,
@@ -46,8 +40,10 @@ const SkillsCloud = memo(function SkillsCloud({
 }: SkillsCloudProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
   const [fontSize, setFontSize] = useState<number>(SKILLS_BASE_FONT_SIZE);
-  const [contrastMode, setContrastMode] = useState<boolean>(false);
-  const [rotateMode, setRotateMode] = useState<boolean>(false);
+  // const [contrastMode, setContrastMode] = useState<boolean>(false);
+  // const [rotateMode, setRotateMode] = useState<boolean>(false);
+  const contrastMode = true;
+  const rotateMode = false;
 
   // Determine if data should be fetched based on the presence of skills.
   const shouldFetch = !skillsData;
@@ -118,25 +114,25 @@ const SkillsCloud = memo(function SkillsCloud({
    * @param {('contrast' | 'rotate')} mode - The mode to toggle.
    * @returns {void}
    */
-  const handleToggleMode = useCallback(
-    async (mode: 'contrast' | 'rotate'): Promise<void> => {
-      try {
-        if (mode === 'rotate') {
-          setRotateMode(!rotateMode);
-        } else setContrastMode(!contrastMode);
-      } catch (err) {
-        await handleError(
-          createError(1003, `${mode} mode toggle failed`, {
-            url: window.location.href,
-            component: 'SkillsCloud',
-            operation: `handleToggleMode_${mode}`,
-            category: 'UI Interaction',
-          }),
-        );
-      }
-    },
-    [contrastMode, handleError, rotateMode],
-  );
+  // const handleToggleMode = useCallback(
+  //   async (mode: 'contrast' | 'rotate'): Promise<void> => {
+  //     try {
+  //       if (mode === 'rotate') {
+  //         setRotateMode(!rotateMode);
+  //       } else setContrastMode(!contrastMode);
+  //     } catch (err) {
+  //       await handleError(
+  //         createError(1003, `${mode} mode toggle failed`, {
+  //           url: window.location.href,
+  //           component: 'SkillsCloud',
+  //           operation: `handleToggleMode_${mode}`,
+  //           category: 'UI Interaction',
+  //         }),
+  //       );
+  //     }
+  //   },
+  //   [contrastMode, handleError, rotateMode],
+  // );
 
   /**
    * Returns a random rotation angle for the words in the word cloud.
@@ -228,22 +224,22 @@ const SkillsCloud = memo(function SkillsCloud({
       )}
       <fieldset className={style.skillsCloud__controls}>
         <legend className='visually-hidden'>Change le contraste ou le mode de rotation</legend>
-        <button
+        {/* <button
           className={style.skillsCloud__controls__toggleMode}
           onClick={() => handleToggleMode('contrast')}
           type='button'
           aria-label={ARIA_LABEL_CONTRAST_MODE}
         >
           <IonIcon name={contrastMode ? CONTRAST_MODE_ICON_OFF : CONTRAST_MODE_ICON_ON} aria-hidden='true' />
-        </button>
-        <button
+        </button> */}
+        {/* <button
           className={style.skillsCloud__controls__toggleMode}
           onClick={() => handleToggleMode('rotate')}
           type='button'
           aria-label={ARIA_LABEL_ROTATE_MODE}
         >
           <IonIcon name={rotateMode ? ROTATE_MODE_ICON_OFF : ROTATE_MODE_ICON_ON} aria-hidden='true' />
-        </button>
+        </button> */}
       </fieldset>
     </div>
   ) : null;

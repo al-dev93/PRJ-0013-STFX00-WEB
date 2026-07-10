@@ -45,6 +45,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
   detailSections,
   anchor,
   isAnchored,
+  hasSectionHeader,
   title,
   introduction,
   MenuSectionsVisibility,
@@ -121,9 +122,13 @@ export const ShowcaseSection = memo(function ShowcaseSection({
       tabIndex={-1}
       aria-labelledby={`${anchor}-title`}
     >
+      {hasSectionHeader ? (
+        <header className={style.section__header}>
+          {title ? showcaseSectionTitle : null}
+          {introduction ? <p>{renderFormattedText(introduction)}</p> : null}
+        </header>
+      ) : null}
       <div className={style.section__bodySection}>
-        {title ? <header className={style[`${anchor}__header`]}>{showcaseSectionTitle}</header> : null}
-        {introduction ? <p>{renderFormattedText(introduction)}</p> : null}
         {detailSections && detailSections.length > 0
           ? renderSectionContent(detailSections, { anchor, style, isHero, kickerRef, titleRef })
           : null}

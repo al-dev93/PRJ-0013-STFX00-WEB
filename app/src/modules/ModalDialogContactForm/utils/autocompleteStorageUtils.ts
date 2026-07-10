@@ -1,6 +1,6 @@
 import type { DialogFormInputElement } from '@/types';
 
-import { FormInputName } from '../types';
+import type { FormInputName } from '../types';
 
 /**
  * Saves a single value to the local storage for a specific input field.

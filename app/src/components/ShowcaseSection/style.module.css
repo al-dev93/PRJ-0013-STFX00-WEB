@@ -8,6 +8,7 @@
   /* layout */
   --section-scroll-margin-top: 110px;
   --section-margin-block-start: clamp(40px, 8vh, 120px);
+  --section-header-space-bottom: var(--semantic-space-xl);
   --title-section-space-bottom: calc(var(--semantic-space-lg) * 1.15);
   --kicker-inset: 0.25rem 0.55rem;
   --title-max-width: 14ch;
@@ -36,6 +37,10 @@
 strong {
   /* color: var(--about-strong-text-color); */
   font-weight: var(--strong-text-fw);
+}
+
+.section__header {
+  margin-block-end: var(--section-header-space-bottom);
 }
 
 .section__titleSection {
@@ -249,9 +254,9 @@ strong {
   font-weight: var(--about-fw-strong-text);
 } */
 
-.section[data-variant='about'] .about__header {
+/* ! .section[data-variant='about'] .about__header {
   margin-bottom: var(--semantic-space-lg);
-}
+} */
 
 /* .section[data-variant='about'] .about__kicker {
   display: inline-block;
@@ -407,17 +412,17 @@ strong {
   opacity: var(--about-rule-skills-cloud-kicker-opacity);
 } */
 
-.section[data-variant='work'] .work__header .work__header__intro {
-  /* margin-top: calc(var(--semantic-space-xs) * 0.75);
+/* ! .section[data-variant='work'] .work__header .work__header__intro { */
+/* margin-top: calc(var(--semantic-space-xs) * 0.75);
   max-width: 60ch; */
-  margin-top: var(--semantic-space-xs);
-  font-size: var(--semantic-fs-kicker);
-  /* font-size: var(--semantic-fs-body); */
-  color: var(--semantic-text-muted);
-  /* line-height: var(--semantic-lh-body); */
+/* ! margin-top: var(--semantic-space-xs); */
+/* ! font-size: var(--semantic-fs-kicker); */
+/* font-size: var(--semantic-fs-body); */
+/* ! color: var(--semantic-text-muted); */
+/* line-height: var(--semantic-lh-body); */
 
-  /* color: var(--semantic-text-soft); */
-}
+/* color: var(--semantic-text-soft); */
+/* ! } */
 
 /* .section[data-variant='work'] .work__header .work__header__intro strong {
   color: var(--semantic-text);
@@ -431,7 +436,7 @@ strong {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--cards-wrapper-gap);
 
-  margin-top: var(--cards-wrapper-gap);
+  /* ! margin-top: var(--cards-wrapper-gap); */
 }
 
 .section__button {

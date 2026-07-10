@@ -1,11 +1,11 @@
 import React, { memo, useCallback, useEffect, useMemo, useReducer } from 'react';
 
 import type { AccountLink, GetProjectSummaryBody, ProjectData } from '@/types';
-import { renderFormattedText } from '@/utils/stylizedString';
-import { isProjectDataArray } from '@/utils/typeHelpers';
 import { SkillsList } from '@components/SkillsList';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import { useFetchData } from '@hooks/useFetchData';
+import { renderFormattedText } from '@utils/stylizedString';
+import { isProjectDataArray } from '@utils/typeHelpers';
 
 import { Fade } from './components/Fade';
 import { PicturesScroller } from './components/PicturesScroller';
@@ -132,7 +132,7 @@ const Slideshow = memo(function Slideshow({
             <footer className={style.footer}>
               <SkillsList primaryTag={activeSlide.primaryTag} list={activeSlide.tags} layoutType='slideshow' />
               <SocialMediaNavBar
-                changeLinkColor={style.externalLinks}
+                classNameButton={style.externalLinks}
                 type='slideshow'
                 buttons={activeSlide.deliverables as AccountLink[]}
               />

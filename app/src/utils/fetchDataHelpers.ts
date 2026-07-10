@@ -1,6 +1,6 @@
-import { FetchErrorContext } from '@/modules/Error/types';
-import { createError } from '@/modules/Error/utils/errorHandling';
-import { AppError } from '@/types';
+import type { AppError } from '@/types';
+import type { FetchErrorContext } from '@modules/Error/types';
+import { createError } from '@modules/Error/utils/errorHandling';
 
 /**
  * Attempts to safety cast an unknown value to an AppError if it matches the expected structure.

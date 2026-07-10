@@ -1,4 +1,4 @@
-import { HttpMethod, TagKind, ValidTag } from '@/types';
+import type { HttpMethod, TagKind, ValidTag } from '@/types';
 
 /**
  * The props for the DynamicElementContainer component.

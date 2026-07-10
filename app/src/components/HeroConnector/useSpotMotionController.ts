@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { SpotMotionAPI, SpotMotionMode, SpotMotionOptions } from './types';
+import type { SpotMotionAPI, SpotMotionMode, SpotMotionOptions } from './types';
 
 // Isomorphic layout effect: layout on client, passive effect on server.
 const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;

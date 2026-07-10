@@ -26,6 +26,7 @@ export const HTML_TAGS = [
   'li',
   'main',
   'nav',
+  'ol',
   'p',
   'section',
   'span',
@@ -33,4 +34,10 @@ export const HTML_TAGS = [
   'ul',
 ] as const satisfies readonly (keyof React.JSX.IntrinsicElements)[];
 
-export const COMPONENT_TAGS = ['Card', 'Slideshow', 'SkillsCloud'] as const;
+export const COMPONENT_TAGS = [
+  'Card',
+  'PresentationBlock',
+  'PresentationCardItem',
+  'Slideshow',
+  'SkillsCloud',
+] as const;

@@ -1,4 +1,5 @@
-import { createContext, Dispatch, useReducer } from 'react';
+import { createContext, useReducer } from 'react';
+import type { Dispatch } from 'react';
 
 import { createContactFormInitialState } from '../reducer/modalDialogContactFormInitialState';
 import { modalDialogContactFormReducer } from '../reducer/modalDialogContactFormReducer';

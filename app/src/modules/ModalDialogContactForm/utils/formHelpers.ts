@@ -1,4 +1,4 @@
-import { MutableRefObject } from 'react';
+import type { MutableRefObject } from 'react';
 
 import { FORM_INPUT_NAME_MAP } from './constants';
 import type { FormInputName } from '../types';

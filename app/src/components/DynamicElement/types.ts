@@ -1,4 +1,4 @@
-import { ValidComponentTag, ValidHTMLTag } from '@/types';
+import type { ValidComponentTag, ValidHTMLTag } from '@/types';
 
 /**
  * Props for the DynamicElement component, which can render either a custom component

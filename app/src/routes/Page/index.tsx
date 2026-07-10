@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import { useCsrfToken } from '@/modules/ModalDialogContactForm/hooks/useCsrfToken';
 import type { OutletContextPage, MenuSectionsVisibility } from '@/types';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import logo from '@images/brand/logoAND.png';
 import { CollapsibleHeader } from '@modules/CollapsibleHeader';
+import { useCsrfToken } from '@modules/ModalDialogContactForm/hooks/useCsrfToken';
 import ModalDialogContactForm from '@modules/ModalDialogContactForm/ModalDialogContactFormWithProvider';
 
 import style from './style.module.css';

@@ -1,4 +1,4 @@
-import { ValidHTMLTag } from '@/types';
+import type { ValidHTMLTag } from '@/types';
 import { HTML_TAGS } from '@utils/dynamicElementsconstants';
 
 const HTML_TAG_SET: ReadonlySet<string> = new Set(HTML_TAGS);

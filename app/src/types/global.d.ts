@@ -1,10 +1,10 @@
-import { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
+import type { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
 
-import { FetchErrorContext } from '@modules/Error/types';
-import { ICON_VALUES, TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
+import type { FetchErrorContext } from '@modules/Error/types';
+import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
 import { COMPONENT_TAGS, HTML_TAGS } from '@utils/dynamicElementsconstants';
 
-import type { IconType } from '.';
+import type { AppIconName } from './appicons';
 
 export type StringObject = {
   readonly [key: string]: string;
@@ -92,7 +92,7 @@ export type MenuItemType = {
 export interface AccountLink {
   id: string;
   service: string;
-  icon: IconType;
+  icon: AppIconName;
   onPage?: boolean;
   address?: string;
 }
@@ -127,6 +127,7 @@ export interface IndexPageSection {
   order: number;
   isAnchored?: boolean;
   isVisible: boolean;
+  hasSectionHeader: boolean;
   isRenderable: boolean;
   detailSections: DetailSection[];
 }
@@ -174,7 +175,7 @@ interface DetailNodeBase<TLevel extends DetailEntityLevel = DetailEntityLevel> {
   styleKey?: string;
   content?: string;
   endpoint?: string;
-  iconName?: (typeof ICON_VALUES)[number];
+  iconName?: AppIconName;
   isVisible: boolean;
 }
 

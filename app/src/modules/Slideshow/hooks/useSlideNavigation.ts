@@ -1,8 +1,8 @@
-import { Dispatch, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import type { Dispatch } from 'react';
 
 import type { SlideshowAction } from '../types';
 import { CHANGE_SLIDE, NEXT_SLIDE, PREVIOUS_SLIDE, START } from '../utils/constants';
-
 /**
  * Custom hook to manage keyboard navigation for the slideshow.
  *
@@ -34,7 +34,10 @@ export function useSlideNavigation(slideshowDispatch: Dispatch<SlideshowAction>)
       }
       switch (event.key) {
         case 'ArrowLeft':
-          slideshowDispatch({ type: CHANGE_SLIDE, payload: { direction: PREVIOUS_SLIDE, transition: START } });
+          slideshowDispatch({
+            type: CHANGE_SLIDE,
+            payload: { direction: PREVIOUS_SLIDE, transition: START },
+          });
           break;
         case 'ArrowRight':
           slideshowDispatch({ type: CHANGE_SLIDE, payload: { direction: NEXT_SLIDE, transition: START } });

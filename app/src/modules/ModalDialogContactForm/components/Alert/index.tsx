@@ -1,8 +1,8 @@
 import React, { memo, useCallback, useEffect, useId, useMemo } from 'react';
 
-import { createError } from '@/modules/Error/utils/errorHandling';
 import { Modal } from '@components/Modal';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
 import { isPrimitiveArray } from '@utils/typeHelpers';
 
 import style from './style.module.css';

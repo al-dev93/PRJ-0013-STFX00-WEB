@@ -1,6 +1,11 @@
-import { RefObject } from 'react';
+import type { RefObject } from 'react';
 
-import type { Point, SetStateBoolean } from '@/types';
+import type { SetStateBoolean } from '@/types';
+
+export type Point = {
+  x: number;
+  y: number;
+};
 
 /**
  * Props for the {@link HeroConnector} component.

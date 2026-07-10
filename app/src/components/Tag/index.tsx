@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from 'react';
 
-import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@/utils/constants';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
+import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
 
 import style from './style.module.css';
 import type { TagProps } from './types';

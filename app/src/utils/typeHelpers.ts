@@ -1,9 +1,9 @@
-import {
+import type {
   AccountLink,
+  AppIconName,
   Deliverable,
   DetailSection,
   DisplayMode,
-  IconType,
   IndexPageSection,
   Item,
   ProjectData,
@@ -13,8 +13,10 @@ import {
 } from '@/types';
 import { ApplicationError } from '@modules/Error/error';
 import { isComponentTag } from '@utils/componentElementHelpers';
-import { ICON_VALUES } from '@utils/constants';
+// import { ICON_VALUES } from '@utils/constants';
 import { isHtmlTag } from '@utils/htmlElementHelpers';
+
+import { APP_ICONS } from './appIconsMap';
 
 /**
  * Utility type that extracts the keys of T which are required (i.e. non-optional).
@@ -33,8 +35,9 @@ const isNonEmptyString = (x: unknown): x is string => typeof x === 'string' && x
 const isNumber = (x: unknown): x is number => typeof x === 'number';
 const isBoolean = (x: unknown): x is boolean => typeof x === 'boolean';
 const isDisplayMode = (x: unknown): x is DisplayMode => x === 'slideshow' || x === 'card';
-const isIconType = (x: unknown): x is IconType =>
-  typeof x === 'string' && (ICON_VALUES as readonly string[]).includes(x);
+// const isIconType = (x: unknown): x is IconType =>
+//   typeof x === 'string' && (ICON_VALUES as readonly string[]).includes(x);
+const isAppIconName = (x: unknown): x is AppIconName => typeof x === 'string' && x in APP_ICONS;
 const isRecord = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null;
 const isSectionsRef = (x: unknown): x is SectionsRef =>
   (typeof x === 'string' && ['home', 'about', 'work', 'more'].includes(x)) || typeof x === 'undefined';
@@ -178,7 +181,7 @@ function isItem(x: unknown): x is Item {
   if (styleKey !== undefined && !isString(styleKey)) return false;
   if (content !== undefined && !isString(content)) return false;
   if (endpoint !== undefined && !isNonEmptyString(endpoint)) return false;
-  if (iconName !== undefined && !isIconType(iconName)) return false;
+  if (iconName !== undefined && !isAppIconName(iconName)) return false;
   if (itemKey !== undefined && !isNonEmptyString(itemKey)) return false;
 
   return true;
@@ -229,7 +232,7 @@ function isDetailSection(x: unknown): x is DetailSection {
   if (styleKey !== undefined && !isString(styleKey)) return false;
   if (content !== undefined && !isString(content)) return false;
   if (endpoint !== undefined && !isNonEmptyString(endpoint)) return false;
-  if (iconName !== undefined && !isString(iconName)) return false;
+  if (iconName !== undefined && !isAppIconName(iconName)) return false;
   if (blockKey !== undefined && !isNonEmptyString(blockKey)) return false;
   if (sectionIntroduction !== undefined && !isString(sectionIntroduction)) return false;
 
@@ -248,7 +251,7 @@ const isDetailSectionArray = (x: unknown): x is DetailSection[] => Array.isArray
 const requiredDeliverableSchema = {
   id: isString,
   service: isString,
-  icon: isIconType,
+  icon: isAppIconName,
   address: isString,
 } satisfies { [K in RequiredKeys<Deliverable>]: (x: unknown) => x is Deliverable[K] };
 
@@ -288,7 +291,7 @@ export const isProjectDataArray = (x: unknown): x is ProjectData[] =>
 const requiredAccountLinkSchema = {
   id: isString,
   service: isString,
-  icon: isIconType,
+  icon: isAppIconName,
 } satisfies { [K in RequiredKeys<AccountLink>]: (x: unknown) => x is AccountLink[K] };
 
 const optionalAccountLinkSchema = {
@@ -306,6 +309,7 @@ const requiredIndexPageSectionSchema = {
   // content: isDetailSectionArray,
   order: isNumber,
   isVisible: isBoolean,
+  hasSectionHeader: isBoolean,
   isRenderable: isBoolean,
   detailSections: isDetailSectionArray,
 } satisfies { [K in RequiredKeys<IndexPageSection>]: (x: unknown) => x is IndexPageSection[K] };

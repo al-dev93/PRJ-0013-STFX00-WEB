@@ -1,4 +1,4 @@
-import { MutableRefObject, RefObject } from 'react';
+import type { MutableRefObject, RefObject } from 'react';
 
 import type { DetailSection, SectionsRef, MenuSectionsVisibility } from '@/types';
 // import type { FetchErrorContext } from '@modules/Error/types';
@@ -39,6 +39,15 @@ export interface ShowcaseSectionProps {
    * @defaultValue undefined
    */
   isAnchored?: boolean;
+
+  /**
+   * Indicates whether the section contains a `header` element.
+   *
+   * @remarks
+   * The `header` element does not exist if there is neither a title nor an introduction;
+   * `header` exists if a title or an introduction exists
+.   */
+  hasSectionHeader: boolean;
 
   /**
    * Optional visible section title rendered above the dynamic content.

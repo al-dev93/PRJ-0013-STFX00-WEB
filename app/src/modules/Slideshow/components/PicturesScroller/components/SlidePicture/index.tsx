@@ -1,7 +1,7 @@
 import React, { memo, useMemo, useRef } from 'react';
 
-import { ProjectSheetLink } from '@/components/ProjectSheetLink';
-import { encodePath, getUrlBase } from '@/utils/urlHelpers';
+import { ProjectSheetLink } from '@components/ProjectSheetLink';
+import { encodePath, getUrlBase } from '@utils/urlHelpers';
 
 import style from './style.module.css';
 import type { FetchPriorityAttr, SlidePictureProps } from '../../../../types';
