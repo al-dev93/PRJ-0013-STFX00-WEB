@@ -94,6 +94,7 @@
     --semantic-space-md: var(--space-4);
     --semantic-space-lg: var(--space-6);
     --semantic-space-xl: var(--space-8);
+    --semantic-sm-radius: var(--ref-radius-2);
     --semantic-md-radius: var(--ref-radius-3);
     --semantic-lg-radius: var(--ref-radius-4);
     --semantic-2xl-radius: var(--ref-radius-6);

@@ -1,0 +1,287 @@
+/* Adaptation of the heading tag used for card titles / names */
+h4 {
+  margin: 0;
+}
+
+/* Global style applied to the section block */
+.section {
+  --block-presentation-bg: var(--semantic-surface-1);
+  --block-presentation-padding: var(--semantic-space-md);
+  --block-presentation-border: 1px solid var(--semantic-border);
+  --block-presentation-radius: var(--semantic-md-radius);
+  --block-presentation-box-shadow: var(--semantic-shadow);
+  --title-section-fg: color-mix(in oklch, var(--semantic-accent) 90%, var(--semantic-text));
+  --title-section-font: var(--semantic-font-display);
+  --title-section-fs: calc(var(--semantic-fs-lead) * 0.94);
+  --title-section-lh: var(--semantic-lh-heading);
+  --card-grid-body-padding-block: var(--semantic-space-md);
+  --card-body-gap: var(--semantic-space-lg);
+  --card-list-body-padding-block: calc(var(--semantic-space-xl) * 1.8);
+
+  --card-item-icon-fg: var(--title-section-fg);
+  --card-item-icon-bg: color-mix(in oklab, var(--semantic-accent) 10%, var(--semantic-surface-1));
+  --card-item-icon-wrapper-size: calc(var(--space-2) * 8);
+  --card-item-icon-size: calc(var(--space-1) * 6);
+  --card-item-padding-block: var(--semantic-space-lg);
+  --card-item-padding-inline: var(--semantic-space-xl);
+
+  inline-size: 100%;
+  background: var(--block-presentation-bg);
+  border: var(--block-presentation-border);
+  border-radius: var(--block-presentation-radius);
+  padding: var(--block-presentation-padding);
+  box-shadow: var(--block-presentation-box-shadow);
+}
+
+.section__title {
+  color: var(--title-section-fg);
+  font: var(--title-section-fs) / var(--title-section-lh) var(--title-section-font);
+  text-transform: uppercase;
+}
+
+/* Bordure adjustment for the callout block */
+.section--callout {
+  box-shadow: none;
+}
+
+/* Specialization of blocks containing lists of items */
+.section[data-variant='card_list'] .section__listBody {
+  padding-block-start: var(--card-list-body-padding-block);
+}
+
+.section[data-variant='card_list']:last-child {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-body-gap);
+}
+
+.section[data-variant='card_list']:last-child .section__listBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Specialization of blocks containing grid of items */
+.section[data-variant='card_grid'] .section__listBody {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--card-body-gap);
+  padding-block: var(--card-grid-body-padding-block);
+}
+
+.section[data-variant='card_grid'] .section__listBody--flexColumn {
+  grid-template-columns: auto auto auto;
+}
+
+/* Global style applied to section block items */
+.cardItem {
+  --card-item-fs-text-axe-technical: var(--semantic-fs-kicker);
+  --card-item-lh-text-axe-technical: var(--semantic-lh-body);
+  --card-item-primary-border: 1px solid color-mix(in oklab, var(--semantic-border) 70%, var(--semantic-surface-1));
+  --card-item-br: var(--semantic-sm-radius);
+  --card-item-max-char-summary-point: 27ch;
+  --card-item-summary-margin-end: var(--semantic-space-xl);
+  --card-item-text-content-offset: var(--semantic-space-sm);
+
+  padding: var(--card-item-padding-block) var(--card-item-padding-inline);
+  box-shadow: none;
+  background: transparent;
+  gap: var(--card-body-gap);
+}
+
+.cardItem__iconWrapper {
+  display: grid;
+  place-items: center;
+
+  inline-size: var(--card-item-icon-wrapper-size);
+  block-size: var(--card-item-icon-wrapper-size);
+  margin-block-end: var(--icon-margin-block-end);
+
+  color: var(--card-item-icon-fg);
+  background-color: var(--card-item-icon-bg);
+
+  border-radius: 50%;
+}
+
+.cardItem__iconWrapper__icon {
+  width: var(--card-item-icon-size);
+  height: var(--card-item-icon-size);
+}
+
+.cardItem__iconWrapper__icon--fill > path {
+  fill: var(--card-item-icon-fg);
+}
+
+.cardItem p {
+  margin-block-start: var(--card-item-text-content-offset);
+}
+
+/* Adaptation specific to the callout container */
+.callout__wrapper {
+  --card-item-max-char-summary-point: 61ch;
+  --card-body-gap: calc(var(--space-1) * 4);
+
+  display: flex;
+  align-items: center;
+  gap: var(--card-body-gap);
+}
+
+/* Specialization of styles applied to the main column blocks */
+.cardItem[data-variant='intervention_axis'] {
+  --card-item-icon-wrapper-size: calc(var(--space-1) * 12);
+  --card-item-icon-size: calc(var(--space-1) * 7);
+  --card-item-padding-block: var(--semantic-space-xl);
+  --icon-inline-offset: calc(var(--semantic-space-sm) / 2);
+  --icon-margin-block-end: var(--semantic-space-md);
+}
+
+.cardItem[data-variant='intervention_axis'] .cardItem__iconWrapper {
+  margin-inline-start: var(--icon-inline-offset);
+}
+
+.cardItem[data-variant='intervention_axis'],
+.cardItem[data-variant='technical_skill'] {
+  border: var(--card-item-primary-border);
+  border-radius: var(--card-item-br);
+}
+
+.cardItem[data-variant='intervention_axis'] p,
+.cardItem[data-variant='technical_skill'] p {
+  font-size: var(--card-item-fs-text-axe-technical);
+  line-height: var(--card-item-lh-text-axe-technical);
+}
+
+.cardItem[data-variant='technical_skill'] h4 {
+  min-block-size: 2lh;
+}
+
+.cardItem[data-variant='technical_skill'],
+.cardItem[data-variant='summary_point'] {
+  display: flex;
+}
+
+.cardItem[data-variant='technical_skill'] .cardItem__iconWrapper,
+.cardItem[data-variant='cross_cutting_skill'] .cardItem__iconWrapper,
+.callout__wrapper .cardItem__iconWrapper {
+  flex: 0 0 auto;
+}
+
+.cardItem[data-variant='cross_cutting_skill'] {
+  --card-item-padding-block: 0;
+  --card-item-padding-inline: 0;
+
+  display: flex;
+  align-items: center;
+}
+
+/* Specialization of styles applied to the secondary column blocks */
+.section[data-variant='card_list'] .cardItem p,
+.callout__wrapper p {
+  max-inline-size: var(--card-item-max-char-summary-point);
+}
+
+/* Styles specific to the "In Summary" block */
+.cardItem[data-variant='summary_point'] {
+  --card-item-padding-block: 0;
+  --card-item-padding-inline: 0;
+
+  margin-block-end: var(--card-item-summary-margin-end);
+}
+
+.cardItem[data-variant='summary_point'] svg {
+  flex: 0 0 auto;
+  fill: var(--card-item-icon-fg);
+}
+
+.cardItem[data-variant='summary_conclusion'] {
+  --card-item-padding-block: calc(var(--semantic-space-lg) * 2);
+  --card-item-padding-inline: var(--semantic-space-lg);
+  --card-item-max-char-summary-point: 30ch;
+  --card-item-stroke-inline-size: 11%;
+  --card-item-stroke-thickness: 1px;
+  --card-item-stroke-color: color-mix(in oklab, var(--semantic-border) 70%, var(--semantic-surface-1));
+
+  position: relative;
+}
+
+.cardItem[data-variant='summary_conclusion'] p {
+  margin: 0;
+}
+
+.cardItem[data-variant='summary_conclusion']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: var(--card-item-stroke-inline-size);
+  block-size: var(--card-item-stroke-thickness);
+  background-color: var(--card-item-stroke-color);
+}
+
+/* Styles specific to the "Methodology" block */
+.cardItem[data-variant='method_step'] {
+  /* step number */
+  --method-step-number-ff: var(--semantic-font-display);
+  --method-step-number-fs: var(--semantic-fs-body);
+  --method-step-number-fw: var(--semantic-fw-kicker);
+  --method-step-number-color: var(--title-section-fg);
+  --method-step-number-lh: 1;
+  /* step number disc */
+  --method-step-disc-diameter: 2rem;
+  --method-disc-rim-thickness-step: 2px;
+  --method-step-disc-bg: var(--semantic-surface-1);
+  --method-step-disc-vertical-offset: -8px;
+
+  --method-step-vertical-gutter: calc(var(--space-1) * 4);
+
+  --method-step-line-fg: var(--title-section-fg);
+  --method-step-line-thickness: 1px;
+
+  --card-item-padding-block: 0;
+  --card-item-padding-inline: 0;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--method-step-vertical-gutter);
+  flex: 1;
+}
+
+.cardItem__method__wrapper {
+  position: relative;
+  inline-size: var(--method-step-disc-diameter);
+  display: flex;
+  justify-content: center;
+}
+
+.cardItem__method__stepNumber {
+  position: absolute;
+  display: flex;
+  inline-size: var(--method-step-disc-diameter);
+  block-size: var(--method-step-disc-diameter);
+  justify-content: center;
+  align-items: center;
+  inset-block-start: var(--method-step-disc-vertical-offset);
+  border: var(--method-disc-rim-thickness-step) solid var(--method-step-line-fg);
+  border-radius: 999px;
+  color: var(--method-step-number-color);
+  background-color: var(--method-step-disc-bg);
+  font-family: var(--method-step-number-ff);
+  font-size: var(--method-step-number-fs);
+  font-weight: var(--method-step-number-fw);
+  line-height: var(--method-step-number-lh);
+  z-index: 1;
+}
+
+.cardItem__method__wrapper::after {
+  position: absolute;
+  content: '';
+  block-size: 100%;
+  inline-size: var(--method-step-line-thickness);
+  background-color: var(--method-step-line-fg);
+}
+
+.cardItem__method__wrapper[data-last='true']::after {
+  display: none;
+}

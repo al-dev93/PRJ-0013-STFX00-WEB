@@ -11,6 +11,8 @@ import { renderFormattedText } from '@utils/stylizedString';
 
 import style from './style.module.css';
 import type { ShowcaseSectionProps } from './types';
+import { TWO_COLUMN_SHOWCASE_SECTION } from './utils/constants';
+import { getShowcaseSectionColumn } from './utils/layoutDesign';
 import { renderSectionContent } from './utils/renderSectionContent';
 
 /**
@@ -75,6 +77,11 @@ export const ShowcaseSection = memo(function ShowcaseSection({
 
   const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
 
+  const { main, secondary } =
+    anchor && TWO_COLUMN_SHOWCASE_SECTION.includes(anchor)
+      ? getShowcaseSectionColumn(detailSections)
+      : { main: detailSections };
+
   /**
    * Updates the visibility of the section in the page sections context.
    */
@@ -122,18 +129,23 @@ export const ShowcaseSection = memo(function ShowcaseSection({
       tabIndex={-1}
       aria-labelledby={`${anchor}-title`}
     >
-      {hasSectionHeader ? (
-        <header className={style.section__header}>
-          {title ? showcaseSectionTitle : null}
-          {introduction ? <p>{renderFormattedText(introduction)}</p> : null}
-        </header>
-      ) : null}
-      <div className={style.section__bodySection}>
+      <div className={style.section__mainColumn}>
+        {hasSectionHeader ? (
+          <header className={style.section__header}>
+            {title ? showcaseSectionTitle : null}
+            {introduction ? <p>{renderFormattedText(introduction)}</p> : null}
+          </header>
+        ) : null}
         {detailSections && detailSections.length > 0
-          ? renderSectionContent(detailSections, { anchor, style, isHero, kickerRef, titleRef })
+          ? renderSectionContent(main, { anchor, style, isHero, kickerRef, titleRef })
           : null}
       </div>
-      <footer>
+      {secondary ? (
+        <div className={style.section__secondaryColumn}>
+          {renderSectionContent(secondary, { anchor, style, isHero, kickerRef, titleRef })}
+        </div>
+      ) : null}
+      <footer className={style.section__footer}>
         <AppButton
           name={isHero ? 'Parlons de votre projet' : 'Me contacter'}
           variant={isHero ? 'hero' : undefined}

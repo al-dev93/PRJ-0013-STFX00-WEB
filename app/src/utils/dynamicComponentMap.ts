@@ -18,5 +18,6 @@ export const COMPONENT_MAP = {
   Slideshow: lazy(() => import('@modules/Slideshow')),
   SkillsCloud: lazy(() => import('@components/SkillsCloud')),
   PresentationBlock: lazy(() => import('@components/PresentationBlock')),
+  PresentationCallout: lazy(() => import('@components/PresentationBlock/components/PresentationCallout')),
   PresentationCardItem: lazy(() => import('@components/PresentationBlock/components/PresentationCardItem')),
 } as const satisfies Record<ValidComponentTag, unknown>;

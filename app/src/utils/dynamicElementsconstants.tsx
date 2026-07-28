@@ -37,6 +37,7 @@ export const HTML_TAGS = [
 export const COMPONENT_TAGS = [
   'Card',
   'PresentationBlock',
+  'PresentationCallout',
   'PresentationCardItem',
   'Slideshow',
   'SkillsCloud',

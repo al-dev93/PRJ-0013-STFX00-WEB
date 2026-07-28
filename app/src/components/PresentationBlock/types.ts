@@ -1,6 +1,6 @@
 export interface PresentationBlockProps {
   name: string;
+  blockKey?: string;
   variant?: string;
-  styleKey?: string;
   children: React.ReactNode;
 }

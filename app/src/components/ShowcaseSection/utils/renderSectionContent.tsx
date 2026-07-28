@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
 import type { DetailEntity, DetailSection, Item } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
@@ -8,7 +8,7 @@ import { isHtmlTag } from '@utils/htmlElementHelpers';
 import { renderFormattedText } from '@utils/stylizedString';
 
 import { resolveStyleClass } from './styleHelpers';
-import type { RenderContext } from '../types';
+import type { RenderContext, RenderNode } from '../types';
 
 function isDetailSection(node: DetailEntity): node is DetailSection {
   return node.level === 'section';
@@ -33,7 +33,7 @@ function getHeroNodeRef(
   return context.titleRef;
 }
 
-function renderNode(node: DetailEntity, context: RenderContext, children?: ReactNode) {
+function renderNode({ node, context, children, numberOfStep }: RenderNode) {
   const className = resolveStyleClass(context.style, node.styleKey);
   const ref = isDetailSection(node) && context.isHero ? getHeroNodeRef(node, context) : undefined;
   const introduction = isDetailSection(node) && node.sectionIntroduction ? node.sectionIntroduction : undefined;
@@ -90,7 +90,10 @@ function renderNode(node: DetailEntity, context: RenderContext, children?: React
         iconName={iconName}
         blockKey={isDetailSection(node) ? node.blockKey : undefined}
         itemKey={isItem(node) ? node.itemKey : undefined}
+        orderInSection={isDetailSection(node) ? node.orderInSection : undefined}
+        orderInBlock={isItem(node) ? node.orderInBlock : undefined}
         introduction={introduction}
+        numberOfStep={numberOfStep}
         ref={ref}
       >
         {children}
@@ -100,14 +103,19 @@ function renderNode(node: DetailEntity, context: RenderContext, children?: React
   return null;
 }
 
-function renderItem(item: Item, context: RenderContext): ReactElement | null {
-  return renderNode(item, context);
+function renderItem(item: Item, context: RenderContext, numberOfStep?: number): ReactElement | null {
+  return renderNode({ node: item, context, numberOfStep });
 }
 
 function renderDetailSection(section: DetailSection, context: RenderContext): ReactElement | null {
-  const itemChildren = section.wrapped ? undefined : section.items.map((item) => renderItem(item, context));
+  const itemChildren = section.wrapped
+    ? undefined
+    : section.items.map((item) => {
+        const numberOfStep = item.variant === 'method_step' ? section.items.length : undefined;
+        return renderItem(item, context, numberOfStep);
+      });
 
-  return renderNode(section, context, itemChildren);
+  return renderNode({ node: section, context, children: itemChildren });
 }
 
 export function renderSectionContent(detailSections: DetailSection[], context: RenderContext): ReactElement[] {

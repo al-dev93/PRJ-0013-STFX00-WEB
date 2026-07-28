@@ -1,6 +1,6 @@
-import type { MutableRefObject, RefObject } from 'react';
+import type { MutableRefObject, ReactNode, RefObject } from 'react';
 
-import type { DetailSection, SectionsRef, MenuSectionsVisibility } from '@/types';
+import type { DetailSection, SectionsRef, MenuSectionsVisibility, DetailEntity } from '@/types';
 // import type { FetchErrorContext } from '@modules/Error/types';
 
 /**
@@ -134,3 +134,10 @@ export interface RenderContext {
 }
 
 // React.RefObject<HTMLHeadingElement>
+
+export interface RenderNode {
+  node: DetailEntity;
+  context: RenderContext;
+  children?: ReactNode;
+  numberOfStep?: number;
+}

@@ -2,17 +2,32 @@ import figmaIcon from '@iconify-icons/simple-icons/figma';
 import githubIcon from '@iconify-icons/simple-icons/github';
 import linkedinIcon from '@iconify-icons/simple-icons/linkedin';
 import npmIcon from '@iconify-icons/simple-icons/npm';
+import reactIcon from '@iconify-icons/simple-icons/react';
+// import typescriptIcon from '@iconify-icons/simple-icons/typescript';
 import {
   ArrowSquareOutIcon,
   CaretLeftIcon,
   CaretRightIcon,
   CheckCircleIcon,
+  CodeIcon,
+  CubeIcon,
+  EarIcon,
   FileTextIcon,
+  FlaskIcon,
   FolderOpenIcon,
   InfoIcon,
+  MagnifyingGlassIcon,
   PaperPlaneTiltIcon,
   PencilSimpleIcon,
+  PersonSimpleCircleIcon,
+  RocketLaunchIcon,
+  ShieldCheckIcon,
+  SparkleIcon,
   StackIcon,
+  StackPlusIcon,
+  TargetIcon,
+  TrendUpIcon,
+  UsersThreeIcon,
   XIcon,
 } from '@phosphor-icons/react';
 import type { IconProps } from '@phosphor-icons/react';
@@ -44,6 +59,21 @@ export const PHOSPHOR_ICONS = {
   send: PaperPlaneTiltIcon,
   externalLink: ArrowSquareOutIcon,
   document: FileTextIcon,
+  stabilize: ShieldCheckIcon,
+  optimize: TrendUpIcon,
+  modernize: CubeIcon,
+  code: CodeIcon,
+  accessibility: PersonSimpleCircleIcon,
+  tests: FlaskIcon,
+  documentation: FileTextIcon,
+  stack: StackPlusIcon,
+  problemSolving: TargetIcon,
+  listening: EarIcon,
+  creativity: SparkleIcon,
+  curiosity: MagnifyingGlassIcon,
+  projectManagement: UsersThreeIcon,
+  agility: RocketLaunchIcon,
+  success: CheckCircleIcon,
 } as const satisfies Record<string, ComponentType<IconProps>>;
 
 export const ICONIFY_ICONS = {
@@ -51,6 +81,8 @@ export const ICONIFY_ICONS = {
   github: githubIcon,
   npm: npmIcon,
   figma: figmaIcon,
+  typescript: 'vscode-icons:file-type-typescript',
+  react: reactIcon,
 } as const;
 
 export const APP_ICONS = { ...ICONIFY_ICONS, ...PHOSPHOR_ICONS };

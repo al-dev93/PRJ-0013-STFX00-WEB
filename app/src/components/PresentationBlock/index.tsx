@@ -1,20 +1,23 @@
-import { PresentationCallout } from './components/PresentationCallout';
+import style from './style.module.css';
 import type { PresentationBlockProps } from './types';
 
 export default function PresentationBlock({
   name,
+  blockKey,
   variant,
   children,
 }: PresentationBlockProps): React.JSX.Element | null {
-  function renderListOrCallout(): React.JSX.Element | null {
-    const ListTag = variant === 'methodology' ? 'ol' : 'ul';
-    if (variant === 'complement') return <PresentationCallout />;
-    return <ListTag className=''>{children}</ListTag>;
-  }
+  const getClassName = (): string => {
+    const baseClassName = style.section__listBody;
+
+    if (blockKey === 'cross_cutting_skills') return `${baseClassName} ${style['section__listBody--flexColumn']}`;
+    return baseClassName;
+  };
+
   return (
-    <section data-variant={variant} className=''>
-      {name ? <h3>{name}</h3> : null}
-      {renderListOrCallout()}
+    <section className={style.section} data-variant={variant}>
+      {name ? <h3 className={style.section__title}>{name}</h3> : null}
+      <ul className={getClassName()}>{children}</ul>
     </section>
   );
 }
