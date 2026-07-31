@@ -77,7 +77,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
 
   const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
 
-  const { main, secondary } =
+  const { main, secondary = [] } =
     anchor && TWO_COLUMN_SHOWCASE_SECTION.includes(anchor)
       ? getShowcaseSectionColumn(detailSections)
       : { main: detailSections };
@@ -140,7 +140,7 @@ export const ShowcaseSection = memo(function ShowcaseSection({
           ? renderSectionContent(main, { anchor, style, isHero, kickerRef, titleRef })
           : null}
       </div>
-      {secondary ? (
+      {secondary.length ? (
         <div className={style.section__secondaryColumn}>
           {renderSectionContent(secondary, { anchor, style, isHero, kickerRef, titleRef })}
         </div>

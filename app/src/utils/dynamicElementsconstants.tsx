@@ -40,5 +40,4 @@ export const COMPONENT_TAGS = [
   'PresentationCallout',
   'PresentationCardItem',
   'Slideshow',
-  'SkillsCloud',
 ] as const;
