@@ -37,7 +37,6 @@ export const DynamicElement = forwardRef<DialogFormElement, DynamicElementProps>
 
     useEffect(() => {
       if (dynamicProps.tagKind === 'react_component' && !isComponentTag(dynamicProps.tag)) {
-        // eslint-disable-next-line no-void
         void handleError(
           createError(422, `Invalid tag: ${tag}`, {
             appCode: 1001,
@@ -53,7 +52,6 @@ export const DynamicElement = forwardRef<DialogFormElement, DynamicElementProps>
         );
       }
       if (dynamicProps.tagKind === 'html' && !isHtmlTag(dynamicProps.tag)) {
-        // eslint-disable-next-line no-void
         void handleError(
           createError(422, `Invalid HTML tag: ${String(dynamicProps.tag)}`, {
             appCode: 1001,

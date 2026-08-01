@@ -32,7 +32,6 @@ function MemoizedMenuItem({
 
   useEffect(() => {
     if (!label || !anchor) {
-      // eslint-disable-next-line no-void
       void handleError(
         createError(1001, 'Properties "label" and "anchor" are required.', {
           component: 'MenuItem',

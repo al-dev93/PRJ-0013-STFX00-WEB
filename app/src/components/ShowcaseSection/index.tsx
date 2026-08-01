@@ -88,7 +88,6 @@ export const ShowcaseSection = memo(function ShowcaseSection({
   useEffect(() => {
     if (!anchor || !isAnchored) return;
     if (observerError) {
-      // eslint-disable-next-line no-void
       void handleError(
         createError(observerError.code, observerError.message, {
           ...observerError.context,

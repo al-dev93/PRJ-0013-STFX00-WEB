@@ -38,7 +38,7 @@ type ImageType = {
  *
  * @al-dev93
  */
-const headerState = [SCROLL_DOWN, TOP_OF_SCREEN, SCROLL_UP] as const;
+// const headerState = [SCROLL_DOWN, TOP_OF_SCREEN, SCROLL_UP] as const;
 
 /**
  * Type representing the union of the types of the constants in the `headerState` tuple.
@@ -49,7 +49,8 @@ const headerState = [SCROLL_DOWN, TOP_OF_SCREEN, SCROLL_UP] as const;
  *
  * @al-dev93
  */
-export type CollapsibleHeaderState = (typeof headerState)[number];
+// export type CollapsibleHeaderState = (typeof headerState)[number];
+export type CollapsibleHeaderState = typeof SCROLL_DOWN | typeof TOP_OF_SCREEN | typeof SCROLL_UP;
 
 /**
  * Extends 'MenuItemType' (excluding 'id') with additionnal properties to represent the props of

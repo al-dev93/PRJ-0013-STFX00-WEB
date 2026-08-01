@@ -8,7 +8,6 @@ import type { ApiConfigParams, FetchMode, FetchOptions, UseFetchDataParams } fro
  */
 export function isValidUrl(url: string): boolean {
   try {
-    // eslint-disable-next-line no-new
     new URL(url);
     return true;
   } catch {

@@ -72,9 +72,8 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
     const postEndpoint = import.meta.env.VITE_API_FORM_RESPONSES_ENDPOINT;
     if (url === `/${postEndpoint}`) return;
     try {
-      // eslint-disable-next-line no-new
       new URL(url);
-    } catch (err) {
+    } catch {
       throw new ApplicationError(400, `Invalid URL: ${url}`, 'medium', {
         url,
         timestamp: Date.now(),

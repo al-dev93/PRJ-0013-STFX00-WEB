@@ -48,7 +48,6 @@ export function FormContent({ dataFormContent, onRenderComplete }: FormContentPr
         isInitializedStateRef.current = true;
         onRenderComplete(true);
       } catch (err) {
-        // eslint-disable-next-line no-void
         void handleError(
           createError(2103, 'Initialization of the global state', {
             originalError: err,

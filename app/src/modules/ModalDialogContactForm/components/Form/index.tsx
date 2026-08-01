@@ -50,7 +50,6 @@ function MemoizedForm({
 
   useEffect(() => {
     if (fetchError) {
-      // eslint-disable-next-line no-void
       void handleFetchError('Form', fetchError, handleError);
     }
   }, [fetchError, handleError]);

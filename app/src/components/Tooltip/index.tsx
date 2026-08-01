@@ -5,7 +5,6 @@ import { useAnimation } from '@hooks/useAnimation';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 
-/* eslint-disable no-void */
 import style from './style.module.css';
 import type { TooltipProps } from './types';
 

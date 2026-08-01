@@ -47,7 +47,6 @@ export function DynamicElementContainer({
 
   useEffect(() => {
     if (isLoaded && !fetchedData) {
-      // eslint-disable-next-line no-void
       void handleError(
         createError(422, 'no usable data for dynamic rendering', {
           appCode: 2202,

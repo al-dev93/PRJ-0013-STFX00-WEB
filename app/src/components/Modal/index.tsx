@@ -173,7 +173,7 @@ export function Modal({
       try {
         // Treat clicks on the dialog backdrop (event target === dialog) as a dismiss action.
         if (e.target === dialogNode) setOpenFalse();
-      } catch (err) {
+      } catch {
         await handleError(createError(1003, 'Error in click event outside modal window'), {
           component: 'Modal',
           operation: 'handleOutsideClick',
@@ -305,7 +305,7 @@ export function Modal({
     const handleCancel = async (): Promise<void> => {
       try {
         setOpenFalse();
-      } catch (err) {
+      } catch {
         await handleError(createError(1003, 'Error closing modal window with escape key'), {
           component: 'Modal',
           operation: 'handleCancel',

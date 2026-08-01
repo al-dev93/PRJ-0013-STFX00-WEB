@@ -46,7 +46,6 @@ export const SocialMediaNavBar = memo(function SocialMediaNavBar({
 
   useEffect(() => {
     if (fetchError) {
-      // eslint-disable-next-line no-void
       void handleFetchError('SocialMediaNavBar', fetchError, handleError);
     }
   }, [fetchError, handleError]);
