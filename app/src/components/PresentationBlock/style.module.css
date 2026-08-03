@@ -10,7 +10,7 @@ h4 {
   --block-presentation-border: 1px solid var(--semantic-border);
   --block-presentation-radius: var(--semantic-md-radius);
   --block-presentation-box-shadow: var(--semantic-shadow);
-  --title-section-fg: color-mix(in oklch, var(--semantic-accent) 90%, var(--semantic-text));
+  --title-section-fg: color-mix(in oklab, var(--semantic-accent) 60%, var(--semantic-text) 40%);
   --title-section-font: var(--semantic-font-display);
   --title-section-fs: calc(var(--semantic-fs-lead) * 0.94);
   --title-section-lh: var(--semantic-lh-heading);
@@ -18,8 +18,8 @@ h4 {
   --card-body-gap: var(--semantic-space-lg);
   --card-list-body-padding-block: calc(var(--semantic-space-xl) * 1.8);
 
-  --card-item-icon-fg: var(--title-section-fg);
-  --card-item-icon-bg: color-mix(in oklab, var(--semantic-accent) 10%, var(--semantic-surface-1));
+  --card-item-icon-fg: color-mix(in oklab, var(--semantic-accent) 75%, var(--semantic-text) 35%);
+  --card-item-icon-bg: color-mix(in oklab, var(--semantic-accent) 12%, var(--semantic-surface-1));
   --card-item-icon-wrapper-size: calc(var(--space-2) * 8);
   --card-item-icon-size: calc(var(--space-1) * 6);
   --card-item-padding-block: var(--semantic-space-lg);
