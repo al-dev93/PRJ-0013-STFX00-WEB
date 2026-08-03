@@ -107,7 +107,7 @@
 
     /* Primary */
     --btn-primary-bg: var(--semantic-accent);
-    --btn-primary-fg: white;
+    --btn-primary-fg: var(--ref-neutral-900);
     --btn-primary-hover: color-mix(in oklab, var(--semantic-accent) 88%, black);
     --btn-primary-active: color-mix(in oklab, var(--semantic-accent) 80%, black);
     --btn-primary-ring: var(--semantic-ring);

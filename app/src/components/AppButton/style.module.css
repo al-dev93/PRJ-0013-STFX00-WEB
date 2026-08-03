@@ -7,9 +7,10 @@
   --btn-ring: var(--btn-primary-ring);
   --btn-shadow: var(--elevation-2);
 
-  --btn-bd: transparent;
+  /* --btn-bd: transparent; */
+  --btn-bd: color-mix(in oklab, var(--semantic-accent) 65%, var(--ref-neutral-900) 35%);
   --btn-border-radius: 12px;
-  --btn-fw: 700;
+  --btn-fw: 500;
 
   display: inline-flex;
   align-items: center;
