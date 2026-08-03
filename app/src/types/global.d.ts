@@ -236,12 +236,6 @@ export type ProjectData = {
   projectSheet?: string;
 };
 
-// export type Skill = {
-//   id: string;
-//   text: string;
-//   value: number;
-// };
-
 /**
  * Type of the form that is displayed in the contact form modal window and the dialogue with the api.
  *
@@ -384,7 +378,6 @@ export type FetchData =
   | MenuItemType[]
   | IndexPageSection[]
   | ProjectData[]
-  | Skill[]
   | ContactFormModal[]
   | ContactFormInput[]
   | ContactFormModal[]
