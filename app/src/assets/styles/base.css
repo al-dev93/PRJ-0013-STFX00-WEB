@@ -56,6 +56,12 @@
     line-height: var(--semantic-lh-heading);
     color: var(--semantic-text);
   }
+  h4 {
+    margin: 0 0 var(--semantic-space-sm);
+    font-weight: 600;
+    line-height: var(--semantic-lh-heading);
+    color: var(--semantic-text);
+  }
 
   /* Links */
   a {

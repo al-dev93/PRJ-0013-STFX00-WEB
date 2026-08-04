@@ -1,12 +1,18 @@
-import React, { ComponentProps, createElement, forwardRef, useEffect, useMemo } from 'react';
+import React, { createElement, forwardRef, useEffect } from 'react';
 
-import type { DialogFormElement } from '@/types';
+import type { DialogFormElement, ValidComponentTag } from '@/types';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
-import { COMPONENT_MAP, HTML_TAGS } from '@utils/dynamicElementsconstants';
+import { isComponentTag } from '@utils/componentElementHelpers';
+import { COMPONENT_MAP } from '@utils/dynamicComponentMap';
+import { COMPONENT_TAGS, HTML_TAGS } from '@utils/dynamicElementsconstants';
 import { isHtmlTag } from '@utils/htmlElementHelpers';
 
-import type { DynamicElementProps, ValidComponentTag, ValidHTMLTag } from './types';
+import { getComponentProps, getHtmlProps } from './getProps';
+import type { DynamicComponent, DynamicElementProps } from './types';
+
+const DYNAMIC_COMPONENT_MAP = COMPONENT_MAP as unknown as Record<ValidComponentTag, DynamicComponent>;
+
 /**
  * Renders a dynamic element based on the provided tag. If the tag corresponds to a custom component,
  * it renders that component with the provided props; otherwise, it renders a standard HTML element.
@@ -23,43 +29,59 @@ import type { DynamicElementProps, ValidComponentTag, ValidHTMLTag } from './typ
  *
  * @al-dev93
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const DynamicElement = forwardRef<DialogFormElement, DynamicElementProps<any>>(function DynamicElementRef<
-  T extends ValidComponentTag | ValidHTMLTag,
->(
-  { tag, children, ...props }: DynamicElementProps<T>,
-  ref?: React.LegacyRef<DialogFormElement>,
-): React.JSX.Element | null {
-  const handleError = useErrorHandler();
+export const DynamicElement = forwardRef<DialogFormElement, DynamicElementProps>(
+  function DynamicElementRef(dynamicProps, ref): React.JSX.Element | null {
+    const handleError = useErrorHandler();
 
-  const isValidElement: boolean = useMemo(() => tag in COMPONENT_MAP || isHtmlTag(tag as ValidHTMLTag), [tag]);
+    const { tagKind, tag } = dynamicProps;
 
-  useEffect(() => {
-    if (!isValidElement) {
-      // eslint-disable-next-line no-void
-      void handleError(
-        createError(422, `Invalid tag: ${tag}`, {
-          component: 'DynamicElement',
-          validTags: [...Object.keys(COMPONENT_MAP), ...HTML_TAGS],
-          invalidTag: tag,
-          url: window.location.href,
-          operation: 'render',
-          category: 'UI Component',
-        }),
-      );
+    useEffect(() => {
+      if (dynamicProps.tagKind === 'react_component' && !isComponentTag(dynamicProps.tag)) {
+        void handleError(
+          createError(422, `Invalid tag: ${tag}`, {
+            appCode: 1001,
+            component: 'DynamicElement',
+            tagKind,
+            validTags: COMPONENT_TAGS, // Object.keys(COMPONENT_MAP),
+            invalidTag: tag,
+            url: window.location.href,
+            operation: 'render',
+            category: 'UI Component',
+            httpStatus: 422,
+          }),
+        );
+      }
+      if (dynamicProps.tagKind === 'html' && !isHtmlTag(dynamicProps.tag)) {
+        void handleError(
+          createError(422, `Invalid HTML tag: ${String(dynamicProps.tag)}`, {
+            appCode: 1001,
+            component: 'DynamicElement',
+            tagKind,
+            validTags: HTML_TAGS,
+            invalidTag: tag,
+            url: window.location.href,
+            operation: 'render',
+            category: 'UI Component',
+          }),
+        );
+      }
+    }, [dynamicProps.tag, dynamicProps.tagKind, handleError, tag, tagKind]);
+
+    // Custom component verification
+    if (dynamicProps.tagKind === 'react_component') {
+      if (!isComponentTag(dynamicProps.tag)) return null;
+
+      const Component = DYNAMIC_COMPONENT_MAP[dynamicProps.tag];
+
+      return createElement(Component, getComponentProps(dynamicProps), dynamicProps.children);
     }
-  }, [handleError, isValidElement, tag]);
 
-  // Custom component verification
-  if (tag in COMPONENT_MAP) {
-    const Component = COMPONENT_MAP[tag as ValidComponentTag] as React.ComponentType<typeof props>;
-    return createElement(Component, { ...props, ref } as ComponentProps<typeof Component>, children);
-  }
+    // Html tag verification
+    if (dynamicProps.tagKind === 'html') {
+      if (!isHtmlTag(dynamicProps.tag)) return null;
 
-  // Html tag verification
-  if (isHtmlTag(tag as ValidHTMLTag)) {
-    // For native HTML elements, we always pass children if they exist.
-    return createElement(tag, { ...props, ref }, children);
-  }
-  return null;
-});
+      return createElement(dynamicProps.tag, { ...getHtmlProps(dynamicProps), ref }, dynamicProps.children);
+    }
+    return null;
+  },
+);

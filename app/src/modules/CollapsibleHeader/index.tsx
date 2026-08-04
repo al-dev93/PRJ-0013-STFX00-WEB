@@ -57,14 +57,12 @@ export function CollapsibleHeader({
 
   useEffect(() => {
     if (fetchError) {
-      // eslint-disable-next-line no-void
       void handleFetchError('CollapsibleHeader', fetchError, handleError);
     }
   }, [fetchError, handleError]);
 
   useEffect(() => {
     if (headerError) {
-      // eslint-disable-next-line no-void
       void handleError(
         createError(headerError.code, headerError.message, {
           ...headerError.context,
@@ -78,7 +76,6 @@ export function CollapsibleHeader({
 
   useEffect(() => {
     if (!isValidHeaderState) {
-      // eslint-disable-next-line no-void
       void handleError(
         createError(1003, `Unexpected header state: ${headerState}`, {
           component: 'CollapsibleHeader',
@@ -93,7 +90,6 @@ export function CollapsibleHeader({
 
   useEffect(() => {
     if (!isValidScrollWithMenuItem) {
-      // eslint-disable-next-line no-void
       void handleError(
         createError(2002, 'Invalid scrollWithMenuItem ref provided', {
           component: 'CollapsibleHeader',

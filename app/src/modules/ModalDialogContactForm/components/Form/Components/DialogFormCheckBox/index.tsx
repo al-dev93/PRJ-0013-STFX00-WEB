@@ -1,4 +1,5 @@
-import { LegacyRef, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import type { LegacyRef } from 'react';
 
 import type { DialogFormInputElement } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
@@ -6,7 +7,7 @@ import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { useContactFormDispatch } from '@modules/ModalDialogContactForm/hooks/useContactFormDispatch';
 import { useContactFormSelector } from '@modules/ModalDialogContactForm/hooks/useContactFormSelector';
-import { DialogFormInputProps } from '@modules/ModalDialogContactForm/types';
+import type { DialogFormInputProps } from '@modules/ModalDialogContactForm/types';
 import {
   DELETE_INPUT_ERROR,
   DELETE_INPUT_VALUE,

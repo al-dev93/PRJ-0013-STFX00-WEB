@@ -1,13 +1,12 @@
 import React, { useEffect, useId, useMemo } from 'react';
 
-import { TooltipContent } from '@/types';
+import type { TooltipContent } from '@/types';
 import { useAnimation } from '@hooks/useAnimation';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 
-/* eslint-disable no-void */
 import style from './style.module.css';
-import { TooltipProps } from './types';
+import type { TooltipProps } from './types';
 
 /**
  * Narrowing helper: check that a value is a non-empty string (after trimming).

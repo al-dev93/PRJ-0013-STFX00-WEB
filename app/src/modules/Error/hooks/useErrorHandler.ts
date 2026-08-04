@@ -2,10 +2,9 @@ import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import type { AppError } from '@/types';
+import { monitoringService } from '@modules/Error/services/monitoring';
 import type { FetchErrorContext } from '@modules/Error/types';
 import { normalizeError } from '@modules/Error/utils/errorHandling';
-
-import { monitoringService } from '../services/monitoring';
 /**
  * A custom React hook for handling errors in a consistent and centralized way.
  * This hook provides a function to capture, normalize, and handle errors,

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 
-import { AppError } from '@/types';
+import type { AppError } from '@/types';
 
 import type { CollapsibleHeaderState, ScrollRef } from '../types';
 import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from '../utils/constants';

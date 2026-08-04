@@ -4,7 +4,7 @@ function toRealNewLines(s: string) {
   return s.replaceAll('\\r\\n', '\n').replaceAll('\\n', '\n');
 }
 
-export function renderFormattedText(text?: string) {
+export function renderFormattedText(text?: string): React.ReactNode | undefined {
   if (!text) return undefined;
 
   // On split avec groupe capturant => parts = [seg, **bold**, seg, **bold**, seg, ...]

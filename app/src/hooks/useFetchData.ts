@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { FetchData, FetchOptions, FetchResultData, JsonObject, UseFetchDataParams } from '@/types';
-import { getFetchUrlOrUrls } from '@/utils/urlHelpers';
 import { ApplicationError } from '@modules/Error/error';
 import type { FetchErrorContext } from '@modules/Error/types';
+import { getFetchUrlOrUrls } from '@utils/urlHelpers';
 
 /**
  * Custom hook to fetch data from one or multiple URLs with specified options.
@@ -72,9 +72,8 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
     const postEndpoint = import.meta.env.VITE_API_FORM_RESPONSES_ENDPOINT;
     if (url === `/${postEndpoint}`) return;
     try {
-      // eslint-disable-next-line no-new
       new URL(url);
-    } catch (err) {
+    } catch {
       throw new ApplicationError(400, `Invalid URL: ${url}`, 'medium', {
         url,
         timestamp: Date.now(),

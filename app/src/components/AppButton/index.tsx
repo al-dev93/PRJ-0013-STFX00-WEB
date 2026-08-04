@@ -49,7 +49,7 @@ export const AppButton = memo(
     const handleClick = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
       try {
         if (onClick) onClick(e);
-      } catch (err) {
+      } catch {
         await handleError(createError(3003, 'Button click event missing'), {
           component: 'ModalFormButton',
           operation: 'onClick',

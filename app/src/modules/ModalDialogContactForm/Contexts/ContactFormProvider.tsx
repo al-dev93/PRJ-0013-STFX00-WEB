@@ -1,11 +1,7 @@
-import { createContext, Dispatch, useReducer } from 'react';
-
-import { createContactFormInitialState } from '../reducer/modalDialogContactFormInitialState';
+import { useReducer } from 'react';
 import { modalDialogContactFormReducer } from '../reducer/modalDialogContactFormReducer';
-import type { ModalDialogContactFormAction, ModalDialogContactFormState } from '../types';
-
-export const ContactFormStateContext = createContext<ModalDialogContactFormState | null>(null);
-export const ContactFormDispatchContext = createContext<Dispatch<ModalDialogContactFormAction> | null>(null);
+import { createContactFormInitialState } from '../reducer/modalDialogContactFormInitialState';
+import { ContactFormStateContext, ContactFormDispatchContext } from './ContactFormContext';
 
 /**
  * The 'ContactFormProvider' component serves as a context provider for managing

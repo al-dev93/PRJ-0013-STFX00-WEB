@@ -1,6 +1,5 @@
-import { ComponentType } from 'react';
-
-import { ContactFormProvider } from '../Contexts/ContactFormContext';
+import type { ComponentType } from 'react';
+import { ContactFormProvider } from '../Contexts/ContactFormProvider';
 
 /**
  * A Higher-Order Component (HOC) that wraps a given component with the 'ContactFormProvider'.

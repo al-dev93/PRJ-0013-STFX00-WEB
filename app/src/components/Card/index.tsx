@@ -1,16 +1,18 @@
-import IonIcon from '@reacticons/ionicons';
 import React, { memo, useEffect } from 'react';
 
+import { AppIcon } from '@components/AppIcon';
 import { ProjectSheetLink } from '@components/ProjectSheetLink';
 import { SkillsList } from '@components/SkillsList';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
+import { LOCAL_ICON_NAME } from '@utils/appIconsMap';
 import { isDeliverableArray } from '@utils/typeHelpers';
 
 import style from './style.module.css';
 import type { CardProps } from './types';
 
+// import IonIcon from '@reacticons/ionicons';
 /**
  * Card component that displays project data including title, description, skills, and social media links.
  *
@@ -78,14 +80,18 @@ function MemoizedCard({ data: cardData }: CardProps): React.JSX.Element | null {
     <article className={style.card} data-variant={variant} aria-labelledby={`card-title-${cardData.id}`}>
       <header className={style.card__header}>
         <div className={style.card__header__meta}>
-          <IonIcon
+          {/* <IonIcon
             className={style.card__folderIcon}
             name={variant === 'root' ? 'layers' : 'folder-open-sharp'}
             aria-hidden='true'
+          /> */}
+          <AppIcon
+            className={style.card__folderIcon}
+            iconName={variant === 'root' ? LOCAL_ICON_NAME.LAYERS : LOCAL_ICON_NAME.FOLDER_OPEN}
           />
           {variant === 'root' ? <span className={style.card__badge}>Projet socle</span> : null}
         </div>
-        <SocialMediaNavBar changeLinkColor={style.card__additionalNav} type='card' buttons={cardData.deliverables} />
+        <SocialMediaNavBar classNameButton={style.card__additionalNav} type='card' buttons={cardData.deliverables} />
       </header>
       <div className={style.card__main}>
         <h3 id={`card-title-${cardData.id}`}>{cardData.title}</h3>

@@ -2,7 +2,7 @@
   --buttonLink-focus-ring: var(--semantic-ring);
   /* --buttonLink-hover-scale: scale(calc(1 + 0.1 * var(--motion-ok)));
   --buttonLink-hover-rotate: rotate(calc(6deg * var(--motion-ok))); */
-  --buttonLink-icon-size: 2rem;
+  --buttonLink-icon-size: 1.4rem;
   --buttonLink-size: 48px;
 
   width: var(--buttonLink-size);

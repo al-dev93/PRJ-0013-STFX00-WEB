@@ -1,6 +1,10 @@
-import { RefObject, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { RefObject } from 'react';
 
-import { AppError } from '@/types';
+import type { AppError } from '@/types';
+
+const DEFAULT_THRESHOLD = 0;
+const DEFAULT_ROOT_MARGIN = '0px';
 
 /**
  * Custom hook to check if an HTML element is visible within the viewport.
@@ -17,11 +21,27 @@ import { AppError } from '@/types';
  */
 export function useOnScreen(
   ref: RefObject<HTMLElement>,
-  observerOptions: { rootMargin?: string; threshold?: number[]; observerError?: AppError },
+  options: IntersectionObserverInit = {},
 ): { isIntersecting: boolean; observerError: AppError | undefined } {
   // State to store whether the target element is visible in the viewport
   const [isIntersecting, setIntersecting] = useState<boolean>(false);
   const [observerError, setObserverError] = useState<AppError>();
+
+  const { root = null, rootMargin = DEFAULT_ROOT_MARGIN, threshold = DEFAULT_THRESHOLD } = options;
+
+  const thresholdKey = Array.isArray(threshold) ? threshold.join('|') : String(threshold);
+
+  const observerOptions = useMemo<IntersectionObserverInit>(
+    () => ({
+      root,
+      rootMargin,
+      threshold,
+    }),
+    // thresholdKey avoids unnecessary observer recreation when an equivalent
+    // threshold array is recreated by the caller.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [root, rootMargin, thresholdKey],
+  );
 
   /**
    * Callback function that is triggered when the intersection status of the target element changes.
@@ -44,6 +64,9 @@ export function useOnScreen(
       }
       // For other elements, set the intersecting state based on the first entry
       const [entry] = entries;
+
+      if (!entry) return;
+
       setIntersecting(entry.isIntersecting);
     },
     [ref],
@@ -53,20 +76,16 @@ export function useOnScreen(
     const element = ref.current;
 
     /**
-     * If there is no target element or IntersectionObserver is not supported, exit early
-     * and sends an error
+     * A missing DOM reference can be a normal transient React state.
+     * Do not report it as an application error.
      */
-    if (!element) {
-      setObserverError({
-        name: 'MissingRefError',
-        code: 1001,
-        message: 'No DOM reference found for observation',
-        severity: 'low',
-      });
-      return undefined;
-    }
+    if (!element) return undefined;
 
-    if (!('IntersectionObserver' in window)) {
+    /**
+     * IntersectionObserver is a browser API.
+     * It may be unavailable in SSR, tests, or older environments.
+     */
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
       setObserverError({
         name: 'UnsupportedFeatureError',
         code: 1204,
@@ -75,6 +94,8 @@ export function useOnScreen(
       });
       return undefined;
     }
+
+    setObserverError(undefined);
 
     // Create a new IntersectionObserver instance with the provided callback and options
     const observer = new IntersectionObserver(handleIntersection, observerOptions);

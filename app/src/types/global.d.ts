@@ -1,9 +1,10 @@
-import { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
+import type { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
 
-import { FetchErrorContext } from '@/modules/Error/types';
-import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@/utils/constants';
+import type { FetchErrorContext } from '@modules/Error/types';
+import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
+import { COMPONENT_TAGS, HTML_TAGS } from '@utils/dynamicElementsconstants';
 
-import type { IconType } from '.';
+import type { AppIconName } from './appicons';
 
 export type StringObject = {
   readonly [key: string]: string;
@@ -34,6 +35,24 @@ export type KeyboardEventButton = KeyboardEvent<HTMLButtonElement>;
  * to an HTML div element and contains details about the keyboard interaction.
  */
 export type KeyboardEventDiv = KeyboardEvent<HTMLDivElement>;
+
+/**
+ * Represents the type of component that can be rendered.
+ *
+ * @exports
+ * @type {keyof typeof COMPONENT_MAP} ValidComponentTag
+ */
+export type ValidComponentTag = (typeof COMPONENT_TAGS)[number];
+
+/**
+ * Represents the type of HTML element
+ *
+ * @exports
+ * @type {typeof HTML_TAGS[number]} ValidHTMLTag
+ */
+export type ValidHTMLTag = (typeof HTML_TAGS)[number];
+
+export type ValidTag = ValidHTMLTag | ValidComponentTag;
 
 /**
  * @description
@@ -70,13 +89,13 @@ export type MenuItemType = {
 /**
  * @description Type use to represent a link to a user account on an external service.
  */
-export type AccountLink = {
+export interface AccountLink {
   id: string;
   service: string;
-  icon: IconType;
+  icon: AppIconName;
   onPage?: boolean;
   address?: string;
-};
+}
 
 // NOTE: on the index page
 /**
@@ -100,14 +119,18 @@ export type SectionsRef = 'home' | 'work' | 'about' | 'services' | 'more';
  *
  * @al-dev93
  */
-export type IndexPageSection = Omit<MenuItemType, 'label' | 'anchor'> & {
-  title?: string;
-  content: DetailSection[];
-  order: number;
+export interface IndexPageSection {
+  id: string;
   anchor?: SectionsRef;
-  isAnchored?: boolean;
+  title?: string;
   introduction?: string;
-};
+  order: number;
+  isAnchored?: boolean;
+  isVisible: boolean;
+  hasSectionHeader: boolean;
+  isRenderable: boolean;
+  detailSections: DetailSection[];
+}
 
 /**
  * @description Represents the context passed to the page sections from a React Router outlet.
@@ -138,25 +161,37 @@ export type OutletContextPage = {
  */
 export type MenuSectionsVisibility = Record<string, boolean>;
 
-export type DetailSection = {
+export type DetailEntityLevel = 'section' | 'item';
+export type TagKind = 'html' | 'react_component';
+
+interface DetailNodeBase<TLevel extends DetailEntityLevel = DetailEntityLevel> {
   id: string;
-  tag: string;
-  wrapped?: boolean;
+  level: TLevel;
+  tag: ValidTag;
+  tagKind: TagKind;
+  variant?: string;
+  wrapped: boolean;
   name?: string;
+  styleKey?: string;
   content?: string;
   endpoint?: string;
+  iconName?: AppIconName;
+  isVisible: boolean;
+}
+
+export interface Item extends DetailNodeBase<'item'> {
+  itemKey?: string;
+  orderInBlock: number;
+}
+
+export interface DetailSection extends DetailNodeBase<'section'> {
+  blockKey?: string;
   orderInSection: number;
-  boldContent?: DetailSection[];
-};
+  sectionIntroduction?: string;
+  items: Item[];
+}
 
-export type Point = { x: number; y: number };
-
-export type ViewBoxRect = {
-  minX: number;
-  minY: number;
-  width: number;
-  height: number;
-};
+export type DetailEntity = DetailSection | Item;
 
 // TODO add comments
 /**
@@ -199,12 +234,6 @@ export type ProjectData = {
   orderInDisplay: number;
   deliverables: Deliverable[];
   projectSheet?: string;
-};
-
-export type Skill = {
-  id: string;
-  text: string;
-  value: number;
 };
 
 /**
@@ -349,7 +378,6 @@ export type FetchData =
   | MenuItemType[]
   | IndexPageSection[]
   | ProjectData[]
-  | Skill[]
   | ContactFormModal[]
   | ContactFormInput[]
   | ContactFormModal[]

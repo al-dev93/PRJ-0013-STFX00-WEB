@@ -1,11 +1,12 @@
 import { useCallback, useLayoutEffect, useMemo } from 'react';
 
 import type { DialogFormInputElement } from '@/types';
+import { LOCAL_ICON_NAME } from '@utils/appIconsMap';
 
 import { useAutoComplete } from './useAutoComplete';
 import { useContactFormDispatch } from './useContactFormDispatch';
 import { useContactFormSelector } from './useContactFormSelector';
-import type { ContactForm, FormInputName } from '../types';
+import type { ContactForm, FormInputName, TooltipIconName } from '../types';
 import { getAutocompleteInput } from '../utils/autocompleteStorageUtils';
 import {
   AUTO_COMPLETION,
@@ -19,7 +20,6 @@ import {
   SET_POPOVER_MODE,
 } from '../utils/constants';
 import { formatInputNumber, sanitizeInput } from '../utils/formHelpers';
-
 /**
  * Custom hook to manage the contact form input fields.
  *
@@ -76,10 +76,11 @@ export function useContactForm(name: FormInputName): ContactForm {
    *
    * @constant renderTooltipIcon
    */
-  const tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle' = useMemo(() => {
-    if (inputValue && !inEdition && !inputError) return 'checkmark-circle';
-    if (inEdition) return 'create';
-    return 'information-circle';
+  // const tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle' = useMemo(() => {
+  const tooltipIconName: TooltipIconName = useMemo(() => {
+    if (inputValue && !inEdition && !inputError) return LOCAL_ICON_NAME.VALIDATED;
+    if (inEdition) return LOCAL_ICON_NAME.EDIT;
+    return LOCAL_ICON_NAME.INFO;
   }, [inEdition, inputError, inputValue]);
 
   /**

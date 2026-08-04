@@ -1,4 +1,4 @@
-import { ApiConfigParams, FetchMode, FetchOptions, UseFetchDataParams } from '@/types';
+import type { ApiConfigParams, FetchMode, FetchOptions, UseFetchDataParams } from '@/types';
 
 /**
  * Validates if the provided string is a valid URL.
@@ -8,7 +8,6 @@ import { ApiConfigParams, FetchMode, FetchOptions, UseFetchDataParams } from '@/
  */
 export function isValidUrl(url: string): boolean {
   try {
-    // eslint-disable-next-line no-new
     new URL(url);
     return true;
   } catch {

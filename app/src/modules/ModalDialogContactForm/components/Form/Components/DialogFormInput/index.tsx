@@ -1,7 +1,8 @@
-import IonIcon from '@reacticons/ionicons';
-import React, { LegacyRef, memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import type { LegacyRef } from 'react';
 
 import type { DialogFormInputElement, TooltipContent } from '@/types';
+import { AppIcon } from '@components/AppIcon';
 import { DynamicElement } from '@components/DynamicElement';
 import { Tag } from '@components/Tag';
 import { Tooltip } from '@components/Tooltip';
@@ -219,10 +220,14 @@ export function MemoizedDialogFormInput({
         direction='right'
         isVisible={isTooltipVisible as boolean}
       >
-        <IonIcon
+        {/* <IonIcon
           className={tooltipIconName === 'checkmark-circle' ? style.dialogFormInput__tooltipIcon : ''}
           name={tooltipIconName}
           aria-hidden='true'
+        /> */}
+        <AppIcon
+          className={tooltipIconName === 'validated' ? style.dialogFormInput__tooltipIcon : ''}
+          iconName={tooltipIconName}
         />
       </Tooltip>
     );
@@ -241,7 +246,7 @@ export function MemoizedDialogFormInput({
       style.dialogFormInput__alertTag +
       (formInput.tag === 'textarea' ? ` ${style['dialogFormInput__alertTag--message']}` : '');
 
-    return <Tag className={alertTagClass} type='alerted' tag={inputStatusTag} ariaHidden />;
+    return <Tag className={alertTagClass} variant='warning-tag' tag={inputStatusTag} ariaHidden />;
   }, [formInput.tag, inputStatusTag]);
 
   /**

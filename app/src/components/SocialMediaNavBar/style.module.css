@@ -22,14 +22,14 @@
 }
 
 /* Style for the navigation bar button */
-a.socialMediaNavBar__externalLink span {
-  /* color: var(--decorative-light); */
-  /* text-decoration: none; */
-  /* transition: color 0.3s; */
-  /* transition: color 200ms ease; */
-  font-size: 1.34rem;
+/*a.socialMediaNavBar__externalLink {*/
+/* ! color: var(--decorative-light); */
+/* ! text-decoration: none; */
+/* ! transition: color 0.3s; */
+/* ! transition: color 200ms ease; */
+/*font-size: 1.34rem;
   line-height: 1;
-}
+}*/
 
 a.socialMediaNavBar__externalLink--primary {
   --sl-control-border: color-mix(in oklch, var(--semantic-border) 85%, transparent);

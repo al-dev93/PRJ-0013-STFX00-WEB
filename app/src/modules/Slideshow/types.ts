@@ -1,19 +1,18 @@
-import React, { Dispatch } from 'react';
+import React from 'react';
+import type { Dispatch } from 'react';
 
 import type { ProjectData } from '@/types';
+import { LOCAL_ICON_NAME } from '@utils/appIconsMap';
 
 import {
   CHANGE_SCROLLING_DOT,
   CHANGE_SLIDE,
   INIT_MAX_INDEX_SLIDE,
-  NEXT_SLIDE,
   PENDING,
-  PREVIOUS_SLIDE,
   SLIDE_TRANSITION,
   START,
   STOP,
 } from './utils/constants';
-
 /**
  * Props for the main Slideshow component.
  * Either `data` or `url` can be provided, but not both.
@@ -163,9 +162,11 @@ export type SlideTransition = typeof START | typeof PENDING | typeof STOP;
  * Direction of the slide transition.
  * Either moves to the next or previous slide.
  *
- * @type {NEXT_SLIDE | PREVIOUS_SLIDE} SlideDirection
+ * @type {'next' | 'previous' } SlideDirection
  */
-export type SlideDirection = typeof NEXT_SLIDE | typeof PREVIOUS_SLIDE;
+// export type SlideDirection = typeof NEXT_SLIDE | typeof PREVIOUS_SLIDE;
+// export type SlideDirection = keyof typeof CONTROL_ICONS;
+export type SlideDirection = typeof LOCAL_ICON_NAME.NEXT_CHEVRON | typeof LOCAL_ICON_NAME.PREV_CHEVRON;
 
 /**
  * Action to change the slide in the slideshow.
@@ -250,7 +251,7 @@ export type SlideStyle =
 /**
  * Payload type used in the slideshow actions and state transitions.
  *
- * @typedef {SlideshowAction | SlideDirection | SlideTransition | number} Payload
+ * @typedef {SlideshowAction | ControlIconName | SlideTransition | number} Payload
  */
 export type Payload = SlideshowAction | SlideDirection | SlideTransition | number;
 

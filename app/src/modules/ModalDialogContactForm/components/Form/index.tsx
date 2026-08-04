@@ -1,10 +1,11 @@
-import React, { FormEvent, memo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
+import type { FormEvent } from 'react';
 
-import { useFetchData } from '@/hooks/useFetchData';
-import { createError } from '@/modules/Error/utils/errorHandling';
-import { handleFetchError } from '@/utils/fetchDataHelpers';
-import { getFetchUrlOrUrls } from '@/utils/urlHelpers';
+import { useFetchData } from '@hooks/useFetchData';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
+import { createError } from '@modules/Error/utils/errorHandling';
+import { handleFetchError } from '@utils/fetchDataHelpers';
+import { getFetchUrlOrUrls } from '@utils/urlHelpers';
 
 import { FormContent } from './Components/FormContent';
 import style from './style.module.css';
@@ -49,7 +50,6 @@ function MemoizedForm({
 
   useEffect(() => {
     if (fetchError) {
-      // eslint-disable-next-line no-void
       void handleFetchError('Form', fetchError, handleError);
     }
   }, [fetchError, handleError]);

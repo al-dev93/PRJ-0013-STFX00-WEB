@@ -1,22 +1,4 @@
-import { ComponentProps, ReactNode } from 'react';
-
-import { COMPONENT_MAP, HTML_TAGS } from '@utils/dynamicElementsconstants';
-
-/**
- * Represents the type of component that can be rendered.
- *
- * @exports
- * @type {keyof typeof COMPONENT_MAP} ValidComponentTag
- */
-export type ValidComponentTag = keyof typeof COMPONENT_MAP;
-
-/**
- * Represents the type of HTML element
- *
- * @exports
- * @type {typeof HTML_TAGS[number]} ValidHTMLTag
- */
-export type ValidHTMLTag = (typeof HTML_TAGS)[number];
+import type { ValidComponentTag, ValidHTMLTag } from '@/types';
 
 /**
  * Props for the DynamicElement component, which can render either a custom component
@@ -28,11 +10,37 @@ export type ValidHTMLTag = (typeof HTML_TAGS)[number];
  * @property {React.ReactNode} [children] - Optional child nodes to be rendered inside the element or component.
  * @property {Object} [props] - Any additional props or attributes specific to the chosen tag.
  */
-export type DynamicElementProps<T extends ValidComponentTag | ValidHTMLTag> = {
-  tag: T;
-  children?: ReactNode;
-} & (T extends ValidComponentTag
-  ? ComponentProps<(typeof COMPONENT_MAP)[T]>
-  : T extends (typeof HTML_TAGS)[number]
-    ? JSX.IntrinsicElements[T]
-    : never);
+
+interface DynamicElementBaseProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export interface DynamicElementHTMLProps extends DynamicElementBaseProps, React.HTMLAttributes<HTMLElement> {
+  tagKind: 'html';
+  tag: ValidHTMLTag;
+}
+
+export interface DynamicElementComponentProps extends DynamicElementBaseProps {
+  tagKind: 'react_component';
+  tag: ValidComponentTag;
+  endpoint?: string;
+  introduction?: string;
+
+  /**
+   * Allows component-specific props received from dynamic data.
+   */
+  [key: string]: unknown;
+}
+
+export interface DynamicComponentRuntimeProps {
+  children?: React.ReactNode;
+  className?: string;
+  endpoint?: string;
+  introduction?: string;
+
+  [key: string]: unknown;
+}
+
+export type DynamicComponent = React.LazyExoticComponent<React.ComponentType<DynamicComponentRuntimeProps>>;
+export type DynamicElementProps = DynamicElementHTMLProps | DynamicElementComponentProps;

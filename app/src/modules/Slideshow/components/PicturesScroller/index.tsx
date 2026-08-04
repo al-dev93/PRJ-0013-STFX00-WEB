@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from 'react';
 
-import { ProjectData } from '@/types';
+import type { ProjectData } from '@/types';
 
 import { ScrollButtons } from './components/ScrollButtons';
 import { SlidePicture } from './components/SlidePicture';

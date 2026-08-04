@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect } from 'react';
 
-import { TagType } from '@/types';
-import { TAG_FORM } from '@/utils/constants';
+import type { TagType } from '@/types';
 import { Tag } from '@components/Tag';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
+import { TAG_FORM } from '@utils/constants';
 import { isPrimitiveArray } from '@utils/typeHelpers';
 
 import style from './style.module.css';

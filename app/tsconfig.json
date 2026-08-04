@@ -5,6 +5,7 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "ignoreDeprecations": "5.0", // ! attention à baseUrl dépréciée
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
@@ -38,14 +39,6 @@
     "noFallthroughCasesInSwitch": true
   },
   // NOTE: paths depuis src/** etc. ajoutés sans résultat
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "vite.config.ts",
-    ".eslintrc.cjs",
-    "types"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.js", "vite.config.ts", "types"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

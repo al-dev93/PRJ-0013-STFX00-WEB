@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect } from 'react';
 
 import { useContactFormDispatch } from './useContactFormDispatch';
 import { useContactFormSelector } from './useContactFormSelector';
-import { FormInputName } from '../types';
+import type { FormInputName } from '../types';
 import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
   DELETE_INPUT_ERROR,
@@ -13,7 +13,6 @@ import {
 } from '../utils/constants';
 import { isFormInputName } from '../utils/formHelpers';
 import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from '../utils/inputErrorHandler';
-
 /**
  * Handles the user interactions on the input field by dispatching actions to the reducer.
  * It also handles the autocomplete feature by fetching the autocomplete data from the local storage,

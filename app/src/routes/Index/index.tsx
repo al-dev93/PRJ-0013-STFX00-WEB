@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import type { IndexPageSection } from '@/types';
-import { isIndexPageSectionArray } from '@/utils/typeHelpers';
 import { ShowcaseSection } from '@components/ShowcaseSection';
 import { useFetchData } from '@hooks/useFetchData';
 import { usePageSection } from '@hooks/usePageSection';
+import { isIndexPageSectionArray } from '@utils/typeHelpers';
 
 import style from './style.module.css';
 
@@ -33,28 +32,7 @@ export function Index(): React.JSX.Element | null {
    * @constant {Object} data - The data fetched from the server.
    */
   const { data } = useFetchData({ endpoint, method: 'POST' });
-
-  /**
-   * Memoized and sorted list of page sections.
-   *
-   * @remarks
-   * - Validates that `data` is a non-null array of `IndexPageSection` before sorting.
-   * - Returns `undefined` if `data` is missing or fails the schema check.
-   * - Sorts by the numeric `order` property in ascending order.
-   *
-   * @type {IndexPageSection[] | undefined}
-   */
-  const sortedAndValidatedData = useMemo<IndexPageSection[] | undefined>(() => {
-    // Only sort if we actually have data and it passes our runtime guard
-    console.log(isIndexPageSectionArray(data));
-    if (isIndexPageSectionArray(data)) {
-      // Clone + sort to avoid mutating the original array
-      return [...data].sort((a, b) => a.order - b.order);
-    }
-    // Fallback: either no data yet or invalid data shape
-    return undefined;
-  }, [data]);
-  console.log(data);
+  const isValidData = isIndexPageSectionArray(data);
 
   /**
    * Handles the click event to open or close the contact form dialog.
@@ -64,22 +42,25 @@ export function Index(): React.JSX.Element | null {
    */
   const handleClick = (): void => setOpenContactFormDialog((formState) => !formState);
 
-  return sortedAndValidatedData ? (
+  return isValidData ? (
     <div className={style.wrapperIndex}>
-      {sortedAndValidatedData.map(({ id, content, anchor, isAnchored, title, introduction }) => (
-        <ShowcaseSection
-          key={id}
-          content={content}
-          anchor={anchor}
-          isAnchored={isAnchored}
-          title={title}
-          introduction={introduction}
-          MenuSectionsVisibility={viewSectionContext}
-          openModalFormDialog={handleClick}
-          showModalFormDialog={openContactFormDialog}
-          modalId={modalId}
-        />
-      ))}
+      {data.map(({ id, detailSections, anchor, isAnchored, title, introduction, isRenderable, hasSectionHeader }) =>
+        isRenderable ? (
+          <ShowcaseSection
+            key={id}
+            detailSections={detailSections}
+            anchor={anchor}
+            isAnchored={isAnchored}
+            hasSectionHeader={hasSectionHeader}
+            title={title}
+            introduction={introduction}
+            MenuSectionsVisibility={viewSectionContext}
+            openModalFormDialog={handleClick}
+            showModalFormDialog={openContactFormDialog}
+            modalId={modalId}
+          />
+        ) : null,
+      )}
     </div>
   ) : null;
 }

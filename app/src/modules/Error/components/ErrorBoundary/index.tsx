@@ -1,4 +1,5 @@
-import React, { Component, ReactNode } from 'react';
+import React, { Component } from 'react';
+import type { ReactNode } from 'react';
 
 import type { FetchErrorContext, Props, State, Window } from '@modules/Error/types';
 import { normalizeError } from '@modules/Error/utils/errorHandling';

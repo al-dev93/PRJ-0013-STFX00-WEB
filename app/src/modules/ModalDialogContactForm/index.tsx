@@ -64,7 +64,6 @@ export function ModalDialogContactForm({
 
   useEffect(() => {
     if (fetchError) {
-      // eslint-disable-next-line no-void
       void handleFetchError('ModalDialogContactForm', fetchError, handleError);
     }
   }, [fetchError, handleError]);
