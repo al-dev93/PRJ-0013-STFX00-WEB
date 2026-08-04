@@ -17,7 +17,7 @@
   --title-gap: clamp(1.25rem, 2.8vw, 2.1rem);
   --pitch-max-width: 36ch;
   --pitch-gap: clamp(0.9rem, 1.8vw, 1.6rem);
-  --body-section-padding-bottom: 50px;
+  --body-section-padding-bottom: var(--semantic-space-xl);
   /* Accent */
   --title-section-underline-length: var(--semantic-title-section-underline-length);
   --title-section-underline-thickness: var(--semantic-title-section-underline-thickness);
