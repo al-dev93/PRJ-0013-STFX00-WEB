@@ -5,20 +5,18 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "ignoreDeprecations": "5.0", // ! attention à baseUrl dépréciée
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@images/*": ["src/assets/images/*"],
-      "@styles/*": ["src/assets/styles/*"],
-      "@components/*": ["src/components/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@modules/*": ["src/modules/*"],
-      "@routes/*": ["src/routes/*"],
-      "@services/*": ["src/services/*"],
-      "@secure/*": ["src/services/secure/*"],
-      "@types/*": ["src/types/*"],
-      "@utils/*": ["src/utils/*"]
+      "@/*": ["./src/*"],
+      "@images/*": ["./src/assets/images/*"],
+      "@styles/*": ["./src/assets/styles/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@services/*": ["./src/services/*"],
+      "@secure/*": ["./src/services/secure/*"],
+      "@types/*": ["./src/types/*"],
+      "@utils/*": ["./src/utils/*"]
     },
     /* Bundler mode */
     "moduleResolution": "Bundler",
