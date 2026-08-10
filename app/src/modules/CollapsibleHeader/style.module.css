@@ -1,35 +1,58 @@
 .header {
+  --header-fluid-gutter-inline: var(--layout-content-gutter);
+  --header-gutter-block: 10px;
+  --header-hover-opacity: 72%;
+  --header-hover-backdrop-filter-blur: 14px;
+  --header-hover-backdrop-filter-saturate: 120%;
+  --header-logo-width: clamp(150px, 15vw, 200px);
+  --header-menu-column-gap: clamp(10px, 1.5vw, 20px);
+  --header-menu-row-gap: 6px;
+
   box-sizing: border-box;
   width: 100%;
-  padding: 10px var(--lateral-margin);
+  padding: var(--header-gutter-block) var(--header-fluid-gutter-inline);
   position: fixed;
   top: 0;
   display: flex;
   justify-content: space-between;
-  background-color: var(--ligth-bg-menu);
+  background-color: transparent;
   z-index: 500;
   transition:
-    top 0.4s ease-out,
-    background-color 0.4s ease-out;
+    transform 0.4s ease-out,
+    background-color 0.3s ease-out,
+    box-shadow 0.3s ease-out;
 }
 
-/* Class to display header in hover mode when user scroll-up */
+/* Header revealed while the user scrolls up */
 .header--isHover {
-  top: 0;
-  backdrop-filter: blur(7px);
-  box-shadow: var(--bsh-collapsible-header);
+  --header-hover-backdrop-filter: blur(var(--header-hover-backdrop-filter-blur))
+    saturate(var(--header-hover-backdrop-filter-saturate));
+  --header-hover-bg: color-mix(in oklch, var(--semantic-surface-1) var(--header-hover-opacity), transparent);
+  --header-hover-bsh: 0 10px 24px -14px rgb(0 0 0 / 28%);
+
+  transform: translateY(0);
+  background-color: var(--header-hover-bg);
+  backdrop-filter: var(--header-hover-backdrop-filter);
+  -webkit-backdrop-filter: var(--header-hover-backdrop-filter);
+  box-shadow: var(--header-hover-bsh);
 }
-/* Class to hide the header when user scroll-down */
+
+/* Header hidden while the user scrolls down */
 .header--isHidden {
-  top: -143px;
+  transform: translateY(-100%);
 }
-/* Class to display the header at the top of the screen, in regular mode */
+
+/* Header integrated into the page at the top of the viewport */
 .header--isRegular {
-  background-color: var(--white);
+  transform: translateY(0);
+  background-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .header__logo {
-  width: 200px;
+  width: var(--header-logo-width);
   height: auto;
 }
 
@@ -39,25 +62,13 @@ nav {
 
 .menuList {
   display: flex;
-  column-gap: 20px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  column-gap: var(--header-menu-column-gap);
+  row-gap: var(--header-menu-row-gap);
   list-style-type: none;
   margin: 0;
   padding: 0;
-}
-
-/* Smartphone */
-@media (max-width: 768px) {
-  .header {
-    padding: 10px 20px;
-  }
-
-  .header__logo {
-    width: 150px;
-  }
-
-  .menuList {
-    column-gap: 10px;
-  }
 }
 
 /* Smartphone with small screen */
@@ -67,7 +78,11 @@ nav {
     align-items: center;
   }
 
-  nav {
+  .header nav {
     align-self: center;
+  }
+
+  .menuList {
+    justify-content: center;
   }
 }
