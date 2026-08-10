@@ -3,7 +3,8 @@ import { useLayoutEffect, useState } from 'react';
 import type { AppError } from '@/types';
 
 import type { CollapsibleHeaderState, ScrollRef } from '../types';
-import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from '../utils/constants';
+import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN, TOP_THRESHOLD } from '../utils/constants';
+
 /**
  * Custom hook that detects the user's scroll direction and returns a state indicating
  * whether the header should be shown, hidden, or reset.
@@ -44,14 +45,17 @@ export function useCollapsibleHeader(scrollWithMenuItem: ScrollRef): {
      * @returns {CollapsibleHeaderState} The new scroll state (SCROLL_UP, SCROLL_DOWN or TOP_OF_SCREEN).
      */
     const determineScrollState = (currentPosition: number): CollapsibleHeaderState => {
+      if (currentPosition <= TOP_THRESHOLD) return TOP_OF_SCREEN;
+
       if (scrollRef.current === currentPosition) {
         // Reset after using the menu-triggered scroll position.
         scrollRef.current = undefined;
 
         return SCROLL_UP;
       }
-      if (currentPosition < position && currentPosition !== TOP_OF_SCREEN) return SCROLL_UP;
+      if (currentPosition < position) return SCROLL_UP;
       if (currentPosition > position) return SCROLL_DOWN;
+
       return TOP_OF_SCREEN;
     };
 
