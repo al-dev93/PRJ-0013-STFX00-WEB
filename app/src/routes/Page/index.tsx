@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import type { OutletContextPage, MenuSectionsVisibility } from '@/types';
+import type { OutletContextPage, SectionsRef } from '@/types';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import logo from '@images/brand/logoAND.png';
 import { CollapsibleHeader } from '@modules/CollapsibleHeader';
@@ -41,11 +41,75 @@ export function Page(): React.JSX.Element {
   // Forwarded to header; used to coordinate menu-driven scroll logic if needed downstream.
   const scrollWithNav = useRef<number>();
 
-  // Shared visibility context for menu highlighting.
-  const viewSectionContext = useRef<MenuSectionsVisibility>({ home: true });
+  // Shared active context for menu highlighting.
+  const [activeSection, setActiveSection] = useState<SectionsRef>('home');
 
   // Root to observe for section availability after route changes (Outlet renders inside).
   const mainRef = useRef<HTMLElement | null>(null);
+
+  // Scrollspy
+  useEffect(() => {
+    const mainElement = mainRef.current;
+    if (!mainElement) return undefined;
+
+    const sectionIds = ['home', 'about', 'work'] as const satisfies readonly SectionsRef[];
+
+    let animationFrameId: number | null = null;
+
+    const updateActiveSection = () => {
+      animationFrameId = null;
+
+      const sections = sectionIds
+        .map((id) => document.getElementById(id))
+        .filter((section): section is HTMLElement => section !== null);
+
+      if (sections.length === 0) return;
+
+      /*
+       * A single virtual line determines the active section.
+       * The most recent section whose top has crossed the middle
+       * of the viewport becomes active.
+       */
+      const activationLine = window.innerHeight / 2;
+
+      let nextActiveSection: (typeof sectionIds)[number] = sectionIds[0];
+
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top > activationLine) break;
+
+        nextActiveSection = section.id as (typeof sectionIds)[number];
+      }
+
+      setActiveSection((currentSection) => (currentSection === nextActiveSection ? currentSection : nextActiveSection));
+    };
+
+    const scheduleUpdate = () => {
+      if (animationFrameId !== null) return;
+
+      animationFrameId = window.requestAnimationFrame(updateActiveSection);
+    };
+
+    scheduleUpdate();
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+
+    const observer = new MutationObserver(scheduleUpdate);
+    observer.observe(mainElement, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      observer.disconnect();
+
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, []);
 
   // Element that opened the dialog (focus will be restored on close).
   const lastOpenerRef = useRef<HTMLElement | null>(null);
@@ -303,7 +367,7 @@ export function Page(): React.JSX.Element {
       {/* Collapsible site header (logo + navigation) */}
       <CollapsibleHeader
         logo={{ src: logo, alt: 'logo' }}
-        MenuSectionsVisibility={viewSectionContext}
+        activeSection={activeSection}
         scrollWithMenuItem={scrollWithNav}
       />
       {/* Contact form dialog */}
@@ -320,7 +384,6 @@ export function Page(): React.JSX.Element {
         <Outlet
           context={
             {
-              viewSectionContext,
               setOpenContactFormDialog,
               openContactFormDialog,
               modalId,

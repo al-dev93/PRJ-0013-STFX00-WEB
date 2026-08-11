@@ -1,4 +1,4 @@
-import type { Dispatch, MouseEventHandler, MutableRefObject, SetStateAction } from 'react';
+import type { Dispatch, MouseEventHandler, SetStateAction } from 'react';
 
 import type { FetchErrorContext } from '@modules/Error/types';
 import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
@@ -136,30 +136,17 @@ export interface IndexPageSection {
  * @description Represents the context passed to the page sections from a React Router outlet.
  *
  * @type {object} OutletContextPage
- * @property {MutableRefObject<MenuSectionsVisibility>} viewSectionContext - A mutable reference to the current
- * visible sections of the page.
  * @property {SetStateBoolean} setOpenContactFormDialog - A function to toggle the state of the contact form dialog.
  * @property {boolean} openContactFormDialog - The current state of the contact form dialog.
  * @property {string} modalId - The id of the modal.
  *
  * @al-dev93
  */
-export type OutletContextPage = {
-  viewSectionContext: MutableRefObject<MenuSectionsVisibility>;
+export interface OutletContextPage {
   setOpenContactFormDialog: SetStateBoolean;
   openContactFormDialog: boolean;
   modalId: string;
-};
-
-/**
- * @description Represents the visibility state of multiple sections on the page and the active menu item(s)
- * because linked to the section(s).
- * The keys are  section names (strings) and the values are booleans indicating
- * whether each section is visible (`true`) or hidden (`false`).
- *
- * @type {Record<string, boolean>} MenuSectionsVisibility
- */
-export type MenuSectionsVisibility = Record<string, boolean>;
+}
 
 export type DetailEntityLevel = 'section' | 'item';
 export type TagKind = 'html' | 'react_component';

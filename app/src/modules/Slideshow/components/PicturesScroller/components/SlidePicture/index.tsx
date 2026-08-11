@@ -45,11 +45,6 @@ export const SlidePicture = memo(function SlidePicture({
    */
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  /**
-   * Custom hook useOnScreen to manage whether the image is in view, used for lazy loading.
-   *
-   * @type {{isIntersecting: boolean; observerError: AppError | undefined;}}
-   */
   const { src, href } = useMemo(() => {
     const { isRemote, urlBase } = getUrlBase();
 

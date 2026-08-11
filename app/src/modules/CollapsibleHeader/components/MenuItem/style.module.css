@@ -1,16 +1,18 @@
 /* Linked section not visible on screen */
 .itemMenu {
-  color: var(--rich-black);
+  --itemMenu-text-color: var(--semantic-text);
+
+  color: var(--itemMenu-text-color);
   text-decoration: none;
 }
 
-.itemMenu:hover {
-  color: var(--secondary-color);
+.itemMenu:hover,
+.itemMenu--isSectionActive {
+  --itemMenu-text-color: color-mix(in oklab, var(--semantic-accent) 60%, var(--semantic-text) 40%);
 }
 
-/* Linked section visible on screen */
-.itemMenu--isSectionVisible {
-  color: var(--secondary-color);
+/* Section currently active in the page navigation. */
+.itemMenu--isSectionActive {
   font-weight: 700;
   text-decoration-line: underline;
 }

@@ -1,6 +1,6 @@
 import type { MutableRefObject } from 'react';
 
-import type { MenuItemType, MenuSectionsVisibility } from '@/types';
+import type { MenuItemType, SectionsRef } from '@/types';
 
 import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
 
@@ -63,23 +63,23 @@ export type CollapsibleHeaderState = typeof SCROLL_DOWN | typeof TOP_OF_SCREEN |
  *
  * @al-dev93
  */
-export type MenuItemProps = Omit<MenuItemType, 'id'> & { isSectionVisible?: boolean; isCollapsedMenu?: boolean };
+export interface MenuItemProps extends Omit<MenuItemType, 'id'> {
+  isSectionActive?: boolean;
+  isCollapsedMenu?: boolean;
+}
 
 /**
  * Represents the properties for collapsible header component.
  *
  * @type {object} CollapsibleHeaderProps
  * @property {ImageType} [logo] - The logo to be displayed in the header.
- * @property {MenuItemType[]} [menu] - The menu items to be displayed in the header.
- * @property {MutableRefObject<MenuSectionsVisibility>} [MenuSectionsVisibility] - Reference to the visible sections
- * for tracking visibility.
+ * @property {SectionRef} [activeSection] - Active section tracking deterministic.
  * @property {MutableRefObject<number | undefined>} scrollWithMenuItem - Reference to the scroll position with the menu item.
  *
  * @al-dev93
  */
-export type CollapsibleHeaderProps = {
+export interface CollapsibleHeaderProps {
   logo?: ImageType;
-  menu?: MenuItemType[];
-  MenuSectionsVisibility?: MutableRefObject<MenuSectionsVisibility>;
+  activeSection?: SectionsRef;
   scrollWithMenuItem: MutableRefObject<number | undefined>;
-};
+}
