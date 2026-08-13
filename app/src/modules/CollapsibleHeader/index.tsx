@@ -31,6 +31,7 @@ export function CollapsibleHeader({
   logo,
   activeSection,
   scrollWithMenuItem,
+  onMenuNavigation,
 }: CollapsibleHeaderProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
 
@@ -142,6 +143,7 @@ export function CollapsibleHeader({
               label={label}
               anchor={anchor}
               isCollapsedMenu={headerState === SCROLL_DOWN}
+              onNavigate={onMenuNavigation}
             />
           ))}
         </ul>

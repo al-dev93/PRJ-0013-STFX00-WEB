@@ -27,6 +27,7 @@ function MemoizedMenuItem({
   label,
   anchor,
   isCollapsedMenu,
+  onNavigate,
 }: MenuItemProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
 
@@ -52,7 +53,13 @@ function MemoizedMenuItem({
   const classNameNavLink = style.itemMenu + (isSectionActive ? ` ${style['itemMenu--isSectionActive']}` : '');
   return anchor && label ? (
     <li>
-      <NavLink className={classNameNavLink} aria-label={label} to={`/#${anchor}`} tabIndex={isCollapsedMenu ? -1 : 0}>
+      <NavLink
+        className={classNameNavLink}
+        aria-label={label}
+        to={`/#${anchor}`}
+        tabIndex={isCollapsedMenu ? -1 : 0}
+        onClick={(event) => onNavigate(event, anchor)}
+      >
         {label}
       </NavLink>
     </li>

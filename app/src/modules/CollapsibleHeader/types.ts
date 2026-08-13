@@ -1,19 +1,8 @@
-import type { MutableRefObject } from 'react';
+import type { MouseEvent, MutableRefObject } from 'react';
 
 import type { MenuItemType, SectionsRef } from '@/types';
 
 import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
-
-/**
- * A mutable reference object that helds the current scroll position as
- * a number or undefined.
- * The value can be updated dynamically as the user scrolls through the page.
- *
- * @type {MutableRefObject<number | undefined>} ScrollRef
- *
- * @al-dev93
- */
-export type ScrollRef = MutableRefObject<number | undefined>;
 
 /**
  * Represents an image with a source URL and alternative text for accessibility.
@@ -21,24 +10,21 @@ export type ScrollRef = MutableRefObject<number | undefined>;
  * @type {object} ImageType
  * @property {string} src - The URL of the image.
  * @property {string} alt - The alternative text for the image, used for accessibility.
- *
- * @al-dev93
  */
-type ImageType = {
+interface ImageType {
   src: string;
   alt: string;
-};
+}
 
 /**
- * A tuple containing the constants SCROLL_DOWN, TOP_OF_SCREEN, SCROLL_UP.
- * These constants are treated as literal types using 'as const'.
+ * A mutable reference object that helds the current scroll position as
+ * a number or undefined.
+ * The value can be updated dynamically as the user scrolls through the page.
  *
- * @constant
- * @type {readonly [typeof SCROLL_DOWN, typeof TOP_OF_SCREEN, typeof SCROLL_UP]}
- *
- * @al-dev93
+ * @type {MutableRefObject<number | undefined>} ScrollRef
+ * @see useCollapsibleHeader
  */
-// const headerState = [SCROLL_DOWN, TOP_OF_SCREEN, SCROLL_UP] as const;
+export type ScrollRef = MutableRefObject<number | undefined>;
 
 /**
  * Type representing the union of the types of the constants in the `headerState` tuple.
@@ -46,11 +32,10 @@ type ImageType = {
  * the type of SCROLL_DOWN, TOP_OF_SCREEN or SCROLL_UP.
  *
  * @type {(typeof headerState)[number]} CollapsibleHeaderState
- *
- * @al-dev93
  */
-// export type CollapsibleHeaderState = (typeof headerState)[number];
 export type CollapsibleHeaderState = typeof SCROLL_DOWN | typeof TOP_OF_SCREEN | typeof SCROLL_UP;
+
+export type MenuNavigationHandler = (event: MouseEvent<HTMLAnchorElement>, targetId: SectionsRef) => void;
 
 /**
  * Extends 'MenuItemType' (excluding 'id') with additionnal properties to represent the props of
@@ -60,12 +45,11 @@ export type CollapsibleHeaderState = typeof SCROLL_DOWN | typeof TOP_OF_SCREEN |
  * @extends {Omit<MenuItemType, 'id'>}
  * @property {boolean} [isSectionVisible] - Indicates whether the linked section is currently visible on the screen.
  * @property {boolean} isCollapsedMenu - Indicates whether the menu is collapsed.
- *
- * @al-dev93
  */
 export interface MenuItemProps extends Omit<MenuItemType, 'id'> {
   isSectionActive?: boolean;
   isCollapsedMenu?: boolean;
+  onNavigate: MenuNavigationHandler;
 }
 
 /**
@@ -75,11 +59,10 @@ export interface MenuItemProps extends Omit<MenuItemType, 'id'> {
  * @property {ImageType} [logo] - The logo to be displayed in the header.
  * @property {SectionRef} [activeSection] - Active section tracking deterministic.
  * @property {MutableRefObject<number | undefined>} scrollWithMenuItem - Reference to the scroll position with the menu item.
- *
- * @al-dev93
  */
 export interface CollapsibleHeaderProps {
   logo?: ImageType;
   activeSection?: SectionsRef;
   scrollWithMenuItem: MutableRefObject<number | undefined>;
+  onMenuNavigation: MenuNavigationHandler;
 }

@@ -41,6 +41,9 @@ export function Page(): React.JSX.Element {
   // Forwarded to header; used to coordinate menu-driven scroll logic if needed downstream.
   const scrollWithNav = useRef<number>();
 
+  // Store the scrolling behavior to the next anchor
+  const nextAnchorScrollBehaviorRef = useRef<ScrollBehavior>('auto');
+
   // Shared active context for menu highlighting.
   const [activeSection, setActiveSection] = useState<SectionsRef>('home');
 
@@ -175,17 +178,15 @@ export function Page(): React.JSX.Element {
   }
 
   /**
-   * Scrolls to a target element by id and gives it focus (without causing a second scroll).
-   * Ensures non-natively-focusable targets can receive programmatic focus via `tabIndex=-1`.
+   * Scrolls to a target element by id and gives it focus without triggering a second scroll.
    *
-   * @param {string} id - Element id to bring into view.
-   * @returns {boolean} True if the element exists and scrolling was initiated.
+   * @param id Element id to bring into view.
+   * @param behavior Scrolling behavior to use. Defaults to `auto`.
+   * @returns `true` when the target exists and scrolling was initiated; otherwise `false`.
    */
-  const scrollAndFocusById = useCallback((id: string): boolean => {
+  const scrollAndFocusById = useCallback((id: string, behavior: ScrollBehavior = 'auto'): boolean => {
     const targetElement = document.getElementById(id) as HTMLElement | null;
     if (!targetElement) return false;
-
-    targetElement.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
 
     // Make programmatically focusable only when necessary.
     if (
@@ -197,8 +198,11 @@ export function Page(): React.JSX.Element {
 
     // Do not override intentional focus inside the target.
     if (document.activeElement !== targetElement && !targetElement.contains(document.activeElement)) {
-      (targetElement as HTMLElement).focus({ preventScroll: true });
+      targetElement.focus({ preventScroll: true });
     }
+
+    targetElement.scrollIntoView({ block: 'start', inline: 'nearest', behavior });
+
     return true;
   }, []);
 
@@ -292,13 +296,17 @@ export function Page(): React.JSX.Element {
 
     const targetId = idFromHash(hash) || DEFAULT_ID;
 
+    const behavior = nextAnchorScrollBehaviorRef.current;
+    nextAnchorScrollBehaviorRef.current = 'auto';
+
     // Try immediately; if not available yet, wait for it under <main>.
-    const ok = scrollAndFocusById(targetId);
+    const ok = scrollAndFocusById(targetId, behavior);
+
     if (!ok) {
       return onElementAvailable(
         targetId,
         () => {
-          scrollAndFocusById(targetId);
+          scrollAndFocusById(targetId, behavior);
         },
         mainRef.current ?? document,
       );
@@ -307,53 +315,30 @@ export function Page(): React.JSX.Element {
   }, [pathname, hash, key, scrollAndFocusById, openContactFormDialog]);
 
   /**
-   * Same-hash re-trigger (document-level, capture phase).
+   * Prepares scrolling behavior for a header menu navigation.
    *
-   * Rationale:
-   * - If the user clicks a menu item that points to the same hash already in the URL,
-   *   React Router won't navigate. We explicitly re-run scroll+focus for that case.
-   *
-   * Filters:
-   * - Unmodified primary-button clicks only.
-   * - Same origin and protocol, same pathname (otherwise the route effect will handle it).
-   *
-   * Cleanup:
-   * - Removes the listener on unmount to avoid duplicates.
+   * @param event Activation event emitted by the menu link.
+   * @param targetId Id of the section targeted by the navigation.
+   * @returns Nothing.
    */
-  useEffect(() => {
-    const onSameHashClick = (e: MouseEvent) => {
-      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const handleMenuNavigation = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, targetId: SectionsRef): void => {
+      const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
-      const target = e.target as Element | null;
-      const anchor = target?.closest('a[href]') as HTMLAnchorElement | null;
-      if (!anchor) return;
+      const behavior: ScrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
 
-      const href = anchor.getAttribute('href') ?? '';
-      if (!href.includes('#')) return;
+      const targetHash = `#${targetId}`;
 
-      let url: URL;
-      try {
-        url = new URL(href, window.location.href);
-      } catch {
+      if (window.location.hash === targetHash) {
+        event.preventDefault();
+        scrollAndFocusById(targetId, behavior);
         return;
       }
 
-      if (url.origin !== window.location.origin || !/^https?:$/.test(url.protocol)) return;
-      if (url.pathname !== window.location.pathname) return;
-      if (url.hash && url.hash === window.location.hash) {
-        const id = decodeURIComponent(url.hash.slice(1));
-        if (!id) return;
-        if (!scrollAndFocusById(id)) {
-          onElementAvailable(id, () => {
-            scrollAndFocusById(id);
-          });
-        }
-      }
-    };
-
-    document.addEventListener('click', onSameHashClick, true);
-    return () => document.removeEventListener('click', onSameHashClick, true);
-  }, [scrollAndFocusById]);
+      nextAnchorScrollBehaviorRef.current = behavior;
+    },
+    [scrollAndFocusById],
+  );
 
   return (
     // If the dialog is rendered via a portal (recommended), `aria-hidden`
@@ -369,6 +354,7 @@ export function Page(): React.JSX.Element {
         logo={{ src: logo, alt: 'logo' }}
         activeSection={activeSection}
         scrollWithMenuItem={scrollWithNav}
+        onMenuNavigation={handleMenuNavigation}
       />
       {/* Contact form dialog */}
       <ModalDialogContactForm
