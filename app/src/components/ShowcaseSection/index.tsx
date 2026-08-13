@@ -1,12 +1,7 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 
-import type { MenuSectionsVisibility } from '@/types';
 import { AppButton } from '@components/AppButton';
 import { HeroSignature } from '@components/HeroSignature';
-import { useOnScreen } from '@hooks/useOnScreen';
-import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
-import { createError } from '@modules/Error/utils/errorHandling';
-import { INTERSECTION_OPTIONS_ROOTMARGIN } from '@utils/constants';
 import { renderFormattedText } from '@utils/stylizedString';
 
 import style from './style.module.css';
@@ -21,7 +16,6 @@ import { renderSectionContent } from './utils/renderSectionContent';
  * @remarks
  * - Builds the section from backend-driven content nodes while preserving semantic headings and dynamic rendering.
  * - Uses `aria-labelledby` on the root section, a stable title id, and dialog-related ARIA attributes on the contact CTA.
- * - Updates the page menu visibility state when the section is anchored and observed on screen.
  * - Exposes styling hooks through the root `data-variant` attribute and CSS module classes derived from `anchor` and node names.
  * - Handles the hero-specific brand signature, CTA readiness state, and intersection target without duplicating prop documentation.
  * - Keep runtime defaults aligned with `@defaultValue` in {@link ShowcaseSectionProps}.
@@ -34,7 +28,6 @@ import { renderSectionContent } from './utils/renderSectionContent';
  *   isAnchored
  *   title="Stack-Flex"
  *   introduction={introduction}
- *   MenuSectionsVisibility={menuSectionsVisibility}
  *   openModalFormDialog={openModalFormDialog}
  *   showModalFormDialog={showModalFormDialog}
  *   modalId="contact-dialog"
@@ -50,30 +43,16 @@ export const ShowcaseSection = memo(function ShowcaseSection({
   hasSectionHeader,
   title,
   introduction,
-  MenuSectionsVisibility,
   openModalFormDialog,
   showModalFormDialog,
   modalId,
 }: ShowcaseSectionProps): React.JSX.Element | null {
-  const handleError = useErrorHandler();
-
   const isHero = anchor === 'home';
 
-  const sectionRef = useRef<HTMLElement | null>(null);
   const kickerRef = useRef<HTMLParagraphElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [hasBrandSignaturePlayed, setHasBrandSignaturePlayed] = useState<boolean>(false);
-
-  const intersectionOptions = useMemo<IntersectionObserverInit>(
-    () => ({
-      threshold: isHero ? [0.45] : undefined,
-      ...INTERSECTION_OPTIONS_ROOTMARGIN,
-    }),
-    [isHero],
-  );
-
-  const { isIntersecting, observerError } = useOnScreen(isHero ? titleRef : sectionRef, intersectionOptions);
 
   const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
 
@@ -81,27 +60,6 @@ export const ShowcaseSection = memo(function ShowcaseSection({
     anchor && TWO_COLUMN_SHOWCASE_SECTION.includes(anchor)
       ? getShowcaseSectionColumn(detailSections)
       : { main: detailSections };
-
-  /**
-   * Updates the visibility of the section in the page sections context.
-   */
-  useEffect(() => {
-    if (!anchor || !isAnchored) return;
-    if (observerError) {
-      void handleError(
-        createError(observerError.code, observerError.message, {
-          ...observerError.context,
-          component: 'ShowcaseSection',
-          operation: 'setupObserver',
-          category: 'UI Interaction',
-          url: window.location.href,
-        }),
-      );
-      return;
-    }
-    const section = MenuSectionsVisibility;
-    (section.current as MenuSectionsVisibility)[anchor as keyof MenuSectionsVisibility] = isIntersecting;
-  }, [anchor, isIntersecting, MenuSectionsVisibility, observerError, handleError, isAnchored]);
 
   /**
    * Renders the title section with a decorative line.
@@ -123,7 +81,6 @@ export const ShowcaseSection = memo(function ShowcaseSection({
     <section
       className={style.section}
       data-variant={anchor ? `${anchor}` : undefined}
-      ref={sectionRef}
       id={isAnchored ? anchor : undefined}
       tabIndex={-1}
       aria-labelledby={`${anchor}-title`}

@@ -7,5 +7,6 @@
 const SCROLL_UP = 1 as const;
 const SCROLL_DOWN = -1 as const;
 const TOP_OF_SCREEN = 0 as const;
+const TOP_THRESHOLD = 8 as const;
 
-export { SCROLL_UP, SCROLL_DOWN, TOP_OF_SCREEN };
+export { SCROLL_UP, SCROLL_DOWN, TOP_OF_SCREEN, TOP_THRESHOLD };

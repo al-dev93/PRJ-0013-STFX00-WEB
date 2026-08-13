@@ -1,13 +1,12 @@
-import type { MutableRefObject, ReactNode, RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 
-import type { DetailSection, SectionsRef, MenuSectionsVisibility, DetailEntity } from '@/types';
-// import type { FetchErrorContext } from '@modules/Error/types';
+import type { DetailSection, SectionsRef, DetailEntity } from '@/types';
 
 /**
  * Public props for {@link ShowcaseSection}.
  *
  * @remarks
- * This interface documents the data, anchoring, visibility tracking, and modal controls
+ * This interface documents the data, anchoring, and modal controls
  * required to render a dynamic showcase section.
  * Keep `@defaultValue` tags aligned with runtime defaults in `index.tsx`.
  */
@@ -69,15 +68,6 @@ export interface ShowcaseSectionProps {
    * @defaultValue undefined
    */
   introduction?: string;
-
-  /**
-   * Mutable visibility registry shared with the page navigation context.
-   *
-   * @remarks
-   * The component updates the entry matching `anchor` when the observed section
-   * intersects the viewport.
-   */
-  MenuSectionsVisibility: MutableRefObject<MenuSectionsVisibility>;
 
   /**
    * Optional handler called when the contact dialog trigger is activated.

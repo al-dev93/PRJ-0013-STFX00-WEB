@@ -23,7 +23,7 @@ export function Index(): React.JSX.Element | null {
    * @constant {boolean} openContactFormDialog - The state of the contact form dialog.
    * @constant {string} modalId - The id of the modal.
    */
-  const { viewSectionContext, setOpenContactFormDialog, openContactFormDialog, modalId } = usePageSection();
+  const { setOpenContactFormDialog, openContactFormDialog, modalId } = usePageSection();
 
   const endpoint = import.meta.env.VITE_API_SHOWCASES_DATA_ENDPOINT;
   /**
@@ -54,7 +54,6 @@ export function Index(): React.JSX.Element | null {
             hasSectionHeader={hasSectionHeader}
             title={title}
             introduction={introduction}
-            MenuSectionsVisibility={viewSectionContext}
             openModalFormDialog={handleClick}
             showModalFormDialog={openContactFormDialog}
             modalId={modalId}

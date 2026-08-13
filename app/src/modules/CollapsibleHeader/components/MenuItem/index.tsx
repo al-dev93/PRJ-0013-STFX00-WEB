@@ -23,10 +23,11 @@ import type { MenuItemProps } from '../../types';
  * @al-dev93
  */
 function MemoizedMenuItem({
-  isSectionVisible,
+  isSectionActive,
   label,
   anchor,
   isCollapsedMenu,
+  onNavigate,
 }: MenuItemProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
 
@@ -47,12 +48,18 @@ function MemoizedMenuItem({
 
   // Check the type of the isCollapsedMenu and the isSectionVisible properties
   validateBooleanOrUndefined(isCollapsedMenu, 'isCollapsedMenu');
-  validateBooleanOrUndefined(isSectionVisible, 'isSectionVisible');
+  validateBooleanOrUndefined(isSectionActive, 'isSectionActive');
 
-  const classNameNavLink = style.itemMenu + (isSectionVisible ? ` ${style['itemMenu--isSectionVisible']}` : '');
+  const classNameNavLink = style.itemMenu + (isSectionActive ? ` ${style['itemMenu--isSectionActive']}` : '');
   return anchor && label ? (
     <li>
-      <NavLink className={classNameNavLink} aria-label={label} to={`/#${anchor}`} tabIndex={isCollapsedMenu ? -1 : 0}>
+      <NavLink
+        className={classNameNavLink}
+        aria-label={label}
+        to={`/#${anchor}`}
+        tabIndex={isCollapsedMenu ? -1 : 0}
+        onClick={(event) => onNavigate(event, anchor)}
+      >
         {label}
       </NavLink>
     </li>

@@ -20,9 +20,7 @@ import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
  * @component
  * @param {CollapsibleHeaderProps} props - The properties for the CollapsibleHeader component.
  * @property {ImageType} [logo] - The logo to be displayed in the header.
- * @property {MenuItemType[]} [menu] - The menu items to be displayed in the header.
- * @property {MutableRefObject<MenuSectionsVisibility>} [MenuSectionsVisibility] - Reference to the visible sections
- * for tracking visibility.
+ * @property {SectionsRef} [activeSection] - Active section tracking deterministic.
  * @property {MutableRefObject<number | undefined>} scrollWithMenuItem - Reference to the scroll position with the menu item.
 
  * @returns {React.JSX.Element} The rendered header component
@@ -31,8 +29,9 @@ import { SCROLL_DOWN, SCROLL_UP, TOP_OF_SCREEN } from './utils/constants';
  */
 export function CollapsibleHeader({
   logo,
-  MenuSectionsVisibility,
+  activeSection,
   scrollWithMenuItem,
+  onMenuNavigation,
 }: CollapsibleHeaderProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
 
@@ -140,10 +139,11 @@ export function CollapsibleHeader({
           {(data as MenuItemType[])?.map(({ label, anchor }) => (
             <MenuItem
               key={anchor}
-              isSectionVisible={MenuSectionsVisibility?.current[anchor as keyof typeof MenuSectionsVisibility.current]}
+              isSectionActive={activeSection === anchor}
               label={label}
               anchor={anchor}
               isCollapsedMenu={headerState === SCROLL_DOWN}
+              onNavigate={onMenuNavigation}
             />
           ))}
         </ul>

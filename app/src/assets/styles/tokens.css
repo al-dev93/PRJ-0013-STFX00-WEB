@@ -113,6 +113,10 @@
     --ref-container-max: 81.25rem; /* 1300px / 16 = 81.25rem */
     --ref-section-max: 62.5rem; /* ≈1000px */
 
+    /* Responsive content gutter */
+    --layout-content-gutter-min: 1.25rem; /* 20px */
+    --layout-content-gutter: max(var(--layout-content-gutter-min), calc((100% - var(--ref-section-max)) / 2));
+
     /* Pixel anchors to reproduce the legacy math exactly */
     --ref-container-max-px: 1300px;
     --ref-section-max-px: 1000px;

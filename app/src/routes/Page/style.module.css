@@ -1,7 +1,7 @@
 .mainPage {
   position: relative;
   overflow: auto;
-  width: 100vw;
+  width: 100%;
   height: auto;
   background-color: var(--white);
 }
@@ -34,7 +34,7 @@
 
 .main {
   width: 100%;
-  max-width: 1300px;
+  max-width: var(--ref-container-max);
   min-height: 100vh;
   margin: 0 auto;
   background-color: transparent;
