@@ -26,10 +26,13 @@
 
 .socialMediaNavBar {
   position: fixed;
-  bottom: 0;
-  right: auto;
-  left: var(--lateral-margin);
-  padding: 6px 6px 0;
+  bottom: var(--semantic-space-lg);
+  left: max(
+    var(--layout-content-gutter-min),
+    calc((100% - var(--ref-container-max)) / 2 + var(--layout-content-gutter-min))
+  );
+
+  z-index: 100;
 }
 
 .main {

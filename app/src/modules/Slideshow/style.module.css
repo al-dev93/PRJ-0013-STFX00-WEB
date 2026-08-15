@@ -60,7 +60,7 @@
   --action-size: 40px;
   --action-border-size: 1px;
   --action-focus-size: 3px;
-  --action-hover-bg: color-mix(in oklch, var(--semantic-surface-1) 82%, var(--semantic-accent) 6%);
+  --action-hover-bg: var(--semantic-surface-1-tinted);
 
   position: relative;
   isolation: isolate;

@@ -3,16 +3,42 @@
 }
 
 .socialMediaNavBar--vertical {
+  --social-nav-bg: color-mix(in oklch, var(--semantic-surface-1) 78%, transparent);
+  --social-nav-border: color-mix(in oklch, var(--semantic-border) 82%, transparent);
+  --social-nav-br: var(--semantic-md-radius);
+  --social-nav-active-color: color-mix(in oklab, var(--semantic-accent) 60%, var(--semantic-text) 40%);
+  --social-nav-hover-bg: color-mix(in oklab, var(--semantic-accent) 8%, var(--semantic-surface-1));
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  row-gap: 6px;
-  margin-bottom: 20px;
+  gap: 0.25rem;
+
+  margin: 0;
+  padding: 0.375rem;
+
+  background: var(--social-nav-bg);
+  border: 1px solid var(--social-nav-border);
+  border-radius: var(--social-nav-br);
+  box-shadow: var(--elevation-2);
+
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
 }
 
-.socialMediaNavBar--verticalLine {
-  display: flex;
-  justify-content: center;
+.socialMediaNavBar__verticalLink {
+  color: var(--semantic-text);
+  border-radius: 999px;
+
+  transition:
+    color calc(160ms * var(--motion-ok)) ease,
+    background-color calc(160ms * var(--motion-ok)) ease,
+    transform calc(160ms * var(--motion-ok)) ease;
+}
+
+.socialMediaNavBar__verticalLink:focus-visible {
+  color: var(--social-nav-active-color);
+  background: var(--social-nav-hover-bg);
 }
 
 .socialMediaNavBar--horizontal {
@@ -21,28 +47,20 @@
   column-gap: 6px;
 }
 
-/* Style for the navigation bar button */
-/*a.socialMediaNavBar__externalLink {*/
-/* ! color: var(--decorative-light); */
-/* ! text-decoration: none; */
-/* ! transition: color 0.3s; */
-/* ! transition: color 200ms ease; */
-/*font-size: 1.34rem;
-  line-height: 1;
-}*/
+.socialMediaNavBar__externalLink--primary:is(a) {
+  --social-nav-primary-surface: oklch(1 0.01 200);
 
-a.socialMediaNavBar__externalLink--primary {
-  --sl-control-border: color-mix(in oklch, var(--semantic-border) 85%, transparent);
-  --semantic-surface-1: oklch(1 0.01 200);
-  /* background: color-mix(in oklch, var(--sl-media-bg) 78%, var(--semantic-accent) 10%);
-  border-color: color-mix(in oklch, var(--sl-media-border) 60%, var(--semantic-accent) 40%); */
-  /* background: color-mix(in oklch, oklch(1 0.01 200) 80%, var(--semantic-accent-weak) 5%); */
-  /* border-color: color-mix(in oklch, var(--semantic-border) 80%, transparent); */
-  background: color-mix(in oklch, var(--semantic-surface-1) 80%, var(--semantic-accent-weak) 5%);
+  background: color-mix(in oklch, var(--social-nav-primary-surface) 80%, var(--semantic-accent-weak) 5%);
 }
 
 /* Mouse only */
 @media (hover: hover) and (pointer: fine) {
+  .socialMediaNavBar__verticalLink:hover {
+    color: var(--social-nav-active-color);
+    background: var(--social-nav-hover-bg);
+    transform: translateY(calc(-1px * var(--motion-ok)));
+  }
+
   .socialMediaNavBar__externalLink:hover {
     color: var(--decorative-dark);
   }
