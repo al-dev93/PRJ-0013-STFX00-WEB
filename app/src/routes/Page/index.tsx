@@ -9,6 +9,7 @@ import { useCsrfToken } from '@modules/ModalDialogContactForm/hooks/useCsrfToken
 import ModalDialogContactForm from '@modules/ModalDialogContactForm/ModalDialogContactFormWithProvider';
 
 import style from './style.module.css';
+import { Footer } from '@/components/Footer';
 
 /**
  * Page
@@ -377,7 +378,7 @@ export function Page(): React.JSX.Element {
           }
         />
       </main>
-      <footer>Pied-de-page</footer>
+      <Footer />
     </div>
   );
 }
