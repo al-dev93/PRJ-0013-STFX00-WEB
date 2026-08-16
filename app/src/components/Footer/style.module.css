@@ -1,0 +1,130 @@
+.footer {
+  --footer-container: var(--ref-container-max);
+  --footer-fluid-gutter-inline: var(--layout-content-gutter);
+
+  width: 100%;
+  margin-block-start: var(--semantic-space-xl);
+
+  background: var(--semantic-surface-2);
+  border-block-start: 1px solid var(--semantic-border);
+}
+
+.footer__container {
+  width: 100%;
+  max-width: var(--footer-container);
+  margin-inline: auto;
+}
+
+.footer__main,
+.footer__meta {
+  margin-inline: var(--footer-fluid-gutter-inline);
+}
+
+.footer__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--semantic-space-lg);
+
+  padding-block: var(--semantic-space-lg);
+}
+
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--semantic-space-sm);
+}
+
+.footer__brandName {
+  font-family: var(--semantic-font-display);
+  font-size: var(--semantic-fs-title);
+  font-weight: 600;
+  line-height: var(--semantic-lh-heading);
+  color: var(--semantic-text);
+}
+
+.footer__baseline {
+  color: var(--semantic-text-muted);
+}
+
+.footer__secondaryNav {
+  flex-shrink: 0;
+}
+
+.footer__secondaryList {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--semantic-space-md);
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.footer__secondaryLink {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 2.75rem;
+
+  color: var(--semantic-text);
+  font-family: inherit;
+  font-size: var(--semantic-fs-kicker);
+  font-weight: 600;
+
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+  text-underline-offset: 0.2em;
+
+  transition:
+    color calc(160ms * var(--motion-ok)) ease,
+    text-decoration-color calc(160ms * var(--motion-ok)) ease;
+}
+
+.footer__contactButton {
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+
+  cursor: pointer;
+}
+
+.footer__meta {
+  padding-block: var(--semantic-space-sm);
+
+  border-block-start: 1px solid var(--semantic-border);
+}
+
+.footer__copyright {
+  color: var(--semantic-text-muted);
+  font-size: var(--semantic-fs-kicker);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .footer__secondaryLink:hover {
+    color: color-mix(in oklab, var(--semantic-accent) 60%, var(--semantic-text) 40%);
+
+    text-decoration-color: currentColor;
+  }
+}
+
+@media (max-width: 48rem) {
+  .footer__main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--semantic-space-md);
+  }
+
+  .footer__secondaryNav {
+    width: 100%;
+  }
+
+  .footer__secondaryList {
+    justify-content: flex-start;
+  }
+}

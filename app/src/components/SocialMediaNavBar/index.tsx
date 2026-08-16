@@ -93,7 +93,7 @@ export const SocialMediaNavBar = memo(function SocialMediaNavBar({
    * @type {AccountLink[] | Deliverable[]}
    */
   const data = useMemo<AccountLink[] | Deliverable[]>(() => {
-    return type === 'left-nav'
+    return type === 'left-nav' || type === 'footer'
       ? ((buttons || fetchedData) as AccountLink[])?.filter((item) => item.onPage)
       : buttons || (fetchedData as Deliverable[]);
   }, [buttons, fetchedData, type]);

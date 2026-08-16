@@ -17,7 +17,7 @@ import type { FetchErrorContext } from '@modules/Error/types';
 export type SocialMediaNavBarProps = {
   className?: string;
   classNameButton?: string;
-  type?: 'left-nav' | 'right-nav' | 'card' | 'slideshow';
+  type?: 'left-nav' | 'right-nav' | 'card' | 'slideshow' | 'footer';
   buttons?: AccountLink[] | Deliverable[];
 };
 
