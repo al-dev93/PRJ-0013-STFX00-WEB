@@ -341,6 +341,10 @@ export function Page(): React.JSX.Element {
     [scrollAndFocusById],
   );
 
+  const handleOpenContactForm = (): void => {
+    setOpenContactFormDialog(true);
+  };
+
   return (
     // If the dialog is rendered via a portal (recommended), `aria-hidden`
     // will correctly hide background content from AT while leaving the dialog exposed.
@@ -378,7 +382,11 @@ export function Page(): React.JSX.Element {
           }
         />
       </main>
-      <Footer />
+      <Footer
+        onOpenContactForm={handleOpenContactForm}
+        isContactFormOpen={openContactFormDialog}
+        contactFormId={modalId}
+      />
     </div>
   );
 }
