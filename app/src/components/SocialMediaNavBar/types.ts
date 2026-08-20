@@ -14,12 +14,12 @@ import type { FetchErrorContext } from '@modules/Error/types';
  *
  * @al-dev93
  */
-export type SocialMediaNavBarProps = {
+export interface SocialMediaNavBarProps {
   className?: string;
   classNameButton?: string;
   type?: 'left-nav' | 'right-nav' | 'card' | 'slideshow' | 'footer';
   buttons?: AccountLink[] | Deliverable[];
-};
+}
 
 /**
  * Props for the SocialMediaButton component.
@@ -31,10 +31,10 @@ export type SocialMediaNavBarProps = {
  *
  * @al-dev93
  */
-export type SocialMediaButtonProps = {
+export interface SocialMediaButtonProps {
   className?: string;
   button: AccountLink | Deliverable;
-};
+}
 
 /**
  * Extended error context interface specific to SocialMediaButton component errors.

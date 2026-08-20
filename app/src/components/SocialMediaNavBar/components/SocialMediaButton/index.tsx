@@ -10,6 +10,7 @@ import { isValidUrl } from '@utils/urlHelpers';
 
 import style from './style.module.css';
 import type { ServiceType, SocialMediaButtonProps } from '../../types';
+
 /**
  * SocialMediaButton component for rendering a button with a social media link.
  * For mail links, the address is encrypted to avoid being displayed in plain text.
@@ -95,7 +96,6 @@ export function SocialMediaButton({ className, button }: SocialMediaButtonProps)
       aria-label={buttonDescription}
       title={buttonDescription}
     >
-      {/* <IonIcon className={style.buttonLink__icon} name={icon} aria-hidden='true' /> */}
       <AppIcon className={style.buttonLink__icon} iconName={icon} />
     </a>
   ) : null;

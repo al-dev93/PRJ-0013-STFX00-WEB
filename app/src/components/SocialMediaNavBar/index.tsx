@@ -2,7 +2,6 @@ import React, { memo, useCallback, useEffect, useMemo } from 'react';
 
 import type { AccountLink, Deliverable } from '@/types';
 import { useFetchData } from '@hooks/useFetchData';
-import verticalLine from '@images/decorations/vertical_line_decorative_light_mode.svg';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
 import { handleFetchError } from '@utils/fetchDataHelpers';
@@ -40,7 +39,6 @@ export const SocialMediaNavBar = memo(function SocialMediaNavBar({
   const endpoint = useMemo(() => (shouldFetch ? import.meta.env.VITE_API_ACCOUNTS_DATA_ENDPOINT : null), [shouldFetch]);
   const { data: fetchedData, fetchError } = useFetchData({
     endpoint,
-    // initialOptions: { method: 'GET' },
     edgeFunction: true,
   });
 
@@ -98,6 +96,28 @@ export const SocialMediaNavBar = memo(function SocialMediaNavBar({
       : buttons || (fetchedData as Deliverable[]);
   }, [buttons, fetchedData, type]);
 
+  /**
+   *
+   *
+   * @param {string} service
+   * @return {string} the composed class names based on the component state.
+   */
+  const getButtonClassName = (service: string): string => {
+    const classNames: string[] = [];
+
+    if (isVerticalNav) {
+      classNames.push(style.socialMediaNavBar__verticalLink);
+    } else if (classNameButton) {
+      classNames.push(classNameButton);
+    }
+
+    if (service === 'external' && (type === 'slideshow' || type === 'card')) {
+      classNames.push(style['socialMediaNavBar__externalLink--primary']);
+    }
+
+    return classNames.join(' ');
+  };
+
   useEffect(() => {
     if ((!endpoint || endpoint.length === 0) && (!buttons || buttons.length === 0)) {
       handleSocialMediaData('props');
@@ -107,27 +127,14 @@ export const SocialMediaNavBar = memo(function SocialMediaNavBar({
   }, [endpoint, buttons, data, handleSocialMediaData]);
 
   return !fetchError ? (
-    <nav
-      className={`${style.socialMediaNavBar} ${className ?? ''}`}
-      // role='navigation'
-      aria-label='Navigation réseaux sociaux et médias'
-    >
+    <nav className={`${style.socialMediaNavBar} ${className ?? ''}`} aria-label='Navigation réseaux sociaux et médias'>
       <ul className={style[`socialMediaNavBar--${isVerticalNav ? `vertical` : `horizontal`}`]}>
         {data?.map((element) => (
           <li key={`${element.service}`}>
-            <SocialMediaButton
-              // className={`${type === 'slideshow' || type === 'card' ? style.socialMediaNavBar__externalLink : ''} ${element.service === 'external' && (type === 'slideshow' || type === 'card') ? style['socialMediaNavBar__externalLink--primary'] : ''} ${changeLinkColor ?? ''}`}
-              className={`${classNameButton ?? ''} ${element.service === 'external' && (type === 'slideshow' || type === 'card') ? style['socialMediaNavBar__externalLink--primary'] : ''}`}
-              button={element}
-            />
+            <SocialMediaButton className={getButtonClassName(element.service)} button={element} />
           </li>
         ))}
       </ul>
-      {isVerticalNav && (
-        <div className={style['socialMediaNavBar--verticalLine']}>
-          <img src={verticalLine} alt='' aria-hidden='true' />
-        </div>
-      )}
     </nav>
   ) : null;
 });
