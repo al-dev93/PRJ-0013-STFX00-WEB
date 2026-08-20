@@ -1,6 +1,5 @@
 .mainPage {
   position: relative;
-  overflow: auto;
   width: 100%;
   height: auto;
   background-color: var(--white);
@@ -24,15 +23,40 @@
   outline: 3px solid var(--rich-black);
 }
 
+.pageContent {
+  position: relative;
+  display: grid;
+}
+
+.main,
+.socialMediaNavBarLayer {
+  grid-area: 1 / 1;
+}
+
+.socialMediaNavBarLayer {
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  align-items: flex-end;
+
+  width: 100%;
+  height: 100dvh;
+  padding-block-end: var(--semantic-space-lg);
+
+  align-self: start;
+
+  pointer-events: none;
+  z-index: 100;
+}
+
 .socialMediaNavBar {
-  position: fixed;
-  bottom: var(--semantic-space-lg);
-  left: max(
+  margin-inline-start: max(
     var(--layout-content-gutter-min),
     calc((100% - var(--ref-container-max)) / 2 + var(--layout-content-gutter-min))
   );
 
-  z-index: 100;
+  pointer-events: auto;
 }
 
 .main {

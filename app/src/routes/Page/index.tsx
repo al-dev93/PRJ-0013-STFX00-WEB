@@ -368,20 +368,26 @@ export function Page(): React.JSX.Element {
         modalId={modalId}
         csrfToken={csrfToken}
       />
-      {/* Left-side social links (external navigation) */}
-      <SocialMediaNavBar className={style.socialMediaNavBar} type='left-nav' />
-      {/* Main content; observed to detect when anchor targets become available */}
-      <main className={style.main} aria-label='Introduction et contenu principal' ref={mainRef}>
-        <Outlet
-          context={
-            {
-              setOpenContactFormDialog,
-              openContactFormDialog,
-              modalId,
-            } satisfies OutletContextPage
-          }
-        />
-      </main>
+      <div className={style.pageContent}>
+        <div className={style.socialMediaNavBarLayer}>
+          {/* Left-side social links (external navigation) */}
+          <SocialMediaNavBar className={style.socialMediaNavBar} type='left-nav' />
+        </div>
+
+        {/* Main content; observed to detect when anchor targets become available */}
+        <main className={style.main} aria-label='Introduction et contenu principal' ref={mainRef}>
+          <Outlet
+            context={
+              {
+                setOpenContactFormDialog,
+                openContactFormDialog,
+                modalId,
+              } satisfies OutletContextPage
+            }
+          />
+        </main>
+      </div>
+
       <Footer
         onOpenContactForm={handleOpenContactForm}
         isContactFormOpen={openContactFormDialog}
