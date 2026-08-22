@@ -188,6 +188,35 @@ strong {
   row-gap: 2.5rem;
 }
 
+/* 960px */
+@media (max-width: 60rem) {
+  .section[data-variant='about'] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      'main'
+      'secondary'
+      'footer';
+  }
+
+  .section[data-variant='about'] .section__secondaryColumn {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--about-grid-column-gap);
+
+    padding-block-start: 0;
+    block-size: auto;
+  }
+}
+
+/* 600px */
+@media (max-width: 37.5rem) {
+  .section[data-variant='about'] .section__secondaryColumn {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .section[data-variant='more'] .more__cardsWrapper {
   --cards-wrapper-gap: var(--semantic-space-xl);
 
