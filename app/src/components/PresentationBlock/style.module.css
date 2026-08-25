@@ -64,6 +64,22 @@ h4 {
   justify-content: space-between;
 }
 
+/* 960px */
+@media (max-width: 62rem) {
+  .section[data-variant='card_list'] {
+    --card-list-body-padding-block: var(--semantic-space-lg);
+  }
+
+  .section[data-variant='card_list'] .cardItem {
+    --card-item-max-char-summary-point: none;
+  }
+
+  .section[data-variant='card_list']:last-child .section__listBody {
+    justify-content: flex-start;
+    gap: var(--card-body-gap);
+  }
+}
+
 /* Specialization of blocks containing grid of items */
 .section[data-variant='card_grid'] .section__listBody {
   display: grid;
@@ -74,6 +90,44 @@ h4 {
 
 .section[data-variant='card_grid'] .section__listBody--flexColumn {
   grid-template-columns: auto auto auto;
+}
+
+/* 768px */
+@media (max-width: 48rem) {
+  .section {
+    --card-item-padding-inline: var(--semantic-space-lg);
+    --card-body-gap: var(--semantic-space-md);
+  }
+
+  .section[data-variant='card_grid'] .section__listBody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .section[data-variant='card_grid'] .section__listBody--flexColumn {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* 640px */
+@media (max-width: 40rem) {
+  .section[data-variant='card_grid'] .section__listBody--flexColumn {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 352px */
+@media (max-width: 22rem) {
+  .section {
+    --card-item-padding-inline: var(--semantic-space-md);
+  }
+
+  .section[data-variant='card_grid'] .section__listBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .section[data-variant='card_grid'] .section__listBody--flexColumn {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* Global style applied to section block items */
@@ -113,6 +167,10 @@ h4 {
 
 .cardItem__iconWrapper__icon--fill > path {
   fill: var(--card-item-icon-fg);
+}
+
+.cardItem__content {
+  min-inline-size: 0;
 }
 
 .cardItem p {
@@ -169,6 +227,14 @@ h4 {
   flex: 0 0 auto;
 }
 
+/* 352px */
+@media (max-width: 22rem) {
+  .cardItem[data-variant='technical_skill'] {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .cardItem[data-variant='cross_cutting_skill'] {
   --card-item-padding-block: 0;
   --card-item-padding-inline: 0;
@@ -218,6 +284,17 @@ h4 {
   inset-inline: var(--card-item-stroke-inline-size);
   block-size: var(--card-item-stroke-thickness);
   background-color: var(--card-item-stroke-color);
+}
+
+/* 600px */
+@media (max-width: 37.5rem) {
+  .cardItem[data-variant='summary_point'] {
+    --card-item-summary-margin-end: var(--semantic-space-lg);
+  }
+
+  .cardItem[data-variant='summary_conclusion'] {
+    --card-item-padding-block: var(--semantic-space-lg);
+  }
 }
 
 /* Styles specific to the "Methodology" block */

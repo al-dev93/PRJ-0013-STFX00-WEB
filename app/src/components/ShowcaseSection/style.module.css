@@ -163,6 +163,13 @@ strong {
   margin-inline: auto;
 }
 
+.section[data-variant='about'] .section__header p {
+  max-inline-size: min(
+    var(--section-header-introduction-max-width),
+    calc(100% - var(--section-header-introduction-offset))
+  );
+}
+
 .section[data-variant='about'] .section__mainColumn,
 .section[data-variant='about'] .section__secondaryColumn {
   display: flex;
@@ -188,8 +195,8 @@ strong {
   row-gap: 2.5rem;
 }
 
-/* 960px */
-@media (max-width: 60rem) {
+/* 992px */
+@media (max-width: 62rem) {
   .section[data-variant='about'] {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto auto;
