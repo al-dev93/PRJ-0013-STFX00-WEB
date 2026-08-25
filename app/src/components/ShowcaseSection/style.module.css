@@ -163,6 +163,13 @@ strong {
   margin-inline: auto;
 }
 
+.section[data-variant='about'] .section__header p {
+  max-inline-size: min(
+    var(--section-header-introduction-max-width),
+    calc(100% - var(--section-header-introduction-offset))
+  );
+}
+
 .section[data-variant='about'] .section__mainColumn,
 .section[data-variant='about'] .section__secondaryColumn {
   display: flex;
@@ -186,6 +193,35 @@ strong {
   padding-block-start: 32px;
   block-size: 100%;
   row-gap: 2.5rem;
+}
+
+/* 992px */
+@media (max-width: 62rem) {
+  .section[data-variant='about'] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      'main'
+      'secondary'
+      'footer';
+  }
+
+  .section[data-variant='about'] .section__secondaryColumn {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--about-grid-column-gap);
+
+    padding-block-start: 0;
+    block-size: auto;
+  }
+}
+
+/* 600px */
+@media (max-width: 37.5rem) {
+  .section[data-variant='about'] .section__secondaryColumn {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .section[data-variant='more'] .more__cardsWrapper {

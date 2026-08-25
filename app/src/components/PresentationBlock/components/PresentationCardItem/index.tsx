@@ -51,7 +51,7 @@ export default function PresentationCardIem({
   const renderOptimizedTextContent = (): React.JSX.Element | null => {
     if (name && content) {
       return (
-        <div>
+        <div className={style.cardItem__content}>
           <h4>{name}</h4>
           <p>{content}</p>
         </div>
