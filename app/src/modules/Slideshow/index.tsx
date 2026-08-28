@@ -103,23 +103,6 @@ const Slideshow = memo(function Slideshow({
           <p className='visually-hidden' aria-live='polite' aria-atomic='true'>
             Projet {slideshowState.new + 1} sur {slideshowState.maxIndexSlide + 1} : {activeSlide.title}
           </p>
-          {/* <div className={style.slideshow__titleRow}>
-            <h3 className={style.slideshow__title}>
-              <span className={style.slideshow__project}>{activeSlide.title}</span>
-              <span className={style.slideshow__dash} aria-hidden='true'>
-                {' '}
-                —{' '}
-              </span>
-              <span className={style.slideshow__subtitle}>{activeSlide.subtitle}</span>
-            </h3>
-            <ProjectSheetLink
-              projectSheet={activeSlide.projectSheet}
-              title={activeSlide.title}
-              linkLabel="Voir l'étude de cas (PDF)"
-              className={style.projectLink}
-              variant='slideshow'
-            />
-          </div> */}
         </header>
         <PicturesScroller
           slideContent={data as ProjectData[]}

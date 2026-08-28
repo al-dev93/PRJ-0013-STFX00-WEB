@@ -180,14 +180,3 @@
     text-align: left;
   }
 }
-
-@media (max-width: 480px) {
-  .projectLinkRow {
-    justify-content: flex-start;
-  }
-  .projectLink {
-    display: inline-flex;
-    margin-left: 0.5rem;
-    margin-top: 0.4rem;
-  }
-}
