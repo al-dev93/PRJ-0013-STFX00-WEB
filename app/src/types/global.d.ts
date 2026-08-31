@@ -1,7 +1,7 @@
 import type { Dispatch, MouseEventHandler, SetStateAction } from 'react';
 
 import type { FetchErrorContext } from '@modules/Error/types';
-import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
+import { TAG_CARD, TAG_FORM, TAG_GALLERY, TAG_SLIDESHOW } from '@utils/constants';
 import { COMPONENT_TAGS, HTML_TAGS } from '@utils/dynamicElementsconstants';
 
 import type { AppIconName } from './appicons';
@@ -102,7 +102,7 @@ export interface AccountLink {
  * @description The type of tag to determine its style.
  */
 // export type TagType = 'alerted' | 'filled' | 'thinned';
-export type TagType = typeof TAG_CARD | typeof TAG_FORM | typeof TAG_SLIDESHOW;
+export type TagType = typeof TAG_CARD | typeof TAG_FORM | typeof TAG_SLIDESHOW | typeof TAG_GALLERY;
 
 /**
  * @description

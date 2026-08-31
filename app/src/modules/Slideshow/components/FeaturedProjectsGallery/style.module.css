@@ -1,0 +1,200 @@
+.gallery {
+  --gallery-fs-description: calc(var(--semantic-fs-body) * 13 / 16);
+  --gallery-lh-body-description: calc(var(--semantic-lh-body) * 1.45 / 1.55);
+  --gallery-fs-subtitle: calc(var(--semantic-fs-body) * 14 / 16);
+  --gallery-lh-subtitle: calc(var(--semantic-lh-heading) * 1.3 / 1.2);
+
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.gallery__list {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: var(--semantic-space-md);
+
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+
+  scroll-snap-type: inline mandatory;
+  scroll-padding-inline: 0;
+
+  list-style: none;
+}
+
+.gallery__item {
+  min-inline-size: 0;
+
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+.gallery__card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+
+  min-inline-size: 0;
+  block-size: 100%;
+}
+
+.gallery__mediaLink {
+  position: relative;
+  display: block;
+  min-inline-size: 0;
+
+  color: inherit;
+  text-decoration: none;
+
+  border-radius: var(--semantic-radius-md);
+}
+
+.gallery__mediaLink:focus {
+  outline: none;
+}
+
+.gallery__mediaLink::after {
+  content: '';
+
+  position: absolute;
+  inset: 2px;
+  z-index: 3;
+
+  border: 2px solid transparent;
+  border-radius: inherit;
+
+  pointer-events: none;
+}
+
+.gallery__mediaLink:focus-visible::after {
+  border-color: var(--semantic-ring);
+}
+
+.gallery__media {
+  position: relative;
+  isolation: isolate;
+
+  aspect-ratio: 16 / 9;
+  inline-size: 100%;
+
+  overflow: hidden;
+}
+
+.gallery__image {
+  display: block;
+
+  inline-size: 100%;
+  block-size: 100%;
+
+  object-fit: cover;
+}
+
+.gallery__position {
+  position: absolute;
+  inset-block-start: var(--semantic-space-sm);
+  inset-inline-end: var(--semantic-space-sm);
+  z-index: 1;
+
+  padding: 0.2rem 0.4rem;
+
+  font-size: var(--semantic-fs-kicker);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+
+  background: color-mix(in oklch, var(--semantic-surface-1) 88%, transparent);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.gallery__projectSheetHint {
+  position: absolute;
+  inset-inline-start: var(--semantic-space-sm);
+  inset-block-end: var(--semantic-space-sm);
+  z-index: 1;
+
+  pointer-events: none;
+}
+
+.gallery__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--semantic-space-md);
+
+  min-inline-size: 0;
+  padding-block-end: var(--semantic-space-sm);
+}
+
+.gallery__header {
+  display: grid;
+  gap: var(--semantic-space-xs);
+}
+
+.gallery__title,
+.gallery__subtitle,
+.gallery__description {
+  margin: 0;
+}
+
+.gallery__title {
+  font-weight: 700;
+  line-height: var(--semantic-lh-heading);
+}
+
+.gallery__subtitle {
+  font-size: var(--gallery-fs-subtitle);
+  font-weight: 500;
+  line-height: var(--gallery-lh-subtitle);
+}
+
+.gallery__description {
+  color: var(--semantic-text-muted);
+  font-size: var(--gallery-fs-description);
+  line-height: var(--gallery-lh-body-description);
+}
+
+.gallery__actions {
+  margin-top: auto;
+  margin-inline-start: var(--semantic-space-md);
+}
+
+.gallery__socialMediaNavBar__buttons {
+  inline-size: var(--action-size);
+  block-size: var(--action-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: var(--sl-control-bg);
+  border: var(--action-border-size) solid var(--sl-control-border);
+  box-shadow: var(--sl-control-shadow);
+
+  color: var(--semantic-text);
+
+  transition:
+    box-shadow calc(160ms * var(--motion-ok)) ease,
+    border-color calc(160ms * var(--motion-ok)) ease,
+    background-color calc(160ms * var(--motion-ok)) ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gallery__socialMediaNavBar__buttons:hover {
+    background: var(--action-hover-bg);
+    border-color: var(--semantic-ring);
+    box-shadow:
+      var(--sl-media-shadow),
+      0 0 0 1px color-mix(in oklch, var(--semantic-ring) 35%, transparent);
+  }
+}
+
+@media (forced-colors: active) {
+  .gallery__mediaLink:focus-visible::after {
+    border-color: Highlight;
+  }
+}

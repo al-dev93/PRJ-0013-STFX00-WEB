@@ -41,3 +41,19 @@
   text-decoration: solid underline var(--skill-card-primary-tag-color) 2px;
   text-underline-offset: 2px;
 }
+
+.skills.skills--gallery {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  gap: var(--semantic-space-xs) var(--semantic-space-sm);
+  padding: 0;
+}
+
+.skills.skills--gallery > li {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}

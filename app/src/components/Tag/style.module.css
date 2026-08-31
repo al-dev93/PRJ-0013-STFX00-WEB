@@ -30,3 +30,16 @@
   background: color-mix(in oklch, var(--semantic-surface-1) 85%, transparent);
   color: var(--semantic-text-muted);
 }
+
+.tag[data-variant='gallery-tag'] {
+  max-inline-size: 100%;
+  /* padding: var(--space-1) var(--space-2); */
+  padding: 0.2rem 0.35rem;
+
+  /* font-size: var(--fs-xxs);
+  line-height: var(--ref-lh-body); */
+  font-size: var(--semantic-fs-kicker);
+  line-height: 1.2;
+
+  border-radius: var(--semantic-radius-sm);
+}

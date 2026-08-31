@@ -111,67 +111,6 @@
   font-weight: var(--sl-header-introduction-bold-fw);
 }
 
-.slideshowWrapper {
-  position: relative;
-  display: grid;
-  gap: var(--semantic-space-md);
-}
-
-/* Text style for the description below the slideshow */
-.description {
-  margin: 0;
-  color: var(--semantic-text-soft);
-  font-size: var(--semantic-fs-body);
-  line-height: var(--semantic-lh-body);
-}
-
-/* Button icon styling */
-.externalLinks {
-  inline-size: var(--action-size);
-  block-size: var(--action-size);
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 999px;
-  background: var(--sl-control-bg);
-  border: var(--action-border-size) solid var(--sl-control-border);
-  box-shadow: var(--sl-control-shadow);
-
-  color: var(--semantic-text);
-
-  transition:
-    transform calc(160ms * var(--motion-ok)) ease,
-    box-shadow calc(160ms * var(--motion-ok)) ease,
-    border-color calc(160ms * var(--motion-ok)) ease,
-    background-color calc(160ms * var(--motion-ok)) ease;
-}
-
-/* Footer section with flex layout for alignment */
-.footer {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--semantic-space-lg);
-  flex-wrap: wrap;
-
-  padding-top: var(--semantic-space-md);
-  border-top: 1px solid color-mix(in oklch, var(--semantic-border) 60%, transparent);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .externalLinks:hover {
-    background: var(--action-hover-bg);
-    transform: translateY(calc(-1px * var(--motion-ok)));
-    border-color: var(--semantic-ring);
-    box-shadow:
-      var(--sl-media-shadow),
-      0 0 0 1px color-mix(in oklch, var(--semantic-ring) 35%, transparent);
-  }
-}
-
-/* option : sur desktop tu peux aligner à gauche si tu préfères “éditorial” */
 @media (min-width: 900px) {
   .slideshow__header {
     justify-content: flex-start;

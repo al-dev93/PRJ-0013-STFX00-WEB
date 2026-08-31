@@ -11,6 +11,7 @@ const LAZY_STATUS = 'lazy';
 const TAG_SLIDESHOW = 'slideshow-tag';
 const TAG_CARD = 'card-tag';
 const TAG_FORM = 'warning-tag';
+const TAG_GALLERY = 'gallery-tag';
 const INTERSECTION_OPTIONS_ROOTMARGIN = { rootMargin: '-100px' };
 
 const SERVICE_LABEL = {
@@ -74,6 +75,7 @@ export {
   SERVICE_LABEL,
   TAG_CARD,
   TAG_FORM,
+  TAG_GALLERY,
   TAG_SLIDESHOW,
   VISIBLE_STATUS,
 };

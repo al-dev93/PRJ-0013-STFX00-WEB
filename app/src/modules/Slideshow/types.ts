@@ -50,6 +50,10 @@ export interface PicturesScrollerProps {
   slideshowDispatch: Dispatch<SlideshowAction>;
 }
 
+export interface FeaturedProjectsProps {
+  projects: ProjectData | ProjectData[];
+}
+
 /**
  * Props for the SlideshowDots component.
  * Represents the pagination dots for navigating the slideshow.
