@@ -40,6 +40,8 @@ export const ProjectSheetLink = memo(function MemoizedProjectSheetLink({
     return `${urlBase}/project-sheets/${encodePath(projectSheet)}${PROJECT_SHEET_EXTENSION}`;
   }, [projectSheet, isRemote, urlBase]);
 
+  const isMediaLinkHint = variant === 'slideshow' || variant === 'gallery';
+
   const content = () => (
     <>
       <svg
@@ -63,57 +65,27 @@ export const ProjectSheetLink = memo(function MemoizedProjectSheetLink({
   );
   if (!href && variant !== 'slideshow') return null;
 
-  return (
-    // <a
-    //   href={href}
-    //   target='_blank'
-    //   rel='noopener noreferrer'
-    //   className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
-    //   data-variant={variant || undefined}
-    //   aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
-    // >
-    //   <svg
-    //     aria-hidden='true'
-    //     focusable='false'
-    //     className={styles.linkPdf__icon}
-    //     viewBox='0 0 24 24'
-    //     fill='none'
-    //     stroke='currentColor'
-    //     strokeWidth='1.6'
-    //     strokeLinecap='round'
-    //     strokeLinejoin='round'
-    //   >
-    //     <path d='M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z' />
-    //     <path d='M14 3v5h5' />
-    //     <path d='M9 13h6' />
-    //     <path d='M9 17h6' />
-    //   </svg>
-    //   {linkLabel}
-    //   <span className='visually-hidden'> — ouvre le fichier (PDF) dans un nouvel onglet</span>
-    // </a>
-    variant !== 'slideshow' ? (
-      <a
-        href={href}
-        target='_blank'
-        rel='noopener noreferrer'
-        className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
-        data-variant={variant || undefined}
-        aria-hidden='true'
-        // aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
-      >
-        {content()}
-        <span className='visually-hidden'> — ouvre la fiche projet « {title} » (PDF) dans un nouvel onglet</span>
-      </a>
-    ) : (
-      <span
-        className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
-        data-variant={variant || undefined}
-        aria-hidden='true'
-        // aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
-      >
-        {content()}
-        <span className='visually-hidden'> — lien via l&apos;image</span>
-      </span>
-    )
+  return !isMediaLinkHint ? (
+    <a
+      href={href}
+      target='_blank'
+      rel='noopener noreferrer'
+      className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
+      data-variant={variant || undefined}
+      aria-hidden='true'
+      // aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
+    >
+      {content()}
+      <span className='visually-hidden'> — ouvre la fiche projet « {title} » (PDF) dans un nouvel onglet</span>
+    </a>
+  ) : (
+    <span
+      className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
+      data-variant={variant || undefined}
+      aria-hidden='true'
+    >
+      {content()}
+      <span className='visually-hidden'> — lien via l&apos;image</span>
+    </span>
   );
 });

@@ -1,4 +1,4 @@
-type LayoutType = 'slideshow' | 'card';
+type LayoutType = 'slideshow' | 'card' | 'gallery';
 /**
  * Props for the Skills component.
  *

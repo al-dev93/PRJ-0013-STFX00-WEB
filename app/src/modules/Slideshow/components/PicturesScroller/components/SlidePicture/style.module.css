@@ -109,13 +109,20 @@
   max-width: 30ch;
 }
 
+@media (max-width: 43.75rem) {
+  .slideshowOverlay__subtitle {
+    font-size: calc(var(--semantic-fs-body) * 0.92);
+    line-height: var(--semantic-lh-heading);
+  }
+}
+
 .slideshowOverlay__cta::after {
   content: '→';
   margin-left: 0.35ch;
   transition: transform 180ms ease;
 }
 
-/* Wrapper de ratio : empêche le CLS */
+/* Ratio wrapper: prevents CLS */
 .picturesToScroll__frame {
   position: relative;
   isolation: isolate;
@@ -139,12 +146,12 @@
   will-change: transform;
 }
 
-/* ring dessiné AU-DESSUS de l'image, avec marge égale partout */
+/* ring drawn OVER the image, with equal margins all around */
 .picturesToScroll__frame::after {
   content: '';
   position: absolute;
   inset: 6px;
-  z-index: 4; /* au-dessus de l'image */
+  z-index: 4; /* above the image */
 
   border-radius: inherit;
   opacity: 0;
@@ -153,7 +160,7 @@
   pointer-events: none;
 }
 
-/* 3) ACTIVE slide: subtle premium lift */
+/* ACTIVE slide: subtle premium lift */
 .picturesToScroll--visible .picturesToScroll__frame {
   transform: translateY(0) scale(1);
   opacity: 1;
@@ -162,7 +169,7 @@
     0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 4) ADJACENT slides: depth retreat */
+/* ADJACENT slides: depth retreat */
 .picturesToScroll--adjacent .picturesToScroll__frame {
   transform: translateY(12px) scale(0.955);
   opacity: 0.9;
@@ -171,7 +178,7 @@
     0 1px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* 5) HIDDEN slides: keep very low visual noise */
+/* HIDDEN slides: keep very low visual noise */
 .picturesToScroll--hidden .picturesToScroll__frame {
   opacity: 0.35;
   transform: translateY(16px) scale(0.94);
@@ -188,7 +195,7 @@
   outline: none;
 }
 
-/* affichage du ring quand le LIEN a le focus clavier */
+/* Display the focus ring when the link has keyboard focus */
 .picturesToScroll__link:focus-visible .picturesToScroll__frame::after {
   opacity: 1;
   box-shadow: 0 0 0 3px var(--sl-focus-ring);
@@ -204,7 +211,7 @@
   pointer-events: none;
 }
 
-/* Effets hover/focus seulement si pointeur fin et pas reduced motion */
+/* Hover/focus effects only with fine pointer and no reduced motion. */
 @media (hover: hover) and (pointer: fine) {
   .picturesToScroll--visible:hover .picturesToScroll__frame {
     transform: translateY(0) scale(calc(1 + var(--frame-hover-scale) * var(--motion-ok)));
@@ -249,18 +256,3 @@
     --frame-max-h: clamp(420px, 55dvh, 720px);
   }
 }
-
-/* Smartphones */
-/* @media (max-width: 768px) {
-  .picturesToScroll--parallaxOn {
-    transform: none;
-  }
-} */
-
-/* Tablet */
-/* @media (max-width: 1024px) {
-  .picturesToScroll__img {
-    max-width: 50%;
-    margin-inline: auto;
-  }
-} */

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
 import { createError } from '@modules/Error/utils/errorHandling';
-import { TAG_CARD, TAG_FORM, TAG_SLIDESHOW } from '@utils/constants';
+import { TAG_CARD, TAG_FORM, TAG_GALLERY, TAG_SLIDESHOW } from '@utils/constants';
 
 import style from './style.module.css';
 import type { TagProps } from './types';
@@ -60,7 +60,7 @@ export function Tag({ className, tag, variant, id, ariaHidden }: TagProps): Reac
   useEffect(() => {
     if (!tag) {
       handleTagValidity();
-    } else if (variant && ![TAG_CARD, TAG_FORM, TAG_SLIDESHOW].includes(variant)) {
+    } else if (variant && ![TAG_CARD, TAG_FORM, TAG_SLIDESHOW, TAG_GALLERY].includes(variant)) {
       handleTagValidity('tagType');
     }
   }, [handleTagValidity, tag, variant]);

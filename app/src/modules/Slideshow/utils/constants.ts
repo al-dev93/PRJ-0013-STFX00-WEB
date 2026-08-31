@@ -112,6 +112,11 @@ const ARIA_LABEL_SCROLL_BUTTONS = {
   [NEXT_SCROLL_BUTTON]: 'Diapo suivante',
 } as const;
 
+/**
+ * Media query used by the 'useMediaQuery' hook to detect mobile viewports.
+ */
+const FEATURED_PROJECTS_GALLERY_MEDIA_QUERY = '(max-width: 39rem)';
+
 export {
   ADJACENT_VISIBILITY,
   ANIMATION_DURATION,
@@ -122,6 +127,7 @@ export {
   FIRST_SLIDE_INDEX,
   INIT_MAX_INDEX_SLIDE,
   INTERSECTION_OPTIONS_THRESHOLD,
+  FEATURED_PROJECTS_GALLERY_MEDIA_QUERY,
   LAST_SLIDE_INDEX,
   NEXT_SLIDE,
   NEXT_SCROLL_BUTTON,
