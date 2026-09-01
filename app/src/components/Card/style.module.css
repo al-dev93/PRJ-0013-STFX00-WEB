@@ -160,11 +160,31 @@
 }
 
 .card__description {
+  --card-fs-description: calc(var(--semantic-fs-body) * 14 / 16);
+
   display: grid;
   gap: var(--card-main-gap);
   font-size: var(--card-fs-description);
   min-width: 0;
   min-height: calc(1.45em * 4 + var(--card-main-gap) + 1.5em);
+}
+
+@media (min-width: 25.5rem) {
+  .card__description {
+    --card-fs-description: var(--semantic-fs-body);
+  }
+}
+
+@media (min-width: 39rem) and (max-width: 43.6rem) {
+  .card__description {
+    --card-fs-description: calc(var(--semantic-fs-body) * 13.9 / 16);
+  }
+}
+
+@media (min-width: 62rem) and (max-width: 64.2rem) {
+  .card__description {
+    --card-fs-description: calc(var(--semantic-fs-body) * 15.3 / 16);
+  }
 }
 
 .card__description > span {
