@@ -17,7 +17,6 @@ import type { FormButtonProps } from './types';
  * @property {MouseEventButton} [onClick] - Click event handler for the button.
  * @property {string} name - The text content of the button.
  * @property {ButtonVariant} [variant] - Style variant.
- * @property {ButtonState} [state] - Button state
  * @property {boolean} [disabled] - Indicates whether the button is disabled.
  * @property {(boolean | 'false' | 'true' | 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog')} [ariaHasPopup] - Indicates whether the button has a popup.
  * @property {boolean} [ariaExpanded] - Indicates whether the button is expanded.
@@ -31,11 +30,11 @@ import type { FormButtonProps } from './types';
  */
 export const AppButton = memo(
   forwardRef(function AppButton(
-    { variant, state, className = '', ...rest }: FormButtonProps,
+    { variant, className = '', ...rest }: FormButtonProps,
     ref?: React.ForwardedRef<HTMLButtonElement>,
   ): React.JSX.Element {
     const { form, onClick, name, disabled, ariaHasPopup, ariaExpanded, ariaControls, ariaLabel } = rest;
-    const isDisabled = state ? state === 'pending' || disabled === false : disabled;
+    const isDisabled = disabled;
 
     const handleError = useErrorHandler();
 
@@ -64,7 +63,6 @@ export const AppButton = memo(
         form={form}
         type={form ? 'submit' : 'button'}
         data-variant={variant}
-        data-state={state}
         onClick={handleClick}
         ref={ref}
         disabled={isDisabled}

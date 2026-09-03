@@ -1,116 +1,15 @@
 .heroSignature {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  inline-size: 100%;
 }
 
 .heroSignature__svg {
-  --hero-stylized-brand-base-color: var(--semantic-brand-muted);
-  --hero-stylized-brand-base-blur: blur(0.5px);
-  --hero-stylized-brand-base-opacity: 0.06;
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
 
-  --hero-stylized-brand-revealed-color: var(--semantic-brand);
-  --hero-stylized-brand-revealed-opacity: 0.85;
-  --hero-stylized-brand-revealed-transition: opacity 220ms ease-out, filter 220ms ease-out;
-
-  --hero-stylized-brand-revealed-final-opacity: 0.95;
-  --hero-stylized-brand-revealed-final-filter: drop-shadow(0 0 4px rgba(182, 243, 255, 0.35));
-
-  --hero-bright-spot-transition: opacity 180ms ease-out;
-  --hero-bright-spot-blur: url(#heroBrightSpotSoftGlow);
-  --hero-bright-spot-outer-gradient: color-mix(in oklch, var(--ref-brand-300) 65%, white);
-  --hero-bright-spot-intermediate-gradient: color-mix(in oklch, var(--ref-brand-300) 35%, white);
-  --hero-bright-spot-inner-gradient: color-mix(in oklch, var(--ref-brand-300) 0%, white);
-  --hero-bright-spot-outer-color: url(#heroBrightSpotOuter);
-  --hero-bright-spot-intermediate-color: #baf3ff;
-  --hero-bright-spot-inner-color: #e9fbff;
-  --hero-bright-spot-intermediate-opacity: 0.2;
-  --hero-bright-spot-inner-opacity: 0.35;
-  --hero-bright-spot-outer-stop-opacity: 0.4;
-  --hero-bright-spot-intermediate-stop-opacity: 0.16;
-  --hero-bright-spot-inner-stop-opacity: 0;
-
-  position: absolute;
-  inset: auto auto -30px 165px;
-  width: 86.866%;
-  height: auto;
+  --hero-signature-fg: color-mix(in oklch, var(--semantic-text) 82%, var(--semantic-surface-1));
 }
 
-.heroSignature__svg g path:not(:nth-child(3)) {
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.heroSignature__brandBase,
-.heroSignature__brandGlow {
-  stroke-width: 0;
-}
-
-.heroSignature__brandBase {
-  filter: var(--hero-stylized-brand-base-blur);
-  opacity: var(--hero-stylized-brand-base-opacity);
-}
-
-.heroSignature__brandBase path {
-  fill: var(--hero-stylized-brand-base-color);
-  stroke: var(--hero-stylized-brand-base-color);
-}
-
-.heroSignature__brandGlow path {
-  fill: var(--hero-stylized-brand-revealed-color);
-  stroke: var(--hero-stylized-brand-revealed-color);
-  opacity: var(--hero-stylized-brand-revealed-opacity);
-  transition: var(--hero-stylized-brand-revealed-transition);
-}
-
-.heroSignature__brandGlowFinal path {
-  opacity: var(--hero-stylized-brand-revealed-final-opacity);
-  filter: var(--hero-stylized-brand-revealed-final-filter);
-}
-
-/* À adapter en fonction de comment tu places le SVG dans ton hero */
-.heroSignature__tracer {
-  fill: none;
-  stroke: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  pointer-events: none;
-}
-
-.heroSignature__brightSpot {
-  transition: var(--hero-bright-spot-transition);
-  filter: var(--hero-bright-spot-blur);
-}
-
-/* Outter halo */
-.heroSignature__brightSpotGradient stop:first-child {
-  stop-color: var(--hero-bright-spot-outer-gradient);
-  stop-opacity: var(--hero-bright-spot-outer-stop-opacity);
-}
-.heroSignature__brightSpot circle:first-child {
-  fill: var(--hero-bright-spot-outer-color);
-}
-
-/* Intermediate halo */
-.heroSignature__brightSpotGradient stop:nth-child(2) {
-  stop-color: var(--hero-bright-spot-intermediate-gradient);
-  stop-opacity: var(--hero-bright-spot-intermediate-stop-opacity);
-}
-.heroSignature__brightSpot circle:nth-child(2) {
-  fill: var(--hero-bright-spot-intermediate-color);
-  opacity: var(--hero-bright-spot-intermediate-opacity);
-}
-
-/* Inner halo */
-.heroSignature__brightSpotGradient stop:last-child {
-  stop-color: var(--hero-bright-spot-inner-gradient);
-  stop-opacity: var(--hero-bright-spot-inner-stop-opacity);
-}
-.heroSignature__brightSpot circle:last-child {
-  fill: var(--hero-bright-spot-inner-color);
-  opacity: var(--hero-bright-spot-inner-opacity);
-}
-
-.heroSignature__brightSpot--done {
-  opacity: 0;
+.heroSignature__brand {
+  fill: var(--hero-signature-fg);
 }
