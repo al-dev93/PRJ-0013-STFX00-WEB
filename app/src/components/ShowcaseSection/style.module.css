@@ -25,7 +25,7 @@
   /* Locale typo */
   --strong-text-fw: 600;
   --title-section-lh: var(--semantic-lh-heading);
-  --kicker-fg: color-mix(in oklch, var(--semantic-accent) 90%, var(--semantic-text));
+  --kicker-fg: color-mix(in oklab, var(--semantic-accent) 60%, var(--semantic-text) 40%);
   --kicker-font: var(--semantic-font-display);
   --kicker-fs: var(--semantic-fs-kicker);
   --kicker-fw: var(--semantic-fw-kicker);
@@ -105,21 +105,29 @@ strong {
 }
 
 .section[data-variant='home'] {
-  position: relative;
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, var(--pitch-max-width)) var(--hero-signature-width);
+  grid-template-areas:
+    'main signature'
+    'footer signature';
+  align-items: center;
+  column-gap: var(--hero-column-gap);
+
   padding-block-start: var(--hero-offset);
   padding-inline: var(--hero-gutter-inline);
+
   color: var(--hero-text-fg);
-  background: var(--semantic-wash-hero), var(--semantic-surface-1);
+  background: var(--semantic-surface-1);
 
   /* Layout */
   --section-scroll-margin-top: initial;
   --section-margin-block-start: initial;
   --body-section-padding-bottom: initial;
   --hero-offset: clamp(160px, 12vw, 230px);
-  --hero-max-width: 78rem;
   --hero-gutter-inline: clamp(1rem, 2vw, 2.5rem);
   --hero-gap: clamp(0.8rem, 1.83vw, 1.33rem);
+  --hero-column-gap: clamp(3rem, 5vw, 5rem);
+  --hero-signature-width: max(clamp(14rem, 22vw, 20rem), clamp(14rem, 26vw, 18rem));
 }
 
 .section[data-variant='home']:hover .section[data-variant='home']:focus {
@@ -131,19 +139,45 @@ strong {
 }
 
 .section[data-variant='home'] .section__mainColumn {
-  max-inline-size: var(--hero-max-width);
+  grid-area: main;
+
   display: flex;
   flex-direction: column;
   row-gap: var(--hero-gap);
 }
 
+.section[data-variant='home'] .section__footer {
+  grid-area: footer;
+  align-self: start;
+}
+
 .section[data-variant='home'] .hero__signature {
-  position: absolute;
-  inset-block-start: var(--hero-offset);
-  inset-inline-end: var(--hero-gutter-inline);
-  inset-block-end: 50px;
-  inset-inline-start: var(--hero-gutter-inline);
+  grid-area: signature;
+  align-self: center;
+  translate: 0 -0.5rem;
+
   pointer-events: none;
+}
+
+@media (max-width: 36.375rem) {
+  .section[data-variant='home'] {
+    --hero-signature-width: clamp(9rem, 42vw, 12rem);
+
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'main'
+      'footer'
+      'signature';
+  }
+
+  .section[data-variant='home'] .hero__signature {
+    justify-self: start;
+
+    margin-block-start: var(--semantic-space-xl);
+    translate: 0;
+
+    inline-size: var(--hero-signature-width);
+  }
 }
 
 .section[data-variant='about'] {

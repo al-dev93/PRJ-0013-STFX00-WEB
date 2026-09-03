@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from 'react';
+import type { ReactNode } from 'react';
 
 import type { DetailSection, SectionsRef, DetailEntity } from '@/types';
 
@@ -93,37 +93,11 @@ export interface ShowcaseSectionProps {
   modalId: string;
 }
 
-/**
- * Context metadata for ShowcaseSection-related errors.
- * Provides structured details to diagnose invalid data or configurations.
- *
- * @export
- * @interface ShowcaseSectionErrorContext
- * @extends {FetchErrorContext}
- * @property {string} invalidProperty - Name of the invalid property that caused the error
- * @property {string} [invalidNodeId] - ID of the invalid node (if applicable)
- */
-// export interface ShowcaseSectionErrorContext extends FetchErrorContext {
-//   invalidProperty: string;
-//   invalidNodeId?: string;
-// }
-
-// export type HeroElementsRect = {
-//   sectionRect: DOMRect;
-//   kickerRect: DOMRect;
-//   titleRect: DOMRect;
-//   buttonRect: DOMRect;
-// };
-
 export interface RenderContext {
   anchor?: string;
   isHero?: boolean;
-  kickerRef?: RefObject<HTMLParagraphElement>;
-  titleRef?: RefObject<HTMLHeadingElement>;
   style: CSSModuleClasses;
 }
-
-// React.RefObject<HTMLHeadingElement>
 
 export interface RenderNode {
   node: DetailEntity;

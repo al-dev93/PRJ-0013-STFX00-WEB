@@ -24,11 +24,11 @@
     --semantic-surface-1-tinted: oklch(1 0.01 var(--brand-h));
 
     /* Hero wash: very light tinted accent */
-    --semantic-wash-hero: radial-gradient(
+    /* --semantic-wash-hero: radial-gradient(
       var(--ref-wash-size-x) var(--ref-wash-size-y) at var(--ref-wash-pos-x) var(--ref-wash-pos-y),
       color-mix(in oklab, var(--ref-wash-color) var(--ref-wash-strength), transparent),
       transparent 70%
-    );
+    ); */
 
     /* Text */
     --semantic-text: var(--ref-neutral-900);
@@ -140,8 +140,8 @@
     -------------------------------------------------------------------------- */
 
     /* Brand logo */
-    --semantic-brand: oklch(0.62 0.18 235);
-    --semantic-brand-muted: color-mix(in oklch, var(--ref-neutral-900) 70%, white 20%);
+    /* --semantic-brand: oklch(0.62 0.18 235); */
+    /* --semantic-brand-muted: color-mix(in oklch, var(--ref-neutral-900) 70%, white 20%); */
   }
 
   /* DARK (auto if user prefers dark and data-theme is not forced to "light") */

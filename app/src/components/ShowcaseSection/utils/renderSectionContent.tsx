@@ -22,20 +22,8 @@ function formatText(value?: string): React.ReactNode | undefined {
   return typeof value === 'string' ? renderFormattedText(value) : undefined;
 }
 
-function getHeroNodeRef(
-  node: DetailSection,
-  context: RenderContext,
-): React.RefObject<HTMLParagraphElement | HTMLHeadingElement> | undefined {
-  if (['hero_kicker_ref', 'hero_title_ref'].includes(node.blockKey ?? '')) {
-    return undefined;
-  }
-  if (node.blockKey === 'hero_kicker_ref') return context.kickerRef;
-  return context.titleRef;
-}
-
 function renderNode({ node, context, children, numberOfStep }: RenderNode) {
   const className = resolveStyleClass(context.style, node.styleKey);
-  const ref = isDetailSection(node) && context.isHero ? getHeroNodeRef(node, context) : undefined;
   const introduction = isDetailSection(node) && node.sectionIntroduction ? node.sectionIntroduction : undefined;
 
   if (node.tagKind === 'html') {
@@ -50,7 +38,6 @@ function renderNode({ node, context, children, numberOfStep }: RenderNode) {
         tag={tag}
         className={className}
         id={isDetailSection(node) && tag === 'h1' && context.anchor ? `${context.anchor}-title` : undefined}
-        ref={ref}
       >
         {formatText(content)}
         {children}
@@ -94,7 +81,6 @@ function renderNode({ node, context, children, numberOfStep }: RenderNode) {
         orderInBlock={isItem(node) ? node.orderInBlock : undefined}
         introduction={introduction}
         numberOfStep={numberOfStep}
-        ref={ref}
       >
         {children}
       </DynamicElement>

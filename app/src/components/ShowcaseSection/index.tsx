@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useRef, useState } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { AppButton } from '@components/AppButton';
 import { HeroSignature } from '@components/HeroSignature';
@@ -6,10 +6,10 @@ import { renderFormattedText } from '@utils/stylizedString';
 
 import style from './style.module.css';
 import type { ShowcaseSectionProps } from './types';
-import { TWO_COLUMN_SHOWCASE_SECTION } from './utils/constants';
 import { getShowcaseSectionColumn } from './utils/layoutDesign';
 import { renderSectionContent } from './utils/renderSectionContent';
 
+const TWO_COLUMN_SHOWCASE_SECTION = ['about'];
 /**
  * Renders a dynamic showcase section for anchored page content and the hero area.
  *
@@ -49,13 +49,6 @@ export const ShowcaseSection = memo(function ShowcaseSection({
 }: ShowcaseSectionProps): React.JSX.Element | null {
   const isHero = anchor === 'home';
 
-  const kickerRef = useRef<HTMLParagraphElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [hasBrandSignaturePlayed, setHasBrandSignaturePlayed] = useState<boolean>(false);
-
-  const buttonState = hasBrandSignaturePlayed ? 'ready' : 'pending';
-
   const { main, secondary = [] } =
     anchor && TWO_COLUMN_SHOWCASE_SECTION.includes(anchor)
       ? getShowcaseSectionColumn(detailSections)
@@ -93,29 +86,27 @@ export const ShowcaseSection = memo(function ShowcaseSection({
           </header>
         ) : null}
         {detailSections && detailSections.length > 0
-          ? renderSectionContent(main, { anchor, style, isHero, kickerRef, titleRef })
+          ? // ? renderSectionContent(main, { anchor, style, isHero, kickerRef, titleRef })
+            renderSectionContent(main, { anchor, style, isHero })
           : null}
       </div>
       {secondary.length ? (
         <div className={style.section__secondaryColumn}>
-          {renderSectionContent(secondary, { anchor, style, isHero, kickerRef, titleRef })}
+          {renderSectionContent(secondary, { anchor, style, isHero })}
         </div>
       ) : null}
       <footer className={style.section__footer}>
         <AppButton
           name={isHero ? 'Parlons de votre projet' : 'Me contacter'}
-          variant={isHero ? 'hero' : undefined}
-          state={isHero ? buttonState : undefined}
           onClick={openModalFormDialog}
           ariaExpanded={showModalFormDialog}
           ariaHasPopup='dialog'
           ariaControls={modalId}
-          ref={isHero ? buttonRef : undefined}
         />
       </footer>
       {isHero ? (
         <div className={style.hero__signature}>
-          <HeroSignature setHasBrandSignaturePlayed={setHasBrandSignaturePlayed} />
+          <HeroSignature />
         </div>
       ) : null}
     </section>
