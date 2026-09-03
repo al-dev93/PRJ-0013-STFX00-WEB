@@ -127,7 +127,7 @@ strong {
   --hero-gutter-inline: clamp(1rem, 2vw, 2.5rem);
   --hero-gap: clamp(0.8rem, 1.83vw, 1.33rem);
   --hero-column-gap: clamp(3rem, 5vw, 5rem);
-  --hero-signature-width: clamp(14rem, 22vw, 20rem);
+  --hero-signature-width: max(clamp(14rem, 22vw, 20rem), clamp(14rem, 26vw, 18rem));
 }
 
 .section[data-variant='home']:hover .section[data-variant='home']:focus {
@@ -157,6 +157,27 @@ strong {
   translate: 0 -0.5rem;
 
   pointer-events: none;
+}
+
+@media (max-width: 36.375rem) {
+  .section[data-variant='home'] {
+    --hero-signature-width: clamp(9rem, 42vw, 12rem);
+
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'main'
+      'footer'
+      'signature';
+  }
+
+  .section[data-variant='home'] .hero__signature {
+    justify-self: start;
+
+    margin-block-start: var(--semantic-space-xl);
+    translate: 0;
+
+    inline-size: var(--hero-signature-width);
+  }
 }
 
 .section[data-variant='about'] {
