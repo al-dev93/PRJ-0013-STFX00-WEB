@@ -19,7 +19,7 @@
   --pitch-gap: clamp(0.9rem, 1.8vw, 1.6rem);
   --body-section-padding-bottom: var(--semantic-space-xl);
   /* Accent */
-  --title-section-underline-length: var(--semantic-title-section-underline-length);
+  /* --title-section-underline-length: var(--semantic-title-section-underline-length); */
   --title-section-underline-thickness: var(--semantic-title-section-underline-thickness);
   --title-section-underline-overhang: var(--semantic-title-section-underline-overhang);
   /* Locale typo */
@@ -76,6 +76,13 @@ strong {
   );
   border-radius: 999px;
   box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
+}
+
+/* 304px */
+@media (max-width: 19rem) {
+  .section__titleSection__inner::after {
+    inset-inline-end: -1.5ch;
+  }
 }
 
 .section__kicker {
