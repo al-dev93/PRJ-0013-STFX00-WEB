@@ -187,6 +187,14 @@ h4 {
   gap: var(--card-body-gap);
 }
 
+/* 220px */
+@media (max-width: 13.75rem) {
+  .callout__wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 /* Specialization of styles applied to the main column blocks */
 .cardItem[data-variant='intervention_axis'] {
   --card-item-icon-wrapper-size: calc(var(--space-1) * 12);
@@ -227,8 +235,8 @@ h4 {
   flex: 0 0 auto;
 }
 
-/* 352px */
-@media (max-width: 22rem) {
+/* 416px */
+@media (max-width: 26rem) {
   .cardItem[data-variant='technical_skill'] {
     flex-direction: column;
     align-items: flex-start;
@@ -241,6 +249,17 @@ h4 {
 
   display: flex;
   align-items: center;
+}
+
+/* ~300px — defensive layout below the supported minimum width */
+@media (max-width: 18.75rem) {
+  .cardItem[data-variant='cross_cutting_skill'] {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .section__listBody:has(.cardItem[data-variant='cross_cutting_skill']) {
+    column-gap: calc(var(--semantic-space-sm) * 2.56);
+  }
 }
 
 /* Specialization of styles applied to the secondary column blocks */
