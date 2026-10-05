@@ -41,7 +41,7 @@
   transform: translate(-50%, -50%);
 }
 
-.dialogFormCheckbox .dialogFormCheckbox__input:checked ~ p {
+.dialogFormCheckbox .dialogFormCheckbox__input:checked ~ .dialogFormCheckbox__label {
   color: var(--tertiary-color);
 }
 
@@ -49,22 +49,20 @@
   border: 1px solid var(--secondary-color);
 }
 
-.dialogFormCheckbox:focus-within .dialogFormCheckbox__input:checked ~ p {
+.dialogFormCheckbox:focus-within .dialogFormCheckbox__input:checked ~ .dialogFormCheckbox__label {
   color: var(--secondary-color);
   font-weight: bold;
 }
 
 .dialogFormCheckbox .dialogFormCheckbox__box--error {
-  /* border-color: var(--primary-alert-color); */
   background-color: var(--primary-bg-alert-color);
 }
 
 .dialogFormCheckbox:hover .dialogFormCheckbox__box--error {
-  /* background-color: var(--primary-light-bg-alert-color); */
   border-color: var(--primary-alert-color);
 }
 
-.dialogFormCheckbox:hover .dialogFormCheckbox__box--error ~ p {
+.dialogFormCheckbox:hover .dialogFormCheckbox__box--error ~ .dialogFormCheckbox__label {
   color: var(--primary-alert-color);
 }
 
@@ -73,7 +71,7 @@
   background-color: var(--primary-light-bg-alert-color);
 }
 
-.dialogFormCheckbox:focus-within .dialogFormCheckbox__box--error ~ p {
+.dialogFormCheckbox:focus-within .dialogFormCheckbox__box--error ~ .dialogFormCheckbox__label {
   color: var(--primary-alert-color);
   font-weight: bold;
 }

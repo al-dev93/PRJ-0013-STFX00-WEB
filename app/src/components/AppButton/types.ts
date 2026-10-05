@@ -29,5 +29,6 @@ export type FormButtonProps = {
   ariaHasPopup?: ButtonHasPopup;
   ariaExpanded?: boolean;
   ariaControls?: string;
+  ariaDisabled?: boolean;
   ariaLabel?: string;
 };
