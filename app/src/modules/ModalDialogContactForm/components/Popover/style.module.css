@@ -1,34 +1,50 @@
 .popover {
   position: absolute;
+  top: 100%;
+  left: 4px;
+
   display: inline-grid;
   grid-template-columns: max-content;
   grid-auto-rows: auto;
+
   max-width: calc(100% - 10px);
-  top: 100%;
-  left: 4px;
-  color: var(--white);
-  font-size: var(--fs-xxs);
+
+  color: var(--semantic-text);
+
+  font-family: var(--semantic-font-body);
+  font-size: var(--semantic-fs-kicker);
   font-weight: 400;
-  background-color: var(--popover-suggestions-bg);
-  border-radius: 0 0 var(--br-xxs) var(--br-xxs);
+
+  border-radius: 0 0 var(--semantic-sm-radius) var(--semantic-sm-radius);
+
   will-change: opacity, height;
+
   z-index: 100;
 }
 
 .popover__message,
 .popover__autocomplete {
   grid-column: 1;
+
   width: 100%;
   min-width: 0;
+
   opacity: 0;
   overflow-wrap: anywhere;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Validation message                                                         */
+/* -------------------------------------------------------------------------- */
+
 .popover__message {
   grid-row: 1;
+
   padding: 8px 12px;
-  background-color: var(--popover-message-bg);
-  border-radius: 0 0 var(--br-xxs) var(--br-xxs);
+
+  color: var(--semantic-danger-text);
+  background-color: var(--semantic-danger-surface);
+
   transition: opacity 200ms ease-in-out;
 }
 
@@ -42,15 +58,34 @@
   white-space: pre-line;
 }
 
+/*
+ * When there are no autocomplete suggestions, the message is the last element
+ * of the popover and therefore owns its bottom corners and shadow.
+ */
 .popover__message--withoutSuggestions {
-  box-shadow: var(--bsh-popover);
+  border-radius: 0 0 var(--semantic-sm-radius) var(--semantic-sm-radius);
+  box-shadow: var(--semantic-shadow);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Autocomplete                                                               */
+/* -------------------------------------------------------------------------- */
 
 .popover__autocomplete {
   grid-row: 2;
+
   display: block;
+
   max-height: 0px;
   overflow-y: auto;
+
+  color: var(--semantic-text);
+  background-color: var(--semantic-surface-1);
+
+  border-radius: 0 0 var(--semantic-sm-radius) var(--semantic-sm-radius);
+
+  box-shadow: var(--semantic-shadow);
+
   transition:
     max-height 200ms ease,
     opacity 200ms ease-in-out;
@@ -60,18 +95,44 @@
   max-height: 120px;
 }
 
-.popover__autocomplete[hidden] {
-  display: none;
-}
-
 .popover__autocomplete__item {
   padding: 2px 12px;
+
+  color: var(--semantic-text);
+  background-color: transparent;
+
+  transition:
+    color var(--semantic-dur) ease,
+    background-color var(--semantic-dur) ease;
 }
 
+/* Keyboard virtual focus and pointer hover share the same visual state. */
 .popover__autocomplete__item--focused,
 .popover__autocomplete__item:hover {
-  background-color: var(--hover-bg-menu);
-  outline: none;
-  color: var(--white);
+  color: var(--semantic-control-edit);
+
+  background-color: color-mix(in oklab, var(--semantic-control-edit) 12%, var(--semantic-surface-1));
+
+  /* outline: none; */
   cursor: pointer;
+}
+
+@media (forced-colors: active) {
+  .popover__autocomplete {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .popover__autocomplete__item--focused {
+    color: HighlightText;
+    background-color: Highlight;
+
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .popover__autocomplete__item:hover:not(.popover__autocomplete__item--focused) {
+    color: HighlightText;
+    background-color: Highlight;
+  }
 }

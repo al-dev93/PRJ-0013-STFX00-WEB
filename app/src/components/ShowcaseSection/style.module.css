@@ -19,7 +19,6 @@
   --pitch-gap: clamp(0.9rem, 1.8vw, 1.6rem);
   --body-section-padding-bottom: var(--semantic-space-xl);
   /* Accent */
-  /* --title-section-underline-length: var(--semantic-title-section-underline-length); */
   --title-section-underline-thickness: var(--semantic-title-section-underline-thickness);
   --title-section-underline-overhang: var(--semantic-title-section-underline-overhang);
   /* Locale typo */

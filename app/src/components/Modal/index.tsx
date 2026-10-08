@@ -252,8 +252,6 @@ export function Modal({
   // Compose BEM-style classes with runtime modifiers; keep "hidden" state on the root <dialog> for CSS transitions.
   const modalClassName = style.modal + (className ? ` ${className}` : '') + (!open ? ` ${style['modal--hidden']}` : '');
   const wrapperClassName = style.modal__wrapper + (customStyle ? ` ${style[`modal__wrapper--${customStyle}`]}` : '');
-  const closeButtonClassName =
-    style.modal__closeButton + (customStyle ? ` ${style[`modal__closeButton--${customStyle}`]}` : '');
 
   // Mount into #app-container; if not found, fall back to document.body to avoid a hard crash in non-standard hosts.
   return createPortal(
@@ -274,7 +272,7 @@ export function Modal({
         <header className={style.modal__header}>
           {closeIcon && (
             <button
-              className={closeButtonClassName}
+              className={style.modal__closeButton}
               type='button'
               ref={closeRef}
               name='closeButton'
