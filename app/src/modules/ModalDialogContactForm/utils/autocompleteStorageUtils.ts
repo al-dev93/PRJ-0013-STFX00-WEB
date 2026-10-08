@@ -13,7 +13,6 @@ import type { FormInputName } from '../types';
  * @param {FormInputName} name - The name of the input field for which to save the value.
  * @returns {void}
  *
- * @al-dev93
  */
 export function saveToLocalStorage(value: string, name: FormInputName): void {
   localStorage.setItem(name, JSON.stringify([value]));
@@ -33,7 +32,6 @@ export function saveToLocalStorage(value: string, name: FormInputName): void {
  * @param {FormInputName} name - The name of the input field for which to add the value.
  * @returns {void}
  *
- * @al-dev93
  */
 export function addToLocalStorage(value: string, name: FormInputName): void {
   const storageSet = new Set(JSON.parse(localStorage.getItem(name) ?? '[]')).add(value);
@@ -59,7 +57,6 @@ export function addToLocalStorage(value: string, name: FormInputName): void {
  * @returns {string[] | undefined} The array of autocomplete suggestions or `undefined` if the input field is not
  * stored in the local storage.
  *
- * @al-dev93
  */
 export function getAutocompleteInput(
   input: DialogFormInputElement,

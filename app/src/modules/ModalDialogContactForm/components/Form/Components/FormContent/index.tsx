@@ -23,7 +23,6 @@ import { DialogFormInput } from '../DialogFormInput';
  * FormContent component is rendered.
  * @returns {(React.JSX.Element | null)}
  *
- * @al-dev93
  */
 export function FormContent({ dataFormContent, onRenderComplete }: FormContentProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
@@ -62,7 +61,9 @@ export function FormContent({ dataFormContent, onRenderComplete }: FormContentPr
     initState();
   }, [contactFormAction, dataFormContent, handleError, onRenderComplete]);
 
-  return dataFormContent && isInitializedStateRef.current ? (
+  if (!dataFormContent || !isInitializedStateRef.current) return null;
+
+  return (
     <div className={style.contactForm}>
       {dataFormContent.map(({ id, input, label, tooltipContent }) =>
         input.type !== 'checkbox' ? (
@@ -79,5 +80,5 @@ export function FormContent({ dataFormContent, onRenderComplete }: FormContentPr
         ),
       )}
     </div>
-  ) : null;
+  );
 }

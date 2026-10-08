@@ -5,7 +5,6 @@ import type { OutletContextPage, SectionsRef } from '@/types';
 import { SocialMediaNavBar } from '@components/SocialMediaNavBar';
 import logo from '@images/brand/logoAND.png';
 import { CollapsibleHeader } from '@modules/CollapsibleHeader';
-import { useCsrfToken } from '@modules/ModalDialogContactForm/hooks/useCsrfToken';
 import ModalDialogContactForm from '@modules/ModalDialogContactForm/ModalDialogContactFormWithProvider';
 
 import style from './style.module.css';
@@ -35,7 +34,6 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
  * @author al-dev93
  */
 export function Page(): React.JSX.Element {
-  const csrfToken = useCsrfToken();
   const isMobile = useMediaQuery('(max-width: 32rem)');
   // Current routing state (used to derive anchor targets and issue router updates).
   const { pathname, hash, key, search } = useLocation();
@@ -377,12 +375,7 @@ export function Page(): React.JSX.Element {
         onMenuNavigation={handleAnchorNavigation}
       />
       {/* Contact form dialog */}
-      <ModalDialogContactForm
-        open={openContactFormDialog}
-        setOpen={setOpenContactFormDialog}
-        modalId={modalId}
-        csrfToken={csrfToken}
-      />
+      <ModalDialogContactForm open={openContactFormDialog} setOpen={setOpenContactFormDialog} modalId={modalId} />
       <div className={style.pageContent}>
         <div className={style.socialMediaNavBarLayer}>
           {/* Left-side social links (external navigation) */}

@@ -1,31 +1,53 @@
-/* Wrapping */
 .tooltip {
-  display: inline-block;
+  --tooltip-offset: var(--semantic-space-sm);
+  --tooltip-arrow-size: calc(var(--semantic-space-sm) * 0.5);
+
   position: relative;
+
+  display: inline-block;
+
   cursor: default;
 }
 
-/* Absolute positioning */
 .tooltip__tip {
   position: absolute;
-  border-radius: 4px;
   left: 50%;
-  padding: 6px;
-  color: var(--white);
-  background: var(--dark-bg-menu);
-  font-size: var(--fs-xxs);
-  font-family: var(--font-accessories);
+
+  padding: var(--tooltip-arrow-size) var(--tooltip-offset);
+
+  color: var(--semantic-text-inverse);
+  background-color: var(--semantic-surface-inverse);
+
+  font-family: var(--semantic-font-body);
+  font-size: var(--semantic-fs-kicker);
   font-weight: 500;
-  line-height: 1;
-  z-index: 100;
+  line-height: var(--semantic-lh-body);
+
+  border-radius: var(--semantic-sm-radius);
+
+  box-shadow: var(--semantic-shadow);
+
   white-space: nowrap;
   pointer-events: none;
-  transform: translateX(-50%);
+
   opacity: 0;
+
+  transform: translateX(-50%);
   translate: 0 -10px;
+
   transition:
     opacity 0.3s ease,
     translate 0.3s ease;
+
+  z-index: 100;
+}
+
+.tooltip__tip p {
+  margin: 0;
+}
+
+.tooltip__tip p + p {
+  margin-top: calc(var(--tooltip-offset) * 0.25);
 }
 
 .tooltip__tip--visible {
@@ -33,65 +55,93 @@
   translate: 0 0;
 }
 
-/* CSS border triangles */
+/* -------------------------------------------------------------------------- */
+/* Arrow                                                                      */
+/* -------------------------------------------------------------------------- */
+
 .tooltip__tip::before {
-  content: ' ';
-  left: 50%;
-  border: solid transparent;
-  height: 0;
-  width: 0;
+  content: '';
+
   position: absolute;
-  pointer-events: none;
+  left: 50%;
+
+  width: 0;
+  height: 0;
+
+  border: solid transparent;
   border-width: var(--tooltip-arrow-size);
+
   margin-left: calc(var(--tooltip-arrow-size) * -1);
+
+  pointer-events: none;
 }
 
-/* Absolute positioning */
+/* -------------------------------------------------------------------------- */
+/* Top                                                                        */
+/* -------------------------------------------------------------------------- */
+
 .tooltip__tip--top {
-  top: calc(var(--tooltip-margin) * -1);
+  top: calc(var(--tooltip-offset) * -1);
 }
-/* CSS border triangles */
+
 .tooltip__tip--top::before {
   top: 100%;
-  border-top-color: var(--dark-bg-menu);
+
+  border-top-color: var(--semantic-surface-inverse);
 }
 
-/* Absolute positioning */
+/* -------------------------------------------------------------------------- */
+/* Right                                                                      */
+/* -------------------------------------------------------------------------- */
+
 .tooltip__tip--right {
-  left: calc(100% + var(--tooltip-margin));
   top: 50%;
+  left: calc(100% + var(--tooltip-offset));
+
   transform: translateX(0) translateY(-50%);
-}
-/* CSS border triangles */
-.tooltip__tip--right::before {
-  left: calc(var(--tooltip-arrow-size) * -1);
-  top: 50%;
-  transform: translateX(0) translateY(-50%);
-  border-right-color: var(--dark-bg-menu);
 }
 
-/* Absolute positioning */
-.tooltip__tip--bottom {
-  bottom: calc(var(--tooltip-margin) * -1);
+.tooltip__tip--right::before {
+  top: 50%;
+  left: calc(var(--tooltip-arrow-size) * -1);
+
+  border-right-color: var(--semantic-surface-inverse);
+
+  transform: translateX(0) translateY(-50%);
 }
-/* CSS border triangles */
+
+/* -------------------------------------------------------------------------- */
+/* Bottom                                                                     */
+/* -------------------------------------------------------------------------- */
+
+.tooltip__tip--bottom {
+  bottom: calc(var(--tooltip-offset) * -1);
+}
+
 .tooltip__tip--bottom::before {
   bottom: 100%;
-  border-bottom-color: var(--dark-bg-menu);
+
+  border-bottom-color: var(--semantic-surface-inverse);
 }
 
-/* Absolute positioning */
+/* -------------------------------------------------------------------------- */
+/* Left                                                                       */
+/* -------------------------------------------------------------------------- */
+
 .tooltip__tip--left {
-  left: auto;
-  right: calc(100% + var(--tooltip-margin));
   top: 50%;
+  right: calc(100% + var(--tooltip-offset));
+  left: auto;
+
   transform: translateX(0) translateY(-50%);
 }
-/* CSS border triangles */
+
 .tooltip__tip--left::before {
-  left: auto;
-  right: calc(var(--tooltip-arrow-size) * -2);
   top: 50%;
+  right: calc(var(--tooltip-arrow-size) * -2);
+  left: auto;
+
+  border-left-color: var(--semantic-surface-inverse);
+
   transform: translateX(0) translateY(-50%);
-  border-left-color: var(--dark-bg-menu);
 }

@@ -6,52 +6,52 @@
   position: relative;
   width: fit-content;
   padding-top: 12px;
-  color: var(--decorative-light);
+  color: var(--semantic-control-text-muted);
   font-weight: 600;
-  border: 1px solid var(--dark-secondary);
-  border-radius: var(--br-xxs);
+  border: 1px solid var(--semantic-control-border);
+  border-radius: var(--semantic-control-radius);
   cursor: text;
   transition:
-    border-color 0.3s ease,
-    color 0.3s ease;
+    border-color var(--semantic-dur) ease,
+    color var(--semantic-dur) ease;
 }
 
 .dialogFormInput--edited {
   margin: 0 -2px -2px 0;
-  border: 2px solid var(--tertiary-color);
-  color: var(--tertiary-color);
+  border: 2px solid var(--semantic-control-saved);
+  color: var(--semantic-control-saved);
 }
 
 .dialogFormInput:hover:not(.dialogFormInput--edited, .dialogFormInput--error:hover, :focus-within) {
-  border-color: var(--decorative-dark);
-  color: var(--decorative-dark);
+  border-color: var(--semantic-control-edit);
+  color: var(--semantic-control-edit);
   font-weight: 500;
 }
 
 .dialogFormInput:focus-within {
   margin: 0 -2px -2px 0;
   border-width: 2px;
-  border-color: var(--secondary-color);
-  color: var(--secondary-color);
+  border-color: var(--semantic-control-edit);
+  color: var(--semantic-control-edit);
   font-weight: 500;
 }
 
 .dialogFormInput--error:hover,
 .dialogFormInput--error:focus-within {
-  color: var(--primary-alert-color);
+  color: var(--semantic-danger-text);
 }
 
 .dialogFormInput--error:hover {
-  border-color: var(--primary-alert-color);
+  border-color: var(--semantic-danger-text);
 }
 
 .dialogFormInput--error:focus-within {
   border-width: 2px;
-  border-color: var(--primary-alert-color);
+  border-color: var(--semantic-danger-text);
 }
 
 .dialogFormInput__tooltipIcon {
-  color: var(--primary-color);
+  color: var(--semantic-control-saved);
 }
 
 .dialogFormInput__label {
@@ -59,7 +59,7 @@
   display: flex;
   top: -12px;
   left: 10px;
-  background-color: white;
+  background-color: var(--semantic-control-surface);
 }
 
 .dialogFormInput__label__content {
@@ -71,12 +71,13 @@
   width: 366px;
   height: 32px;
   padding: 0px 8px 8px 8px;
-  line-height: var(--lh-label);
-  font-family: var(--font-regular);
-  font-size: var(--fs-xs);
+  line-height: var(--semantic-lh-body);
+  font-family: var(--semantic-font-body);
+  font-size: calc(var(--semantic-fs-body) * 0.875);
   border: none;
   outline: none;
   background: none;
+  color: var(--semantic-control-text);
 }
 
 .dialogFormInput__inputBox--textArea {
@@ -90,8 +91,8 @@
 
 .dialogFormInput__inputBox::placeholder {
   align-self: flex-start;
-  font-size: var(--fs-xxs);
-  color: var(--decorative-dark);
+  font-size: var(--semantic-fs-kicker);
+  color: var(--semantic-control-text-muted);
 }
 
 .dialogFormInput__alertTag {

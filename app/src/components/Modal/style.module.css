@@ -1,20 +1,37 @@
 .modal {
+  --modal-padding: 1.25rem; /* 20px */
+  --modal-header-gap: 0.625rem; /* 10px */
+  --modal-footer-padding-bottom: 1.875rem; /* 30px */
+  --modal-title-wrapper-padding-block: var(--semantic-space-xs);
+  --modal-title-font-size: 2rem; /* 32px */
+  --modal-title-margin-bottom: 0.5rem; /* 8px */
+  --modal-slogan-font-size: 1.25rem; /* 20px */
+  --modal-slogan-margin-left: 0.75rem; /* 12px */
+
   position: fixed;
+
   width: max-content;
+
   top: 50%;
   bottom: 50%;
+
   transform: translate(0, 0);
+
   padding: 0;
+
   border: none;
-  background-color: var(--white);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  background-color: var(--semantic-surface-1);
+
+  box-shadow: var(--semantic-shadow-overlay);
+
   transition:
-    opacity var(--modal-transition-duration) ease,
-    transform var(--modal-transition-duration) ease;
+    opacity var(--semantic-dur) ease,
+    transform var(--semantic-dur) ease;
 }
 
 .modal::backdrop {
-  background: var(--modal-backdrop-color);
+  background: var(--semantic-backdrop);
 }
 
 .modal--hidden {
@@ -28,51 +45,94 @@
 }
 
 .modal__wrapper--alert {
-  background-color: var(--quaternary-color);
+  background-color: var(--semantic-success-surface);
+
+  border: 1px solid var(--semantic-success-border);
+  border-radius: var(--semantic-md-radius);
 }
 
 .modal__header {
-  padding: var(--modal-padding) var(--modal-padding) 0 var(--modal-padding);
   display: flex;
   flex-direction: column;
   gap: var(--modal-header-gap);
+
+  padding: var(--modal-padding) var(--modal-padding) 0 var(--modal-padding);
 }
 
 .modal__closeButton {
   align-self: flex-end;
-  font-size: var(--fs-lg);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  flex: 0 0 auto;
+
+  padding: 0;
+
+  color: var(--semantic-text-muted);
+  background-color: transparent;
+
+  border: 1px solid transparent;
+  border-radius: var(--semantic-sm-radius);
+
   cursor: pointer;
-  background: none;
-  border: none;
-  color: inherit;
+
+  transition:
+    color var(--semantic-dur) ease,
+    background-color var(--semantic-dur) ease,
+    border-color var(--semantic-dur) ease;
 }
 
-.modal__closeButton--alert {
-  color: var(--primary-color);
+.modal__closeButton:hover {
+  color: var(--semantic-accent-foreground);
+
+  background-color: color-mix(in oklab, var(--semantic-accent) 10%, var(--semantic-surface-1));
+}
+
+.modal__closeButton:active {
+  background-color: color-mix(in oklab, var(--semantic-accent) 16%, var(--semantic-surface-1));
+}
+
+.modal__closeButton:focus-visible {
+  color: var(--semantic-accent-foreground);
+
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: 2px;
 }
 
 .modal__titleWrapper {
   width: max-content;
-  padding: 5px 0;
+
+  padding-block: var(--modal-title-wrapper-padding-block);
+
   align-self: center;
+
   outline: none;
 }
 
 .modal__title {
-  margin-bottom: 8px;
-  font-size: var(--fs-lg);
-  color: var(--quaternary-color);
+  margin-bottom: var(--modal-title-margin-bottom);
+
+  color: var(--semantic-accent-foreground);
+
+  font-size: var(--modal-title-font-size);
 }
 
 .modal__slogan {
-  margin-left: 12px;
-  font-size: var(--fs-sm);
-  color: var(--secondary-color);
+  margin-left: var(--modal-slogan-margin-left);
+
+  color: var(--semantic-accent-foreground-strong);
+
+  font-size: var(--modal-slogan-font-size);
   font-weight: 600;
 }
 
 .modal__innerWrapper {
   width: max-content;
+
   padding: var(--modal-padding);
 }
 
@@ -84,14 +144,19 @@
   margin: 0 auto;
 }
 
-.buttonForm:disabled {
-  opacity: 0.5;
-  border: transparent;
+@media (forced-colors: active) {
+  .modal__closeButton {
+    color: ButtonText;
+    border-color: transparent;
+  }
+
+  .modal__closeButton:hover {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .modal__closeButton:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
 }
-/*
-.modal[data-a11y-open='1'] .modal__title {
-  opacity: 1 !important;
-  transform: none !important;
-  transition: none !important;
-  will-change: auto !important;
-} */
