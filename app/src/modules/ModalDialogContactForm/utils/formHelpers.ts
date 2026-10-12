@@ -49,42 +49,56 @@ export function manageModalVisibility(
 }
 
 /**
- * Cleans the value entered in an input field by removing unnecessary spaces,
- * non-breaking spaces, control characters, and dangerous characters.
- * The function also applies specific cleaning rules based on the context
- * (field type) to ensure the value is safe and meets expectations.
+ * Normalizes and sanitizes a contact form value according to its field context.
  *
- * @export
- * @param {string} inputValue - The value to be sanitized.
- * @param {FormInputName} context - The context of the input field.
- *   - `'name'` : For the "name" field, allows letters, spaces, and hyphens.
- *   - `'company'` : For the "company" field, allows letters, digits, spaces, hyphens, apostrophes, periods, and `&`.
- *   - `'email'` : For the "email" field, allows valid characters for an email address.
- *   - `'tel'` : For the "phone" field, allows digits and spaces.
- *   - `'message'` : For the "message" field, escapes angle brackets and removes unauthorized special characters.
- * @returns {string} The sanitized and safe value.
- * @throws {Error} If the provided context is invalid.
+ * @remarks
+ * Structured fields (`name`, `company`, `email`, and `tel`) are normalized
+ * using Unicode NFKC normalization, stripped of Unicode control/format
+ * characters, trimmed, and then filtered according to their field-specific
+ * rules.
  *
- * @example
- * NOTE: Sanitize a name
- * const cleanedName = sanitizeInput("  Jean--Dupont  ", "name");
- * console.log(cleanedName); // "Jean-Dupont"
+ * The `message` field is treated as free text. It is normalized using NFC,
+ * preserves user-entered line breaks, normalizes CRLF and CR line endings to
+ * LF (`\n`), removes other Unicode control characters, and trims leading and
+ * trailing whitespace. HTML-like content such as `<tag>` is preserved and
+ * must be encoded or escaped when rendered in an HTML context.
+ *
+ * @param inputValue The raw value entered in the form field.
+ * @param context The contact form field whose sanitization rules must be applied.
+ * @returns The normalized and sanitized field value.
+ * @throws {@link Error} If `context` does not match a supported form field.
  *
  * @example
- * NOTE: Sanitize an email
- * const cleanedEmail = sanitizeInput("user@example.com", "email");
- * console.log(cleanedEmail); // "user@example.com"
+ * ```ts
+ * const cleanedName = sanitizeInput('  Jean   Dupont  ', 'name');
+ * console.log(cleanedName);
+ * // "Jean Dupont"
+ * ```
  *
  * @example
- * NOTE: Sanitize a message
- * const cleanedMessage = sanitizeInput("<script>alert('XSS')</script>", "message");
- * console.log(cleanedMessage); // "&lt;script&gt;alert('XSS')&lt;/script&gt;"
+ * ```ts
+ * const cleanedEmail = sanitizeInput('  user@example.com  ', 'email');
+ * console.log(cleanedEmail);
+ * // "user@example.com"
+ * ```
+ *
+ * @example
+ * ```ts
+ * const cleanedMessage = sanitizeInput(
+ *   "Bonjour,\r\n\r\nJ'aimerais échanger sur React < 20.",
+ *   'message',
+ * );
+ *
+ * console.log(cleanedMessage);
+ * // "Bonjour,\n\nJ'aimerais échanger sur React < 20."
+ * ```
+ *
+ * @see {@link FormInputName}
  */
 export function sanitizeInput(inputValue: string, context: FormInputName): string {
-  let sanitized = inputValue
-    .normalize('NFKC') // Normalizes unicode characters
-    .replace(/\p{C}/gu, '') // Removes control characters
-    .trim();
+  let sanitized = context === 'message' ? inputValue.normalize('NFC') : inputValue.normalize('NFKC');
+
+  if (context !== 'message') sanitized = sanitized.replace(/\p{C}/gu, '').trim();
 
   switch (context) {
     case 'name':
@@ -103,8 +117,12 @@ export function sanitizeInput(inputValue: string, context: FormInputName): strin
       sanitized = sanitized.replace(/\s+/g, ' '); // Replace multiple spaces with a single space
       break;
     case 'message':
-      sanitized = sanitized.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape angle brackets
-      sanitized = sanitized.replace(/[^\w\s.,!?-]/g, ''); // Remove unauthorized special characters
+      sanitized = sanitized
+        .replace(/\r\n?/g, '\n')
+        .split('\n')
+        .map((line) => line.replace(/\p{Cc}/gu, ''))
+        .join('\n')
+        .trim();
       break;
     default:
       // TODO: Sortir l'erreur
