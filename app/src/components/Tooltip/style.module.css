@@ -24,10 +24,10 @@
   line-height: var(--semantic-lh-body);
 
   border-radius: var(--semantic-sm-radius);
-
   box-shadow: var(--semantic-shadow);
 
   white-space: nowrap;
+
   pointer-events: none;
 
   opacity: 0;
@@ -144,4 +144,33 @@
   border-left-color: var(--semantic-surface-inverse);
 
   transform: translateX(0) translateY(-50%);
+}
+
+@media (max-width: 29.5rem) {
+  .tooltip__tip--right {
+    top: auto;
+    bottom: calc(100% + var(--tooltip-offset));
+    left: 60%;
+
+    inline-size: max-content;
+    max-inline-size: min(10rem, calc(100vw - 2rem));
+
+    white-space: normal;
+    overflow-wrap: normal;
+
+    transform: translateX(-60%);
+  }
+
+  .tooltip__tip--right::before {
+    top: 100%;
+    right: auto;
+    left: 60%;
+
+    margin-left: calc(var(--tooltip-arrow-size) * -1);
+
+    border-right-color: transparent;
+    border-top-color: var(--semantic-surface-inverse);
+
+    transform: none;
+  }
 }

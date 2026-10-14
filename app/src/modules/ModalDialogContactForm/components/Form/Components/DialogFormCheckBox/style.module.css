@@ -45,6 +45,7 @@
 }
 
 .dialogFormCheckbox__label {
+  min-width: 0;
   transition: color var(--semantic-dur) ease;
 }
 

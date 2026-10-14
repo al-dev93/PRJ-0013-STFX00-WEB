@@ -50,6 +50,7 @@ export function MemoizedDialogFormInput({
 
   const inputElementRef = useRef<DialogFormInputElement>(null);
   const hasAnnouncedCompletionRef = useRef<boolean>(false);
+  const wasFocusedRef = useRef<boolean>(false);
 
   const handleError = useErrorHandler();
 
@@ -61,6 +62,7 @@ export function MemoizedDialogFormInput({
     inputError,
     inputNode,
     inputStatusTag,
+    isFocused,
     isValidationExposed,
     listItemFocused,
     popoverMode,
@@ -71,6 +73,7 @@ export function MemoizedDialogFormInput({
     'inputError',
     'inputNode',
     'inputStatusTag',
+    'isFocused',
     'isValidationExposed',
     'listItemFocused',
     'popoverMode',
@@ -169,6 +172,39 @@ export function MemoizedDialogFormInput({
       window.clearTimeout(timeoutId);
     };
   }, [errorDescriptionText, isCompletionReached, isInvalid, isMessageMinimumReached, isTelComplete]);
+
+  useEffect(() => {
+    const hasGainedFocus = isFocused && !wasFocusedRef.current;
+
+    wasFocusedRef.current = isFocused;
+
+    if (!hasGainedFocus || !isValidationExposed || !inputNode?.value.trim()) {
+      return;
+    }
+
+    let message: string;
+
+    if (isInvalid) {
+      if (!errorDescriptionText) return;
+
+      message = errorDescriptionText;
+    } else {
+      message =
+        inputNode instanceof HTMLTextAreaElement
+          ? 'Champ correctement renseigné.'
+          : `Valeur actuelle : ${inputNode.value}. Champ correctement renseigné.`;
+    }
+
+    setAnnouncedStatusText('');
+
+    const timeoutId = window.setTimeout(() => {
+      setAnnouncedStatusText(message);
+    }, 600);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [errorDescriptionText, inputNode, isFocused, isInvalid, isValidationExposed]);
 
   /**
    * Handles setting the autocomplete input.

@@ -3,14 +3,15 @@
   --modal-header-gap: 0.625rem; /* 10px */
   --modal-footer-padding-bottom: 1.875rem; /* 30px */
   --modal-title-wrapper-padding-block: var(--semantic-space-xs);
-  --modal-title-font-size: 2rem; /* 32px */
+  --modal-title-font-size: clamp(1.5rem, 5vw, 2rem); /* 2rem = 32px */
   --modal-title-margin-bottom: 0.5rem; /* 8px */
-  --modal-slogan-font-size: 1.25rem; /* 20px */
-  --modal-slogan-margin-left: 0.75rem; /* 12px */
+  --modal-slogan-font-size: clamp(1rem, 4vw, 1.25rem); /* 1.25rem = 20px */
+  --modal-viewport-gutter: var(--semantic-space-xl);
 
   position: fixed;
 
   width: max-content;
+  max-width: calc(100dvw - (2 * var(--modal-viewport-gutter)));
 
   top: 50%;
   bottom: 50%;
@@ -104,13 +105,14 @@
 }
 
 .modal__titleWrapper {
-  width: max-content;
+  width: fit-content;
+  max-width: 100%;
 
   padding-block: var(--modal-title-wrapper-padding-block);
 
   align-self: center;
 
-  outline: none;
+  text-align: center;
 }
 
 .modal__title {
@@ -119,10 +121,12 @@
   color: var(--semantic-accent-foreground);
 
   font-size: var(--modal-title-font-size);
+
+  text-wrap: balance;
 }
 
 .modal__slogan {
-  margin-left: var(--modal-slogan-margin-left);
+  margin-inline: 0;
 
   color: var(--semantic-accent-foreground-strong);
 
@@ -130,18 +134,22 @@
   font-weight: 600;
 }
 
+.modal__title,
+.modal__slogan {
+  text-wrap: balance;
+}
+
 .modal__innerWrapper {
-  width: max-content;
+  width: 100%;
+  min-width: 0;
 
   padding: var(--modal-padding);
 }
 
 .modal__footer {
+  display: flex;
+  justify-content: center;
   padding-bottom: var(--modal-footer-padding-bottom);
-}
-
-.buttonForm {
-  margin: 0 auto;
 }
 
 @media (forced-colors: active) {

@@ -94,7 +94,9 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     (event: React.SyntheticEvent<HTMLLIElement>): void => {
       try {
         event.preventDefault();
-        const value = (event.currentTarget.textContent ?? '').trim();
+
+        const value = event.currentTarget.dataset.value?.trim() ?? '';
+
         if (!value) {
           handleError(
             createError(1001, 'Empty value selected from autocomplete list.', {
@@ -200,10 +202,12 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
               role='option'
               aria-selected={listItemFocused === index}
               tabIndex={-1}
+              data-value={value}
               onMouseDown={!hasPointer ? handleOptionSelect : undefined}
               onPointerDown={hasPointer ? handleOptionSelect : undefined}
             >
-              {value}
+              <span aria-hidden='true'>{value}</span>
+              <span className='visually-hidden'>{value}</span>
             </li>
           );
         })}

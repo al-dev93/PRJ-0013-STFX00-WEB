@@ -309,7 +309,6 @@ export function Modal({
         {button && (
           <footer className={style.modal__footer}>
             <AppButton
-              className={style.buttonForm}
               name={button.name}
               form={button.form}
               ref={buttonRef}
