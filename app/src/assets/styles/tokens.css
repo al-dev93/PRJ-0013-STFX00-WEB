@@ -53,6 +53,7 @@
     /* Typography families */
     --ref-font-body: 'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
     --ref-font-display: 'Oswald', 'Roboto Condensed', 'Roboto', ui-sans-serif, system-ui, Arial, sans-serif;
+    --ref-font-condensed: 'Roboto Condensed', 'Roboto', ui-sans-serif, system-ui, Arial, sans-serif;
 
     /* Spacing scale (modular) */
     --space-ratio: 1.25;

@@ -5,6 +5,7 @@ supabase/.temp
 supabase/config.toml
 
 # dotenvx
+.env.deploy
 .env.keys
 .env.local
 .env.*.local

@@ -1,9 +1,19 @@
 .wrapperAlert {
   padding: 10px 40px 25px;
+  display: grid;
+  gap: calc(var(--semantic-space-sm) * 0.5);
+
+  padding: var(--semantic-space-md) var(--semantic-space-xl) var(--semantic-space-lg);
 }
 .bodyAlert {
   display: block;
-  margin-bottom: 5px;
-  font-size: var(--fs-xs);
-  color: var(--white);
+
+  margin: 0;
+
+  color: var(--semantic-success-text);
+
+  font-family: var(--semantic-font-body);
+  font-size: var(--semantic-fs-body);
+  font-weight: 500;
+  line-height: var(--semantic-lh-body);
 }

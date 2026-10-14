@@ -2,6 +2,7 @@ import type { DialogFormInputElement } from '@/types';
 
 import { DELETE_ERROR_TAG_NAME, SET_ERROR_TAG_NAME, SET_INPUT_BORDER_BOX } from './constants';
 import type { FormInputName, InputBorderBox, ErrorTagComponent, InputComponent, Validity } from '../types';
+
 /**
  * sets the border style of the active input field to distinguish between an incorrect
  * input and a correctly edited input field.
@@ -17,7 +18,6 @@ import type { FormInputName, InputBorderBox, ErrorTagComponent, InputComponent, 
  * If the input is invalid, the border style is set to 'error'. If the input has a value and is valid,
  * the border style is set to 'edited'. The function then returns an action to update the border style in the application's state.
  *
- * @al-dev93
  */
 export function setInputBorderBox(
   name: FormInputName,
@@ -50,14 +50,8 @@ export function setInputBorderBox(
  * is set to 'remplir' (fill in), otherwise it is set to 'modifier' (modify).
  * The function returns an action to update the error tag in the application's state.
  *
- * @al-dev93
  */
-export function setInputErrorTag(
-  name: FormInputName,
-  // input: DialogFormInputElement,
-  inputValidity: Validity,
-): ErrorTagComponent {
-  // const { name } = input;
+export function setInputErrorTag(name: FormInputName, inputValidity: Validity): ErrorTagComponent {
   const type = inputValidity.valid ? DELETE_ERROR_TAG_NAME : SET_ERROR_TAG_NAME;
   const tag = inputValidity.valueMissing ? 'remplir' : 'modifier';
 
@@ -94,6 +88,7 @@ export function setInputErrorTag(
  *
  * The returned 'Validity' object includes :
  *   - 'minLength': The minimum length required for the input.
+ *   - 'invalidCharacter': Whether an invalid character is entered in the 'tel' field.
  *   - 'patternMismatch': Whether the input matches the specified pattern.
  *   - 'tooLong': Whether the input is too long.
  *   - 'tooShort': Whether the input is too short.
@@ -106,32 +101,42 @@ export function setInputErrorTag(
  *   // Handle input validation errors
  * }
  *
- * @al-dev93
  */
-export function getInputValidityProperties(
-  input: DialogFormInputElement,
-  isAutocompleted: boolean | undefined,
-): Validity {
+export function getInputValidityProperties(input: DialogFormInputElement, isAutocompleted = false): Validity {
   const { maxLength, minLength, required, value } = input;
-  const { pattern } = input as HTMLInputElement;
+  const isTelInput = input instanceof HTMLInputElement && input.type === 'tel';
+  const invalidCharacter = isTelInput && /[^\d\s]/.test(value);
+  const pattern = input instanceof HTMLInputElement ? input.pattern : '';
 
   if (isAutocompleted) {
     const valueMissing = required ? !value.length : false;
-    const patternMismatch = pattern ? !new RegExp(pattern).test(value) : false;
-    const tooLong = maxLength > 0 ? value.length >= maxLength : false;
+    const patternMismatch = !invalidCharacter && pattern ? !new RegExp(pattern).test(value) : false;
+    const tooLong = maxLength > 0 ? value.length > maxLength : false;
     const tooShort = minLength > 0 ? value.length < minLength : false;
-    const valid = !valueMissing && !patternMismatch && !tooShort && !tooLong;
-    return { maxLength, minLength, patternMismatch, tooShort, tooLong, valid, valueMissing };
+    const valid = !valueMissing && !invalidCharacter && !patternMismatch && !tooShort && !tooLong;
+    return { maxLength, minLength, invalidCharacter, patternMismatch, tooShort, tooLong, valid, valueMissing };
   }
 
-  const { patternMismatch, tooShort, tooLong: isTooLong, valid: isValid, valueMissing } = input.validity;
+  const {
+    patternMismatch: nativePatternMismatch,
+    tooShort,
+    tooLong: isTooLong,
+    valid: isValid,
+    valueMissing,
+  } = input.validity;
+
+  const patternMismatch = !invalidCharacter && nativePatternMismatch;
+  const tooLong = maxLength > 0 ? value.length > maxLength : isTooLong;
+  const valid = maxLength > 0 ? value.length <= maxLength && isValid : isValid;
+
   return {
     maxLength,
     minLength,
+    invalidCharacter,
     patternMismatch,
     tooShort,
-    tooLong: maxLength > 0 ? value.length >= maxLength : isTooLong,
-    valid: maxLength > 0 ? value.length < maxLength && isValid : isValid,
+    tooLong,
+    valid,
     valueMissing,
   };
 }

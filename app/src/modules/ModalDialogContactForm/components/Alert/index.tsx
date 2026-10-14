@@ -20,11 +20,11 @@ import type { AlertProps } from '../../types';
  * @property {SetStateBoolean} [closeParentModal] - A function to close the parent modal, if necessary (optional).
  * @returns {(React.JSX.Element | null)} The rendered Alert component.
  *
- * @al-dev93
  */
 function MemoizedAlert({
   showAlert,
   setShowAlert,
+  ariaLabel,
   message: alertMessage,
   closeParentModal,
 }: AlertProps): React.JSX.Element | null {
@@ -103,7 +103,9 @@ function MemoizedAlert({
     <Modal
       open={showAlert}
       setOpen={setShowAlert}
+      ariaLabel={ariaLabel}
       closeIcon
+      closeButtonAriaLabel='Fermer la confirmation'
       closeParentModal={closeParentModal}
       customStyle='alert'
       modalId={modalId}

@@ -103,23 +103,23 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
   }, [contactFormAction, handleError, label, name]);
 
   const classDialogFormCheckbox: string =
-    style.dialogFormCheckbox__box + (!error?.valid ? ` ${style['dialogFormCheckbox__box--error']}` : '');
+    style.dialogFormCheckbox__box + (error?.valid === false ? ` ${style['dialogFormCheckbox__box--error']}` : '');
 
   return (
     <label htmlFor={name} className={style.dialogFormCheckbox}>
       <DynamicElement
         className={style.dialogFormCheckbox__input}
         onChange={handleChange}
+        tagKind='html'
         tag={formInput.tag}
         type={formInput.type}
         name={name}
         id={name}
         required={formInput.required}
         ref={inputElementRef as LegacyRef<DialogFormInputElement>}
-        // aria-label={name}
       />
       <span className={classDialogFormCheckbox} />
-      <p>{label}</p>
+      <span className={style.dialogFormCheckbox__label}>{label}</span>
     </label>
   );
 }

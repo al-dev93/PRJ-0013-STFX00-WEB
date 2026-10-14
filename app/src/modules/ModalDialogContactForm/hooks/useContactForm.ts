@@ -20,6 +20,30 @@ import {
   SET_POPOVER_MODE,
 } from '../utils/constants';
 import { formatInputNumber, sanitizeInput } from '../utils/formHelpers';
+import { flushSync } from 'react-dom';
+
+function formatInputTel(inputNode: HTMLInputElement): HTMLInputElement {
+  const rawCaretPosition = inputNode.selectionStart ?? 0;
+  const digitsBeforeCaret = inputNode.value.slice(0, rawCaretPosition).replace(/\D/g, '').length;
+  const formattedValue = formatInputNumber(inputNode.value);
+
+  inputNode.value = formattedValue;
+
+  let formattedCaretPosition = 0;
+  let digitCount = 0;
+
+  while (formattedCaretPosition < formattedValue.length && digitCount < digitsBeforeCaret) {
+    if (/\d/.test(formattedValue[formattedCaretPosition])) {
+      digitCount += 1;
+    }
+
+    formattedCaretPosition += 1;
+  }
+
+  inputNode.setSelectionRange(formattedCaretPosition, formattedCaretPosition);
+  return inputNode;
+}
+
 /**
  * Custom hook to manage the contact form input fields.
  *
@@ -44,26 +68,27 @@ export function useContactForm(name: FormInputName): ContactForm {
    */
   // Partial state selector using keys
   const {
-    inputNode,
-    inputValue,
+    autoComplete,
     inEdition,
     inputError,
+    inputNode,
+    inputValue,
     isHovered,
-    popoverMode,
     isStored,
-    autoComplete,
     listItemFocused,
+    popoverMode,
   } = useContactFormSelector(name, [
-    'inputNode',
-    'inputValue',
+    'autoComplete',
     'inEdition',
     'inputError',
+    'inputNode',
+    'inputValue',
     'isHovered',
-    'popoverMode',
     'isStored',
-    'autoComplete',
     'listItemFocused',
+    'popoverMode',
   ]);
+
   const contactFormAction = useContactFormDispatch();
 
   const [putAutoCompleteInInput, storeInputValue, validateInput] = useAutoComplete(name);
@@ -76,10 +101,10 @@ export function useContactForm(name: FormInputName): ContactForm {
    *
    * @constant renderTooltipIcon
    */
-  // const tooltipIconName: 'checkmark-circle' | 'create' | 'information-circle' = useMemo(() => {
   const tooltipIconName: TooltipIconName = useMemo(() => {
     if (inputValue && !inEdition && !inputError) return LOCAL_ICON_NAME.VALIDATED;
     if (inEdition) return LOCAL_ICON_NAME.EDIT;
+
     return LOCAL_ICON_NAME.INFO;
   }, [inEdition, inputError, inputValue]);
 
@@ -93,7 +118,6 @@ export function useContactForm(name: FormInputName): ContactForm {
    * @constant isTooltipVisible
    */
   const isTooltipVisible: boolean | undefined = useMemo(
-    // () => isHovered && !inEdition && inputError && !popoverMode,
     () => isHovered && !inEdition && !!inputError && !popoverMode,
 
     [inEdition, inputError, isHovered, popoverMode],
@@ -110,18 +134,21 @@ export function useContactForm(name: FormInputName): ContactForm {
    * @returns {void}
    */
   const showSuggestions = useCallback(
-    (event: KeyboardEvent) => {
+    (event: KeyboardEvent): void => {
       if (!inputNode) return;
+
       const autoCompleteValue = getAutocompleteInput(inputNode, isStored, inEdition);
       if (!autoCompleteValue?.length) return;
 
       event.preventDefault();
 
+      const sortedAutoComplete = [...autoCompleteValue].sort((a, b) => a.localeCompare(b));
+
       contactFormAction({
         type: SET_POPOVER_MODE,
         payload: { name, popoverMode: inEdition ? AUTO_COMPLETION : FULL_HISTORY },
       });
-      contactFormAction({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete: autoCompleteValue } });
+      contactFormAction({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete: sortedAutoComplete } });
       contactFormAction({
         type: SET_POPOVER_LIST_FOCUSED_INDEX,
         payload: { name, listItemFocused: event.code === 'ArrowDown' ? 0 : autoCompleteValue.length - 1 },
@@ -138,7 +165,7 @@ export function useContactForm(name: FormInputName): ContactForm {
    * @returns {void}
    */
   const handleArrowKeys = useCallback(
-    (event: KeyboardEvent) => {
+    (event: KeyboardEvent): void => {
       if (!autoComplete) return;
 
       event.preventDefault();
@@ -165,69 +192,137 @@ export function useContactForm(name: FormInputName): ContactForm {
     [contactFormAction, autoComplete, listItemFocused, name],
   );
 
+  const handleTabWithOpenPopover = useCallback(
+    (event: KeyboardEvent): boolean => {
+      if (event.code !== 'Tab' || !popoverMode || !autoComplete?.length || !inputNode) {
+        return false;
+      }
+
+      const dialog = inputNode.closest('dialog');
+
+      if (!dialog) return false;
+
+      const tabbableElements = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          [
+            'button:not([disabled])',
+            '[href]',
+            'input:not([disabled]):not([type="hidden"]):not([tabindex="-1"])',
+            'select:not([disabled]):not([tabindex="-1"])',
+            'textarea:not([disabled]):not([tabindex="-1"])',
+            '[tabindex]:not([tabindex="-1"])',
+          ].join(', '),
+        ),
+      );
+
+      const currentIndex = tabbableElements.indexOf(inputNode);
+
+      if (currentIndex < 0) return false;
+
+      const nextIndex = event.shiftKey
+        ? currentIndex === 0
+          ? tabbableElements.length - 1
+          : currentIndex - 1
+        : currentIndex === tabbableElements.length - 1
+          ? 0
+          : currentIndex + 1;
+
+      const nextElement = tabbableElements[nextIndex];
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      flushSync(() => {
+        contactFormAction({
+          type: RESET_AUTO_COMPLETE_OVERLAY,
+          payload: { name },
+        });
+      });
+
+      nextElement?.focus({
+        preventScroll: true,
+      });
+
+      return true;
+    },
+    [autoComplete?.length, contactFormAction, inputNode, name, popoverMode],
+  );
+
   /**
-   * Tests whether an early return should be triggered based on specific conditions.
-   *  1. If no event is provided, checks if a popover is open or if there is autocomplete text.
-   *  2. If an event is provided, checks if the input element exist or :
-   *    - first case, event is KeyboardEvent: if a specific keyboard key (ArrowDown, ArrowUp, Escape, or Enter) is pressed.
-   *    - second case, event is Event: if one of specified events (input, change, or keydown) has been triggered.
+   * Determines whether the current event requires no further processing.
+   *
+   * Keyboard handling is limited to autocomplete navigation and selection:
+   * - `ArrowDown` and `ArrowUp` may navigate or open autocomplete suggestions.
+   * - `Enter` is handled only when an autocomplete suggestion is currently
+   *   selectable.
+   *
+   * `Escape` is handled separately by `handleKeyboardEvent` so that it can
+   * close an open autocomplete list without preventing the native dialog
+   * cancellation behavior when autocomplete is closed.
    *
    * @function shouldEarlyReturn
-   * @param {Event} event - Keyboard event or input event
-   * @returns {boolean} Returns 'true' if the input element does not exits or if one of the specified events does not exits
+   * @param {Event} event - The event to evaluate.
+   * @returns {boolean} `true` when no autocomplete-specific processing is required.
    */
   const shouldEarlyReturn = useCallback(
-    (event?: Event) => {
+    (event?: Event): boolean => {
       if (!event) return !(popoverMode && autoComplete?.length);
+
       if (event instanceof KeyboardEvent) {
-        return !(inputNode && ['ArrowDown', 'ArrowUp', 'Escape', 'Enter'].includes(event.code));
+        if (!inputNode) return true;
+
+        if (event.code === 'Enter') {
+          return !(popoverMode && autoComplete?.length && listItemFocused !== undefined);
+        }
+        return !['ArrowDown', 'ArrowUp', 'Escape'].includes(event.code);
       }
       return !(inputNode && ['input', 'change', 'keydown'].includes(event.type));
     },
-    [autoComplete?.length, inputNode, popoverMode],
+    [autoComplete?.length, inputNode, listItemFocused, popoverMode],
   );
 
   /**
-   * Handles actions based on keyboard keys pressed and popover status:
-   *   1. keys 'ArrowDown' or 'ArrowUp'
-   *     - if the popover is open, the operator scrolls in the window.
-   *     - if the popover is closed, this opens it and the focus is placed
-   *       on the first or last item in the list depending on the key pressed.
-   *   2. keys 'Enter', this saves the focused autocomplete list item to the active input field
+   * Handles autocomplete keyboard actions.
+   *
+   * Arrow keys open or navigate the autocomplete list. `Enter` selects the
+   * currently focused suggestion when autocomplete is open and a suggestion
+   * is active.
    *
    * @function handleKeyActions
    * @param {KeyboardEvent} event - The keyboard event.
-   * @returns {boolean} True if an action is performed, false otherwise.
+   * @returns {boolean} `true` when an autocomplete action was performed.
    */
   const handleKeyActions = useCallback(
-    (event: KeyboardEvent) => {
+    (event: KeyboardEvent): boolean => {
       if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
         if (!popoverMode) showSuggestions(event);
         else handleArrowKeys(event);
+
         return true;
       }
 
-      if (event.code === 'Enter') {
+      if (event.code === 'Enter' && popoverMode && autoComplete?.length && listItemFocused !== undefined) {
         event.preventDefault();
-        putAutoCompleteInInput((autoComplete as string[])[listItemFocused as number]);
+
+        putAutoCompleteInInput(autoComplete[listItemFocused]);
+
         return true;
       }
 
-      return shouldEarlyReturn();
+      return false;
     },
-    [
-      autoComplete,
-      handleArrowKeys,
-      listItemFocused,
-      popoverMode,
-      putAutoCompleteInInput,
-      shouldEarlyReturn,
-      showSuggestions,
-    ],
+    [autoComplete, handleArrowKeys, listItemFocused, popoverMode, putAutoCompleteInInput, showSuggestions],
   );
+
   /**
-   * Handles the keyboard events on the input field. Only handles the ArrowDown and ArrowUp keys.
-   * If the key is not ArrowDown or ArrowUp, it returns.
+   * Handles keyboard interaction for autocomplete.
+   *
+   * When autocomplete is open, `Escape` closes the suggestion list without
+   * closing the surrounding dialog. When autocomplete is closed, `Escape` is
+   * left untouched so that the native `<dialog>` cancellation behavior can
+   * close the modal.
+   *
+   * Other supported keys are delegated to `handleKeyActions`.
    *
    * @function handleKeyboardEvent
    * @param {KeyboardEvent} event - The keyboard event.
@@ -235,15 +330,27 @@ export function useContactForm(name: FormInputName): ContactForm {
    */
   const handleKeyboardEvent = useCallback(
     (event: KeyboardEvent): void => {
+      if (handleTabWithOpenPopover(event)) return;
+
       if (shouldEarlyReturn(event)) return;
+
       if (handleKeyActions(event)) return;
 
-      event.preventDefault();
-      event.stopPropagation();
-
-      contactFormAction({ type: RESET_AUTO_COMPLETE_OVERLAY, payload: { name } });
+      if (event.code === 'Escape' && popoverMode && autoComplete?.length) {
+        event.preventDefault();
+        event.stopPropagation();
+        contactFormAction({ type: RESET_AUTO_COMPLETE_OVERLAY, payload: { name } });
+      }
     },
-    [contactFormAction, handleKeyActions, name, shouldEarlyReturn],
+    [
+      autoComplete?.length,
+      contactFormAction,
+      handleKeyActions,
+      handleTabWithOpenPopover,
+      name,
+      popoverMode,
+      shouldEarlyReturn,
+    ],
   );
 
   /**
@@ -255,8 +362,14 @@ export function useContactForm(name: FormInputName): ContactForm {
    */
   const processInputValue = useCallback(
     (stateInputNode: DialogFormInputElement) => {
-      const { type } = stateInputNode;
-      let { value } = stateInputNode;
+      const isTelInput = stateInputNode instanceof HTMLInputElement && stateInputNode.type === 'tel';
+
+      const rawValue = stateInputNode.value;
+
+      const value = isTelInput && /^[\d\s]*$/.test(rawValue) ? formatInputTel(stateInputNode).value : rawValue;
+
+      if (stateInputNode.value !== value) stateInputNode.value = value;
+
       contactFormAction({
         type: IN_EDIT_MODE,
         payload: {
@@ -264,13 +377,29 @@ export function useContactForm(name: FormInputName): ContactForm {
           inEdition: value !== inputValue && !!value.length,
         },
       });
-      if (type === 'tel') value = formatInputNumber(value);
+
       validateInput();
-      const autocompleteInput = getAutocompleteInput(stateInputNode, isStored, true);
-      contactFormAction({ type: SET_POPOVER_MODE, payload: { name, popoverMode: AUTO_COMPLETION } });
-      if (autocompleteInput) {
-        contactFormAction({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete: autocompleteInput } });
+
+      // An empty field must not automatically open autocomplete.
+      if (!value.length) {
+        contactFormAction({
+          type: RESET_AUTO_COMPLETE_OVERLAY,
+          payload: { name },
+        });
+
+        return;
       }
+
+      const autocompleteInput = getAutocompleteInput(stateInputNode, isStored, true);
+
+      // Do not expose an open combobox when no suggestion actually exists.
+      if (!autocompleteInput?.length) {
+        contactFormAction({ type: RESET_AUTO_COMPLETE_OVERLAY, payload: { name } });
+        return;
+      }
+
+      contactFormAction({ type: SET_POPOVER_MODE, payload: { name, popoverMode: AUTO_COMPLETION } });
+      contactFormAction({ type: SET_AUTO_COMPLETE, payload: { name, autoComplete: autocompleteInput } });
     },
     [contactFormAction, inputValue, isStored, name, validateInput],
   );
@@ -338,21 +467,36 @@ export function useContactForm(name: FormInputName): ContactForm {
    */
   const handleParentInputEvent = useCallback(
     (event: Event): void => {
-      if (!inputNode || name === undefined || !['click', 'focusin', 'focusout'].includes(event.type)) return;
-      event.preventDefault();
-      event.stopPropagation();
+      if (!inputNode || name === undefined || !['focusin', 'focusout'].includes(event.type)) return;
 
-      if (event.type === 'click') {
-        inputNode.focus();
-        return;
-      }
       if (event.type === 'focusin') {
-        contactFormAction({ type: SET_INPUT_FOCUS, payload: { name, isFocused: true } });
+        contactFormAction({
+          type: RESET_AUTO_COMPLETE_OVERLAY,
+          payload: { name },
+        });
+
+        contactFormAction({
+          type: SET_INPUT_FOCUS,
+          payload: {
+            name,
+            isFocused: true,
+          },
+        });
+
         return;
       }
-      if (event.type === 'focusout') {
-        contactFormAction({ type: SET_INPUT_FOCUS, payload: { name, isFocused: false } });
-      }
+      contactFormAction({
+        type: RESET_AUTO_COMPLETE_OVERLAY,
+        payload: { name },
+      });
+
+      contactFormAction({
+        type: SET_INPUT_FOCUS,
+        payload: {
+          name,
+          isFocused: false,
+        },
+      });
     },
     [contactFormAction, inputNode, name],
   );
@@ -364,12 +508,12 @@ export function useContactForm(name: FormInputName): ContactForm {
   useLayoutEffect((): (() => void) | void => {
     if (!inputNode) return undefined;
     ['change', 'keydown', 'input'].forEach((eventType) => inputNode.addEventListener(eventType, handleInputEvent));
-    ['click', 'focusin', 'focusout'].forEach((eventType) =>
+    ['focusin', 'focusout'].forEach((eventType) =>
       inputNode.parentElement?.addEventListener(eventType, handleParentInputEvent),
     );
     return () => {
       ['change', 'keydown', 'input'].forEach((eventType) => inputNode.removeEventListener(eventType, handleInputEvent));
-      ['click', 'focusin', 'focusout'].forEach((eventType) =>
+      ['focusin', 'focusout'].forEach((eventType) =>
         inputNode.parentElement?.removeEventListener(eventType, handleParentInputEvent),
       );
     };
