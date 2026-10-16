@@ -1,4 +1,5 @@
-import React, { useEffect, useId, useMemo } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import type { TooltipContent } from '@/types';
 import { useAnimation } from '@hooks/useAnimation';
@@ -65,6 +66,76 @@ export function Tooltip({
   const tooltipId = isNonEmptyString(id) ? id : reactId;
 
   const handleError = useErrorHandler();
+  const anchorRef = useRef<HTMLSpanElement>(null);
+  const portalAnchorRef = useRef<HTMLSpanElement>(null);
+  const [portalDialog, setPortalDialog] = useState<HTMLDialogElement | null>(null);
+
+  // Keep tooltips outside the modal scroll region but inside the native dialog.
+  useLayoutEffect(() => {
+    setPortalDialog(anchorRef.current?.closest('dialog') ?? null);
+  }, []);
+
+  useEffect(() => {
+    const anchor = anchorRef.current;
+    const overlay = portalAnchorRef.current;
+    const dialog = portalDialog;
+
+    if (!isVisible || !anchor || !overlay || !dialog) return;
+
+    let frameId: number | null = null;
+
+    /** Positions the portaled tooltip anchor in the dialog's coordinate space. */
+    const updatePosition = (): void => {
+      frameId = null;
+
+      if (!anchor.isConnected || !dialog.open) {
+        overlay.style.visibility = 'hidden';
+        return;
+      }
+
+      const anchorRect = anchor.getBoundingClientRect();
+      const dialogRect = dialog.getBoundingClientRect();
+      const scrollRegion = anchor.closest<HTMLElement>('[data-modal-scroll-region]');
+      const scrollRect = scrollRegion?.getBoundingClientRect();
+
+      // Prevent a tooltip from lingering when its trigger is scrolled out of view.
+      const anchorIsVisible = !scrollRect || (anchorRect.bottom > scrollRect.top && anchorRect.top < scrollRect.bottom);
+
+      overlay.style.left = `${anchorRect.left - dialogRect.left - dialog.clientLeft}px`;
+      overlay.style.top = `${anchorRect.top - dialogRect.top - dialog.clientTop}px`;
+      overlay.style.width = `${anchorRect.width}px`;
+      overlay.style.height = `${anchorRect.height}px`;
+      overlay.style.visibility = anchorIsVisible ? 'visible' : 'hidden';
+    };
+
+    /** Coalesces multiple scroll and resize events into one position update per frame. */
+    const scheduleUpdate = (): void => {
+      if (frameId !== null) return;
+      frameId = window.requestAnimationFrame(updatePosition);
+    };
+
+    // Apply the initial position before the browser paints the next frame.
+    updatePosition();
+
+    dialog.addEventListener('scroll', scheduleUpdate, true);
+    window.addEventListener('resize', scheduleUpdate);
+    window.visualViewport?.addEventListener('resize', scheduleUpdate);
+    window.visualViewport?.addEventListener('scroll', scheduleUpdate);
+
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(scheduleUpdate);
+    resizeObserver?.observe(anchor);
+    resizeObserver?.observe(dialog);
+
+    return () => {
+      dialog.removeEventListener('scroll', scheduleUpdate, true);
+      window.removeEventListener('resize', scheduleUpdate);
+      window.visualViewport?.removeEventListener('resize', scheduleUpdate);
+      window.visualViewport?.removeEventListener('scroll', scheduleUpdate);
+      resizeObserver?.disconnect();
+
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+    };
+  }, [isVisible, portalDialog]);
 
   /**
    * Drive CSS animation classes from the externally controlled `isVisible` flag.
@@ -211,15 +282,24 @@ export function Tooltip({
     (isAnimating ? ` ${style['tooltip__tip--visible']} ` : ' ') +
     style[`tooltip__tip--${direction}`];
 
-  return (
-    <span className={style.tooltip} role='presentation'>
-      {children}
+  // Keep the same accessible description in either rendering mode.
+  const panel = (
+    <div id={tooltipId} role='tooltip' aria-hidden={!isVisible ? 'true' : undefined} className={classNameTip}>
+      {tooltipBody}
+    </div>
+  );
 
-      {/* Keep the panel mounted so `aria-describedby={tooltipId}` can always point here.
-         Hidden from AT when closed to avoid mass reading at dialog open. */}
-      <div id={tooltipId} role='tooltip' aria-hidden={!isVisible ? 'true' : undefined} className={classNameTip}>
-        {tooltipBody}
-      </div>
+  return (
+    <span ref={anchorRef} className={style.tooltip} role='presentation'>
+      {children}
+      {portalDialog
+        ? createPortal(
+            <span ref={portalAnchorRef} className={style.tooltip__portalAnchor}>
+              {panel}
+            </span>,
+            portalDialog,
+          )
+        : panel}
     </span>
   );
 }

@@ -13,8 +13,14 @@
   width: max-content;
   max-width: calc(100dvw - (2 * var(--modal-viewport-gutter)));
 
-  top: 50%;
-  bottom: 50%;
+  /* top: 50%;
+  bottom: 50%; */
+  inset: 0;
+  margin: auto;
+
+  max-height: calc(100dvh - (2 * var(--modal-viewport-gutter)));
+
+  overflow: hidden;
 
   transform: translate(0, 0);
 
@@ -41,8 +47,16 @@
 }
 
 .modal__wrapper {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+
   width: 100%;
-  overflow-x: hidden;
+
+  max-height: inherit;
+
+  overflow: clip;
+
+  /* overflow-x: hidden; */
 }
 
 .modal__wrapper--alert {
@@ -142,6 +156,10 @@
 .modal__innerWrapper {
   width: 100%;
   min-width: 0;
+  min-height: 0;
+
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 
   padding: var(--modal-padding);
 }

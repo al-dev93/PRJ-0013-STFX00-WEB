@@ -174,3 +174,14 @@
     transform: none;
   }
 }
+
+/* Tooltip overlay rendered as a direct child of a modal dialog. */
+.tooltip__portalAnchor {
+  --tooltip-offset: var(--semantic-space-sm);
+  --tooltip-arrow-size: calc(var(--semantic-space-sm) * 0.5);
+
+  position: absolute;
+  z-index: 1000;
+  visibility: hidden;
+  pointer-events: none;
+}

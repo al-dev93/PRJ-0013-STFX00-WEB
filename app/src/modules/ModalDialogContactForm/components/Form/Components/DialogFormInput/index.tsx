@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { LegacyRef } from 'react';
+import type { FocusEvent, LegacyRef } from 'react';
 
 import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { AppIcon } from '@components/AppIcon';
@@ -173,6 +173,10 @@ export function MemoizedDialogFormInput({
     };
   }, [errorDescriptionText, isCompletionReached, isInvalid, isMessageMinimumReached, isTelComplete]);
 
+  /**
+   * This effect allows the screen reader to announce a field with an error
+   * or a correctly filled-in field after focus returns to it.
+   */
   useEffect(() => {
     const hasGainedFocus = isFocused && !wasFocusedRef.current;
 
@@ -291,31 +295,48 @@ export function MemoizedDialogFormInput({
    * @param {boolean} visible - Indicates whether the tooltip should be visible (true) or hidden (false).
    * @returns {Promise<void>}
    */
-  const handleTooltipVisibility = useCallback(
-    async (
-      event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.FocusEvent<HTMLDivElement, Element>,
-      visible: boolean,
-    ): Promise<void> => {
-      event.preventDefault();
-      event.stopPropagation();
+  const handleTooltipVisibility = async (visible: boolean): Promise<void> => {
+    try {
+      contactFormAction({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
+    } catch (err) {
+      await handleError(
+        createError(1005, 'Tooltip not visible', {
+          originalError: err,
+          component: 'DialogFormInput',
+          inputName: name,
+          operation: 'setTooltipVisibility',
+          category: 'UI Component',
+          url: window.location.href,
+        }),
+      );
+    }
+  };
 
-      try {
-        contactFormAction({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
-      } catch (err) {
-        await handleError(
-          createError(1005, 'Tooltip not visible', {
-            originalError: err,
-            component: 'DialogFormInput',
-            inputName: name,
-            operation: 'setTooltipVisibility',
-            category: 'UI Component',
-            url: window.location.href,
-          }),
-        );
+  const handleFocusCapture = (event: FocusEvent<HTMLDivElement>): void => {
+    if (event.target !== inputElementRef.current) return;
+
+    const field = event.currentTarget;
+
+    window.requestAnimationFrame(() => {
+      if (!field.isConnected || document.activeElement !== inputElementRef.current) return;
+
+      const scrollContainer = field.closest<HTMLElement>('[data-modal-scroll-region]');
+
+      const labelWrapper = field.querySelector<HTMLElement>(`.${style.dialogFormInput__label}`);
+
+      if (!scrollContainer || !labelWrapper) return;
+
+      const labelRect = labelWrapper.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+
+      const margin = 8;
+      const overflow = labelRect.top - containerRect.top - margin;
+
+      if (overflow < 0) {
+        scrollContainer.scrollTop += overflow;
       }
-    },
-    [contactFormAction, handleError, name],
-  );
+    });
+  };
 
   const hasTooltip = Boolean(inputNode?.required && tooltipContent?.length);
 
@@ -442,10 +463,11 @@ export function MemoizedDialogFormInput({
     <div className={style.dialogFormComponent}>
       <div
         className={classNameDialogFormInput}
-        onMouseEnter={hasTooltip ? (event) => handleTooltipVisibility(event, true) : undefined}
-        onMouseLeave={hasTooltip ? (event) => handleTooltipVisibility(event, false) : undefined}
-        onFocus={hasTooltip ? (event) => handleTooltipVisibility(event, true) : undefined}
-        onBlur={hasTooltip ? (event) => handleTooltipVisibility(event, false) : undefined}
+        onMouseEnter={hasTooltip ? () => void handleTooltipVisibility(true) : undefined}
+        onMouseLeave={hasTooltip ? () => void handleTooltipVisibility(false) : undefined}
+        onFocus={hasTooltip ? () => void handleTooltipVisibility(true) : undefined}
+        onBlur={hasTooltip ? () => void handleTooltipVisibility(false) : undefined}
+        onFocusCapture={handleFocusCapture}
       >
         <div className={style.dialogFormInput__label}>
           <label id={labelInputId} className={style.dialogFormInput__label__content} htmlFor={inputId}>
@@ -479,8 +501,8 @@ export function MemoizedDialogFormInput({
         </span>
 
         {renderAlertTag}
-        {renderPopover}
       </div>
+      {renderPopover}
     </div>
   );
 }

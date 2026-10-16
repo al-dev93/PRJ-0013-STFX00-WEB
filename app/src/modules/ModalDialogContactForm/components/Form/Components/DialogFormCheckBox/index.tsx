@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import type { LegacyRef } from 'react';
+import type { FocusEvent, LegacyRef } from 'react';
 
 import type { DialogFormInputElement } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
@@ -69,6 +69,28 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
     validateInput(inputElementRef.current);
   }, [contactFormAction, handleError, name]);
 
+  const handleFocusCapture = (event: FocusEvent<HTMLLabelElement>) => {
+    const label = event.currentTarget;
+
+    window.requestAnimationFrame(() => {
+      if (!label.isConnected) return;
+
+      const scrollContainer = label.closest<HTMLElement>('[data-modal-scroll-region]');
+
+      if (!scrollContainer) return;
+
+      const labelRect = label.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const margin = 8;
+
+      if (labelRect.bottom > containerRect.bottom - margin) {
+        scrollContainer.scrollTop += labelRect.bottom - containerRect.bottom + margin;
+      } else if (labelRect.top < containerRect.top + margin) {
+        scrollContainer.scrollTop -= containerRect.top - labelRect.top + margin;
+      }
+    });
+  };
+
   /**
    * Handles the change of the consent checkbox and append validity and input value
    * in the state.
@@ -106,7 +128,7 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
     style.dialogFormCheckbox__box + (error?.valid === false ? ` ${style['dialogFormCheckbox__box--error']}` : '');
 
   return (
-    <label htmlFor={name} className={style.dialogFormCheckbox}>
+    <label htmlFor={name} className={style.dialogFormCheckbox} onFocusCapture={handleFocusCapture}>
       <DynamicElement
         className={style.dialogFormCheckbox__input}
         onChange={handleChange}

@@ -170,6 +170,16 @@ export function Modal({
     const direction = event.shiftKey ? -1 : 1;
 
     const nextIndex = (currentIndex + direction + keyboardNavigableElements.length) % keyboardNavigableElements.length;
+    const nextElement = keyboardNavigableElements[nextIndex];
+
+    nextElement.focus({ preventScroll: true });
+
+    if (childrenRef.current?.contains(nextElement)) {
+      nextElement.scrollIntoView({
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    }
 
     keyboardNavigableElements[nextIndex].focus({
       preventScroll: true,
@@ -302,7 +312,7 @@ export function Modal({
         </header>
 
         {open && (
-          <div className={style.modal__innerWrapper} ref={childrenRef}>
+          <div className={style.modal__innerWrapper} ref={childrenRef} data-modal-scroll-region>
             {children}
           </div>
         )}

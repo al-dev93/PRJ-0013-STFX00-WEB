@@ -53,6 +53,96 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
 
   const shouldMountSuggestions = suggestionsVisible || shouldRenderSuggestions;
 
+  const isPopoverOpen = isFocused && (suggestionsVisible || Boolean(errorMessage?.length));
+
+  useEffect(() => {
+    if (!isPopoverOpen) return;
+
+    let animationFrameId = 0;
+
+    const timeoutId = window.setTimeout(() => {
+      animationFrameId = window.requestAnimationFrame(() => {
+        const popover = popoverRef.current;
+        const scrollContainer = popover?.closest<HTMLElement>('[data-modal-scroll-region]');
+
+        if (!popover || !scrollContainer) return;
+
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const popoverRect = popover.getBoundingClientRect();
+
+        const margin = 8;
+        const overflow = popoverRect.bottom - containerRect.bottom + margin;
+
+        if (overflow > 0) {
+          scrollContainer.scrollTop += overflow;
+        }
+      });
+    }, 220);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.cancelAnimationFrame(animationFrameId);
+    };
+  }, [isPopoverOpen, shouldRenderMessage, shouldMountSuggestions]);
+
+  /**
+   * Keeps expanding validation messages visible within the modal.
+   *
+   * @remarks
+   * - Observes actual message height changes rather than text updates.
+   * - Scrolls only when the message grows beyond the visible region.
+   * - Preserves the input focus and the popover animations.
+   * - Disconnects the observer and cancels pending frames on cleanup.
+   * - Runs only on the client, when ResizeObserver is available.
+   */
+  useEffect(() => {
+    if (name === 'message') return;
+    if (!isFocused || !shouldRenderMessage) return;
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const message = messageRef.current;
+    const scrollContainer = message?.closest<HTMLElement>('[data-modal-scroll-region]');
+
+    if (!message || !scrollContainer) return;
+
+    let previousHeight: number | null = null;
+    let animationFrameId: number | null = null;
+
+    const observer = new ResizeObserver(() => {
+      const currentHeight = message.getBoundingClientRect().height;
+
+      if (previousHeight !== null && currentHeight > previousHeight + 0.5) {
+        if (animationFrameId !== null) {
+          window.cancelAnimationFrame(animationFrameId);
+        }
+
+        animationFrameId = window.requestAnimationFrame(() => {
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const messageRect = message.getBoundingClientRect();
+
+          const margin = 8;
+          const overflow = messageRect.bottom - containerRect.bottom + margin;
+
+          if (overflow > 0) {
+            scrollContainer.scrollTop += overflow;
+          }
+        });
+      }
+
+      previousHeight = currentHeight;
+    });
+
+    observer.observe(message);
+
+    return () => {
+      observer.disconnect();
+
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [isFocused, shouldRenderMessage]);
+
   /**
    * Scrolls the focused item into view when the list of autocomplete suggestions is updated.
    * If the list is not rendered or the focused item index is undefined, the function does nothing.
