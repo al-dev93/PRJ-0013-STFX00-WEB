@@ -1,3 +1,7 @@
+.dialogFormCheckbox__wrapper {
+  min-width: 0;
+}
+
 .dialogFormCheckbox {
   position: relative;
 
@@ -61,6 +65,29 @@
 
 .dialogFormCheckbox__box--error ~ .dialogFormCheckbox__label {
   color: var(--semantic-danger-text);
+}
+
+.dialogFormCheckbox__error {
+  display: block;
+  inline-size: max-content;
+  max-inline-size: calc(100% - 4px);
+
+  margin-inline-start: 4px;
+  padding: 8px 12px;
+
+  color: var(--semantic-danger-text);
+  background-color: var(--semantic-danger-surface);
+
+  font-family: var(--semantic-font-body);
+  font-size: var(--semantic-fs-kicker);
+  font-weight: 400;
+  line-height: var(--semantic-lh-body);
+
+  overflow-wrap: anywhere;
+
+  border-radius: 0 0 var(--semantic-sm-radius) var(--semantic-sm-radius);
+
+  box-shadow: var(--semantic-shadow);
 }
 
 /* -------------------------------------------------------------------------- */

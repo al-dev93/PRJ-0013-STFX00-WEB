@@ -10,7 +10,7 @@ export function AppIcon({ className, iconName, weight = 'regular' }: AppIconProp
 
   if (isPhosphorIconName(iconName) || isLocalPhosphorIconName(iconName)) {
     const IconComponent = { ...PHOSPHOR_ICONS, ...LOCAL_PHOSPHOR_ICONS }[iconName];
-    // size={size}
+
     return <IconComponent className={className} weight={weight} aria-hidden='true' />;
   }
 

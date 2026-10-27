@@ -40,10 +40,15 @@ export function ModalDialogContactForm({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const modalVisibility = useRef<boolean>();
+  const [clearAutocompleteButton, setClearAutocompleteButton] = useState<HTMLButtonElement | null>(null);
 
   const contactFormFocusableFields = Object.values(useContactFormFieldsPropSelector('inputNode')).filter(
     (element): element is DialogFormInputElement => element instanceof HTMLElement && element.isConnected,
   );
+  const contactFormFocusableElements: HTMLElement[] = clearAutocompleteButton
+    ? [...contactFormFocusableFields, clearAutocompleteButton]
+    : contactFormFocusableFields;
+
   const contacFormValidity = Object.values(useContactFormFieldsPropSelector('inputNode', true)).some(
     (element) => !element,
   );
@@ -90,10 +95,11 @@ export function ModalDialogContactForm({
     alertOnSubmit,
     dataFormContent,
   } = useMemo((): ContactFormModal => {
-    if (!formModalData && !data) return EMPTY_MODAL_DIALOG_CONTACT_FORM;
-
     const formModalContent = formModalData || data;
-    return Array.isArray(formModalContent) ? formModalContent[0] : formModalContent;
+
+    const resolvedModalContent = Array.isArray(formModalContent) ? formModalContent[0] : formModalContent;
+
+    return resolvedModalContent ?? EMPTY_MODAL_DIALOG_CONTACT_FORM;
   }, [data, formModalData]);
 
   /**
@@ -120,7 +126,7 @@ export function ModalDialogContactForm({
       modalId={modalId}
       title={title}
       subtitle={subtitle}
-      focusableElements={contactFormFocusableFields}
+      focusableElements={contactFormFocusableElements}
       onRenderComplete={isFormContentRendered}
       closeIcon
       closeButtonAriaLabel='Fermer le formulaire de contact'
@@ -145,6 +151,7 @@ export function ModalDialogContactForm({
         onRenderComplete={setFormContentRendered}
         isSubmitting={isSubmitting}
         setIsSubmitting={setIsSubmitting}
+        clearAutocompleteButtonRef={setClearAutocompleteButton}
       />
     </Modal>
   );

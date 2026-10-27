@@ -3,7 +3,7 @@ import { useCallback, useLayoutEffect } from 'react';
 import { useContactFormDispatch } from './useContactFormDispatch';
 import { useContactFormSelector } from './useContactFormSelector';
 import type { FormInputName } from '../types';
-import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
+import { addToLocalStorage, hasStoredAutocomplete, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
   DELETE_INPUT_ERROR,
   RESET_AUTO_COMPLETE_OVERLAY,
@@ -107,14 +107,9 @@ export function useAutoComplete(
 
     if (!value || !validity.valid || name === 'message') return;
 
-    if (isStored) addToLocalStorage(value, name);
-    else {
-      saveToLocalStorage(value, name);
-      contactFormAction({
-        type: SET_IS_STORED,
-        payload: { name, isStored: true },
-      });
-    }
+    const saved = isStored ? addToLocalStorage(value, name) : saveToLocalStorage(value, name);
+
+    if (saved) contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: true } });
   }, [contactFormAction, isStored, input, name]);
 
   /**
@@ -125,7 +120,7 @@ export function useAutoComplete(
 
     validateInput(false, false);
 
-    contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: !!localStorage.getItem(name) } });
+    contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: hasStoredAutocomplete(name) } });
   }, [contactFormAction, input, name, validateInput]);
 
   return [putAutoCompleteInInput, storeInputValue, validateInput];

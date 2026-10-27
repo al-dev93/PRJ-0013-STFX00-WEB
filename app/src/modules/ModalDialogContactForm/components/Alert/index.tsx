@@ -19,7 +19,6 @@ import type { AlertProps } from '../../types';
  * @property {(string | string[])} message - The message(s) to display in the alert. Can be a string or an array of strings.
  * @property {SetStateBoolean} [closeParentModal] - A function to close the parent modal, if necessary (optional).
  * @returns {(React.JSX.Element | null)} The rendered Alert component.
- *
  */
 function MemoizedAlert({
   showAlert,

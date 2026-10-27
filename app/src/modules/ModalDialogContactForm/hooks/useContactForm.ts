@@ -10,6 +10,7 @@ import type { ContactForm, FormInputName, TooltipIconName } from '../types';
 import { getAutocompleteInput } from '../utils/autocompleteStorageUtils';
 import {
   AUTO_COMPLETION,
+  DELETE_INPUT_VALUE,
   FULL_HISTORY,
   IN_EDIT_MODE,
   RESET_AUTO_COMPLETE_OVERLAY,
@@ -54,8 +55,6 @@ function formatInputTel(inputNode: HTMLInputElement): HTMLInputElement {
  * @function useContactForm
  * @param {FormInputName} name - The name of the current input field.
  * @returns {ContactForm} - Returns an array with item value and tooltip status.
- *
- * @al-dev93
  */
 export function useContactForm(name: FormInputName): ContactForm {
   /**
@@ -415,12 +414,25 @@ export function useContactForm(name: FormInputName): ContactForm {
   const processFinalValue = useCallback(
     (stateInputNode: DialogFormInputElement) => {
       const input = stateInputNode;
+
+      // Normalize before validating the final value.
       input.value = sanitizeInput(input.value, name);
-      contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: input.value } });
+
+      // Explicitly validate the programmatically updated value.
+      const isValid = validateInput(true);
+
       contactFormAction({ type: IN_EDIT_MODE, payload: { name, inEdition: false } });
+
+      if (!isValid) {
+        // Do not retain a previously accepted value after an invalid edit.
+        contactFormAction({ type: DELETE_INPUT_VALUE, payload: { name } });
+        return;
+      }
+
+      contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: input.value } });
       storeInputValue();
     },
-    [contactFormAction, name, storeInputValue],
+    [contactFormAction, name, storeInputValue, validateInput],
   );
 
   /**
