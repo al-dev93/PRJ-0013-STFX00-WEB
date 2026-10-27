@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useAnimation } from '@hooks/useAnimation';
 import { useErrorHandler } from '@modules/Error/hooks/useErrorHandler';
@@ -8,6 +8,7 @@ import style from './style.module.css';
 import { useContactFormSelector } from '../../hooks/useContactFormSelector';
 import type { PopoverProps } from '../../types';
 import { SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
+import { getModalScrollContainer } from '@/utils/modalScrollUtils';
 
 /**
  * Popover component that displays a list of autocomplete suggestions and error messages.
@@ -18,7 +19,6 @@ import { SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
  * @property {string} [errorMessage] - Error messages associated with input validation.
  * @property {(content: string) => void} inputAutocomplete - Callback function to handle input autocomplete.
  * @returns {(React.JSX.Element | null)} The rendered Popover component or null if no suggestions or errors.
- * @author al-dev93
  */
 export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps): React.JSX.Element {
   const handleError = useErrorHandler();
@@ -35,13 +35,16 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     'listItemFocused',
   ]);
 
-  const [statusText, setStatusText] = useState<string>('');
-  const [activeText, setActiveText] = useState<string>('');
-  const [showSuggestions, setShowSuggestions] = useState<string[]>();
+  const suggestionsVisible = Boolean(autoComplete?.length && isFocused);
+
+  const showSuggestions = useMemo(
+    () => (autoComplete?.length && isFocused ? autoComplete : []),
+    [autoComplete, isFocused],
+  );
 
   // Animations for suggestions and message popups
   const { isAnimating: isAnimatingSuggestions, shouldRender: shouldRenderSuggestions } = useAnimation(
-    !!autoComplete?.length && isFocused,
+    suggestionsVisible,
     200,
   );
   const { isAnimating: isAnimatingMessage, shouldRender: shouldRenderMessage } = useAnimation(
@@ -49,14 +52,123 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     200,
   );
 
+  const shouldMountSuggestions = suggestionsVisible || shouldRenderSuggestions;
+
+  const isPopoverOpen = isFocused && (suggestionsVisible || Boolean(errorMessage?.length));
+
+  useEffect(() => {
+    if (!isPopoverOpen) return;
+
+    let animationFrameId = 0;
+
+    const revealPopover = (): void => {
+      animationFrameId = 0;
+
+      const popover = popoverRef.current;
+      if (!popover) return;
+
+      const scrollContainer = getModalScrollContainer(popover);
+
+      if (!scrollContainer) return;
+
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const popoverRect = popover.getBoundingClientRect();
+      const visualViewport = window.visualViewport;
+
+      const visibleBottom =
+        scrollContainer instanceof HTMLDialogElement && visualViewport
+          ? Math.min(containerRect.bottom, visualViewport.offsetTop + visualViewport.height)
+          : containerRect.bottom;
+
+      const margin = 8;
+      const overflow = popoverRect.bottom - visibleBottom + margin;
+
+      if (overflow > 0) {
+        scrollContainer.scrollTop += overflow;
+      }
+    };
+
+    const scheduleReveal = (): void => {
+      if (animationFrameId) window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = window.requestAnimationFrame(revealPopover);
+    };
+
+    const timeoutId = window.setTimeout(scheduleReveal, 220);
+
+    // Preserve the validated iOS keyboard handling for the message field.
+    if (name === 'message') window.visualViewport?.addEventListener('resize', scheduleReveal);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.cancelAnimationFrame(animationFrameId);
+      if (name === 'message') {
+        window.visualViewport?.removeEventListener('resize', scheduleReveal);
+      }
+    };
+  }, [isPopoverOpen, name, shouldRenderMessage, shouldMountSuggestions]);
+
   /**
-   * Sets the autocomplete list when it is updated.
+   * Keeps expanding validation messages visible within the modal.
+   *
+   * @remarks
+   * - Observes actual message height changes rather than text updates.
+   * - Scrolls only when the message grows beyond the visible region.
+   * - Preserves the input focus and the popover animations.
+   * - Disconnects the observer and cancels pending frames on cleanup.
+   * - Runs only on the client, when ResizeObserver is available.
    */
   useEffect(() => {
-    if (autoComplete?.length && isFocused) {
-      setShowSuggestions(autoComplete.sort((a, b) => a.localeCompare(b)));
-    }
-  }, [autoComplete, isFocused]);
+    if (!isFocused || !shouldRenderMessage) return;
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const message = messageRef.current;
+    const scrollContainer = message ? getModalScrollContainer(message) : null;
+
+    if (!message || !scrollContainer) return;
+
+    let previousHeight: number | null = null;
+    let animationFrameId: number | null = null;
+
+    const observer = new ResizeObserver(() => {
+      const currentHeight = message.getBoundingClientRect().height;
+
+      if (previousHeight !== null && currentHeight > previousHeight + 0.5) {
+        if (animationFrameId !== null) {
+          window.cancelAnimationFrame(animationFrameId);
+        }
+
+        animationFrameId = window.requestAnimationFrame(() => {
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const messageRect = message.getBoundingClientRect();
+          const visualViewport = window.visualViewport;
+
+          const visibleBottom =
+            scrollContainer instanceof HTMLDialogElement && visualViewport
+              ? Math.min(containerRect.bottom, visualViewport.offsetTop + visualViewport.height)
+              : containerRect.bottom;
+
+          const margin = 8;
+          const overflow = messageRect.bottom - visibleBottom + margin;
+
+          if (overflow > 0) {
+            scrollContainer.scrollTop += overflow;
+          }
+        });
+      }
+
+      previousHeight = currentHeight;
+    });
+
+    observer.observe(message);
+
+    return () => {
+      observer.disconnect();
+
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [isFocused, name, shouldRenderMessage]);
 
   /**
    * Scrolls the focused item into view when the list of autocomplete suggestions is updated.
@@ -83,42 +195,6 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     }
   }, [handleError, listItemFocused, name]);
 
-  useEffect(() => {
-    let timeoutId: number | undefined;
-
-    const numberOfSuggestions = showSuggestions?.length ?? 0;
-
-    if (isFocused && shouldRenderSuggestions && numberOfSuggestions > 0) {
-      const text =
-        `${numberOfSuggestions} suggestion${numberOfSuggestions > 1 ? 's' : ''} disponibles. ` +
-        `Utilisez Flèche haut/bas pour naviguer, Entrée pour valider.`;
-
-      timeoutId = window.setTimeout(() => setStatusText(text), 0);
-    } else {
-      setStatusText('');
-    }
-
-    return () => {
-      if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
-      }
-    };
-  }, [isFocused, shouldRenderSuggestions, showSuggestions?.length]);
-
-  useEffect(() => {
-    const n = showSuggestions?.length ?? 0;
-    if (!shouldRenderSuggestions || !n || listItemFocused === undefined) {
-      setActiveText('');
-      return () => {};
-    }
-    const label = showSuggestions?.[listItemFocused] ?? '';
-    // Ad example : "Name, 2 sur 5"
-    const txt = `${label}, ${listItemFocused + 1} sur ${n}`;
-    // micro latency
-    const id = window.setTimeout(() => setActiveText(txt), 0);
-    return () => window.clearTimeout(id);
-  }, [listItemFocused, showSuggestions, shouldRenderSuggestions]);
-
   /**
    * Selects an autocomplete option via a single unified handler (pointer devices).
    *
@@ -135,7 +211,9 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     (event: React.SyntheticEvent<HTMLLIElement>): void => {
       try {
         event.preventDefault();
-        const value = (event.currentTarget.textContent ?? '').trim();
+
+        const value = event.currentTarget.dataset.value?.trim() ?? '';
+
         if (!value) {
           handleError(
             createError(1001, 'Empty value selected from autocomplete list.', {
@@ -160,12 +238,6 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
     },
     [handleError, inputAutocomplete],
   );
-
-  const errorAnnounceText = useMemo(() => {
-    if (!errorMessage?.length) return '';
-    const parts = errorMessage.map(({ text }) => text.trim()).filter(Boolean);
-    return parts.length ? `Erreur : ${parts.join('. ')}` : '';
-  }, [errorMessage]);
 
   /**
    * Renders the message that is displayed when there are validation errors.
@@ -216,13 +288,13 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
   const renderSuggestions: React.JSX.Element | null = useMemo(() => {
     const hasPointer = typeof window !== 'undefined' && 'PointerEvent' in window;
 
-    return shouldRenderSuggestions ? (
+    return shouldMountSuggestions ? (
       <ul
         id={`${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}`}
         className={classNameSuggestions}
         role='listbox'
         aria-labelledby={`input_${name}-label`}
-        hidden={!showSuggestions?.length}
+        aria-hidden={!suggestionsVisible ? true : undefined}
         ref={suggestionsRef}
       >
         {showSuggestions?.map((value, index) => {
@@ -247,47 +319,31 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
               role='option'
               aria-selected={listItemFocused === index}
               tabIndex={-1}
+              data-value={value}
               onMouseDown={!hasPointer ? handleOptionSelect : undefined}
               onPointerDown={hasPointer ? handleOptionSelect : undefined}
             >
-              {value}
+              <span aria-hidden='true'>{value}</span>
+              <span className='visually-hidden'>{value}</span>
             </li>
           );
         })}
       </ul>
     ) : null;
-  }, [classNameSuggestions, handleOptionSelect, listItemFocused, name, shouldRenderSuggestions, showSuggestions]);
+  }, [
+    classNameSuggestions,
+    handleOptionSelect,
+    listItemFocused,
+    name,
+    shouldMountSuggestions,
+    showSuggestions,
+    suggestionsVisible,
+  ]);
 
   return (
     <div className={style.popover} ref={popoverRef}>
       {renderMessage}
       {renderSuggestions}
-      {/* Global list status */}
-      <div
-        id={`${name}-status`}
-        role='status'
-        aria-live='polite'
-        aria-atomic='true'
-        aria-relevant='additions text'
-        className='visually-hidden'
-      >
-        {statusText}
-      </div>
-      {/* Active item status */}
-      <div id={`${name}-active-status`} role='status' aria-live='polite' aria-atomic='true' className='visually-hidden'>
-        {activeText}
-      </div>
-      {/* Error status */}
-      <div
-        id={`announce_${name}_error`}
-        role='status'
-        aria-live='polite'
-        aria-atomic='true'
-        aria-relevant='text'
-        className='visually-hidden'
-      >
-        {isFocused ? errorAnnounceText : ''}
-      </div>
     </div>
   );
 }

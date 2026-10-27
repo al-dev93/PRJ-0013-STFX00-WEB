@@ -268,6 +268,7 @@ export type ErrorMessage = {
   tooLong?: string;
   tooShort?: string;
   valueMissing?: string;
+  invalidCharacter?: string;
 };
 
 export type FormInput = {
@@ -391,12 +392,7 @@ export type FetchResultData = {
     error: unknown;
     context?: FetchErrorContext;
   } | null;
-  refetch: (url: string | undefined | null, options: FetchOptions) => Promise<void>;
-};
-
-export type CsrfRecord = {
-  token: string;
-  fetchedAt: number;
+  refetch: (url: string | undefined | null, options: FetchOptions) => Promise<boolean>;
 };
 
 // NOTE: setting up the application operation

@@ -33,8 +33,7 @@ export const AppButton = memo(
     { variant, className = '', ...rest }: FormButtonProps,
     ref?: React.ForwardedRef<HTMLButtonElement>,
   ): React.JSX.Element {
-    const { form, onClick, name, disabled, ariaHasPopup, ariaExpanded, ariaControls, ariaLabel } = rest;
-    const isDisabled = disabled;
+    const { form, onClick, name, disabled, ariaHasPopup, ariaExpanded, ariaControls, ariaDisabled, ariaLabel } = rest;
 
     const handleError = useErrorHandler();
 
@@ -65,8 +64,8 @@ export const AppButton = memo(
         data-variant={variant}
         onClick={handleClick}
         ref={ref}
-        disabled={isDisabled}
-        aria-disabled={isDisabled ? 'true' : 'false'}
+        disabled={disabled}
+        aria-disabled={ariaDisabled}
         aria-haspopup={ariaHasPopup}
         aria-expanded={ariaExpanded}
         aria-controls={ariaControls}

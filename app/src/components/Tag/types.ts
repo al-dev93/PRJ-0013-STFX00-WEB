@@ -13,11 +13,11 @@ import type { TagType } from '@/types';
  *
  * @al-dev93
  */
-export type TagProps = {
+export interface TagProps {
   className?: string;
   tag: string;
   variant?: TagType;
   ariaLabel?: string;
   id?: string;
   ariaHidden?: boolean;
-};
+}

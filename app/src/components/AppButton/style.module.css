@@ -1,92 +1,153 @@
 .appButton {
-  --btn-bg: var(--btn-primary-bg);
-  --btn-fg: var(--btn-primary-fg);
-  --btn-hover-bg: var(--btn-primary-hover);
-  --btn-active-bg: var(--btn-primary-active);
-
-  --btn-ring: var(--btn-primary-ring);
-  --btn-shadow: var(--elevation-2);
-
-  /* --btn-bd: transparent; */
-  --btn-bd: color-mix(in oklab, var(--semantic-accent) 65%, var(--ref-neutral-900) 35%);
-  --btn-border-radius: 12px;
-  --btn-fw: 500;
+  --button-bg: var(--semantic-button-primary-bg);
+  --button-fg: var(--semantic-button-primary-fg);
+  --button-border: var(--semantic-button-primary-border);
+  --button-hover-bg: var(--semantic-button-primary-hover-bg);
+  --button-active-bg: var(--semantic-button-primary-active-bg);
+  --button-ring: var(--semantic-button-primary-ring);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 0.5rem;
+
   inline-size: fit-content;
   min-inline-size: 10.5rem;
+  min-block-size: 2.75rem;
+
   padding: 0.72rem 1rem;
-  border-radius: var(--btn-border-radius);
-  font-weight: var(--btn-fw);
+
+  color: var(--button-fg);
+  background-color: var(--button-bg);
+
+  font-weight: 500;
   line-height: 1;
+
+  border: 1px solid var(--button-border);
+  border-radius: var(--semantic-sm-radius);
+
+  box-shadow: var(--semantic-shadow);
+
   cursor: pointer;
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  border: 1px solid var(--btn-bd);
-  box-shadow: var(--btn-shadow);
+
   transition:
-    transform calc(0.12s * var(--motion-ok)) ease,
-    box-shadow calc(0.12s * var(--motion-ok)) ease,
-    background-color calc(0.12s * var(--motion-ok)) ease,
-    color calc(0.12s * var(--motion-ok)) ease,
-    border-color calc(0.12s * var(--motion-ok)) ease;
+    transform var(--semantic-dur) ease,
+    box-shadow var(--semantic-dur) ease,
+    background-color var(--semantic-dur) ease,
+    color var(--semantic-dur) ease,
+    border-color var(--semantic-dur) ease;
 }
 
-.appButton:enabled:hover {
-  background: var(--btn-hover-bg);
-  transform: translateY(calc(-1px * var(--motion-ok)));
+/* -------------------------------------------------------------------------- */
+/* Variants                                                                   */
+/* -------------------------------------------------------------------------- */
+
+.appButton[data-variant='outline'] {
+  --button-bg: var(--semantic-button-outline-bg);
+  --button-fg: var(--semantic-button-outline-fg);
+  --button-border: var(--semantic-button-outline-border);
+  --button-hover-bg: var(--semantic-button-outline-hover-bg);
+  --button-active-bg: var(--semantic-button-outline-active-bg);
+
+  box-shadow: none;
 }
-.appButton:enabled:active {
-  background: var(--btn-active-bg);
+
+.appButton[data-variant='ghost'] {
+  --button-bg: var(--semantic-button-ghost-bg);
+  --button-fg: var(--semantic-button-ghost-fg);
+  --button-border: transparent;
+  --button-hover-bg: var(--semantic-button-ghost-hover-bg);
+  --button-active-bg: var(--semantic-button-ghost-active-bg);
+
+  box-shadow: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Pointer interaction                                                        */
+/*                                                                            */
+/* aria-disabled buttons remain native enabled elements so that they stay     */
+/* keyboard-focusable. They must therefore be explicitly excluded here.       */
+/* -------------------------------------------------------------------------- */
+
+.appButton:not(:disabled):not([aria-disabled='true']):hover {
+  background-color: var(--button-hover-bg);
+
+  transform: translateY(-1px);
+}
+
+.appButton:not(:disabled):not([aria-disabled='true']):active {
+  background-color: var(--button-active-bg);
+
   transform: translateY(0);
 }
-.appButton:enabled:focus-visible {
-  outline: 3px solid var(--btn-ring);
-  outline-offset: 2px;
+
+/* -------------------------------------------------------------------------- */
+/* Disabled / unavailable                                                     */
+/*                                                                            */
+/* Native disabled and aria-disabled share the same visual state.             */
+/* aria-disabled remains focusable by design.                                 */
+/* -------------------------------------------------------------------------- */
+
+.appButton:disabled,
+.appButton[aria-disabled='true'] {
+  color: var(--semantic-button-disabled-fg);
+  background-color: var(--semantic-button-disabled-bg);
+
+  border-color: var(--semantic-button-disabled-border);
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+
   transition: none;
   transform: none;
 }
 
-@media (forced-colors: active) {
-  .appButton:focus-visible {
-    outline: 2px solid Highlight;
-    outline-offset: 2px;
-    box-shadow: none;
+/* -------------------------------------------------------------------------- */
+/* Keyboard focus                                                             */
+/*                                                                            */
+/* Kept after the disabled rules so an aria-disabled button can still expose  */
+/* keyboard focus while remaining visually unavailable.                       */
+/* -------------------------------------------------------------------------- */
+
+.appButton:focus-visible {
+  outline: 2px solid var(--button-ring);
+  outline-offset: 3px;
+
+  transform: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* User preferences                                                           */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .appButton {
+    transition: none;
+  }
+
+  .appButton:not(:disabled):not([aria-disabled='true']):hover,
+  .appButton:not(:disabled):not([aria-disabled='true']):active {
+    transform: none;
   }
 }
 
-.appButton:disabled,
-.appButton[aria-disabled='true'] {
-  /* 1 when --motion-ok=0 (reduced), 0.55 when --motion-ok=1 (normal)*/
-  opacity: calc(1 - 0.45 * var(--motion-ok));
-  /* 1 when --motion-ok=0 (reduced), 0.90 when --motion-ok=1 (normal) */
-  filter: saturate(calc(1 - 0.1 * var(--motion-ok)));
-  cursor: not-allowed;
+@media (forced-colors: active) {
+  .appButton {
+    border-color: ButtonText;
 
-  transition: none !important;
-  transform: none !important;
-  box-shadow: var(--elevation-0, none) !important;
-}
+    box-shadow: none;
+  }
 
-.appButton[data-variant='outline'] {
-  --btn-bg: transparent;
-  --btn-fg: var(--semantic-accent);
-  --btn-bd: color-mix(in oklab, var(--semantic-accent) 55%, white);
-  --btn-hover-bg: color-mix(in oklab, var(--semantic-accent) 10%, white);
-  --btn-active-bg: color-mix(in oklab, var(--semantic-accent) 16%, white);
-  --btn-ring: var(--ref-brand-500);
-  --btn-shadow: none;
-}
+  .appButton:disabled,
+  .appButton[aria-disabled='true'] {
+    color: GrayText;
+    border-color: GrayText;
+  }
 
-.appButton[data-variant='ghost'] {
-  --btn-bg: transparent;
-  --btn-fg: color-mix(in oklab, var(--semantic-accent) 40%, var(--semantic-text));
-  --btn-bd: transparent;
-  --btn-hover-bg: color-mix(in oklab, var(--semantic-accent) 12%, white);
-  --btn-active-bg: color-mix(in oklab, var(--semantic-accent) 18%, white);
-  --btn-ring: var(--ref-brand-500);
-  --btn-shadow: none;
+  .appButton:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 3px;
+  }
 }

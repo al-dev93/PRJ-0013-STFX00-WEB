@@ -23,12 +23,13 @@
 
     --semantic-surface-1-tinted: oklch(1 0.01 var(--brand-h));
 
-    /* Hero wash: very light tinted accent */
-    /* --semantic-wash-hero: radial-gradient(
-      var(--ref-wash-size-x) var(--ref-wash-size-y) at var(--ref-wash-pos-x) var(--ref-wash-pos-y),
-      color-mix(in oklab, var(--ref-wash-color) var(--ref-wash-strength), transparent),
-      transparent 70%
-    ); */
+    /* Overlays */
+    --semantic-backdrop: color-mix(in srgb, var(--ref-neutral-900) 58%, transparent);
+    --semantic-shadow-overlay: var(--ref-shadow-2);
+
+    /* Inverse surfaces */
+    --semantic-surface-inverse: var(--semantic-text);
+    --semantic-text-inverse: var(--semantic-surface-1);
 
     /* Text */
     --semantic-text: var(--ref-neutral-900);
@@ -47,14 +48,18 @@
     );
 
     /* Accent & derivatives (cyan AI+) */
-    --semantic-accent: var(--ref-brand-600);
     --semantic-accent-weak: var(--ref-brand-400);
+    --semantic-accent: var(--ref-brand-600);
     --semantic-accent-strong: var(--ref-brand-700);
 
     --elevation-0: none;
     --elevation-1: 0 2px 10px rgba(0, 0, 0, 0.06);
     --elevation-2: 0 6px 20px rgba(0, 0, 0, 0.08);
     --elevation-3: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+    /* Accent foregrounds for content displayed on light surfaces */
+    --semantic-accent-foreground: color-mix(in oklab, var(--semantic-accent) 60%, var(--semantic-text) 40%);
+    --semantic-accent-foreground-strong: color-mix(in oklab, var(--semantic-accent) 75%, var(--semantic-text) 35%);
 
     /* Links & focus */
     --semantic-link: color-mix(in oklch, var(--ref-brand-600) 90%, black);
@@ -76,10 +81,28 @@
     --semantic-success: var(--ref-success);
     --semantic-warning: var(--ref-warning);
     --semantic-danger: var(--ref-danger);
+    /* Form controls */
+    --semantic-control-surface: var(--semantic-surface-1);
+    --semantic-control-mark: var(--ref-neutral-0);
+    --semantic-control-text: var(--semantic-text);
+    --semantic-control-text-muted: var(--semantic-text-muted);
+    --semantic-control-border: color-mix(in oklch, var(--semantic-text) 45%, var(--semantic-control-surface));
+    --semantic-control-radius: calc(var(--ref-radius-1) * 0.5);
+
+    --semantic-danger-text: color-mix(in oklch, var(--semantic-danger) 70%, var(--semantic-text));
+    --semantic-danger-surface: color-mix(in oklch, var(--semantic-danger) 10%, var(--semantic-surface-1));
+    --semantic-success-text: color-mix(in oklab, var(--semantic-success) 75%, var(--semantic-text) 25%);
+    --semantic-success-surface: color-mix(in oklab, var(--semantic-success) 12%, var(--semantic-surface-1) 88%);
+    --semantic-success-border: color-mix(in oklab, var(--semantic-success) 40%, var(--semantic-surface-1) 60%);
+
+    /* Form controls states */
+    --semantic-control-saved: var(--semantic-accent-foreground);
+    --semantic-control-edit: var(--semantic-accent-foreground-strong);
 
     /* Typography & rhythm */
     --semantic-font-body: var(--ref-font-body);
     --semantic-font-display: var(--ref-font-display);
+    --semantic-font-condensed: var(--ref-font-condensed);
     --semantic-fs-kicker: var(--ref-fs-step--1);
     --semantic-fs-body: var(--ref-fs-step-0);
     --semantic-fs-lead: var(--ref-fs-step-1);
@@ -90,6 +113,7 @@
     --semantic-lh-body: var(--ref-lh-body);
     --semantic-lh-heading: var(--ref-lh-heading);
 
+    --semantic-space-xs: var(--space-2);
     --semantic-space-sm: var(--space-3);
     --semantic-space-md: var(--space-4);
     --semantic-space-lg: var(--space-6);
@@ -105,7 +129,7 @@
       primary : Cyan AI+, neutral to contrast with cyan, outline, ghost
     -------------------------------------------------------------------------- */
 
-    /* Primary */
+    /* Primary (à remplacer) */
     --btn-primary-bg: var(--semantic-accent);
     --btn-primary-fg: var(--ref-neutral-900);
     --btn-primary-hover: color-mix(in oklab, var(--semantic-accent) 88%, black);
@@ -114,13 +138,13 @@
     --btn-outline-bd: color-mix(in oklab, var(--semantic-accent) 55%, white);
     --btn-outline-fg: var(--semantic-accent);
 
-    /* Neutral variant */
+    /* Neutral variant (à remplacer) */
     --btn-hero-bg: var(--ref-neutral-900);
     --btn-hero-fg: var(--ref-neutral-0);
     --btn-hero-hover: color-mix(in oklab, var(--ref-neutral-900) 88%, white);
     --btn-hero-ring: var(--ref-brand-500);
 
-    /* Outline variant */
+    /* Outline variant (à remplacer) */
     --btn-outline-fg: var(--semantic-accent);
     --btn-outline-bd: color-mix(in oklab, var(--semantic-accent) 55%, white);
     --btn-outline-bg: transparent;
@@ -128,20 +152,48 @@
     --btn-outline-active-bg: color-mix(in oklab, var(--semantic-accent) 16%, white);
     --btn-outline-ring: var(--ref-brand-500);
 
-    /* Ghost variant */
+    /* Ghost variant (à remplacer) */
     --btn-ghost-fg: color-mix(in oklab, var(--semantic-accent) 40%, var(--semantic-text));
     --btn-ghost-bg: transparent;
     --btn-ghost-hover-bg: color-mix(in oklab, var(--semantic-accent) 12%, white);
     --btn-ghost-active-bg: color-mix(in oklab, var(--semantic-accent) 18%, white);
     --btn-ghost-ring: var(--ref-brand-500);
 
-    /*--------------------------------------------------------------------------
-      hero signature semantics: colors for brand and bright spot
-    -------------------------------------------------------------------------- */
+    /* Primary button */
+    --semantic-button-primary-bg: var(--semantic-accent);
+    --semantic-button-primary-fg: var(--semantic-text);
 
-    /* Brand logo */
-    /* --semantic-brand: oklch(0.62 0.18 235); */
-    /* --semantic-brand-muted: color-mix(in oklch, var(--ref-neutral-900) 70%, white 20%); */
+    --semantic-button-primary-border: color-mix(in oklab, var(--semantic-accent) 65%, var(--semantic-text) 35%);
+
+    --semantic-button-primary-hover-bg: color-mix(in oklab, var(--semantic-accent) 88%, black);
+
+    --semantic-button-primary-active-bg: color-mix(in oklab, var(--semantic-accent) 80%, black);
+
+    --semantic-button-primary-ring: var(--semantic-ring);
+
+    /* Disabled button */
+    --semantic-button-disabled-bg: color-mix(in oklab, var(--semantic-accent) 18%, var(--semantic-surface-1));
+
+    --semantic-button-disabled-fg: var(--semantic-text-muted);
+
+    --semantic-button-disabled-border: color-mix(in oklab, var(--semantic-accent) 25%, var(--semantic-border));
+
+    /* Outline button */
+    --semantic-button-outline-bg: transparent;
+    --semantic-button-outline-fg: var(--semantic-accent-foreground);
+    --semantic-button-outline-border: var(--semantic-accent-foreground);
+
+    --semantic-button-outline-hover-bg: color-mix(in oklab, var(--semantic-accent) 10%, var(--semantic-surface-1));
+
+    --semantic-button-outline-active-bg: color-mix(in oklab, var(--semantic-accent) 16%, var(--semantic-surface-1));
+
+    /* Ghost button */
+    --semantic-button-ghost-bg: transparent;
+    --semantic-button-ghost-fg: var(--semantic-accent-foreground);
+
+    --semantic-button-ghost-hover-bg: color-mix(in oklab, var(--semantic-accent) 10%, var(--semantic-surface-1));
+
+    --semantic-button-ghost-active-bg: color-mix(in oklab, var(--semantic-accent) 16%, var(--semantic-surface-1));
   }
 
   /* DARK (auto if user prefers dark and data-theme is not forced to "light") */
