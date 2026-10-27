@@ -34,7 +34,6 @@ export const AppButton = memo(
     ref?: React.ForwardedRef<HTMLButtonElement>,
   ): React.JSX.Element {
     const { form, onClick, name, disabled, ariaHasPopup, ariaExpanded, ariaControls, ariaDisabled, ariaLabel } = rest;
-    // const isDisabled = disabled;
 
     const handleError = useErrorHandler();
 
@@ -66,7 +65,6 @@ export const AppButton = memo(
         onClick={handleClick}
         ref={ref}
         disabled={disabled}
-        // aria-disabled={isDisabled ? 'true' : 'false'}
         aria-disabled={ariaDisabled}
         aria-haspopup={ariaHasPopup}
         aria-expanded={ariaExpanded}

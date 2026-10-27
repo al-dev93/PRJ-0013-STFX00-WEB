@@ -13,8 +13,6 @@
   width: max-content;
   max-width: calc(100dvw - (2 * var(--modal-viewport-gutter)));
 
-  /* top: 50%;
-  bottom: 50%; */
   inset: 0;
   margin: auto;
 
@@ -55,8 +53,6 @@
   max-height: inherit;
 
   overflow: clip;
-
-  /* overflow-x: hidden; */
 }
 
 .modal__wrapper--alert {
@@ -184,5 +180,25 @@
   .modal__closeButton:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
+  }
+}
+
+@media (max-width: 48rem) {
+  .modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
+  .modal__wrapper {
+    display: block;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .modal__innerWrapper {
+    min-height: auto;
+    overflow: visible;
+    overscroll-behavior-y: auto;
   }
 }

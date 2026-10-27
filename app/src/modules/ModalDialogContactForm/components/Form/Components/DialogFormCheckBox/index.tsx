@@ -14,10 +14,12 @@ import {
   SET_INPUT_ERROR,
   SET_INPUT_NODE,
   SET_INPUT_VALUE,
+  SET_IS_VALIDATION_EXPOSED,
 } from '@modules/ModalDialogContactForm/utils/constants';
 import { getInputValidityProperties } from '@modules/ModalDialogContactForm/utils/inputErrorHandler';
 
 import style from './style.module.css';
+import { ensureModalFocusRegionVisible } from '@/utils/modalScrollUtils';
 
 /**
  * DialogFormCheckBox component for rendering input checkbox within a form.
@@ -34,7 +36,13 @@ import style from './style.module.css';
 export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputProps): React.JSX.Element {
   const inputElementRef = useRef<DialogFormInputElement>(null);
 
-  const { inputError: error } = useContactFormSelector(name, ['inputError']);
+  const { inputError: error, isValidationExposed } = useContactFormSelector(name, [
+    'inputError',
+    'isValidationExposed',
+  ]);
+  const isInvalid = Boolean(isValidationExposed && error?.valid === false);
+  const errorId = `input_${name}-error-description`;
+  const errorMessage = 'Veuillez cocher cette case pour envoyer le formulaire.';
   const contactFormAction = useContactFormDispatch();
   const handleError = useErrorHandler();
 
@@ -69,27 +77,28 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
     validateInput(inputElementRef.current);
   }, [contactFormAction, handleError, name]);
 
-  const handleFocusCapture = (event: FocusEvent<HTMLLabelElement>) => {
-    const label = event.currentTarget;
+  const revealFocusedCheckbox = useCallback((): void => {
+    const input = inputElementRef.current;
+    if (!input || document.activeElement !== input) return;
 
-    window.requestAnimationFrame(() => {
-      if (!label.isConnected) return;
+    const wrapper = input.closest<HTMLElement>(`.${style.dialogFormCheckbox__wrapper}`);
+    if (!wrapper) return;
 
-      const scrollContainer = label.closest<HTMLElement>('[data-modal-scroll-region]');
+    ensureModalFocusRegionVisible(input, [wrapper]);
+  }, []);
 
-      if (!scrollContainer) return;
+  const handleFocusCapture = (event: FocusEvent<HTMLLabelElement>): void => {
+    const input = inputElementRef.current;
 
-      const labelRect = label.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-      const margin = 8;
-
-      if (labelRect.bottom > containerRect.bottom - margin) {
-        scrollContainer.scrollTop += labelRect.bottom - containerRect.bottom + margin;
-      } else if (labelRect.top < containerRect.top + margin) {
-        scrollContainer.scrollTop -= containerRect.top - labelRect.top + margin;
-      }
-    });
+    if (!input || event.nativeEvent.target !== input) return;
+    window.requestAnimationFrame(revealFocusedCheckbox);
   };
+
+  useEffect(() => {
+    if (!isInvalid) return;
+    const frameId = window.requestAnimationFrame(revealFocusedCheckbox);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [isInvalid, revealFocusedCheckbox]);
 
   /**
    * Handles the change of the consent checkbox and append validity and input value
@@ -101,15 +110,23 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
   const handleChange = useCallback(async (): Promise<void> => {
     if (!inputElementRef.current) return;
     try {
+      contactFormAction({
+        type: SET_IS_VALIDATION_EXPOSED,
+        payload: { name, isValidationExposed: true },
+      });
+
       const inputError = getInputValidityProperties(inputElementRef.current, false);
+
       contactFormAction({
         type: inputError.valid ? DELETE_INPUT_ERROR : SET_INPUT_ERROR,
         payload: { name, inputError },
       });
+
       if (!inputError.valid) {
         contactFormAction({ type: DELETE_INPUT_VALUE, payload: { name } });
         return;
       }
+
       contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: label } });
     } catch (err) {
       await handleError(
@@ -124,24 +141,42 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
     }
   }, [contactFormAction, handleError, label, name]);
 
+  const handleBlur = useCallback((): void => {
+    contactFormAction({
+      type: SET_IS_VALIDATION_EXPOSED,
+      payload: { name, isValidationExposed: true },
+    });
+  }, [contactFormAction, name]);
+
   const classDialogFormCheckbox: string =
-    style.dialogFormCheckbox__box + (error?.valid === false ? ` ${style['dialogFormCheckbox__box--error']}` : '');
+    style.dialogFormCheckbox__box + (isInvalid ? ` ${style['dialogFormCheckbox__box--error']}` : '');
 
   return (
-    <label htmlFor={name} className={style.dialogFormCheckbox} onFocusCapture={handleFocusCapture}>
-      <DynamicElement
-        className={style.dialogFormCheckbox__input}
-        onChange={handleChange}
-        tagKind='html'
-        tag={formInput.tag}
-        type={formInput.type}
-        name={name}
-        id={name}
-        required={formInput.required}
-        ref={inputElementRef as LegacyRef<DialogFormInputElement>}
-      />
-      <span className={classDialogFormCheckbox} />
-      <span className={style.dialogFormCheckbox__label}>{label}</span>
-    </label>
+    <div className={style.dialogFormCheckbox__wrapper}>
+      <label htmlFor={name} className={style.dialogFormCheckbox} onFocusCapture={handleFocusCapture}>
+        <DynamicElement
+          className={style.dialogFormCheckbox__input}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          tagKind='html'
+          tag={formInput.tag}
+          type={formInput.type}
+          name={name}
+          id={name}
+          required={formInput.required}
+          aria-describedby={isInvalid ? errorId : undefined}
+          ref={inputElementRef as LegacyRef<DialogFormInputElement>}
+        />
+
+        <span className={classDialogFormCheckbox} />
+        <span className={style.dialogFormCheckbox__label}>{label}</span>
+      </label>
+
+      {isInvalid && (
+        <span id={errorId} className={style.dialogFormCheckbox__error}>
+          {errorMessage}
+        </span>
+      )}
+    </div>
   );
 }

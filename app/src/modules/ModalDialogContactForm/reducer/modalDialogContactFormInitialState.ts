@@ -1,4 +1,4 @@
-import { ModalDialogContactFormState } from '../types';
+import type { ModalDialogContactFormState } from '../types';
 
 /**
  * Creates the initial state for the contact form.

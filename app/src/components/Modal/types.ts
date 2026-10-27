@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { MouseEventButton, SetStateBoolean } from '@/types';
+import type { SetStateBoolean } from '@/types';
 
 /**
  * Type for the button used in the Modal component.
@@ -16,7 +16,7 @@ import type { MouseEventButton, SetStateBoolean } from '@/types';
 export interface ModalButton {
   name: string;
   form?: string;
-  onClick?: MouseEventButton;
+  // onClick?: MouseEventButton;
   disable?: boolean;
   ariaDisabled?: boolean;
   ariaLabel?: string;

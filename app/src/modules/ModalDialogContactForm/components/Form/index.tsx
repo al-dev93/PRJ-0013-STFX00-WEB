@@ -36,6 +36,7 @@ function MemoizedForm({
   onRenderComplete,
   isSubmitting,
   setIsSubmitting,
+  clearAutocompleteButtonRef,
 }: FormProps): React.JSX.Element | null {
   const handleError = useErrorHandler();
   const websiteRef = useRef<HTMLInputElement>(null);
@@ -101,31 +102,32 @@ function MemoizedForm({
       isSubmittingRef.current = true;
       setIsSubmitting(true);
 
-      const { apiEndpoint: secretEndpoint } = getFetchUrlOrUrls({
-        endpoint: import.meta.env.VITE_API_CSRF_SECRET_ENDPOINT,
-        edgeFunction: true,
-      });
-
-      const { apiEndpoint: tokenEndpoint } = getFetchUrlOrUrls({
-        endpoint: import.meta.env.VITE_API_CSRF_TOKEN_ENDPOINT,
-        edgeFunction: true,
-      });
-
-      if (typeof secretEndpoint !== 'string' || typeof tokenEndpoint !== 'string') {
-        await handleError(
-          createError(2104, 'Form submission failed : CSRF endpoints are not configured.', {
-            component: 'Form',
-            operation: 'handleFormSubmission',
-            category: 'Validation',
-            url: window.location.href,
-          }),
-        );
-
-        return;
-      }
-
       try {
+        const { apiEndpoint: secretEndpoint } = getFetchUrlOrUrls({
+          endpoint: import.meta.env.VITE_API_CSRF_SECRET_ENDPOINT,
+          edgeFunction: true,
+        });
+
+        const { apiEndpoint: tokenEndpoint } = getFetchUrlOrUrls({
+          endpoint: import.meta.env.VITE_API_CSRF_TOKEN_ENDPOINT,
+          edgeFunction: true,
+        });
+
+        if (typeof secretEndpoint !== 'string' || typeof tokenEndpoint !== 'string') {
+          await handleError(
+            createError(2104, 'Form submission failed : CSRF endpoints are not configured.', {
+              component: 'Form',
+              operation: 'handleFormSubmission',
+              category: 'Validation',
+              url: window.location.href,
+            }),
+          );
+
+          return;
+        }
+
         const csrfToken = await getCsrfToken(secretEndpoint, tokenEndpoint);
+
         await createContactEntry({
           ...validValues,
           website: websiteRef.current?.value,
@@ -163,7 +165,11 @@ function MemoizedForm({
         {isSubmitting ? 'Envoi du message en cours.' : ''}
       </span>
 
-      <FormContent dataFormContent={dataFormContent} onRenderComplete={onRenderComplete} />
+      <FormContent
+        dataFormContent={dataFormContent}
+        onRenderComplete={onRenderComplete}
+        clearAutocompleteButtonRef={clearAutocompleteButtonRef}
+      />
 
       <div className={style.hidingWrap}>
         <input type='text' name='website' aria-hidden='true' tabIndex={-1} autoComplete='off' ref={websiteRef} />

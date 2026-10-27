@@ -106,14 +106,14 @@ export function getInputValidityProperties(input: DialogFormInputElement, isAuto
   const { maxLength, minLength, required, value } = input;
   const isTelInput = input instanceof HTMLInputElement && input.type === 'tel';
   const invalidCharacter = isTelInput && /[^\d\s]/.test(value);
-  const pattern = input instanceof HTMLInputElement ? input.pattern : '';
 
   if (isAutocompleted) {
-    const valueMissing = required ? !value.length : false;
-    const patternMismatch = !invalidCharacter && pattern ? !new RegExp(pattern).test(value) : false;
-    const tooLong = maxLength > 0 ? value.length > maxLength : false;
-    const tooShort = minLength > 0 ? value.length < minLength : false;
-    const valid = !valueMissing && !invalidCharacter && !patternMismatch && !tooShort && !tooLong;
+    const nativeValidity = input.validity;
+    const valueMissing = required && value.length === 0;
+    const patternMismatch = !invalidCharacter && nativeValidity.patternMismatch;
+    const tooLong = maxLength >= 0 && value.length > maxLength;
+    const tooShort = value.length > 0 && minLength > 0 && value.length < minLength;
+    const valid = nativeValidity.valid && !valueMissing && !invalidCharacter && !tooShort && !tooLong;
     return { maxLength, minLength, invalidCharacter, patternMismatch, tooShort, tooLong, valid, valueMissing };
   }
 
@@ -127,7 +127,7 @@ export function getInputValidityProperties(input: DialogFormInputElement, isAuto
 
   const patternMismatch = !invalidCharacter && nativePatternMismatch;
   const tooLong = maxLength > 0 ? value.length > maxLength : isTooLong;
-  const valid = maxLength > 0 ? value.length <= maxLength && isValid : isValid;
+  const valid = isValid && !invalidCharacter && !tooLong;
 
   return {
     maxLength,

@@ -6,3 +6,39 @@
   padding: 30px 15px 20px;
   gap: 30px;
 }
+
+.contactForm__clearAutocomplete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  max-inline-size: 100%;
+  min-block-size: 2.5rem;
+
+  padding: 0.25rem 0.5rem;
+
+  color: var(--semantic-button-ghost-fg);
+  background: transparent;
+
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  text-align: left;
+
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  border: 0;
+  border-radius: var(--semantic-sm-radius);
+
+  cursor: pointer;
+}
+
+.contactForm__clearAutocomplete:hover {
+  background-color: var(--semantic-button-ghost-hover-bg);
+}
+
+.contactForm__clearAutocomplete:focus-visible {
+  outline: 2px solid var(--semantic-button-primary-ring);
+  outline-offset: 2px;
+}

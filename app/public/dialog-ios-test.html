@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Test dialog iOS</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, sans-serif;
+        min-height: 150vh;
+        padding: 1rem;
+      }
+
+      dialog {
+        position: fixed;
+        inset: 0;
+        margin: auto;
+        width: calc(100% - 2rem);
+        max-width: 26rem;
+        max-height: calc(100dvh - 2rem);
+        padding: 1.25rem;
+        border: none;
+        border-radius: 0.75rem;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+      }
+
+      dialog::backdrop {
+        background: rgb(0 0 0 / 0.55);
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      input,
+      textarea,
+      button {
+        font: inherit;
+        font-size: 16px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+      }
+
+      textarea {
+        min-height: 8rem;
+      }
+
+      @media (max-width: 48rem) {
+        dialog {
+          position: fixed;
+          inset: 0;
+
+          width: 100%;
+          max-width: none;
+
+          height: 100dvh;
+          max-height: 100dvh;
+
+          margin: 0;
+          border-radius: 0;
+
+          overflow-y: auto;
+          overscroll-behavior-y: contain;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Test de dialog natif sur iOS</h1>
+    <button id="open" type="button">Ouvrir la modale</button>
+
+    <dialog id="dialog" aria-labelledby="title">
+      <form>
+        <button id="close" type="button">Fermer</button>
+        <h2 id="title">Contact</h2>
+        <p>Formulaire de démonstration</p>
+
+        <div class="field">
+          <label for="name">Nom</label>
+          <input id="name" name="name" />
+        </div>
+
+        <div class="field">
+          <label for="company">Entreprise</label>
+          <input id="company" name="company" />
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" />
+        </div>
+
+        <div class="field">
+          <label for="tel">Téléphone</label>
+          <input id="tel" name="tel" type="tel" />
+        </div>
+
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message"></textarea>
+          <p>Texte de validation de démonstration.</p>
+        </div>
+
+        <label>
+          <input type="checkbox" name="consent" />
+          J'accepte le traitement de mes données.
+        </label>
+
+        <button type="button">Envoyer</button>
+      </form>
+    </dialog>
+
+    <script>
+      const dialog = document.querySelector('#dialog');
+      const email = document.querySelector('#email');
+      const message = document.querySelector('#message');
+
+      document.querySelector('#open').addEventListener('click', () => {
+        dialog.showModal();
+      });
+
+      document.querySelector('#close').addEventListener('click', () => {
+        dialog.close();
+      });
+
+      email.addEventListener('focus', () => {
+        window.setTimeout(() => {
+          // Do not intervene if focus has already changed.
+          if (document.activeElement !== email) return;
+
+          const viewport = window.visualViewport;
+          const dialogRect = dialog.getBoundingClientRect();
+          const messageRect = message.getBoundingClientRect();
+
+          // Determine the bottom of the area visible above the keyboard.
+          const viewportBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
+
+          const visibleBottom = Math.min(dialogRect.bottom, viewportBottom);
+
+          // Reveal at least the beginning of the textarea.
+          const visibleMargin = 48;
+
+          const scrollAmount = messageRect.top + visibleMargin - visibleBottom;
+
+          if (scrollAmount > 0) {
+            dialog.scrollTop += scrollAmount;
+          }
+        }, 250);
+      });
+    </script>
+  </body>
+</html>

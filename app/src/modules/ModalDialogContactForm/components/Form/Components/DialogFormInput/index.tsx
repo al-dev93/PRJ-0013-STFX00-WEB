@@ -21,6 +21,7 @@ import style from './style.module.css';
 import { useContactForm } from '../../../../hooks/useContactForm';
 import type { DialogFormInputProps } from '../../../../types';
 import { Popover } from '../../../Popover';
+import { ensureModalFocusRegionVisible } from '@/utils/modalScrollUtils';
 
 /**
  * DialogFormInput component for rendering input elements within a form.
@@ -135,9 +136,7 @@ export function MemoizedDialogFormInput({
     if (!isCompletionReached) hasAnnouncedCompletionRef.current = false;
 
     function getAnnouncementMessage(): string {
-      if (isInvalid) {
-        return errorDescriptionText;
-      }
+      if (isInvalid) return errorDescriptionText;
 
       if (hasAnnouncedCompletionRef.current) {
         return '';
@@ -182,9 +181,7 @@ export function MemoizedDialogFormInput({
 
     wasFocusedRef.current = isFocused;
 
-    if (!hasGainedFocus || !isValidationExposed || !inputNode?.value.trim()) {
-      return;
-    }
+    if (!hasGainedFocus || !isValidationExposed || !inputNode?.value.trim()) return;
 
     let message: string;
 
@@ -320,21 +317,11 @@ export function MemoizedDialogFormInput({
     window.requestAnimationFrame(() => {
       if (!field.isConnected || document.activeElement !== inputElementRef.current) return;
 
-      const scrollContainer = field.closest<HTMLElement>('[data-modal-scroll-region]');
+      const label = field.querySelector<HTMLElement>(`.${style.dialogFormInput__label}`);
+      const tooltip = field.querySelector<HTMLElement>(`[id="${tooltipContentId}"]`);
 
-      const labelWrapper = field.querySelector<HTMLElement>(`.${style.dialogFormInput__label}`);
-
-      if (!scrollContainer || !labelWrapper) return;
-
-      const labelRect = labelWrapper.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      const margin = 8;
-      const overflow = labelRect.top - containerRect.top - margin;
-
-      if (overflow < 0) {
-        scrollContainer.scrollTop += overflow;
-      }
+      // Include the absolutely positioned label and tooltip, not just the input.
+      ensureModalFocusRegionVisible(field, [field, label, tooltip]);
     });
   };
 
@@ -435,9 +422,7 @@ export function MemoizedDialogFormInput({
   );
 
   useEffect(() => {
-    if (formInput.error) {
-      formattedErrorMessage();
-    }
+    if (formInput.error) formattedErrorMessage();
   }, [formInput.error, formattedErrorMessage]);
 
   /**
@@ -499,7 +484,6 @@ export function MemoizedDialogFormInput({
         <span id={feedbackId} role='status' aria-atomic='true' className='visually-hidden'>
           {announcedStatusText}
         </span>
-
         {renderAlertTag}
       </div>
       {renderPopover}

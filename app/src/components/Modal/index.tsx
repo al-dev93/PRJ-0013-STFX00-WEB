@@ -11,6 +11,7 @@ import { LOCAL_ICON_NAME } from '@utils/appIconsMap';
 
 import style from './style.module.css';
 import type { ModalProps } from './types';
+import { getModalScrollContainer } from '@/utils/modalScrollUtils';
 
 function isKeyboardNavigableElement(element: HTMLElement | null | undefined): element is HTMLElement {
   if (!element || !element.isConnected) {
@@ -174,16 +175,23 @@ export function Modal({
 
     nextElement.focus({ preventScroll: true });
 
-    if (childrenRef.current?.contains(nextElement)) {
+    if (nextElement === closeRef.current || nextElement === buttonRef.current) {
+      // On mobile, the native dialog scrolls and the header is part of its content.
+      const scrollContainer = getModalScrollContainer(nextElement);
+
+      if (scrollContainer instanceof HTMLDialogElement) {
+        scrollContainer.scrollTop = nextElement === closeRef.current ? 0 : scrollContainer.scrollHeight;
+      }
+    } else if (childrenRef.current?.contains(nextElement)) {
       nextElement.scrollIntoView({
         block: 'nearest',
         inline: 'nearest',
       });
     }
 
-    keyboardNavigableElements[nextIndex].focus({
-      preventScroll: true,
-    });
+    // keyboardNavigableElements[nextIndex].focus({
+    //   preventScroll: true,
+    // });
   };
 
   /**
@@ -229,7 +237,7 @@ export function Modal({
       if (!dialogNode.open && (onRenderComplete === true || onRenderComplete === undefined)) dialogNode.showModal();
     } else if (dialogNode.open) {
       dialogNode.close();
-      if (closeParentModal) closeParentModal((state) => !state);
+      closeParentModal?.(false);
     }
   }, [closeParentModal, onRenderComplete, open]);
 
@@ -241,16 +249,9 @@ export function Modal({
     const dialogNode = dialogRef.current;
     if (!dialogNode) return undefined;
 
-    const handleCancel = async (): Promise<void> => {
-      try {
-        setOpenFalse();
-      } catch {
-        await handleError(createError(1003, 'Error closing modal window with escape key'), {
-          component: 'Modal',
-          operation: 'handleCancel',
-          url: window.location.href,
-        });
-      }
+    const handleCancel = (event: Event): void => {
+      event.preventDefault();
+      setOpenFalse();
     };
 
     dialogNode?.addEventListener('cancel', handleCancel);
@@ -263,7 +264,13 @@ export function Modal({
   const modalClassName = style.modal + (className ? ` ${className}` : '') + (!open ? ` ${style['modal--hidden']}` : '');
   const wrapperClassName = style.modal__wrapper + (customStyle ? ` ${style[`modal__wrapper--${customStyle}`]}` : '');
 
-  // Mount into #app-container; if not found, fall back to document.body to avoid a hard crash in non-standard hosts.
+  // Mount into #app-container.
+  const portalContainer = document.getElementById('app-container');
+
+  if (!portalContainer) {
+    throw new Error('Modal: #app-container is missing.');
+  }
+
   return createPortal(
     // ARIA strategy:
     // - Prefer aria-labelledby when we have a visible (for SR) title; fallback to aria-label otherwise.
@@ -330,6 +337,7 @@ export function Modal({
         )}
       </div>
     </dialog>,
-    document.getElementById('app-container') as HTMLElement,
+    // document.getElementById('app-container') as HTMLElement,
+    portalContainer,
   );
 }

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Test modale iOS sans dialog</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+      }
+
+      body.modal-open {
+        overflow: hidden;
+      }
+
+      main {
+        min-height: 150vh;
+        padding: 1.25rem;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+      }
+
+      /* Modal backdrop */
+
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        background: rgb(0 0 0 / 0.55);
+      }
+
+      /* Full-screen modal */
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+
+        width: 100%;
+        height: 100dvh;
+
+        padding: 1.25rem;
+
+        background: white;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+      }
+
+      .modal[hidden],
+      .backdrop[hidden] {
+        display: none;
+      }
+
+      .modal__content {
+        max-width: 26rem;
+        margin-inline: auto;
+      }
+
+      .modal__header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .modal__close {
+        align-self: flex-end;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      input:not([type='checkbox']),
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+      }
+
+      textarea {
+        min-height: 8rem;
+      }
+
+      .consent {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+
+      .modal__footer {
+        padding-block: 1.5rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main id="page">
+      <h1>Page de démonstration</h1>
+
+      <button id="open" type="button">Ouvrir la modale</button>
+
+      <p>Contenu de la page située derrière la modale.</p>
+    </main>
+
+    <div id="backdrop" class="backdrop" hidden></div>
+
+    <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+      <div class="modal__content">
+        <header class="modal__header">
+          <button id="close" class="modal__close" type="button" aria-label="Fermer la modale">Fermer</button>
+
+          <h2 id="modal-title">Contact</h2>
+          <p>Formulaire de démonstration iOS</p>
+        </header>
+
+        <form>
+          <div class="field">
+            <label for="name">Nom</label>
+            <input id="name" name="name" type="text" />
+          </div>
+
+          <div class="field">
+            <label for="company">Entreprise</label>
+            <input id="company" name="company" type="text" />
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" />
+          </div>
+
+          <div class="field">
+            <label for="tel">Téléphone</label>
+            <input id="tel" name="tel" type="tel" />
+          </div>
+
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message"></textarea>
+            <p>Texte de validation de démonstration.</p>
+          </div>
+
+          <label class="consent">
+            <input type="checkbox" name="consent" />
+            J'accepte le traitement de mes données.
+          </label>
+
+          <footer class="modal__footer">
+            <button type="button">Envoyer</button>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const page = document.querySelector('#page');
+      const modal = document.querySelector('#modal');
+      const backdrop = document.querySelector('#backdrop');
+      const openButton = document.querySelector('#open');
+      const closeButton = document.querySelector('#close');
+
+      let previousFocus = null;
+
+      function openModal() {
+        previousFocus = document.activeElement;
+
+        modal.hidden = false;
+        backdrop.hidden = false;
+        page.inert = true;
+
+        document.body.classList.add('modal-open');
+
+        closeButton.focus({ preventScroll: true });
+      }
+
+      function closeModal() {
+        page.inert = false;
+
+        modal.hidden = true;
+        backdrop.hidden = true;
+
+        document.body.classList.remove('modal-open');
+
+        previousFocus?.focus({ preventScroll: true });
+      }
+
+      openButton.addEventListener('click', openModal);
+      closeButton.addEventListener('click', closeModal);
+
+      modal.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeModal();
+          return;
+        }
+
+        if (event.key !== 'Tab') return;
+
+        const focusable = Array.from(
+          modal.querySelectorAll('button:not(:disabled), input:not(:disabled), textarea:not(:disabled)'),
+        );
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+    </script>
+  </body>
+</html>

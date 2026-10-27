@@ -8,6 +8,7 @@ import style from './style.module.css';
 import { useContactFormSelector } from '../../hooks/useContactFormSelector';
 import type { PopoverProps } from '../../types';
 import { SUFFIX_AUTO_COMPLETE_LIST_ID } from '../../utils/constants';
+import { getModalScrollContainer } from '@/utils/modalScrollUtils';
 
 /**
  * Popover component that displays a list of autocomplete suggestions and error messages.
@@ -60,30 +61,51 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
 
     let animationFrameId = 0;
 
-    const timeoutId = window.setTimeout(() => {
-      animationFrameId = window.requestAnimationFrame(() => {
-        const popover = popoverRef.current;
-        const scrollContainer = popover?.closest<HTMLElement>('[data-modal-scroll-region]');
+    const revealPopover = (): void => {
+      animationFrameId = 0;
 
-        if (!popover || !scrollContainer) return;
+      const popover = popoverRef.current;
+      if (!popover) return;
 
-        const containerRect = scrollContainer.getBoundingClientRect();
-        const popoverRect = popover.getBoundingClientRect();
+      const scrollContainer = getModalScrollContainer(popover);
 
-        const margin = 8;
-        const overflow = popoverRect.bottom - containerRect.bottom + margin;
+      if (!scrollContainer) return;
 
-        if (overflow > 0) {
-          scrollContainer.scrollTop += overflow;
-        }
-      });
-    }, 220);
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const popoverRect = popover.getBoundingClientRect();
+      const visualViewport = window.visualViewport;
+
+      const visibleBottom =
+        scrollContainer instanceof HTMLDialogElement && visualViewport
+          ? Math.min(containerRect.bottom, visualViewport.offsetTop + visualViewport.height)
+          : containerRect.bottom;
+
+      const margin = 8;
+      const overflow = popoverRect.bottom - visibleBottom + margin;
+
+      if (overflow > 0) {
+        scrollContainer.scrollTop += overflow;
+      }
+    };
+
+    const scheduleReveal = (): void => {
+      if (animationFrameId) window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = window.requestAnimationFrame(revealPopover);
+    };
+
+    const timeoutId = window.setTimeout(scheduleReveal, 220);
+
+    // Preserve the validated iOS keyboard handling for the message field.
+    if (name === 'message') window.visualViewport?.addEventListener('resize', scheduleReveal);
 
     return () => {
       window.clearTimeout(timeoutId);
       window.cancelAnimationFrame(animationFrameId);
+      if (name === 'message') {
+        window.visualViewport?.removeEventListener('resize', scheduleReveal);
+      }
     };
-  }, [isPopoverOpen, shouldRenderMessage, shouldMountSuggestions]);
+  }, [isPopoverOpen, name, shouldRenderMessage, shouldMountSuggestions]);
 
   /**
    * Keeps expanding validation messages visible within the modal.
@@ -96,12 +118,11 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
    * - Runs only on the client, when ResizeObserver is available.
    */
   useEffect(() => {
-    if (name === 'message') return;
     if (!isFocused || !shouldRenderMessage) return;
     if (typeof ResizeObserver === 'undefined') return;
 
     const message = messageRef.current;
-    const scrollContainer = message?.closest<HTMLElement>('[data-modal-scroll-region]');
+    const scrollContainer = message ? getModalScrollContainer(message) : null;
 
     if (!message || !scrollContainer) return;
 
@@ -119,9 +140,15 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
         animationFrameId = window.requestAnimationFrame(() => {
           const containerRect = scrollContainer.getBoundingClientRect();
           const messageRect = message.getBoundingClientRect();
+          const visualViewport = window.visualViewport;
+
+          const visibleBottom =
+            scrollContainer instanceof HTMLDialogElement && visualViewport
+              ? Math.min(containerRect.bottom, visualViewport.offsetTop + visualViewport.height)
+              : containerRect.bottom;
 
           const margin = 8;
-          const overflow = messageRect.bottom - containerRect.bottom + margin;
+          const overflow = messageRect.bottom - visibleBottom + margin;
 
           if (overflow > 0) {
             scrollContainer.scrollTop += overflow;
@@ -141,7 +168,7 @@ export function Popover({ name, errorMessage, inputAutocomplete }: PopoverProps)
         window.cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [isFocused, shouldRenderMessage]);
+  }, [isFocused, name, shouldRenderMessage]);
 
   /**
    * Scrolls the focused item into view when the list of autocomplete suggestions is updated.

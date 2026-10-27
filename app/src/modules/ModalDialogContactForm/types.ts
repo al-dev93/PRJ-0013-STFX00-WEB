@@ -1,4 +1,4 @@
-import type { Dispatch } from 'react';
+import type { Dispatch, RefCallback } from 'react';
 
 import type {
   ContactFormInput,
@@ -126,6 +126,7 @@ export interface FormProps {
   dataFormContent: ContactFormInput[];
   isSubmitting: boolean;
   setIsSubmitting: SetStateBoolean;
+  clearAutocompleteButtonRef?: RefCallback<HTMLButtonElement>;
 }
 
 /**
