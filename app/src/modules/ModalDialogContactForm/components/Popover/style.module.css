@@ -142,3 +142,9 @@
     background-color: Highlight;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .popover__message {
+    transition: none;
+  }
+}

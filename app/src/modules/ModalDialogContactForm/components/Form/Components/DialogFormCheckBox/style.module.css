@@ -88,6 +88,13 @@
   border-radius: 0 0 var(--semantic-sm-radius) var(--semantic-sm-radius);
 
   box-shadow: var(--semantic-shadow);
+
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.dialogFormCheckbox__error--visible {
+  opacity: 1;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -141,4 +148,10 @@
 .dialogFormCheckbox .dialogFormCheckbox__input:focus-visible + .dialogFormCheckbox__box {
   outline: 2px solid var(--semantic-ring);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialogFormCheckbox__error {
+    transition: none;
+  }
 }

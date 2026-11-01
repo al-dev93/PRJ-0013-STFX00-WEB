@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import type { FocusEvent, LegacyRef } from 'react';
 
 import type { DialogFormInputElement } from '@/types';
@@ -20,6 +20,7 @@ import { getInputValidityProperties } from '@modules/ModalDialogContactForm/util
 
 import style from './style.module.css';
 import { ensureModalFocusRegionVisible } from '@/utils/modalScrollUtils';
+import { useAnimation } from '@/hooks/useAnimation';
 
 /**
  * DialogFormCheckBox component for rendering input checkbox within a form.
@@ -35,16 +36,20 @@ import { ensureModalFocusRegionVisible } from '@/utils/modalScrollUtils';
  */
 export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputProps): React.JSX.Element {
   const inputElementRef = useRef<DialogFormInputElement>(null);
+  const focusAfterBlurRef = useRef<HTMLElement | null>(null);
 
   const { inputError: error, isValidationExposed } = useContactFormSelector(name, [
     'inputError',
     'isValidationExposed',
   ]);
+  const contactFormAction = useContactFormDispatch();
+  const handleError = useErrorHandler();
+
   const isInvalid = Boolean(isValidationExposed && error?.valid === false);
   const errorId = `input_${name}-error-description`;
   const errorMessage = 'Veuillez cocher cette case pour envoyer le formulaire.';
-  const contactFormAction = useContactFormDispatch();
-  const handleError = useErrorHandler();
+
+  const { isAnimating, shouldRender } = useAnimation(isInvalid, 200);
 
   /**
    * The reference to the input element.
@@ -141,12 +146,32 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
     }
   }, [contactFormAction, handleError, label, name]);
 
-  const handleBlur = useCallback((): void => {
-    contactFormAction({
-      type: SET_IS_VALIDATION_EXPOSED,
-      payload: { name, isValidationExposed: true },
-    });
-  }, [contactFormAction, name]);
+  const handleBlur = useCallback(
+    (event: FocusEvent<HTMLElement>): void => {
+      focusAfterBlurRef.current = event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
+
+      contactFormAction({
+        type: SET_IS_VALIDATION_EXPOSED,
+        payload: { name, isValidationExposed: true },
+      });
+    },
+    [contactFormAction, name],
+  );
+
+  useLayoutEffect(() => {
+    if (!isInvalid || !shouldRender) return;
+
+    const target = focusAfterBlurRef.current;
+    focusAfterBlurRef.current = null;
+
+    if (!(target instanceof HTMLButtonElement)) return;
+    if (document.activeElement !== target) return;
+
+    const form = inputElementRef.current?.closest('form');
+    if (!form?.contains(target)) return;
+
+    ensureModalFocusRegionVisible(target, [target]);
+  }, [isInvalid, shouldRender]);
 
   const classDialogFormCheckbox: string =
     style.dialogFormCheckbox__box + (isInvalid ? ` ${style['dialogFormCheckbox__box--error']}` : '');
@@ -172,8 +197,14 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
         <span className={style.dialogFormCheckbox__label}>{label}</span>
       </label>
 
-      {isInvalid && (
-        <span id={errorId} className={style.dialogFormCheckbox__error}>
+      {shouldRender && (
+        <span
+          id={errorId}
+          className={`${style.dialogFormCheckbox__error} ${
+            isAnimating ? style['dialogFormCheckbox__error--visible'] : ''
+          }`}
+          aria-hidden={!isInvalid}
+        >
           {errorMessage}
         </span>
       )}
