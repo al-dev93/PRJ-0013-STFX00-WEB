@@ -1,8 +1,5 @@
 import type { MutableRefObject } from 'react';
-
-import { FORM_INPUT_NAME_MAP } from './constants';
 import type { FormInputName } from '../types';
-// import type { ModalDialogContactFormState } from '../types';
 
 /**
  * Formats a numeric string by grouping digits into pairs separated by spaces.
@@ -22,7 +19,6 @@ import type { FormInputName } from '../types';
  * formatInputNumber('0123456789')
  * Returns '01 23 45 67 89'
  *
- * @al-dev93
  */
 export function formatInputNumber(number: string): string {
   return number.replace(/\s/g, '').replace(/(\d{2})(?=\d)/g, '$1 ');
@@ -38,7 +34,6 @@ export function formatInputNumber(number: string): string {
  * @param {(MutableRefObject<boolean | undefined>)} modalVisibilityRef - A ref tracking the current visibility state of the modal.
  * @returns {void}
  *
- * @al-dev93
  */
 export function manageModalVisibility(
   open: boolean,
@@ -47,48 +42,63 @@ export function manageModalVisibility(
 ): void {
   const modalVisibility = modalVisibilityRef;
   const isVisible = modalVisibility.current;
+
   if (open && !openAlert && isVisible !== undefined) {
     modalVisibility.current = isVisible ? undefined : true;
   } else if (open && openAlert) modalVisibility.current = false;
 }
 
 /**
- * Cleans the value entered in an input field by removing unnecessary spaces,
- * non-breaking spaces, control characters, and dangerous characters.
- * The function also applies specific cleaning rules based on the context
- * (field type) to ensure the value is safe and meets expectations.
+ * Normalizes and sanitizes a contact form value according to its field context.
  *
- * @export
- * @param {string} inputValue - The value to be sanitized.
- * @param {FormInputName} context - The context of the input field.
- *   - `'name'` : For the "name" field, allows letters, spaces, and hyphens.
- *   - `'company'` : For the "company" field, allows letters, digits, spaces, hyphens, apostrophes, periods, and `&`.
- *   - `'email'` : For the "email" field, allows valid characters for an email address.
- *   - `'tel'` : For the "phone" field, allows digits and spaces.
- *   - `'message'` : For the "message" field, escapes angle brackets and removes unauthorized special characters.
- * @returns {string} The sanitized and safe value.
- * @throws {Error} If the provided context is invalid.
+ * @remarks
+ * Structured fields (`name`, `company`, `email`, and `tel`) are normalized
+ * using Unicode NFKC normalization, stripped of Unicode control/format
+ * characters, trimmed, and then filtered according to their field-specific
+ * rules.
  *
- * @example
- * NOTE: Sanitize a name
- * const cleanedName = sanitizeInput("  Jean--Dupont  ", "name");
- * console.log(cleanedName); // "Jean-Dupont"
+ * The `message` field is treated as free text. It is normalized using NFC,
+ * preserves user-entered line breaks, normalizes CRLF and CR line endings to
+ * LF (`\n`), removes other Unicode control characters, and trims leading and
+ * trailing whitespace. HTML-like content such as `<tag>` is preserved and
+ * must be encoded or escaped when rendered in an HTML context.
+ *
+ * @param inputValue The raw value entered in the form field.
+ * @param context The contact form field whose sanitization rules must be applied.
+ * @returns The normalized and sanitized field value.
+ * @throws {@link Error} If `context` does not match a supported form field.
  *
  * @example
- * NOTE: Sanitize an email
- * const cleanedEmail = sanitizeInput("user@example.com", "email");
- * console.log(cleanedEmail); // "user@example.com"
+ * ```ts
+ * const cleanedName = sanitizeInput('  Jean   Dupont  ', 'name');
+ * console.log(cleanedName);
+ * // "Jean Dupont"
+ * ```
  *
  * @example
- * NOTE: Sanitize a message
- * const cleanedMessage = sanitizeInput("<script>alert('XSS')</script>", "message");
- * console.log(cleanedMessage); // "&lt;script&gt;alert('XSS')&lt;/script&gt;"
+ * ```ts
+ * const cleanedEmail = sanitizeInput('  user@example.com  ', 'email');
+ * console.log(cleanedEmail);
+ * // "user@example.com"
+ * ```
+ *
+ * @example
+ * ```ts
+ * const cleanedMessage = sanitizeInput(
+ *   "Bonjour,\r\n\r\nJ'aimerais échanger sur React < 20.",
+ *   'message',
+ * );
+ *
+ * console.log(cleanedMessage);
+ * // "Bonjour,\n\nJ'aimerais échanger sur React < 20."
+ * ```
+ *
+ * @see {@link FormInputName}
  */
 export function sanitizeInput(inputValue: string, context: FormInputName): string {
-  let sanitized = inputValue
-    .normalize('NFKC') // Normalizes unicode characters
-    .replace(/\p{C}/gu, '') // Removes control characters
-    .trim();
+  let sanitized = context === 'message' ? inputValue.normalize('NFC') : inputValue.normalize('NFKC');
+
+  if (context !== 'message') sanitized = sanitized.replace(/\p{C}/gu, '').trim();
 
   switch (context) {
     case 'name':
@@ -107,8 +117,12 @@ export function sanitizeInput(inputValue: string, context: FormInputName): strin
       sanitized = sanitized.replace(/\s+/g, ' '); // Replace multiple spaces with a single space
       break;
     case 'message':
-      sanitized = sanitized.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape angle brackets
-      sanitized = sanitized.replace(/[^\w\s.,!?-]/g, ''); // Remove unauthorized special characters
+      sanitized = sanitized
+        .replace(/\r\n?/g, '\n')
+        .split('\n')
+        .map((line) => line.replace(/\p{Cc}/gu, ''))
+        .join('\n')
+        .trim();
       break;
     default:
       // TODO: Sortir l'erreur
@@ -116,28 +130,4 @@ export function sanitizeInput(inputValue: string, context: FormInputName): strin
   }
 
   return sanitized;
-}
-
-/**
- * Type guard that checks whether a runtime value is a valid {@link FormInputName}.
- *
- * @remarks
- * When this function returns `true`, TypeScript narrows `value` to `FormInputName`.
- * It uses `FORM_INPUT_NAME_MAP` as the single source of truth, so adding a new key
- * there keeps the union type and this guard in sync.
- * Requires `Object.hasOwn` (ES2022+). For older targets, use:
- * `Object.prototype.hasOwnProperty.call(FORM_INPUT_NAME_MAP, value)`.
- *
- * @param value - The value to test.
- * @returns `true` if `value` is a valid {@link FormInputName}, otherwise `false`.
- * @example
- * const value: string = getUserInput();
- * if (isFormInputName(value)) {
- *   // value is now narrowed to FormInputName
- * } else {
- *   // handle invalid input name
- * }
- */
-export function isFormInputName(value: unknown): value is FormInputName {
-  return typeof value === 'string' && Object.hasOwn(FORM_INPUT_NAME_MAP, value);
 }

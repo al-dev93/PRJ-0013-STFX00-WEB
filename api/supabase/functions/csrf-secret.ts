@@ -1,34 +1,38 @@
 import type { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
-import { genSecret } from "./csrf-utils.ts";
+import { genSecret, parseCookies } from "./csrf-utils.ts";
 
 /**
- * Edge Function handler that generates a CSRF secret and sets it in a secure cookie.
+ * Edge Function handler that ensures a CSRF secret exists in a secure cookie.
  *
- * This function:
- * - Generates a cryptographically secure random secret using `genSecret()`.
- * - Sends it to the client as an `HttpOnly`, `Secure`, `SameSite=None` cookie named `csrf_secret`.
- * - Returns a `204 No Content` response with no body.
- *
- * The cookie is intended to be used later to verify a signed CSRF token.
- * The `Partitioned` attribute is included for browser compatibility with third-party contexts.
+ * If a `csrf_secret` cookie is already present, the existing secret is kept.
+ * Otherwise, a new cryptographically secure secret is generated and stored
+ * in an HttpOnly cookie.
  *
  * @function
  * @param {Context} c - The Hono context representing the incoming request and response builder.
- * @returns {Response} An HTTP response with status `204` and a `Set-Cookie` header.
+ * @returns {Response} An HTTP response with status `204`.
  *
  * @example
- * // Example request
- * GET /functions/v1/csrf/secret
+ * // First request:
+ * // GET /functions/v1/csrf/secret
+ * // -> creates the csrf_secret cookie
  *
- * // Response
- * 204 No Content
- * Set-Cookie: csrf_secret=<base64url-secret>; HttpOnly; Secure; SameSite=None; Partitioned
+ * // Subsequent requests in the same browser session:
+ * // GET /functions/v1/csrf/secret
+ * // -> keeps the existing csrf_secret cookie
  */
-export default (c: Context) => {
-  const secret = genSecret();
-  c.header(
-    "Set-Cookie",
-    `csrf_secret=${secret}; Path=/; SameSite=None; Secure; HttpOnly; Partitioned`
-  );
-  return c.body(null, 204); // Pas de JSON, juste le cookie
+export default (c: Context): Response => {
+  const cookieHeader = c.req.header("cookie");
+  const cookies = cookieHeader ? parseCookies(cookieHeader) : {};
+
+  if (!cookies["csrf_secret"]) {
+    const secret = genSecret();
+
+    c.header(
+      "Set-Cookie",
+      `csrf_secret=${secret}; Path=/; SameSite=None; Secure; HttpOnly; Partitioned`,
+    );
+  }
+
+  return c.body(null, 204); // No JSON, just the cookie
 };

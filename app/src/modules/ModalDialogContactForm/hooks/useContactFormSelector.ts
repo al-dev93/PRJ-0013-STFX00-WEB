@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { useContactFormState } from './useContactFormState';
 import type { FieldState, ModalDialogContactFormState } from '../types';
 
@@ -19,10 +17,12 @@ export function useContactFormSelector<N extends keyof ModalDialogContactFormSta
   keys: K[],
 ): Pick<FieldState, K> {
   const state = useContactFormState()[name];
-  return useMemo(() => {
-    return keys.reduce(
-      (accumulator, current) => ({ ...accumulator, [current]: state[current] }),
-      {} as Pick<FieldState, K>,
-    );
-  }, [state, keys]);
+
+  return keys.reduce(
+    (accumulator, current) => ({
+      ...accumulator,
+      [current]: state[current],
+    }),
+    {} as Pick<FieldState, K>,
+  );
 }

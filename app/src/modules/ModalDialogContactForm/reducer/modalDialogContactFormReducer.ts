@@ -17,9 +17,11 @@ import {
   SET_INPUT_NODE,
   SET_INPUT_VALUE,
   SET_IS_STORED,
+  SET_IS_VALIDATION_EXPOSED,
   SET_POPOVER_LIST_FOCUSED_INDEX,
   SET_POPOVER_MODE,
 } from '../utils/constants';
+
 /**
  * Reducer function to manage the state of the modal dialog contact form.
  *
@@ -34,7 +36,6 @@ import {
  * @returns {ModalDialogContactFormState} - The updated state of the contact form after applying the action.
  * @throws {Error} - Throws an error if an unknown action type is dispatched.
  *
- * @al-dev93
  */
 export function modalDialogContactFormReducer(
   state: ModalDialogContactFormState,
@@ -132,6 +133,15 @@ export function modalDialogContactFormReducer(
         [action.payload.name]: {
           ...state[action.payload.name],
           isStored: action.payload.isStored,
+        },
+      };
+
+    case SET_IS_VALIDATION_EXPOSED:
+      return {
+        ...state,
+        [action.payload.name]: {
+          ...state[action.payload.name],
+          isValidationExposed: action.payload.isValidationExposed,
         },
       };
 

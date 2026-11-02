@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
-import type { LegacyRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import type { FocusEvent, LegacyRef } from 'react';
 
 import type { DialogFormInputElement } from '@/types';
 import { DynamicElement } from '@components/DynamicElement';
@@ -14,10 +14,13 @@ import {
   SET_INPUT_ERROR,
   SET_INPUT_NODE,
   SET_INPUT_VALUE,
+  SET_IS_VALIDATION_EXPOSED,
 } from '@modules/ModalDialogContactForm/utils/constants';
 import { getInputValidityProperties } from '@modules/ModalDialogContactForm/utils/inputErrorHandler';
 
 import style from './style.module.css';
+import { ensureModalFocusRegionVisible } from '@/utils/modalScrollUtils';
+import { useAnimation } from '@/hooks/useAnimation';
 
 /**
  * DialogFormCheckBox component for rendering input checkbox within a form.
@@ -33,10 +36,20 @@ import style from './style.module.css';
  */
 export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputProps): React.JSX.Element {
   const inputElementRef = useRef<DialogFormInputElement>(null);
+  const focusAfterBlurRef = useRef<HTMLElement | null>(null);
 
-  const { inputError: error } = useContactFormSelector(name, ['inputError']);
+  const { inputError: error, isValidationExposed } = useContactFormSelector(name, [
+    'inputError',
+    'isValidationExposed',
+  ]);
   const contactFormAction = useContactFormDispatch();
   const handleError = useErrorHandler();
+
+  const isInvalid = Boolean(isValidationExposed && error?.valid === false);
+  const errorId = `input_${name}-error-description`;
+  const errorMessage = 'Veuillez cocher cette case pour envoyer le formulaire.';
+
+  const { isAnimating, shouldRender } = useAnimation(isInvalid, 200);
 
   /**
    * The reference to the input element.
@@ -69,6 +82,29 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
     validateInput(inputElementRef.current);
   }, [contactFormAction, handleError, name]);
 
+  const revealFocusedCheckbox = useCallback((): void => {
+    const input = inputElementRef.current;
+    if (!input || document.activeElement !== input) return;
+
+    const wrapper = input.closest<HTMLElement>(`.${style.dialogFormCheckbox__wrapper}`);
+    if (!wrapper) return;
+
+    ensureModalFocusRegionVisible(input, [wrapper]);
+  }, []);
+
+  const handleFocusCapture = (event: FocusEvent<HTMLLabelElement>): void => {
+    const input = inputElementRef.current;
+
+    if (!input || event.nativeEvent.target !== input) return;
+    window.requestAnimationFrame(revealFocusedCheckbox);
+  };
+
+  useEffect(() => {
+    if (!isInvalid) return;
+    const frameId = window.requestAnimationFrame(revealFocusedCheckbox);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [isInvalid, revealFocusedCheckbox]);
+
   /**
    * Handles the change of the consent checkbox and append validity and input value
    * in the state.
@@ -79,15 +115,23 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
   const handleChange = useCallback(async (): Promise<void> => {
     if (!inputElementRef.current) return;
     try {
+      contactFormAction({
+        type: SET_IS_VALIDATION_EXPOSED,
+        payload: { name, isValidationExposed: true },
+      });
+
       const inputError = getInputValidityProperties(inputElementRef.current, false);
+
       contactFormAction({
         type: inputError.valid ? DELETE_INPUT_ERROR : SET_INPUT_ERROR,
         payload: { name, inputError },
       });
+
       if (!inputError.valid) {
         contactFormAction({ type: DELETE_INPUT_VALUE, payload: { name } });
         return;
       }
+
       contactFormAction({ type: SET_INPUT_VALUE, payload: { name, inputValue: label } });
     } catch (err) {
       await handleError(
@@ -102,24 +146,68 @@ export function DialogFormCheckBox({ formInput, label, name }: DialogFormInputPr
     }
   }, [contactFormAction, handleError, label, name]);
 
+  const handleBlur = useCallback(
+    (event: FocusEvent<HTMLElement>): void => {
+      focusAfterBlurRef.current = event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
+
+      contactFormAction({
+        type: SET_IS_VALIDATION_EXPOSED,
+        payload: { name, isValidationExposed: true },
+      });
+    },
+    [contactFormAction, name],
+  );
+
+  useLayoutEffect(() => {
+    if (!isInvalid || !shouldRender) return;
+
+    const target = focusAfterBlurRef.current;
+    focusAfterBlurRef.current = null;
+
+    if (!(target instanceof HTMLButtonElement)) return;
+    if (document.activeElement !== target) return;
+
+    const form = inputElementRef.current?.closest('form');
+    if (!form?.contains(target)) return;
+
+    ensureModalFocusRegionVisible(target, [target]);
+  }, [isInvalid, shouldRender]);
+
   const classDialogFormCheckbox: string =
-    style.dialogFormCheckbox__box + (!error?.valid ? ` ${style['dialogFormCheckbox__box--error']}` : '');
+    style.dialogFormCheckbox__box + (isInvalid ? ` ${style['dialogFormCheckbox__box--error']}` : '');
 
   return (
-    <label htmlFor={name} className={style.dialogFormCheckbox}>
-      <DynamicElement
-        className={style.dialogFormCheckbox__input}
-        onChange={handleChange}
-        tag={formInput.tag}
-        type={formInput.type}
-        name={name}
-        id={name}
-        required={formInput.required}
-        ref={inputElementRef as LegacyRef<DialogFormInputElement>}
-        // aria-label={name}
-      />
-      <span className={classDialogFormCheckbox} />
-      <p>{label}</p>
-    </label>
+    <div className={style.dialogFormCheckbox__wrapper}>
+      <label htmlFor={name} className={style.dialogFormCheckbox} onFocusCapture={handleFocusCapture}>
+        <DynamicElement
+          className={style.dialogFormCheckbox__input}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          tagKind='html'
+          tag={formInput.tag}
+          type={formInput.type}
+          name={name}
+          id={name}
+          required={formInput.required}
+          aria-describedby={isInvalid ? errorId : undefined}
+          ref={inputElementRef as LegacyRef<DialogFormInputElement>}
+        />
+
+        <span className={classDialogFormCheckbox} />
+        <span className={style.dialogFormCheckbox__label}>{label}</span>
+      </label>
+
+      {shouldRender && (
+        <span
+          id={errorId}
+          className={`${style.dialogFormCheckbox__error} ${
+            isAnimating ? style['dialogFormCheckbox__error--visible'] : ''
+          }`}
+          aria-hidden={!isInvalid}
+        >
+          {errorMessage}
+        </span>
+      )}
+    </div>
   );
 }

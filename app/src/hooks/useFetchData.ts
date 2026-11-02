@@ -21,9 +21,9 @@ import { getFetchUrlOrUrls } from '@utils/urlHelpers';
  *  - 'data': the fetched data, either as a single result or an array of results;
  *  - 'isLoaded': boolean indicating if the fetch is completed;
  *  - 'fetchError': An error definition object, if any;
- *  - 'refetch': function to manually trigger a fetch request.
+ *  - 'refetch': function to manually trigger a fetch request, return a promise resolving to `true`
+ *               when the request succeeds, or `false` when the request fails, is aborted, or cannot be executed.
  *
- * @al-dev93
  */
 export function useFetchData<TBody extends JsonObject = JsonObject>({
   endpoint,
@@ -82,16 +82,18 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
   };
 
   /**
-   * Executes the fetch request to one or multiple URLs with the provided options.
-   * Handles errors, manages fetch state, and aborts any ongoing fetches if necessary.
+   * Executes a fetch request to one or multiple URLs.
    *
-   * @function
-   * @param {(string | string[] | undefined | null)} [url=initialUrl] - The URL or array of URLs to fetch data from.
-   * @param {FetchOptions} [options=apiOptions] - Options for the fetch request (method, headers, body, etc.)
-   * @returns {void} Triggers a side-effect for fetching data and updates the state accordingly.
+   * @param url URL or URLs to fetch. Defaults to the endpoint resolved by the hook.
+   * @param options Fetch options applied to the request.
+   * @returns A promise resolving to `true` when the request succeeds, or `false`
+   * when the request fails, is aborted, or cannot be executed.
    */
   const executeFetch = useCallback(
-    async (url: string | string[] | undefined | null = urlOrUrls, options: FetchOptions = apiOptions) => {
+    async (
+      url: string | string[] | undefined | null = urlOrUrls,
+      options: FetchOptions = apiOptions,
+    ): Promise<boolean> => {
       if (!url) {
         setFetchError({
           error: new ApplicationError(400, 'No URL provided', 'medium', {
@@ -99,11 +101,11 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
             timestamp: Date.now(),
           }),
         });
-        return;
+        return false;
       }
 
       // Prevent re-fetch if data has already been fetched and refetching is disabled.
-      if (hasFetched.current && !shouldRefetch) return;
+      if (hasFetched.current && !shouldRefetch) return true;
 
       // If there's an ongoing request, abort it
       if (controllerRef.current) controllerRef.current.abort();
@@ -116,13 +118,11 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
 
       try {
         // Check if the URL is valid
-        if (Array.isArray(url)) {
-          url.forEach(validateUrl);
-        } else {
-          validateUrl(url);
-        }
+        if (Array.isArray(url)) url.forEach(validateUrl);
+        else validateUrl(url);
 
         let fetchData;
+
         if (Array.isArray(url)) {
           // Fetch for multiple URLs
           const fetchPromises = url.map((singleUrl) =>
@@ -136,26 +136,33 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
               return response.json();
             }),
           );
+
           fetchData = await Promise.all(fetchPromises);
         } else {
           // Fetch for a single URL
           const response = await fetch(url, { ...options, signal });
+
           if (!response.ok) {
             throw new ApplicationError(400, `HTTP ${response.status} in single fetch`, 'medium', {
               url,
               timestamp: Date.now(),
             });
           }
+
           fetchData = await response.json();
         }
+
         storeFetchValue(url, fetchData);
         setIsLoaded(true);
         hasFetched.current = true;
+
+        return true;
       } catch (error: unknown) {
         if (error instanceof DOMException && error.name === 'AbortError') {
           console.log('Fetch knowingly cancelled');
-          return;
+          return false;
         }
+
         const context: FetchErrorContext = {
           url: Array.isArray(url) ? url.join(', ') : url || 'unknown',
           method: options.method || 'GET',
@@ -172,6 +179,8 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
               });
 
         setFetchError({ error: normalizedError, context });
+
+        return false;
       }
     },
     [apiOptions, shouldRefetch, urlOrUrls],
@@ -196,5 +205,6 @@ export function useFetchData<TBody extends JsonObject = JsonObject>({
       controllerRef.current?.abort();
     };
   }, [executeFetch, urlOrUrls]);
+
   return { data, isLoaded, fetchError, refetch: executeFetch };
 }

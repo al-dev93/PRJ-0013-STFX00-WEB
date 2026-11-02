@@ -1,5 +1,5 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
-import type { LegacyRef } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { FocusEvent, LegacyRef } from 'react';
 
 import type { DialogFormInputElement, TooltipContent } from '@/types';
 import { AppIcon } from '@components/AppIcon';
@@ -21,6 +21,7 @@ import style from './style.module.css';
 import { useContactForm } from '../../../../hooks/useContactForm';
 import type { DialogFormInputProps } from '../../../../types';
 import { Popover } from '../../../Popover';
+import { ensureModalFocusRegionVisible } from '@/utils/modalScrollUtils';
 
 /**
  * DialogFormInput component for rendering input elements within a form.
@@ -34,7 +35,6 @@ import { Popover } from '../../../Popover';
  * @property {TooltipContent[]} [tooltipContent] - content for tooltips associated with the input element (optional)
  * @returns {React.JSX.Element} The rendered DialogFormInput component.
  *
- * @al-dev93
  */
 export function MemoizedDialogFormInput({
   formInput,
@@ -42,29 +42,70 @@ export function MemoizedDialogFormInput({
   name,
   tooltipContent,
 }: DialogFormInputProps): React.JSX.Element {
+  const isInput = useMemo(() => formInput.tag === 'input', [formInput.tag]);
   const inputId = useMemo(() => `${name}-input`, [name]);
   const tooltipContentId = useMemo(() => `input_${name}-tooltip`, [name]);
-  const errorMessageId = useMemo(() => `popover_${name}_message-error`, [name]);
   const labelInputId = useMemo(() => `input_${name}-label`, [name]);
+  const listId = useMemo(() => `${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}`, [name]);
+  const feedbackId = useMemo(() => `input_${name}-error-description`, [name]);
+
   const inputElementRef = useRef<DialogFormInputElement>(null);
+  const hasAnnouncedCompletionRef = useRef<boolean>(false);
+  const wasFocusedRef = useRef<boolean>(false);
 
   const handleError = useErrorHandler();
 
   // Partial state selector using keys
-  const { inputNode, inputStatusTag, inputError, inputBorderBox, popoverMode, listItemFocused, errorMessage } =
-    useContactFormSelector(name, [
-      'inputNode',
-      'inputStatusTag',
-      'inputError',
-      'inputBorderBox',
-      'popoverMode',
-      'listItemFocused',
-      'errorMessage',
-    ]);
+  const {
+    autoComplete,
+    errorMessage,
+    inputBorderBox,
+    inputError,
+    inputNode,
+    inputStatusTag,
+    isFocused,
+    isValidationExposed,
+    listItemFocused,
+    popoverMode,
+  } = useContactFormSelector(name, [
+    'autoComplete',
+    'errorMessage',
+    'inputBorderBox',
+    'inputError',
+    'inputNode',
+    'inputStatusTag',
+    'isFocused',
+    'isValidationExposed',
+    'listItemFocused',
+    'popoverMode',
+  ]);
+
   const contactFormAction = useContactFormDispatch();
   const [setInputAutocomplete, tooltipIconName, isTooltipVisible] = useContactForm(name);
-  const isInput = useMemo(() => formInput.tag === 'input', [formInput.tag]);
-  const listId = useMemo(() => `input_${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}`, [name]);
+
+  const isInvalid = isValidationExposed && !!inputError;
+
+  const isTelComplete =
+    name === 'tel' && isValidationExposed && !inputError && inputNode?.value.replace(/\D/g, '').length === 10;
+
+  const isMessageMinimumReached =
+    name === 'message' &&
+    isValidationExposed &&
+    !inputError &&
+    !!formInput.minLength &&
+    (inputNode?.value.length ?? 0) >= formInput.minLength;
+
+  const isCompletionReached = isTelComplete || isMessageMinimumReached;
+
+  const errorDescriptionText = useMemo(() => {
+    if (!errorMessage?.length) return '';
+
+    const parts = errorMessage.map(({ text }) => text.trim()).filter(Boolean);
+
+    return parts.length ? `Erreur : ${parts.join('. ')}` : '';
+  }, [errorMessage]);
+
+  const [announcedStatusText, setAnnouncedStatusText] = useState<string>('');
 
   /**
    * The reference to the input element.
@@ -90,6 +131,81 @@ export function MemoizedDialogFormInput({
     };
     setNode(inputElementRef.current);
   }, [contactFormAction, handleError, name]);
+
+  useEffect(() => {
+    if (!isCompletionReached) hasAnnouncedCompletionRef.current = false;
+
+    function getAnnouncementMessage(): string {
+      if (isInvalid) return errorDescriptionText;
+
+      if (hasAnnouncedCompletionRef.current) {
+        return '';
+      }
+
+      if (isTelComplete) {
+        return 'Numéro au bon format. Dix chiffres saisis.';
+      }
+
+      if (isMessageMinimumReached) {
+        return 'Longueur minimale atteinte.';
+      }
+
+      return '';
+    }
+
+    const message = getAnnouncementMessage();
+
+    if (!message) {
+      if (!isCompletionReached) setAnnouncedStatusText('');
+      return;
+    }
+
+    setAnnouncedStatusText('');
+
+    const timeoutId = window.setTimeout(() => {
+      if (isCompletionReached && !isInvalid) hasAnnouncedCompletionRef.current = true;
+      setAnnouncedStatusText(message);
+    }, 600);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [errorDescriptionText, isCompletionReached, isInvalid, isMessageMinimumReached, isTelComplete]);
+
+  /**
+   * This effect allows the screen reader to announce a field with an error
+   * or a correctly filled-in field after focus returns to it.
+   */
+  useEffect(() => {
+    const hasGainedFocus = isFocused && !wasFocusedRef.current;
+
+    wasFocusedRef.current = isFocused;
+
+    if (!hasGainedFocus || !isValidationExposed || !inputNode?.value.trim()) return;
+
+    let message: string;
+
+    if (isInvalid) {
+      if (!errorDescriptionText) return;
+
+      message = errorDescriptionText;
+    } else {
+      message =
+        inputNode instanceof HTMLTextAreaElement
+          ? 'Champ correctement renseigné.'
+          : `Valeur actuelle : ${inputNode.value}. Champ correctement renseigné.`;
+    }
+
+    setAnnouncedStatusText('');
+
+    const timeoutId = window.setTimeout(() => {
+      setAnnouncedStatusText(message);
+    }, 600);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [errorDescriptionText, inputNode, isFocused, isInvalid, isValidationExposed]);
 
   /**
    * Handles setting the autocomplete input.
@@ -146,15 +262,15 @@ export function MemoizedDialogFormInput({
    *   'aria-autocomplete'?: 'list';
    *   'aria-expanded'?: boolean;
    *   'aria-controls'?: string;
-   *   'aria-haspopup'?: 'listbox';
    *   'aria-activedescendant'?: string | undefined;
+   *   'aria-haspopup'?: 'listbox';
    * }> | {}}
    * A stable object of ARIA props to spread on the input (or an empty object for non-input controls).
    */
   const comboboxProps = useMemo(() => {
     if (!isInput) return {};
     const activeId =
-      isInput && listItemFocused !== null
+      popoverMode && autoComplete?.length && listItemFocused !== undefined
         ? `option_${name}${SUFFIX_AUTO_COMPLETE_LIST_ID}${listItemFocused}`
         : undefined;
     return {
@@ -162,11 +278,10 @@ export function MemoizedDialogFormInput({
       'aria-autocomplete': 'list' as const,
       'aria-expanded': Boolean(popoverMode),
       'aria-controls': listId,
-      'aria-owns': listId,
       'aria-activedescendant': activeId,
       'aria-haspopup': 'listbox' as const,
     };
-  }, [isInput, listId, listItemFocused, name, popoverMode]);
+  }, [autoComplete?.length, isInput, listId, listItemFocused, name, popoverMode]);
 
   /**
    * Handles the visibility of the tooltip by setting the tooltip's active state.
@@ -177,31 +292,40 @@ export function MemoizedDialogFormInput({
    * @param {boolean} visible - Indicates whether the tooltip should be visible (true) or hidden (false).
    * @returns {Promise<void>}
    */
-  const handleTooltipVisibility = useCallback(
-    async (
-      event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.FocusEvent<HTMLDivElement, Element>,
-      visible: boolean,
-    ): Promise<void> => {
-      event.preventDefault();
-      event.stopPropagation();
+  const handleTooltipVisibility = async (visible: boolean): Promise<void> => {
+    try {
+      contactFormAction({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
+    } catch (err) {
+      await handleError(
+        createError(1005, 'Tooltip not visible', {
+          originalError: err,
+          component: 'DialogFormInput',
+          inputName: name,
+          operation: 'setTooltipVisibility',
+          category: 'UI Component',
+          url: window.location.href,
+        }),
+      );
+    }
+  };
 
-      try {
-        contactFormAction({ type: SET_INPUT_HOVER, payload: { name, isHovered: visible } });
-      } catch (err) {
-        await handleError(
-          createError(1005, 'Tooltip not visible', {
-            originalError: err,
-            component: 'DialogFormInput',
-            inputName: name,
-            operation: 'setTooltipVisibility',
-            category: 'UI Component',
-            url: window.location.href,
-          }),
-        );
-      }
-    },
-    [contactFormAction, handleError, name],
-  );
+  const handleFocusCapture = (event: FocusEvent<HTMLDivElement>): void => {
+    if (event.target !== inputElementRef.current) return;
+
+    const field = event.currentTarget;
+
+    window.requestAnimationFrame(() => {
+      if (!field.isConnected || document.activeElement !== inputElementRef.current) return;
+
+      const label = field.querySelector<HTMLElement>(`.${style.dialogFormInput__label}`);
+      const tooltip = field.querySelector<HTMLElement>(`[id="${tooltipContentId}"]`);
+
+      // Include the absolutely positioned label and tooltip, not just the input.
+      ensureModalFocusRegionVisible(field, [field, label, tooltip]);
+    });
+  };
+
+  const hasTooltip = Boolean(inputNode?.required && tooltipContent?.length);
 
   /**
    * Renders the tooltip for the form field.
@@ -211,7 +335,7 @@ export function MemoizedDialogFormInput({
    */
   const renderTooltip: React.JSX.Element | null = useMemo(() => {
     // If the tooltip should not be rendered, return null.
-    if (!inputNode?.required || !tooltipContent) return null;
+    if (!hasTooltip) return null;
 
     return (
       <Tooltip
@@ -220,18 +344,15 @@ export function MemoizedDialogFormInput({
         direction='right'
         isVisible={isTooltipVisible as boolean}
       >
-        {/* <IonIcon
-          className={tooltipIconName === 'checkmark-circle' ? style.dialogFormInput__tooltipIcon : ''}
-          name={tooltipIconName}
-          aria-hidden='true'
-        /> */}
         <AppIcon
           className={tooltipIconName === 'validated' ? style.dialogFormInput__tooltipIcon : ''}
           iconName={tooltipIconName}
         />
       </Tooltip>
     );
-  }, [inputNode?.required, isTooltipVisible, tooltipContent, tooltipContentId, tooltipIconName]);
+  }, [hasTooltip, isTooltipVisible, tooltipContent, tooltipContentId, tooltipIconName]);
+
+  const describedBy = useMemo(() => (hasTooltip ? tooltipContentId : undefined), [hasTooltip, tooltipContentId]);
 
   /**
    * Renders the Tag component if the input status tag is provided.
@@ -240,6 +361,7 @@ export function MemoizedDialogFormInput({
    * @constant renderAlertTag
    */
   const renderAlertTag: React.JSX.Element | null = useMemo(() => {
+    // if there is no alert tag, return null
     if (!inputStatusTag) return null;
 
     const alertTagClass =
@@ -300,9 +422,7 @@ export function MemoizedDialogFormInput({
   );
 
   useEffect(() => {
-    if (formInput.error) {
-      formattedErrorMessage();
-    }
+    if (formInput.error) formattedErrorMessage();
   }, [formInput.error, formattedErrorMessage]);
 
   /**
@@ -328,13 +448,14 @@ export function MemoizedDialogFormInput({
     <div className={style.dialogFormComponent}>
       <div
         className={classNameDialogFormInput}
-        onMouseEnter={tooltipContent?.length ? (event) => handleTooltipVisibility(event, true) : undefined}
-        onMouseLeave={tooltipContent?.length ? (event) => handleTooltipVisibility(event, false) : undefined}
-        onFocus={tooltipContent?.length ? (event) => handleTooltipVisibility(event, true) : undefined}
-        onBlur={tooltipContent?.length ? (event) => handleTooltipVisibility(event, false) : undefined}
+        onMouseEnter={hasTooltip ? () => void handleTooltipVisibility(true) : undefined}
+        onMouseLeave={hasTooltip ? () => void handleTooltipVisibility(false) : undefined}
+        onFocus={hasTooltip ? () => void handleTooltipVisibility(true) : undefined}
+        onBlur={hasTooltip ? () => void handleTooltipVisibility(false) : undefined}
+        onFocusCapture={handleFocusCapture}
       >
         <div className={style.dialogFormInput__label}>
-          <label id={labelInputId} className={style.dialogFormInput__label__content} htmlFor={name}>
+          <label id={labelInputId} className={style.dialogFormInput__label__content} htmlFor={inputId}>
             {label}
           </label>
           {renderTooltip}
@@ -342,6 +463,7 @@ export function MemoizedDialogFormInput({
 
         <DynamicElement
           className={classNameDynamicElement}
+          tagKind='html'
           tag={formInput.tag}
           type={formInput.type}
           name={name}
@@ -354,12 +476,17 @@ export function MemoizedDialogFormInput({
           autoComplete='off'
           ref={inputElementRef as LegacyRef<DialogFormInputElement>}
           {...comboboxProps}
-          aria-describedby={`${errorMessage ? errorMessageId : undefined} ${tooltipContent ? tooltipContentId : undefined}`}
-          aria-invalid={inputError?.valid || undefined}
+          aria-describedby={describedBy}
+          aria-invalid={isInvalid}
+          aria-errormessage={isInvalid ? feedbackId : undefined}
         />
+
+        <span id={feedbackId} role='status' aria-atomic='true' className='visually-hidden'>
+          {announcedStatusText}
+        </span>
         {renderAlertTag}
-        {renderPopover}
       </div>
+      {renderPopover}
     </div>
   );
 }

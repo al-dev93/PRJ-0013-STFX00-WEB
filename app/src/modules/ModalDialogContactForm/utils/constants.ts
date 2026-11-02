@@ -10,7 +10,6 @@ const EMPTY_MODAL_DIALOG_CONTACT_FORM: ContactFormModal = {
   id: '',
   title: '',
   subtitle: '',
-  srOnlyDescription: '',
   submitButtonName: '',
   alertOnSubmit: [],
   dataFormContent: [],
@@ -72,6 +71,7 @@ const SUFFIX_AUTO_COMPLETE_LIST_ID = '-autocomplete-list';
  * @constant SET_POPOVER_LIST_FOCUSED_INDEX
  * @constant SET_INPUT_VALUE
  * @constant SET_IS_STORED
+ * @constant SET_IS_VALIDATION_EXPOSED
  * @constant SET_POPOVER_MODE
  * @constant IN_EDIT_MODE
  * @constant SET_INPUT_HOVER
@@ -91,6 +91,7 @@ const SET_INPUT_FOCUS = 'SET_INPUT_FOCUS';
 const SET_POPOVER_LIST_FOCUSED_INDEX = 'SET_POPOVER_LIST_FOCUSED_INDEX';
 const SET_INPUT_VALUE = 'SET_INPUT_VALUE';
 const SET_IS_STORED = 'SET_IS_STORED';
+const SET_IS_VALIDATION_EXPOSED = 'SET_IS_VALIDATION_EXPOSED';
 const SET_POPOVER_MODE = 'SET_POPOVER_MODE';
 const IN_EDIT_MODE = 'IN_EDIT_MODE';
 const SET_INPUT_HOVER = 'SET_INPUT_HOVER';
@@ -101,8 +102,6 @@ const SET_INPUT_HOVER = 'SET_INPUT_HOVER';
  * @constant IS_EDITED_BORDER_BOX
  * @constant IS_IN_ERROR
  */
-// const HIDDEN_MODAL = 'hidden';
-// const SOFT_MODAL = 'soft';
 const IS_EDITED_BORDER_BOX = 'edited';
 const IS_IN_ERROR = 'error';
 
@@ -112,7 +111,6 @@ export {
   DELETE_INPUT_ERROR,
   DELETE_INPUT_VALUE,
   EMPTY_MODAL_DIALOG_CONTACT_FORM,
-  // HIDDEN_MODAL,
   FULL_HISTORY,
   IN_EDIT_MODE,
   INIT_DIALOG_CONTACT_FORM_STATE,
@@ -130,9 +128,9 @@ export {
   SET_INPUT_NODE,
   SET_INPUT_VALUE,
   SET_IS_STORED,
+  SET_IS_VALIDATION_EXPOSED,
   SET_POPOVER_LIST_FOCUSED_INDEX,
   SET_POPOVER_MODE,
   SUFFIX_AUTO_COMPLETE_LIST_ID,
   FORM_INPUT_NAME_MAP,
-  // SOFT_MODAL,
 };

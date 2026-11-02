@@ -214,9 +214,6 @@ export function Tooltip({
   return (
     <span className={style.tooltip} role='presentation'>
       {children}
-
-      {/* Keep the panel mounted so `aria-describedby={tooltipId}` can always point here.
-         Hidden from AT when closed to avoid mass reading at dialog open. */}
       <div id={tooltipId} role='tooltip' aria-hidden={!isVisible ? 'true' : undefined} className={classNameTip}>
         {tooltipBody}
       </div>

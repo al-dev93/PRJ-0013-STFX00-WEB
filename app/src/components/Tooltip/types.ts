@@ -15,17 +15,11 @@ import type { TooltipContent } from '@/types';
  *
  * @al-dev93
  */
-export type TooltipProps = {
+export interface TooltipProps {
   id?: string;
   children: ReactNode;
   content: string | TooltipContent | TooltipContent[];
   delay?: number;
   direction?: 'bottom' | 'left' | 'right' | 'top';
   isVisible: boolean;
-};
-
-// export type DescribedByProps = {
-//   'aria-describedby'?: string;
-// };
-
-// export type ChildValidation = { ok: true; child: React.ReactElement<DescribedByProps> } | { ok: false };
+}

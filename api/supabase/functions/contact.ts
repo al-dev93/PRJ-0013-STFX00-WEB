@@ -3,135 +3,147 @@ import { StatusCode } from "https://deno.land/x/hono@v4.3.11/utils/http-status.t
 import { parseCookies } from "./csrf-utils.ts";
 
 /**
- * Converts a URL-safe Base64 string into a standard Base64 string.
+ * Converts a URL-safe Base64 string into standard Base64.
  *
- * Replaces URL-safe characters (`-` → `+`, `_` → `/`) and adds padding
- * (`=`) as needed to make the string’s length a multiple of 4.
- *
- * @function base64UrlToBase64
- * @param {string} str - A URL-safe Base64–encoded string.
- * @returns {string} The equivalent standard Base64–encoded string with correct padding.
+ * @param {string} str - The URL-safe Base64 string.
+ * @returns {string} The equivalent padded standard Base64 string.
  */
-function base64UrlToBase64(str: string) {
-  // replaces characters « URL-safe »
+function base64UrlToBase64(str: string): string {
   let b64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  // add the missing padding
+
   while (b64.length % 4) {
     b64 += "=";
   }
+
   return b64;
 }
 
 /**
- * Verifies a signed token by checking its timestamp and HMAC-SHA256 signature.
+ * Verifies a signed CSRF token against the current session secret.
  *
- * 1. Splits the token into payload and signature segments (`payload.signature`).
- * 2. Decodes the payload (timestamp) and ensures it is a number within the allowed age.
- * 3. Decodes the signature from Base64URL to binary.
- * 4. Imports the provided secret as an HMAC-SHA256 key.
- * 5. Verifies the signature against the payload.
+ * The token must contain a valid timestamp, must not be older than the allowed
+ * lifetime and must have a valid HMAC-SHA256 signature.
  *
- * @param {string} secret - The secret key used to sign the token.
- * @param {string} token - The signed token in the format `<base64url-payload>.<base64url-signature>`.
- * @param {number} [maxAgeMs=900000] - Maximum token age in milliseconds (default is 15 minutes).
- * @returns {Promise<boolean>} A promise that resolves to `true` if the token is valid and within age, otherwise `false`.
+ * @param {string} secret - The secret used to verify the signature.
+ * @param {unknown} token - The CSRF token received from the request body.
+ * @param {number} [maxAgeMs=900000] - Maximum token age in milliseconds.
+ * @returns {Promise<boolean>} Whether the token is valid.
  */
-async function verify(secret: string, token: string, maxAgeMs = 15 * 60_000) {
-  const [b64p, b64s] = token.split(".");
-  if (!b64p || !b64s) return false;
+async function verify(
+  secret: string,
+  token: unknown,
+  maxAgeMs = 15 * 60_000,
+): Promise<boolean> {
+  if (typeof token !== "string" || token.length === 0) {
+    return false;
+  }
 
-  // rebuilds the payload
-  const payload = atob(base64UrlToBase64(b64p));
-  const ts = Number(payload);
-  if (isNaN(ts) || Date.now() - ts > maxAgeMs) return false;
+  const [b64p, b64s, ...extraParts] = token.split(".");
 
-  // correctly decodes the signature
-  const sigBin = atob(base64UrlToBase64(b64s));
-  const sigBuf = Uint8Array.from(sigBin, (c) => c.charCodeAt(0));
+  if (!b64p || !b64s || extraParts.length > 0) {
+    return false;
+  }
 
-  // imports the key HMAC-SHA256
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["verify"]
-  );
+  try {
+    const payload = atob(base64UrlToBase64(b64p));
 
-  // check
-  return crypto.subtle.verify(
-    "HMAC",
-    key,
-    sigBuf,
-    new TextEncoder().encode(payload)
-  );
+    const timestamp = Number(payload);
+
+    if (!Number.isFinite(timestamp)) {
+      return false;
+    }
+
+    const age = Date.now() - timestamp;
+
+    if (age < 0 || age > maxAgeMs) {
+      return false;
+    }
+
+    const signatureBinary = atob(base64UrlToBase64(b64s));
+
+    const signatureBuffer = Uint8Array.from(signatureBinary, (character) =>
+      character.charCodeAt(0),
+    );
+
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      {
+        name: "HMAC",
+        hash: "SHA-256",
+      },
+      false,
+      ["verify"],
+    );
+
+    return crypto.subtle.verify(
+      "HMAC",
+      key,
+      signatureBuffer,
+      new TextEncoder().encode(payload),
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**
- * Initializes a new Hono application instance.
- *
- * This application instance is used to define routes, apply middleware,
- * and handle incoming HTTP requests.
- *
- * @constant contactApp
- * @type {Hono<Env, BlankSchema, "/">}
+ * Initializes the contact form Hono application.
  */
 const contactApp = new Hono();
 
 /**
- * Handles POST requests to the contact form endpoint.
+ * Handles contact form submissions.
  *
- * ### Request Payload (JSON)
- * - `name`: string – User's name
- * - `company`: string – User's company
- * - `email`: string – User's email
- * - `tel`: string – User's phone number
- * - `message`: string – The message content
- * - `consent`: boolean – Must be `true` (legal consent)
- * - `website`: string (optional) – Honeypot field to detect bots
- * - `csrfToken`: string – Token signed with the CSRF secret
- *
- * ### Behavior
- * - ✅ Immediately returns `{ success: true }` if honeypot is filled (bot detected).
- * - ❌ Returns `400` if `consent` is missing or false.
- * - ❌ Returns `400` if the `csrf_secret` cookie is missing.
- * - ❌ Returns `400` if the CSRF token is invalid.
- * - ✅ On valid request, inserts data into the `contacts` table using Supabase REST API.
- * - ❌ Returns `400`–`500` with `{ error: string }` if Supabase insertion fails.
- * - ✅ On success, returns `{ success: true }` with status `200`.
- *
- * @param {import('hono').Context} c - Hono context containing the request and response.
- * @returns {Promise<import('hono').Response>} JSON response with success or error message.
+ * @param {import('hono').Context} c - The Hono request context.
+ * @returns {Promise<import('hono').Response>} The contact endpoint response.
  */
 contactApp.post("/", async (c) => {
   const { name, company, email, tel, message, consent, website, csrfToken } =
     await c.req.json();
 
-  // 1️⃣ Anti-bot honeypot
-  if (website) return c.json({ success: true });
+  // 1. Anti-bot honeypot.
+  if (website) {
+    return c.json({ success: true });
+  }
 
-  // 2️⃣ Check consent
-  if (!consent) return c.json({ error: "consent required" }, 400);
+  // 2. Check consent.
+  if (!consent) {
+    return c.json({ error: "consent required" }, 400);
+  }
 
-  // 3️⃣ Extract CSRF secret from cookies
+  // 3. Extract the CSRF secret from cookies.
   const cookieHeader = c.req.header("cookie") ?? "";
+
   const cookies = parseCookies(cookieHeader);
-
   const secret = cookies["csrf_secret"];
-  if (!secret) return c.json({ error: "Missing CSRF secret" }, 400);
 
-  // 4️⃣ Verify CSRF token
+  if (!secret) {
+    return c.json({ error: "Missing CSRF secret" }, 400);
+  }
+
+  // 4. Check that a token was provided.
+  if (typeof csrfToken !== "string" || csrfToken.length === 0) {
+    return c.json({ error: "Missing CSRF token" }, 400);
+  }
+
+  // 5. Verify token age and signature.
   const valid = await verify(secret, csrfToken);
-  if (!valid) return c.json({ error: "Invalid CSRF token" }, 400);
 
-  // 5️⃣ Get Supabase credentials
+  if (!valid) {
+    return c.json({ error: "Invalid CSRF token" }, 400);
+  }
+
+  // 6. Get Supabase credentials.
   const SUPA_URL = Deno.env.get("SUPABASE_URL");
+
   const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
+
   if (!SUPA_URL || !ANON_KEY) {
     return c.json({ error: "Missing Supabase credentials" }, 500);
   }
 
-  // 6️⃣ Send to Supabase
+  // 7. Insert the contact entry.
   const response = await fetch(`${SUPA_URL}/rest/v1/contacts`, {
     method: "POST",
     headers: {
@@ -141,17 +153,28 @@ contactApp.post("/", async (c) => {
       Prefer: "return=minimal",
     },
     body: JSON.stringify([
-      { name, company, email, tel, message, consent: true },
+      {
+        name,
+        company,
+        email,
+        tel,
+        message,
+        consent: true,
+      },
     ]),
   });
+
   if (!response.ok) {
     let errorMsg: string;
+
     try {
       const errorJson = await response.json();
+
       errorMsg = errorJson.message || JSON.stringify(errorJson);
     } catch {
       errorMsg = await response.text();
     }
+
     return c.json({ error: errorMsg }, response.status as StatusCode);
   }
 

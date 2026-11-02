@@ -3,16 +3,17 @@ import { useCallback, useLayoutEffect } from 'react';
 import { useContactFormDispatch } from './useContactFormDispatch';
 import { useContactFormSelector } from './useContactFormSelector';
 import type { FormInputName } from '../types';
-import { addToLocalStorage, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
+import { addToLocalStorage, hasStoredAutocomplete, saveToLocalStorage } from '../utils/autocompleteStorageUtils';
 import {
   DELETE_INPUT_ERROR,
   RESET_AUTO_COMPLETE_OVERLAY,
   SET_INPUT_ERROR,
   SET_INPUT_VALUE,
   SET_IS_STORED,
+  SET_IS_VALIDATION_EXPOSED,
 } from '../utils/constants';
-import { isFormInputName } from '../utils/formHelpers';
 import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from '../utils/inputErrorHandler';
+
 /**
  * Handles the user interactions on the input field by dispatching actions to the reducer.
  * It also handles the autocomplete feature by fetching the autocomplete data from the local storage,
@@ -25,7 +26,6 @@ import { getInputValidityProperties, setInputBorderBox, setInputErrorTag } from 
  * 2. A function to store the input value into local storage.
  * 3. A function to validate the input field, returning a boolean indicating validity.
  *
- * @al-dev93
  */
 export function useAutoComplete(
   name: FormInputName,
@@ -43,20 +43,28 @@ export function useAutoComplete(
    * @returns {boolean} - Returns a boolean indicating validity.
    */
   const validateInput = useCallback(
-    (isAutocompleted: boolean = false): boolean => {
+    (isAutocompleted = false, shouldExposeValidation = true): boolean => {
       if (!input) return false;
 
       const { required } = input;
       const inputError = getInputValidityProperties(input, isAutocompleted);
 
-      if (isFormInputName(name)) {
+      contactFormAction({
+        type: inputError.valid ? DELETE_INPUT_ERROR : SET_INPUT_ERROR,
+        payload: { name, inputError },
+      });
+
+      if (required) contactFormAction(setInputErrorTag(name, inputError));
+      contactFormAction(setInputBorderBox(name, input, inputError));
+
+      if (shouldExposeValidation)
         contactFormAction({
-          type: inputError.valid ? DELETE_INPUT_ERROR : SET_INPUT_ERROR,
-          payload: { name, inputError },
+          type: SET_IS_VALIDATION_EXPOSED,
+          payload: {
+            name,
+            isValidationExposed: true,
+          },
         });
-        if (required) contactFormAction(setInputErrorTag(name, inputError));
-        contactFormAction(setInputBorderBox(name, input, inputError));
-      }
 
       return inputError.valid;
     },
@@ -99,14 +107,9 @@ export function useAutoComplete(
 
     if (!value || !validity.valid || name === 'message') return;
 
-    if (isStored) addToLocalStorage(value, name);
-    else {
-      saveToLocalStorage(value, name);
-      contactFormAction({
-        type: SET_IS_STORED,
-        payload: { name, isStored: true },
-      });
-    }
+    const saved = isStored ? addToLocalStorage(value, name) : saveToLocalStorage(value, name);
+
+    if (saved) contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: true } });
   }, [contactFormAction, isStored, input, name]);
 
   /**
@@ -114,8 +117,10 @@ export function useAutoComplete(
    */
   useLayoutEffect((): void => {
     if (!input) return;
-    validateInput();
-    contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: !!localStorage.getItem(name) } });
+
+    validateInput(false, false);
+
+    contactFormAction({ type: SET_IS_STORED, payload: { name, isStored: hasStoredAutocomplete(name) } });
   }, [contactFormAction, input, name, validateInput]);
 
   return [putAutoCompleteInInput, storeInputValue, validateInput];
