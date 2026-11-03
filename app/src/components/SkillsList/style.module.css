@@ -23,13 +23,6 @@
   padding: var(--skills-slideshow-padding);
 }
 
-.skills.skills--slideshow li > .primaryTag {
-  background: var(--skills-slideshow-primary-bg);
-  border-color: var(--skills-slideshow-primary-bc);
-  color: var(--skills-slideshow-primary-color);
-  font-weight: var(--skills-slideshow-primary-fw);
-}
-
 .skills.skills--card {
   --skills-slideshow-gap: var(--semantic-space-lg);
   flex-wrap: wrap;
@@ -56,4 +49,12 @@
 .skills.skills--gallery > li {
   min-inline-size: 0;
   max-inline-size: 100%;
+}
+
+.skills.skills--slideshow li > .primaryTag,
+.skills.skills--gallery li > .primaryTag {
+  background: var(--skills-slideshow-primary-bg);
+  border: 1px solid var(--skills-slideshow-primary-bc);
+  color: var(--skills-slideshow-primary-color);
+  font-weight: var(--skills-slideshow-primary-fw);
 }
