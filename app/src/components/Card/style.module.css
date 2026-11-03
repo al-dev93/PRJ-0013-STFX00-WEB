@@ -78,7 +78,12 @@
   }
 }
 
-.card:focus-within {
+/* .card:focus-within {
+  border-color: var(--card-focus-border-color);
+  box-shadow: var(--card-focus-box-shadow);
+} */
+
+.card:has(:focus-visible) {
   border-color: var(--card-focus-border-color);
   box-shadow: var(--card-focus-box-shadow);
 }
