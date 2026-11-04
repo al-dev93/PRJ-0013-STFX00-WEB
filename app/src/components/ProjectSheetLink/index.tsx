@@ -12,7 +12,6 @@ import { PROJECT_SHEET_EXTENSION } from '../../modules/Slideshow/utils/constants
  * The component:
  * - Builds the final href from environment-driven `urlBase` + `projectSheet` + PDF extension.
  * - Uses `target="_blank"` with `rel="noopener noreferrer"` for security.
- * - Adds an explicit `aria-label` to announce opening the PDF in a new tab.
  *
  * @component
  * @param {ProjectSheetLinkProps} props - the props for the ProjectSheetLink component
@@ -72,8 +71,6 @@ export const ProjectSheetLink = memo(function MemoizedProjectSheetLink({
       rel='noopener noreferrer'
       className={className ? `${styles.linkPdf} ${className}` : styles.linkPdf}
       data-variant={variant || undefined}
-      aria-hidden='true'
-      // aria-label={`Ouvrir la fiche projet PDF « ${title} » dans un nouvel onglet`}
     >
       {content()}
       <span className='visually-hidden'> — ouvre la fiche projet « {title} » (PDF) dans un nouvel onglet</span>
