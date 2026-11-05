@@ -72,7 +72,7 @@ export function SkillsList({ className, primaryTag, list, layoutType }: SkillsLi
       {list?.map((value, index) => (
         <li key={value}>
           <Tag
-            className={`${primaryTag === index + 1 ? style.primaryTag : ''} ${className}`}
+            className={[primaryTag === index + 1 ? style.primaryTag : '', className ?? ''].filter(Boolean).join(' ')}
             tag={value}
             variant={variant}
             ariaLabel={`compétence ${index + 1} : ${value}`}
