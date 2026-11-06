@@ -2,7 +2,7 @@
 
 **Issue pilote :** [#23 — Validate the responsive version and fix regressions](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/issues/23)
 **Campagne :** Lot 3 — Validation transversale
-**Statut :** En cours — aucune validation du lot 3 encore enregistrée
+**Statut :** En cours — premier scénario validé à 320 px (`L3-RG-01`) ; campagne globale non terminée
 **Démarrage :** 6 novembre 2026
 **Branche documentaire :** `docs/23-responsive-qa-lot3`
 **Version applicative testée (SHA complet) :** [2099697](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/209969704bbad0c6819376e3c75fd8553cc2cd0d)
@@ -21,11 +21,11 @@ Cette section décrit les conditions techniques et méthodologiques de la campag
 
 La traçabilité repose sur trois niveaux complémentaires :
 
-- **Environnement (**`**ENV**`**)** : configuration technique de référence comprenant le système, le navigateur, les technologies d'assistance et les paramètres habituels d'affichage.
+- **Environnement (`ENV`)** : configuration technique de référence comprenant le système, le navigateur, les technologies d'assistance et les paramètres habituels d'affichage.
 
-- **Session (**`**L3-S**`**)** : période de tests réalisée sur une version identifiée du code applicatif, dans un environnement donné.
+- **Session (`L3-S`)** : période de tests réalisée sur une version identifiée du code applicatif, dans un environnement donné.
 
-- **Configuration d'exécution (**`**CFG**`**)** : combinaison de paramètres particuliers, notamment les dimensions du viewport, le DPR et les préférences d'affichage.
+- **Configuration d'exécution (`CFG`)** : combinaison de paramètres particuliers, notamment les dimensions du viewport, le DPR et les préférences d'affichage.
 
 Un environnement peut être réutilisé pour plusieurs sessions. Une session peut comporter plusieurs configurations d'exécution. Plusieurs tests peuvent partager une même configuration.
 
@@ -50,7 +50,7 @@ Les dimensions du viewport et le DPR ne constituent pas, à eux seuls, des envir
 | Exécution du frontend               | Locale — React / TypeScript / Vite                                               |
 | Backend                             | Supabase auto-hébergé sur une VM Hetzner                                         |
 | Source des données                  | API applicative reliée à Supabase ; connexion effective à confirmer              |
-| Zoom du navigateur                  | À confirmer dans Firefox                                                         |
+| Zoom du navigateur                  | 100%                                                                             |
 | Police racine calculée              | `16px`                                                                           |
 | Thème applicatif                    | `light` (attribut `data-theme` de `<html>`)                                      |
 | Préférence de couleur du navigateur | `dark`                                                                           |
@@ -70,9 +70,9 @@ Une nouvelle session est créée lorsqu'une campagne de tests reprend à une aut
 
 Le SHA enregistré correspond à la **version applicative réellement testée**. Un commit modifiant exclusivement la documentation QA ne nécessite pas, à lui seul, de modifier cette référence.
 
-| Session  | Date / heure | Environnement | SHA applicatif testé                       | Périmètre                             | État        |
-| -------- | ------------ | ------------- | ------------------------------------------ | ------------------------------------- | ----------- |
-| `L3-S01` | À renseigner | `ENV-01`      | `209969704bbad0c6819376e3c75fd8553cc2cd0d` | Préparation ; R16-01 et R16-02 prévus | Préparation |
+| Session  | Date / heure         | Environnement | SHA applicatif testé                       | Périmètre                             | État                        |
+| -------- | -------------------- | ------------- | ------------------------------------------ | ------------------------------------- | --------------------------- |
+| `L3-S01` | 06/11/2026<br> — 16h | `ENV-01`      | `209969704bbad0c6819376e3c75fd8553cc2cd0d` | Préparation ; R16-01 et R16-02 prévus | En  cours — `L3-RG-01` PASS |
 
 #### Notes de la session L3-S01
 
@@ -88,7 +88,7 @@ Le SHA enregistré correspond à la **version applicative réellement testée**.
 
 - **Backend :** Supabase auto-hébergé sur Hetzner ; connexion effective à confirmer.
 
-- **Résultats :** aucun résultat du lot 3 encore enregistré.
+- **Résultats :** `L3-RG-01` conforme à 320 px : R16-01 et R16-02 satisfaits pour cette largeur.
 
 Les notes de session servent à documenter les circonstances particulières d'exécution, les changements de configuration et les difficultés rencontrées.
 
@@ -218,6 +218,7 @@ Les tests peuvent couvrir plusieurs critères simultanément, à condition que l
 | `BLOCKED`        | Test impossible à exécuter ou à conclure en raison d'un obstacle identifié    |
 | `NOT TESTED`     | Test non encore exécuté                                                       |
 | `NOT APPLICABLE` | Test non applicable à la configuration considérée ; justification obligatoire |
+| `WIP`            | Validation en cours                                                           |
 
 Un contrôle non exécuté ne peut jamais être déclaré `PASS`.
 
@@ -292,14 +293,14 @@ Pour relever le débordement global dans la console :
 });
 ```
 
-| Test       | Largeur (CSS px) | Session  | R16-01 —Overflow global | R16-02 — Intégrité visuelle | Verdict    | Preuve / remarque                                                               |
-| ---------- | ---------------: | -------- | ----------------------- | --------------------------- | ---------- | ------------------------------------------------------------------------------- |
-| `L3-RG-01` |              320 | `L3-S01` | PASS — 0 px<br>         | PASS — aucun défaut observé | PASS       | `CFG-02`;<br>scrollWidth=320, clientWidth=320 ;<br>inspection visuelle complète |
-| `L3-RG-02` |              390 | —        | Non mesuré              | Non inspecté                | NOT TESTED | —                                                                               |
-| `L3-RG-03` |              768 | —        | Non mesuré              | Non inspecté                | NOT TESTED | —                                                                               |
-| `L3-RG-04` |             1024 | —        | Non mesuré              | Non inspecté                | NOT TESTED | —                                                                               |
-| `L3-RG-05` |             1280 | —        | Non mesuré              | Non inspecté                | NOT TESTED | —                                                                               |
-| `L3-RG-06` |             1440 | —        | Non mesuré              | Non inspecté                | NOT TESTED | —                                                                               |
+| Test       | Largeur (CSS px) | Session  | R16-01 —Overflow global | R16-02 — Intégrité visuelle   | Verdict    | Preuve / remarque                                                               |
+| ---------- | ---------------: | -------- | ----------------------- | ----------------------------- | ---------- | ------------------------------------------------------------------------------- |
+| `L3-RG-01` |              320 | `L3-S01` | `PASS` — 0 px<br>       | `PASS` — aucun défaut observé | `PASS`     | `CFG-02`;<br>scrollWidth=320, clientWidth=320 ;<br>inspection visuelle complète |
+| `L3-RG-02` |              390 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
+| `L3-RG-03` |              768 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
+| `L3-RG-04` |             1024 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
+| `L3-RG-05` |             1280 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
+| `L3-RG-06` |             1440 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
 
 > Une mesure globale sans débordement n'exclut pas un contenu tronqué dans un conteneur à `overflow: hidden`, ni un recouvrement entre composants : vérifier les deux aspects séparément.
 
@@ -324,7 +325,7 @@ Compléter les lignes lors des sessions dédiées. Les identifiants détaillés 
 
 | Issue | Critères matriciels | Domaine                                       | Session(s) | État de la revalidation | Référence des résultats |
 | ----- | ------------------- | --------------------------------------------- | ---------- | ----------------------- | ----------------------- |
-| #16   | `R16-*`             | Exigences globales                            | —          | NOT TESTED              | §2, §3, §5–7            |
+| #16   | `R16-*`             | Exigences globales                            | `L3-S01`   | `WIP`                   | §2, §3, §5–7            |
 | #17   | `FND-*`             | Fondations responsive / gouttières            | —          | NOT TESTED              | —                       |
 | #18   | `HDR-*`             | En-tête, transparence et navigation           | —          | NOT TESTED              | —                       |
 | #19   | `SOC-*`             | Navigation sociale, footer et point d'ancrage | —          | NOT TESTED              | —                       |
