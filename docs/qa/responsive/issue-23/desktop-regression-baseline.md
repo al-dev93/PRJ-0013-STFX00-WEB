@@ -5,15 +5,15 @@
 **Livrable :** 2/2 · **Date :** 3 novembre 2026 · **Statut :** **référentiel technique documenté — lot 1 terminé / comparaison visuelle non réalisée**.
 **Sources :** GitHub issues #16/#21/#23/#24/#25/#26/#31/#37, PR #33/#34/#35, commits de fusion et premiers parents vérifiés ; analyse statique de l’archive `PRJ-0013-STFX00-WEB-main(8).zip`.
 
-> **Important :** « référentiel documenté » ne signifie pas « absence de régression démontrée ». Les trois états historiques sont retrouvés comme commits Git, mais aucune comparaison d’images réalisée dans des conditions comparables ne permet d’affirmer que le design desktop est inchangé. L’ancienne application n’a pas été reproduite avec succès. Le volet historique du critère QA-02 de #23 est toujours **en attente de preuve**.
+> **Important :** « référentiel documenté » ne signifie pas « absence de régression démontrée ». Les trois états historiques sont retrouvés comme commits Git, mais aucune comparaison d’images réalisée dans des conditions comparables ne permet d’affirmer que le design desktop est inchangé. L’ancienne application n’a pas été reproduite avec succès. Le volet historique du critère `QA‑02` de #23 est toujours **en attente de preuve**.
 
 ## 1. Tableau des références historiques vérifiées
 
 | Référence | Section                    | PR                                                             | SHA historique avant PR (= premier parent de fusion)                                                                                          | SHA après intégration (= fusion)                                                                                                              |
 | --------- | -------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| DESK-01   | Présentation de Stack-Flex | [#33](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/pull/33) | [`7221a285e87e356da417f824409b1600fdac6670`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/7221a285e87e356da417f824409b1600fdac6670) | [`db7d2eea61f9c0dd0f48a97a0046707ee5b263fe`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/db7d2eea61f9c0dd0f48a97a0046707ee5b263fe) |
-| DESK-02   | Principales Réalisations   | [#34](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/pull/34) | [`db7d2eea61f9c0dd0f48a97a0046707ee5b263fe`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/db7d2eea61f9c0dd0f48a97a0046707ee5b263fe) | [`53ddc3c19b9838eb5ad3df24f1407785c0bfebf3`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/53ddc3c19b9838eb5ad3df24f1407785c0bfebf3) |
-| DESK-03   | Autres Réalisations        | [#35](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/pull/35) | [`53ddc3c19b9838eb5ad3df24f1407785c0bfebf3`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/53ddc3c19b9838eb5ad3df24f1407785c0bfebf3) | [`dbbec5b7a07613b623c221da9350ffc010c41130`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/dbbec5b7a07613b623c221da9350ffc010c41130) |
+| `DESK‑01` | Présentation de Stack-Flex | [#33](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/pull/33) | [`7221a285e87e356da417f824409b1600fdac6670`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/7221a285e87e356da417f824409b1600fdac6670) | [`db7d2eea61f9c0dd0f48a97a0046707ee5b263fe`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/db7d2eea61f9c0dd0f48a97a0046707ee5b263fe) |
+| `DESK‑02` | Principales Réalisations   | [#34](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/pull/34) | [`db7d2eea61f9c0dd0f48a97a0046707ee5b263fe`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/db7d2eea61f9c0dd0f48a97a0046707ee5b263fe) | [`53ddc3c19b9838eb5ad3df24f1407785c0bfebf3`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/53ddc3c19b9838eb5ad3df24f1407785c0bfebf3) |
+| `DESK‑03` | Autres Réalisations        | [#35](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/pull/35) | [`53ddc3c19b9838eb5ad3df24f1407785c0bfebf3`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/53ddc3c19b9838eb5ad3df24f1407785c0bfebf3) | [`dbbec5b7a07613b623c221da9350ffc010c41130`](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/dbbec5b7a07613b623c221da9350ffc010c41130) |
 
 Les SHA « avant PR » sont **des instantanés techniques de `main`** antérieurs aux changements visés, pas des captures photographiques ou des signatures d’approbation du rendu. Le site peut avoir évolué sur d’autres sections entre ces états et `main` actuel. Pour conclure sur chaque section, la comparaison doit porter sur le **même contenu et le même état d’UI**.
 
@@ -34,14 +34,14 @@ Le présent document définit comment établir et vérifier l'absence de régres
 
 ### Critères GitHub applicables
 
-| Référence          | Exigence, reprise de l'issue #16                                                                                                            | Preuve à obtenir                                                                                                               |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **R16-04**         | `The "Présentation de Stack-Flex", "Principales Réalisations" and "Autres Réalisations" sections retain their validated desktop rendering.` | Pour chacune des trois sections, comparaison à sa référence desktop historique, à conditions d'affichage et de données égales. |
-| **R16-14**         | `No regression is observed at 1280 and 1440 px.`                                                                                            | Vérifications globales desktop à 1280 et 1440 px, y compris l'intégration des composants.                                      |
-| **R16-01**         | `No horizontal scrolling occurs at 320, 390, 768, 1024, 1280 and 1440 px.`                                                                  | Absence de débordement horizontal aux largeurs desktop 1024, 1280 et 1440 px.                                                  |
-| **R16-02**         | `No text, button, card or control is clipped or overlapped.`                                                                                | Contrôle de l'intégrité des contenus et des commandes aux mêmes largeurs.                                                      |
-| **R16-12**         | `Focus states remain visible.`                                                                                                              | Vérification au clavier des contrôles interactifs de ces sections.                                                             |
-| **QA-02 / FTR-09** | Critères de #23 et #31 imposant de conserver le rendu desktop des trois sections.                                                           | Même campagne de captures et mêmes preuves : ne pas dupliquer les tests.                                                       |
+| Référence              | Exigence, reprise de l'issue #16                                                                                                            | Preuve à obtenir                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **`R16‑04`**           | `The "Présentation de Stack-Flex", "Principales Réalisations" and "Autres Réalisations" sections retain their validated desktop rendering.` | Pour chacune des trois sections, comparaison à sa référence desktop historique, à conditions d'affichage et de données égales. |
+| **`R16‑14`**           | `No regression is observed at 1280 and 1440 px.`                                                                                            | Vérifications globales desktop à 1280 et 1440 px, y compris l'intégration des composants.                                      |
+| **`R16‑01`**           | `No horizontal scrolling occurs at 320, 390, 768, 1024, 1280 and 1440 px.`                                                                  | Absence de débordement horizontal aux largeurs desktop 1024, 1280 et 1440 px.                                                  |
+| **`R16‑02`**           | `No text, button, card or control is clipped or overlapped.`                                                                                | Contrôle de l'intégrité des contenus et des commandes aux mêmes largeurs.                                                      |
+| **`R16‑12`**           | `Focus states remain visible.`                                                                                                              | Vérification au clavier des contrôles interactifs de ces sections.                                                             |
+| **`QA‑02` / `FTR‑09`** | Critères de #23 et #31 imposant de conserver le rendu desktop des trois sections.                                                           | Même campagne de captures et mêmes preuves : ne pas dupliquer les tests.                                                       |
 
 Les autres critères de #16 sont intégrés à la **matrice de traçabilité globale** (document distinct) et seront validés dans la QA transverse de l'issue #23 ; ils ne doivent pas être artificiellement assimilés à une comparaison d'images desktop.
 
@@ -51,7 +51,7 @@ Les autres critères de #16 sont intégrés à la **matrice de traçabilité glo
 
 ## 4. Registre des trois sections de référence
 
-### DESK-01 — Présentation de Stack-Flex
+### DESK‑01 — Présentation de Stack-Flex
 
 | Champ                                 | Référence de travail                                                                                                                                                                                                                 |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -60,10 +60,10 @@ Les autres critères de #16 sont intégrés à la **matrice de traçabilité glo
 | Composition actuelle observée         | Grille à **deux colonnes** (principale + secondaire) au-dessus de **992 CSS px** si `1rem = 16px` ; retour sur une colonne à `max-width: 62rem`.                                                                                     |
 | Points de comparaison visuelle        | Position de l'introduction et du titre, proportions des deux colonnes, ordre des blocs, cartes de compétences et du « Socle technique », espacements, bordures, couleurs, soulignements, alignements et lisibilité des titres longs. |
 | Points de non-régression particuliers | Aucun bloc tronqué/chevauché ; absence de débordement ; cohérence des colonnes à 1024/1280/1440 px. Le correctif #37 ne doit pas modifier involontairement les dispositions desktop.                                                 |
-| Référence historique                  | **SHA identifié (DESK-01)** ; capture approuvée non disponible ; reproduction bloquée par HTTP 400.                                                                                                                                  |
+| Référence historique                  | **SHA identifié (`DESK‑01`)** ; capture approuvée non disponible ; reproduction bloquée par HTTP 400.                                                                                                                                |
 | État                                  | **À comparer** ; la présence des règles CSS ne prouve pas l'identité visuelle historique.                                                                                                                                            |
 
-### DESK-02 — Principales Réalisations
+### DESK‑02 — Principales Réalisations
 
 | Champ                                 | Référence de travail                                                                                                                                                                |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -72,12 +72,12 @@ Les autres critères de #16 sont intégrés à la **matrice de traçabilité glo
 | Composition actuelle observée         | Le code sélectionne la **galerie horizontale** pour `max-width: 39rem` (624 CSS px si `1rem = 16px`), et le **diaporama (`SlideshowCarousel`)** au-dessus de cette limite.          |
 | Points de comparaison visuelle        | Présentation des images, ratio/cadrage, légendes, tags, textes, espacements, contrôles précédent/suivant, pagination, transitions et proportions de la zone de diaporama.           |
 | Points de non-régression particuliers | Le diaporama desktop doit rester présent et utilisable ; ne pas substituer la galerie mobile à la version desktop ; aucune détérioration des commandes ni des indicateurs de focus. |
-| Référence historique                  | **SHA identifié (DESK-02)** ; capture et état interactif historiques non disponibles.                                                                                               |
+| Référence historique                  | **SHA identifié (`DESK‑02`)** ; capture et état interactif historiques non disponibles.                                                                                             |
 | État                                  | **À comparer** ; reproduire le même index de slide et les mêmes données.                                                                                                            |
 
-**Note :** les défauts connus de tags dans la **galerie horizontale** relèvent de QA-07 / lot 2. Ils ne prouvent pas à eux seuls une régression du **diaporama desktop**.
+**Note :** les défauts connus de tags dans la **galerie horizontale** relèvent de `QA‑07` / lot 2. Ils ne prouvent pas à eux seuls une régression du **diaporama desktop**.
 
-### DESK-03 — Autres Réalisations
+### DESK‑03 — Autres Réalisations
 
 | Champ                                 | Référence de travail                                                                                                                                                                           |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -86,8 +86,8 @@ Les autres critères de #16 sont intégrés à la **matrice de traçabilité glo
 | Composition actuelle observée         | Grille à **trois colonnes** à partir de `min-width: 62rem` (992 CSS px si `1rem = 16px`) ; deux colonnes dès `min-width: 39rem` ; une colonne sous ce seuil.                                   |
 | Points de comparaison visuelle        | Nombre de colonnes, largeur et hauteur des cartes, distribution des contenus, éléments graphiques, liens vers les ressources, titres, tags, intervalles, alignements et états de survol/focus. |
 | Points de non-régression particuliers | Maintien de la grille desktop en trois colonnes ; aucune carte tronquée/chevauchée et aucun débordement horizontal à 1024/1280/1440 px.                                                        |
-| Référence historique                  | **SHA identifié (DESK-03)** ; capture de la grille auparavant validée non disponible.                                                                                                          |
-| État                                  | **À comparer** ; la correction de restitution du focus sur retour de ressource est couverte séparément par QA-08 / lot 2.                                                                      |
+| Référence historique                  | **SHA identifié (`DESK‑03`)** ; capture de la grille auparavant validée non disponible.                                                                                                        |
+| État                                  | **À comparer** ; la correction de restitution du focus sur retour de ressource est couverte séparément par `QA‑08` / lot 2.                                                                    |
 
 ---
 
@@ -129,17 +129,17 @@ L'interaction à la souris ou au clavier et l'absence de scroll horizontal deman
 
 ### Tableau de preuves à remplir
 
-| ID      | Largeur (px CSS) | Capture BASE | Capture CURRENT | Différence / commentaire | Verdict   |
-| ------- | ---------------: | ------------ | --------------- | ------------------------ | --------- |
-| DESK-01 |             1024 | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-01 |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-01 |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-02 |             1024 | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-02 |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-02 |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-03 |             1024 | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-03 |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
-| DESK-03 |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
+| ID        | Largeur (px CSS) | Capture BASE | Capture CURRENT | Différence / commentaire | Verdict   |
+| --------- | ---------------: | ------------ | --------------- | ------------------------ | --------- |
+| `DESK‑01` |             1024 | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑01` |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑01` |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑02` |             1024 | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑02` |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑02` |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑03` |             1024 | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑03` |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
+| `DESK‑03` |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
 
 **Verdicts admis :** `Conforme`, `Régression confirmée`, `Non comparable` (conditions différentes), `Non vérifiable` (BASE absent), `Non testé`. Chaque régression doit être corrigée ou associée à une issue dédiée avec justification, conformément à #23.
 
@@ -149,7 +149,7 @@ L'interaction à la souris ou au clavier et l'absence de scroll horizontal deman
 
 Ces vérifications sont à coordonner avec le lot 3 plutôt qu'à remplacer par des captures :
 
-- **1280 et 1440 px** : absence de défilement horizontal, clipping et chevauchements, navigation fonctionnelle, focus visible et absence de régression globale (R16-01, R16-02, R16-12, R16-14).
+- **1280 et 1440 px** : absence de défilement horizontal, clipping et chevauchements, navigation fonctionnelle, focus visible et absence de régression globale (`R16‑01`, `R16‑02`, `R16‑12`, `R16‑14`).
 - **1024 px** : vérification des transitions de grille et des commandes, notamment autour de `62rem` et des adaptations visuelles du diaporama.
 - **Footer / navigation sociale** : `Footer` et `SocialMediaNavBar` sont **indépendants**. Sur mobile, la barre sociale horizontale reste au-dessus du footer lorsqu'il devient visible, avec un contrôle de saut vers ce dernier. Le footer conserve les liens secondaires, **pas** les liens sociaux (issues #19, #31 et #23). Ce comportement mobile ne doit pas être imposé comme référence desktop.
 - **Issue #37** : les contrôles défensifs sous 320 px et les changements de disposition à 352/416 px concernent les petites largeurs, pas une modification voulue du référentiel desktop.
@@ -160,12 +160,12 @@ Ces vérifications sont à coordonner avec le lot 3 plutôt qu'à remplacer par 
 
 | Référence | Candidat Git « avant »     | Capture historique approuvée | Exécution ancienne version   | Capture actuelle comparable | Verdict visuel                |
 | --------- | -------------------------- | ---------------------------- | ---------------------------- | --------------------------- | ----------------------------- |
-| DESK-01   | Identifié (SHA complet §1) | Absente                      | Tentative échouée (HTTP 400) | Non réalisée                | **Non vérifiable à ce stade** |
-| DESK-02   | Identifié (SHA complet §1) | Absente                      | Non tentée                   | Non réalisée                | **Non vérifiable à ce stade** |
-| DESK-03   | Identifié (SHA complet §1) | Absente                      | Non tentée                   | Non réalisée                | **Non vérifiable à ce stade** |
+| `DESK‑01` | Identifié (SHA complet §1) | Absente                      | Tentative échouée (HTTP 400) | Non réalisée                | **Non vérifiable à ce stade** |
+| `DESK‑02` | Identifié (SHA complet §1) | Absente                      | Non tentée                   | Non réalisée                | **Non vérifiable à ce stade** |
+| `DESK‑03` | Identifié (SHA complet §1) | Absente                      | Non tentée                   | Non réalisée                | **Non vérifiable à ce stade** |
 
 **Dossier de preuves attendu au lot 3 :** captures actuelles 1280/1440 px (1024 complémentaire), rapport de contrôle CSS et d’interactions, comparaison des PR/diffs avec les premiers parents, éventuelles captures historiques retrouvées, justification explicite des écarts et de toute limite de preuve. Les références historiques pourront être reproduites **uniquement si cela reste proportionné** et si l’accès aux données peut être stabilisé sans travail imprévu majeur.
 
-**Décision : LOT 1 TERMINÉ (préparation et identification des limites).** La comparaison desktop est **réservée au lot 3**. On ne peut pas cocher les critères R16-04, R16-14, QA-02 ni les critères locaux correspondants comme conformes sur la base de ces deux livrables.
+**Décision : LOT 1 TERMINÉ (préparation et identification des limites).** La comparaison desktop est **réservée au lot 3**. On ne peut pas cocher les critères `R16‑04`, `R16‑14`, `QA‑02` ni les critères locaux correspondants comme conformes sur la base de ces deux livrables.
 
 **Ce référentiel est versionné dans le dépôt avec la matrice de traçabilité, dans le cadre de la PR #42**. Il sera actualisé au fil des validations de l'issue #23.

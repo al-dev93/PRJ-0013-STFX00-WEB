@@ -2,7 +2,8 @@
 
 **Issue pilote :** [#23 — Validate the responsive version and fix regressions](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/issues/23)
 **Campagne :** Lot 3 — Validation transversale
-**Statut :** En cours — premier scénario validé à 320 px (`L3-RG-01`) ; campagne globale non terminée
+**Statut :** En cours — 6/6 scénarios aux largeurs nominales validés (`L3‑RG‑01`, `L3‑RG‑02`, 
+`L3‑RG‑03`, `L3‑RG‑04`, `L3‑RG‑05` et `L3‑RG‑06`) ; campagne globale non terminée
 **Démarrage :** 6 novembre 2026
 **Branche documentaire :** `docs/23-responsive-qa-lot3`
 **Version applicative testée (SHA complet) :** [2099697](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/commit/209969704bbad0c6819376e3c75fd8553cc2cd0d)
@@ -39,11 +40,11 @@ Un nouvel environnement est enregistré lorsqu'une modification significative es
 
 Les dimensions du viewport et le DPR ne constituent pas, à eux seuls, des environnements distincts.
 
-#### ENV-01 — Poste de développement principal
+#### ENV‑01 — Poste de développement principal
 
 | Paramètre                           | Valeur                                                                           |
 | ----------------------------------- | -------------------------------------------------------------------------------- |
-| Identifiant                         | `ENV-01`                                                                         |
+| Identifiant                         | `ENV‑01`                                                                         |
 | Système d'exploitation              | Fedora KDE Plasma — 6.7.5 (version déclarée, à préciser si nécessaire)           |
 | Navigateur                          | Mozilla Firefox 159.0 — 64 bits                                                  |
 | Lecteur d'écran                     | Orca 49.7                                                                        |
@@ -58,7 +59,7 @@ Les dimensions du viewport et le DPR ne constituent pas, à eux seuls, des envir
 | Contraste forcé                     | Désactivé (`forced-colors: active` = `false`)                                    |
 | Remarques                           | Environnement de référence pour les tests responsive et d'accessibilité du lot 3 |
 
-La configuration matérielle et les versions logicielles doivent être actualisées lorsqu'elles changent. Une nouvelle ligne ou sous-section `ENV-02`, `ENV-03`, etc., sera créée uniquement si nécessaire.
+La configuration matérielle et les versions logicielles doivent être actualisées lorsqu'elles changent. Une nouvelle ligne ou sous-section `ENV‑02`, `ENV‑03`, etc., sera créée uniquement si nécessaire.
 
 **Important :** la source des données réellement utilisée doit être confirmée à partir de la configuration du frontend ou des requêtes réseau. L'existence du backend Hetzner ne suffit pas à démontrer que chaque test l'utilise.
 
@@ -70,11 +71,12 @@ Une nouvelle session est créée lorsqu'une campagne de tests reprend à une aut
 
 Le SHA enregistré correspond à la **version applicative réellement testée**. Un commit modifiant exclusivement la documentation QA ne nécessite pas, à lui seul, de modifier cette référence.
 
-| Session  | Date / heure         | Environnement | SHA applicatif testé                       | Périmètre                             | État                        |
-| -------- | -------------------- | ------------- | ------------------------------------------ | ------------------------------------- | --------------------------- |
-| `L3-S01` | 06/11/2026<br> — 16h | `ENV-01`      | `209969704bbad0c6819376e3c75fd8553cc2cd0d` | Préparation ; R16-01 et R16-02 prévus | En  cours — `L3-RG-01` PASS |
+| Session  | Date / heure                       | Environ-nement | SHA applicatif testé                       | Périmètre                                                       | État                                                                 |
+| -------- | ---------------------------------- | -------------- | ------------------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `L3‑S01` | 06/11/2026<br> — 16h               | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d` | `R16‑01`<br>et `R16‑02` <br>à 320px                             | `L3‑RG‑01` — `PASS`                                                  |
+| `L3‑S02` | 06/11/2026 — 23h → 07/11/2026 — 2h | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d` | `R16‑01` <br>et `R16‑02` <br>à <br>390, 768, 1024,1280, 1440 px | `L3‑RG‑02`, `L3‑RG‑03`, `L3‑RG‑04`, `L3‑RG‑05`, `L3‑RG‑06`  — `PASS` |
 
-#### Notes de la session L3-S01
+#### Notes de la session L3‑S01
 
 - **Branche de travail documentaire :** `docs/23-responsive-qa-lot3`.
 
@@ -88,7 +90,12 @@ Le SHA enregistré correspond à la **version applicative réellement testée**.
 
 - **Backend :** Supabase auto-hébergé sur Hetzner ; connexion effective à confirmer.
 
-- **Résultats :** `L3-RG-01` conforme à 320 px : R16-01 et R16-02 satisfaits pour cette largeur.
+- **Résultats :** `L3‑RG‑01` conforme à 320 px : `R16‑01` et `R16‑02` satisfaits pour cette largeur.
+
+#### Notes de la session L3‑S02
+
+- **Résultats :** `L3‑RG‑02` conforme à 390 px, `L3‑RG‑03` conforme à 768 px, `L3‑RG‑04` conforme à 1024 px, `L3‑RG‑05` conforme à 1280 px, `L3‑RG‑06` conforme à 1440 px : `R16‑01` et `R16‑02` satisfaits pour ces largeurs.
+
 
 Les notes de session servent à documenter les circonstances particulières d'exécution, les changements de configuration et les difficultés rencontrées.
 
@@ -98,16 +105,21 @@ Elles ne remplacent pas les résultats détaillés des tests.
 
 Les configurations d'exécution documentent les paramètres susceptibles de varier au sein d'une même session.
 
-Chaque configuration reçoit un identifiant unique `CFG-XX`.
+Chaque configuration reçoit un identifiant unique `CFG‑XX`.
 
 Les dimensions du viewport sont exprimées en pixels CSS. Le DPR correspond à la valeur retournée par `window.devicePixelRatio`.
 
 | Configuration | Session  | Viewport (L × H) | DPR    | Zoom | Police racine | Particularités                                              |
 | ------------- | -------- | ---------------- | ------ | ---- | ------------- | ----------------------------------------------------------- |
-| `CFG-01`      | `L3-S01` | 2111 × 692 px    | 1.8182 | 100% | 16px          | Firefox desktop ; mesure initiale hors émulation responsive |
-| `CFG-02`      | `L3-S01` | 320 x 800px      | 3      | 100% | 16px          | Firefox responsive Design Mode                              |
+| `CFG‑01`      | `L3‑S01` | 2111 ×  692 px   | 1.8182 | 100% | 16px          | Firefox desktop ; mesure initiale hors émulation responsive |
+| `CFG‑02`      | `L3‑S01` | 320 x 800 px     | 3      | 100% | 16px          | Firefox responsive Design Mode                              |
+| `CFG‑03`      | `L3‑S02` | 390 x 800 px     | 3      | 100% | 16px          | Firefox responsive Design Mode                              |
+| `CFG‑04`      | `L3‑S02` | 768 x 800 px     | 3      | 100% | 16px          | Firefox responsive Design Mode                              |
+| `CFG‑05`      | `L3‑S02` | 1024 x 800 px    | 3      | 100% | 16px          | Firefox responsive Design Mode                              |
+| `CFG‑06`      | `L3‑S02` | 1280 x 800 px    | 3      | 100% | 16px          | Firefox responsive Design Mode                              |
+| `CFG‑07`      | `L3‑S02` | 1440 x 800 px    | 3      | 100% | 16px          | Firefox responsive Design Mode                              |
 
-**Mesures complémentaires de CFG-01 :**
+**Mesures complémentaires de `CFG‑01` :**
 
 - Viewport de mise en page : `2111 × 692` px CSS.
 - Viewport visuel : `2111.45 × 691.90` px CSS (valeurs arrondies).
@@ -116,13 +128,13 @@ Les dimensions du viewport sont exprimées en pixels CSS. Le DPR correspond à l
 
 Une configuration supplémentaire est créée lorsqu'un changement pertinent intervient : largeur ou hauteur du viewport, DPR, zoom, taille de police racine, thème, réduction des animations ou contraste forcé.
 
-Il n'est pas nécessaire de dupliquer toutes les informations de l'environnement `ENV-01` dans chaque configuration.
+Il n'est pas nécessaire de dupliquer toutes les informations de l'environnement `ENV‑01` dans chaque configuration.
 
-Les tests peuvent référencer directement les identifiants `L3-S01` et `CFG-01`.
+Les tests peuvent référencer directement les identifiants `L3‑S01` et `CFG‑01`.
 
 #### Conditions d'affichage complémentaires
 
-Les paramètres ci-dessous ont été relevés pour la configuration `CFG-01`.
+Les paramètres ci-dessous ont été relevés pour la configuration `CFG‑01`.
 
 | Paramètre                    | Valeur                                                                                        |
 | ---------------------------- | --------------------------------------------------------------------------------------------- |
@@ -209,6 +221,20 @@ Pour chaque groupe de tests :
 
 Les tests peuvent couvrir plusieurs critères simultanément, à condition que les résultats soient explicitement traçables.
 
+#### Convention de nommage des identifiants
+
+Afin de garantir une présentation homogène et d'empêcher les retours à la ligne à l'intérieur des identifiants documentaires, **Tous les identifiants propres au référentiel QA utilisent le trait d'union insécable Unicode (`U+2011`).**
+
+Cette convention s'applique notamment aux identifiants de critères d'acceptation (`R16‑01`, `HDR‑01`, `QA‑01`), de scénarios de test (`L3‑RG‑01`, `L3‑BP‑01`), de sessions (`L3‑S01`), de configurations d'exécution (`CFG‑01`) et de références historiques (`DESK‑01`).
+
+Elle est appliquée de manière uniforme dans les trois documents de référence de l'issue #23 : `acceptance-traceability.md`, `desktop-regression-baseline.md` et `validation-report.md`.
+
+**Cette convention concerne exclusivement les identifiants documentaires.** Les tirets ASCII (`U+002D`) sont conservés lorsqu'ils font partie de la syntaxe Markdown, de chemins de fichiers, de noms de branches Git, de commandes, de propriétés CSS, d'attributs HTML ou de références techniques externes.
+
+Les identifiants utilisant `U+2011` constituent la forme de référence dans la documentation QA. Toute automatisation future exploitant ces identifiants devra prendre en charge ce caractère ou effectuer une normalisation explicite avant les comparaisons.
+
+Cette convention n'affecte ni les identifiants GitHub des issues et des PR, ni les critères d'acceptation originaux.
+
 #### Statuts des résultats
 
 | Statut           | Signification                                                                 |
@@ -222,7 +248,7 @@ Les tests peuvent couvrir plusieurs critères simultanément, à condition que l
 
 Un contrôle non exécuté ne peut jamais être déclaré `PASS`.
 
-Une anomalie constatée doit être documentée et soit corrigée, soit associée à une issue de suivi explicitement justifiée, conformément à QA-06.
+Une anomalie constatée doit être documentée et soit corrigée, soit associée à une issue de suivi explicitement justifiée, conformément à `QA‑06`.
 
 #### Traçabilité des preuves
 
@@ -276,7 +302,7 @@ Les nouvelles PR correctives documentent les tests associés à leurs propres mo
 
 Le bilan global de la campagne est publié dans l'issue #23 avant toute décision de clôture.
 
-## 2. Responsive global — R16-01 / R16-02
+## 2. Responsive global — R16‑01 / R16‑02
 
 **Objectif :** vérifier l'absence de débordement horizontal du document, de troncature et de chevauchement à chaque largeur nominale, sur tout le parcours de la page.
 
@@ -293,29 +319,29 @@ Pour relever le débordement global dans la console :
 });
 ```
 
-| Test       | Largeur (CSS px) | Session  | R16-01 —Overflow global | R16-02 — Intégrité visuelle   | Verdict    | Preuve / remarque                                                               |
-| ---------- | ---------------: | -------- | ----------------------- | ----------------------------- | ---------- | ------------------------------------------------------------------------------- |
-| `L3-RG-01` |              320 | `L3-S01` | `PASS` — 0 px<br>       | `PASS` — aucun défaut observé | `PASS`     | `CFG-02`;<br>scrollWidth=320, clientWidth=320 ;<br>inspection visuelle complète |
-| `L3-RG-02` |              390 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
-| `L3-RG-03` |              768 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
-| `L3-RG-04` |             1024 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
-| `L3-RG-05` |             1280 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
-| `L3-RG-06` |             1440 | —        | Non mesuré              | Non inspecté                  | NOT TESTED | —                                                                               |
+| Test       | Largeur (CSS px) | Session  | R16‑01 —Overflow global | R16‑02 — Intégrité visuelle   | Verdict | Preuve / remarque                                                                 |
+| ---------- | ---------------: | -------- | ----------------------- | ----------------------------- | ------- | --------------------------------------------------------------------------------- |
+| `L3‑RG‑01` |              320 | `L3‑S01` | `PASS` — 0 px<br>       | `PASS` — aucun défaut observé | `PASS`  | `CFG‑02`;<br>scrollWidth=320, clientWidth=320 ;<br>inspection visuelle complète   |
+| `L3‑RG‑02` |              390 | `L3‑S02` | `PASS` — 0 px<br>       | `PASS` — aucun défaut observé | `PASS`  | `CFG‑03`;<br>scrollWidth=390, clientWidth=390 ;<br>inspection visuelle complète   |
+| `L3‑RG‑03` |              768 | `L3‑S02` | `PASS` — 0 px           | `PASS` — aucun défaut observé | `PASS`  | `CFG‑04`;<br>scrollWidth=768, clientWidth=768 ;<br>inspection visuelle complète   |
+| `L3‑RG‑04` |             1024 | `L3‑S02` | `PASS` — 0 px           | `PASS` — aucun défaut observé | `PASS`  | `CFG‑05`;<br>scrollWidth=1024, clientWidth=1024 ;<br>inspection visuelle complète |
+| `L3‑RG‑05` |             1280 | `L3‑S02` | `PASS` — 0 px           | `PASS` — aucun défaut observé | `PASS`  | `CFG‑06`;<br>scrollWidth=1280, clientWidth=1280 ;<br>inspection visuelle complète |
+| `L3‑RG‑06` |             1440 | `L3‑S02` | `PASS` — 0 px           | `PASS` — aucun défaut observé | `PASS`  | `CFG‑07`;<br>scrollWidth=1440, clientWidth=1440 ;<br>inspection visuelle complète |
 
 > Une mesure globale sans débordement n'exclut pas un contenu tronqué dans un conteneur à `overflow: hidden`, ni un recouvrement entre composants : vérifier les deux aspects séparément.
 
-## 3. Transitions et limites de largeur — R16 / QA-04
+## 3. Transitions et limites de largeur — R16 / QA‑04
 
 Les seuils ci-dessous sont ceux identifiés dans la matrice. Vérifier les conditions effectives (`max-width` / `min-width`, taille racine) avant de conclure à un défaut de transition.
 
 | Test       | Largeurs (CSS px)           | Zone / comportement                            | Session | Verdict    | Preuve / remarque |
 | ---------- | --------------------------- | ---------------------------------------------- | ------- | ---------- | ----------------- |
-| `L3-BP-01` | 511 / 512 / 513             | Navigation sociale mobile / desktop            | —       | NOT TESTED | —                 |
-| `L3-BP-02` | 623 / 624 / 625             | Principales Réalisations : galerie / diaporama | —       | NOT TESTED | —                 |
-| `L3-BP-03` | 767 / 768 / 769             | Footer et disposition / navigation             | —       | NOT TESTED | —                 |
-| `L3-BP-04` | 991 / 992 / 993             | Transitions des grilles desktop                | —       | NOT TESTED | —                 |
-| `L3-BP-05` | 219–221 ; 299–301 ; 303–305 | Présentation : robustesse sous 320 px (#37)    | —       | NOT TESTED | —                 |
-| `L3-BP-06` | 319–321 ; 351–353 ; 415–417 | Présentation : transitions des cartes (#37)    | —       | NOT TESTED | —                 |
+| `L3‑BP‑01` | 511 / 512 / 513             | Navigation sociale mobile / desktop            | —       | NOT TESTED | —                 |
+| `L3‑BP‑02` | 623 / 624 / 625             | Principales Réalisations : galerie / diaporama | —       | NOT TESTED | —                 |
+| `L3‑BP‑03` | 767 / 768 / 769             | Footer et disposition / navigation             | —       | NOT TESTED | —                 |
+| `L3‑BP‑04` | 991 / 992 / 993             | Transitions des grilles desktop                | —       | NOT TESTED | —                 |
+| `L3‑BP‑05` | 219–221 ; 299–301 ; 303–305 | Présentation : robustesse sous 320 px (#37)    | —       | NOT TESTED | —                 |
+| `L3‑BP‑06` | 319–321 ; 351–353 ; 415–417 | Présentation : transitions des cartes (#37)    | —       | NOT TESTED | —                 |
 
 **Limite :** les essais sous 320 px concernent uniquement la robustesse défensive prévue par #37 ; ils ne changent pas la largeur minimale officiellement prise en charge.
 
@@ -323,21 +349,21 @@ Les seuils ci-dessous sont ceux identifiés dans la matrice. Vérifier les condi
 
 Compléter les lignes lors des sessions dédiées. Les identifiants détaillés sont dans la matrice ; cette table suit uniquement l'avancement par domaine, sans prétendre qu'une issue d'implémentation clôturée vaut une revalidation.
 
-| Issue | Critères matriciels | Domaine                                       | Session(s) | État de la revalidation | Référence des résultats |
-| ----- | ------------------- | --------------------------------------------- | ---------- | ----------------------- | ----------------------- |
-| #16   | `R16-*`             | Exigences globales                            | `L3-S01`   | `WIP`                   | §2, §3, §5–7            |
-| #17   | `FND-*`             | Fondations responsive / gouttières            | —          | NOT TESTED              | —                       |
-| #18   | `HDR-*`             | En-tête, transparence et navigation           | —          | NOT TESTED              | —                       |
-| #19   | `SOC-*`             | Navigation sociale, footer et point d'ancrage | —          | NOT TESTED              | —                       |
-| #20   | `HRO-*`             | Hero                                          | —          | NOT TESTED              | —                       |
-| #21   | `SEC-*`             | Intégration des sections validées             | —          | NOT TESTED              | —                       |
-| #22   | `FRM-*`             | Modale et formulaire de contact               | —          | NOT TESTED              | —                       |
-| #24   | `PRS-*`             | Présentation                                  | —          | NOT TESTED              | —                       |
-| #25   | `FPR-*`             | Principales Réalisations                      | —          | NOT TESTED              | —                       |
-| #26   | `OPR-*`             | Autres Réalisations                           | —          | NOT TESTED              | —                       |
-| #31   | `FTR-*`             | Footer                                        | —          | NOT TESTED              | —                       |
-| #37   | `POV-*`             | Débordements / robustesse étroite             | —          | NOT TESTED              | §3                      |
-| #23   | `QA-*`              | Bilan transversal                             | —          | En cours                | §2–9                    |
+| Issue | Critères matriciels | Domaine                                       | Session(s)         | État de la revalidation                                                            | Référence des résultats |
+| ----- | ------------------- | --------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------- | ----------------------- |
+| #16   | `R16‑*`             | Exigences globales                            | `L3‑S01`, `L3‑S02` | `WIP` — `R16‑01/R16‑02` :<br>6/6 largeurs  conformes ; autres contrôles à réaliser | §2, §3, §5–7            |
+| #17   | `FND‑*`             | Fondations responsive / gouttières            | —                  | NOT TESTED                                                                         | —                       |
+| #18   | `HDR‑*`             | En-tête, transparence et navigation           | —                  | NOT TESTED                                                                         | —                       |
+| #19   | `SOC‑*`             | Navigation sociale, footer et point d'ancrage | —                  | NOT TESTED                                                                         | —                       |
+| #20   | `HRO‑*`             | Hero                                          | —                  | NOT TESTED                                                                         | —                       |
+| #21   | `SEC‑*`             | Intégration des sections validées             | —                  | NOT TESTED                                                                         | —                       |
+| #22   | `FRM‑*`             | Modale et formulaire de contact               | —                  | NOT TESTED                                                                         | —                       |
+| #24   | `PRS‑*`             | Présentation                                  | —                  | NOT TESTED                                                                         | —                       |
+| #25   | `FPR‑*`             | Principales Réalisations                      | —                  | NOT TESTED                                                                         | —                       |
+| #26   | `OPR‑*`             | Autres Réalisations                           | —                  | NOT TESTED                                                                         | —                       |
+| #31   | `FTR‑*`             | Footer                                        | —                  | NOT TESTED                                                                         | —                       |
+| #37   | `POV‑*`             | Débordements / robustesse étroite             | —                  | NOT TESTED                                                                         | §3                      |
+| #23   | `QA‑*`              | Bilan transversal                             | —                  | En cours                                                                           | §2–9                    |
 
 ### 4.1. Résultats détaillés par session
 
@@ -351,35 +377,35 @@ Ajouter un tableau par série de tests sans dupliquer les textes originaux des c
 
 | Test         | Scénario                                                                                | Session | Verdict    | Preuve / remarque               |
 | ------------ | --------------------------------------------------------------------------------------- | ------- | ---------- | ------------------------------- |
-| `L3-A11Y-01` | Parcours clavier Hero → contact → footer ; ordre de tabulation et focus visible         | —       | NOT TESTED | —                               |
-| `L3-A11Y-02` | Orca : titres, régions, noms accessibles, ressources et formulaire                      | —       | NOT TESTED | —                               |
-| `L3-A11Y-03` | Ouverture/fermeture du dialogue ; focus initial, confinement et restitution             | —       | NOT TESTED | —                               |
-| `L3-A11Y-04` | Validation du formulaire ; annonces d'erreur, consentement, soumission                  | —       | NOT TESTED | —                               |
-| `L3-A11Y-05` | Hauteur contrainte et clavier virtuel mobile : champs, erreurs et actions atteignables  | —       | NOT TESTED | —                               |
-| `L3-A11Y-06` | `prefers-reduced-motion`, contrastes pertinents et visibilité du focus                  | —       | NOT TESTED | —                               |
-| `L3-A11Y-07` | Retour depuis les ressources externes, clavier et pointeur (revalidation si nécessaire) | —       | NOT TESTED | Validation initiale dans PR #43 |
+| `L3‑A11Y‑01` | Parcours clavier Hero → contact → footer ; ordre de tabulation et focus visible         | —       | NOT TESTED | —                               |
+| `L3‑A11Y‑02` | Orca : titres, régions, noms accessibles, ressources et formulaire                      | —       | NOT TESTED | —                               |
+| `L3‑A11Y‑03` | Ouverture/fermeture du dialogue ; focus initial, confinement et restitution             | —       | NOT TESTED | —                               |
+| `L3‑A11Y‑04` | Validation du formulaire ; annonces d'erreur, consentement, soumission                  | —       | NOT TESTED | —                               |
+| `L3‑A11Y‑05` | Hauteur contrainte et clavier virtuel mobile : champs, erreurs et actions atteignables  | —       | NOT TESTED | —                               |
+| `L3‑A11Y‑06` | `prefers-reduced-motion`, contrastes pertinents et visibilité du focus                  | —       | NOT TESTED | —                               |
+| `L3‑A11Y‑07` | Retour depuis les ressources externes, clavier et pointeur (revalidation si nécessaire) | —       | NOT TESTED | Validation initiale dans PR #43 |
 
-## 6. Non-régression desktop — QA-02 / DESK-01 à DESK-03
+## 6. Non-régression desktop — QA‑02 / DESK‑01 à DESK‑03
 
 Se reporter au [protocole desktop](./desktop-regression-baseline.md), notamment au tableau des preuves à remplir pour 1024, 1280 et 1440 px CSS.
 
 | Référence | Section                  | État        | Justification / preuve                                                |
 | --------- | ------------------------ | ----------- | --------------------------------------------------------------------- |
-| `DESK-01` | Présentation             | NON VÉRIFIÉ | Référence historique visuelle absente ; captures actuelles à produire |
-| `DESK-02` | Principales Réalisations | NON VÉRIFIÉ | Référence historique visuelle absente ; captures actuelles à produire |
-| `DESK-03` | Autres Réalisations      | NON VÉRIFIÉ | Référence historique visuelle absente ; captures actuelles à produire |
+| `DESK‑01` | Présentation             | NON VÉRIFIÉ | Référence historique visuelle absente ; captures actuelles à produire |
+| `DESK‑02` | Principales Réalisations | NON VÉRIFIÉ | Référence historique visuelle absente ; captures actuelles à produire |
+| `DESK‑03` | Autres Réalisations      | NON VÉRIFIÉ | Référence historique visuelle absente ; captures actuelles à produire |
 
 Les SHA historiques identifiés dans le référentiel sont des candidats techniques, **pas** des captures du rendu approuvé. Ne pas déclarer `PASS` pour une comparaison historique faute de BASE réellement comparable. Distinguer clairement « fonctionnement actuel conforme » et « identité visuelle historique démontrée ».
 
-## 7. Confidentialité du formulaire — QA-09
+## 7. Confidentialité du formulaire — QA‑09
 
 **Issue de suivi fonctionnel :** [#41](https://github.com/al-dev93/PRJ-0013-STFX00-WEB/issues/41).
 
 | Test         | Contrôle                                                                                            | Session | Verdict    | Observations / référence |
 | ------------ | --------------------------------------------------------------------------------------------------- | ------- | ---------- | ------------------------ |
-| `L3-PRIV-01` | Examiner la notice et la distinction entre traitement nécessaire et consentements facultatifs       | —       | NOT TESTED | —                        |
-| `L3-PRIV-02` | Vérifier la possibilité de soumettre une demande légitime sans consentement facultatif sans rapport | —       | NOT TESTED | —                        |
-| `L3-PRIV-03` | Documenter tout écart et le suivre dans #41 sans étendre le correctif au lot 3                      | —       | NOT TESTED | —                        |
+| `L3‑PRIV‑01` | Examiner la notice et la distinction entre traitement nécessaire et consentements facultatifs       | —       | NOT TESTED | —                        |
+| `L3‑PRIV‑02` | Vérifier la possibilité de soumettre une demande légitime sans consentement facultatif sans rapport | —       | NOT TESTED | —                        |
+| `L3‑PRIV‑03` | Documenter tout écart et le suivre dans #41 sans étendre le correctif au lot 3                      | —       | NOT TESTED | —                        |
 
 ## 8. Registre des anomalies et décisions
 
@@ -387,7 +413,7 @@ Les SHA historiques identifiés dans le référentiel sont des candidats techniq
 | --- | ----------------------- | ------------------------------------------- | ------- | --------------------- | ---------------------- |
 | —   | —                       | Aucune anomalie du lot 3 encore enregistrée | —       | —                     | —                      |
 
-Les corrections des anciens lots restent traçables dans leurs PR. Les nouveaux défauts sont corrigés dans des PR ciblées ou font l'objet d'une issue avec justification explicite du report (QA-06).
+Les corrections des anciens lots restent traçables dans leurs PR. Les nouveaux défauts sont corrigés dans des PR ciblées ou font l'objet d'une issue avec justification explicite du report (`QA‑06`).
 
 ## 9. Bilan de couverture et décision de sortie
 
@@ -398,7 +424,7 @@ Les corrections des anciens lots restent traçables dans leurs PR. Les nouveaux 
 | Contrôles aux seuils et conditions particulières                    | NON          |
 | Contrôles clavier, Orca, formulaire et contraintes de hauteur       | NON          |
 | Comparaisons desktop historiques démontrées ou réserves formalisées | NON          |
-| Revue de consentement QA-09 / suivi #41                             | NON          |
+| Revue de consentement `QA‑09` / suivi #41                           | NON          |
 | Anomalies corrigées ou reportées avec justification                 | NON          |
 
 **Décision :** lot 3 non terminé. Aucun résultat n'est présumé conforme avant exécution. La clôture de #23 sera examinée après les lots 3 et 4 et après traitement explicite des réserves.
