@@ -360,7 +360,7 @@ La clôture d'une issue d'implémentation ne constitue pas, à elle seule, une v
 
 **Périmètre :** `QA‑04` — Contrôles aux frontières des breakpoints.
 
-**Session :** `L3‑S03`.
+**Session :** `L3‑S03`, `L3‑S04` et `L3‑S05`.
 
 **Preuves :** [Rapport de validation responsive](./validation-report.md), §3 et annexe A.
 
