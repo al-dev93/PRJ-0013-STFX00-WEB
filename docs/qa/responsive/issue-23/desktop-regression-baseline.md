@@ -2,7 +2,7 @@
 
 ## Référentiel de non-régression desktop — v3 (FR)
 
-**Livrable :** 2/2 · **Date :** 3 novembre 2026 · **Statut :** **référentiel technique documenté — lot 1 terminé / comparaison visuelle non réalisée**.
+**Livrable :** 2/2 · **Date :** 3 novembre 2026 · **Dernière actualisation QA :** 10 novembre 2026 — `L3‑FND‑02` (lot 3) · **Statut :** **référentiel technique documenté — lot 1 terminé / comparaison visuelle non réalisée**.
 **Sources :** GitHub issues #16/#21/#23/#24/#25/#26/#31/#37, PR #33/#34/#35, commits de fusion et premiers parents vérifiés ; analyse statique de l’archive `PRJ-0013-STFX00-WEB-main(8).zip`.
 
 > **Important :** « référentiel documenté » ne signifie pas « absence de régression démontrée ». Les trois états historiques sont retrouvés comme commits Git, mais aucune comparaison d’images réalisée dans des conditions comparables ne permet d’affirmer que le design desktop est inchangé. L’ancienne application n’a pas été reproduite avec succès. Le volet historique du critère `QA‑02` de #23 est toujours **en attente de preuve**.
@@ -129,19 +129,28 @@ L'interaction à la souris ou au clavier et l'absence de scroll horizontal deman
 
 ### Tableau de preuves à remplir
 
-| ID        | Largeur (px CSS) | Capture BASE | Capture CURRENT | Différence / commentaire | Verdict   |
-| --------- | ---------------: | ------------ | --------------- | ------------------------ | --------- |
-| `DESK‑01` |             1024 | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑01` |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑01` |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑02` |             1024 | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑02` |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑02` |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑03` |             1024 | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑03` |         **1280** | À fournir    | À produire      | À analyser               | Non testé |
-| `DESK‑03` |         **1440** | À fournir    | À produire      | À analyser               | Non testé |
+| ID        | Largeur (px CSS) | Capture BASE | Capture CURRENT                                                                      | Différence / commentaire                                                                                      | Verdict        |
+| --------- | ---------------: | ------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | -------------- |
+| `DESK‑01` |             1024 | Absente      | [Présentation](./evidence/L3-FND-02_CFG-05_presentation-1024px.png)                  | Rendu actuel : alignement et disposition conformes ; comparaison historique impossible                        | Non vérifiable |
+| `DESK‑01` |         **1280** | Absente      | [Présentation](./evidence/L3-FND-02_CFG-06_presentation-1280px.png)                  | Rendu actuel : deux colonnes équilibrées, gouttières cohérentes ; comparaison historique impossible           | Non vérifiable |
+| `DESK‑01` |         **1440** | Absente      | [Présentation](./evidence/L3-FND-02_CFG-07_presentation-1440px.png)                  | Rendu actuel : contenu centré, largeur et alignement conformes ; comparaison historique impossible            | Non vérifiable |
+| `DESK‑02` |             1024 | Absente      | [Principales Réalisations](./evidence/L3-FND-02_CFG-05_featured-projects-1024px.png) | Rendu actuel : diaporama correctement positionné ; comparaison historique impossible                          | Non vérifiable |
+| `DESK‑02` |         **1280** | Absente      | [Principales Réalisations](./evidence/L3-FND-02_CFG-06_featured-projects-1280px.png) | Rendu actuel : alignement conforme ; recadrage Kasa constaté (`L3‑DEF‑05`). Comparaison historique impossible | Non vérifiable |
+| `DESK‑02` |         **1440** | Absente      | [Principales Réalisations](./evidence/L3-FND-02_CFG-07_featured-projects-1440px.png) | Rendu actuel : alignement conforme ; recadrage Kasa confirmé (`L3‑DEF‑05`). Comparaison historique impossible | Non vérifiable |
+| `DESK‑03` |             1024 | Absente      | [Autres Réalisations](./evidence/L3-FND-02_CFG-05_other-projects-1024px.png)         | Rendu actuel : grille à trois colonnes correctement alignée ; comparaison historique impossible               | Non vérifiable |
+| `DESK‑03` |         **1280** | Absente      | [Autres Réalisations](./evidence/L3-FND-02_CFG-06_other-projects-1280px.png)         | Rendu actuel : grille régulière, espacements cohérents ; comparaison historique impossible                    | Non vérifiable |
+| `DESK‑03` |         **1440** | Absente      | [Autres Réalisations](./evidence/L3-FND-02_CFG-07_other-projects-1440px.png)         | Rendu actuel : alignement et centrage conformes ; comparaison historique impossible                           | Non vérifiable |
 
 **Verdicts admis :** `Conforme`, `Régression confirmée`, `Non comparable` (conditions différentes), `Non vérifiable` (BASE absent), `Non testé`. Chaque régression doit être corrigée ou associée à une issue dédiée avec justification, conformément à #23.
+
+
+**État de la revalidation — `L3-FND-02` (`L3-S06`) :**
+
+Les neuf captures CURRENT ont été examinées à 1024, 1280 et 1440 px CSS (`CFG-05/06/07`). Les mesures et inspections visuelles confirment la cohérence géométrique du rendu actuel, sans débordement horizontal global.
+
+L'anomalie visuelle `L3-DEF-05` (recadrage de l'aperçu Kasa) a été identifiée à 1280 et 1440 px. Une correction CSS a été validée localement, mais reste en attente d'intégration. Les captures référencées documentent le rendu avant cette correction.
+
+Aucune capture BASE historiquement approuvée et comparable n'étant disponible, la non-régression visuelle historique demeure **non vérifiable** pour `DESK-01`, `DESK-02` et `DESK-03`. Le critère `QA-02` reste ouvert.
 
 ---
 
@@ -167,5 +176,7 @@ Ces vérifications sont à coordonner avec le lot 3 plutôt qu'à remplacer par 
 **Dossier de preuves attendu au lot 3 :** captures actuelles 1280/1440 px (1024 complémentaire), rapport de contrôle CSS et d’interactions, comparaison des PR/diffs avec les premiers parents, éventuelles captures historiques retrouvées, justification explicite des écarts et de toute limite de preuve. Les références historiques pourront être reproduites **uniquement si cela reste proportionné** et si l’accès aux données peut être stabilisé sans travail imprévu majeur.
 
 **Décision : LOT 1 TERMINÉ (préparation et identification des limites).** La comparaison desktop est **réservée au lot 3**. On ne peut pas cocher les critères `R16‑04`, `R16‑14`, `QA‑02` ni les critères locaux correspondants comme conformes sur la base de ces deux livrables.
+
+**Actualisation du 10 novembre 2026** : les neuf captures CURRENT ont été produites et référencées en section 6. Elles ne permettent toujours pas de comparaison historique, faute de références BASE approuvées et comparables.
 
 **Ce référentiel est versionné dans le dépôt avec la matrice de traçabilité, dans le cadre de la PR #42**. Il sera actualisé au fil des validations de l'issue #23.
