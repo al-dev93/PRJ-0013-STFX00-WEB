@@ -148,7 +148,7 @@ L'interaction à la souris ou au clavier et l'absence de scroll horizontal deman
 
 Les neuf captures CURRENT ont été examinées à 1024, 1280 et 1440 px CSS (`CFG-05/06/07`). Les mesures et inspections visuelles confirment la cohérence géométrique du rendu actuel, sans débordement horizontal global.
 
-L'anomalie visuelle `L3-DEF-05` (recadrage de l'aperçu Kasa) a été identifiée à 1280 et 1440 px. Une correction CSS a été validée localement, mais reste en attente d'intégration. Les captures référencées documentent le rendu avant cette correction.
+L'anomalie visuelle `L3-DEF-05` (recadrage de l'aperçu Kasa), identifiée à 1280 et 1440 px, a été corrigée et intégrée dans `main` via la PR #46 (issue #45, commit `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33`). Les neuf captures CURRENT référencées documentent le rendu avant correction. Elles restent conservées comme preuves historiques de la session `L3‑S06`.
 
 Aucune capture BASE historiquement approuvée et comparable n'étant disponible, la non-régression visuelle historique demeure **non vérifiable** pour `DESK-01`, `DESK-02` et `DESK-03`. Le critère `QA-02` reste ouvert.
 
