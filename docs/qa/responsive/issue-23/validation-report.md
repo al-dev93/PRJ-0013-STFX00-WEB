@@ -10,7 +10,7 @@
 **Versions applicatives de référence :**
 
 - `209969704bbad0c6819376e3c75fd8553cc2cd0d` — sessions `L3‑S01` à `L3‑S06`.
-- `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33` — référence prévue pour `L3‑S07`, après intégration de la PR #46.
+- `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33` — sessions `L3‑S07` et `L3‑S08`, après intégration de la PR #46.
 
 Les SHA effectivement testés sont consignés dans le journal des sessions (§1.2).
 
@@ -78,16 +78,16 @@ Une nouvelle session est créée lorsqu'une campagne de tests reprend à une aut
 
 Le SHA enregistré correspond à la **version applicative réellement testée**. Un commit modifiant exclusivement la documentation QA ne nécessite pas, à lui seul, de modifier cette référence.
 
-| Session  | Date / heure                                     | Environ-nement | SHA applicatif testé                           | Périmètre                                                                                                                                                                                                                    | État                                                                                                                                                                                                                                                                                                       |
-| -------- | ------------------------------------------------ | -------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `L3‑S01` | 06/11/2026<br> — 16h                             | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `R16‑01`<br>et `R16‑02` <br>à 320px                                                                                                                                                                                          | `L3‑RG‑01` — `PASS`                                                                                                                                                                                                                                                                                        |
-| `L3‑S02` | 06/11/2026 — 23h → 07/11/2026 — 2h               | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `R16‑01` <br>et `R16‑02` <br>à 390, 768, 1024,1280, 1440 px                                                                                                                                                                  | `L3‑RG‑02`, `L3‑RG‑03`, `L3‑RG‑04`, `L3‑RG‑05`, `L3‑RG‑06`  — `PASS`                                                                                                                                                                                                                                       |
-| `L3‑S03` | 08/11/2026<br>— 22h30 → 09/11/2026 — 2h          | `ENV‑01`<br>   | `209969704bbad0c6819376e3c75fd8553cc2cd0d`<br> | `L3‑BP‑01`<br>à 511, 512, 513 px<br>et<br>`L3‑BP‑02`<br>à 623, 624, 625 px                                                                                                                                                   | `L3‑BP‑01` — `PASS`<br>`L3‑BP‑02` — `PASS` avec réserve visuelle (`L3‑DEF‑01`)                                                                                                                                                                                                                             |
-| `L3‑S04` | 09/11/2026 — 9h  → 14h15                         | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `L3‑BP‑03`<br>à 767, 768, 769 px<br>et<br>`L3‑BP‑04`<br>à 991, 992, 993 px<br>et <br>`L3‑BP‑05`<br> à 219, 220, 221,299, 300, 301, 303, 304 et 305 px                                                                        | `L3‑BP‑03` — `PASS`<br>`L3‑BP‑04` — `PASS`<br>`L3‑BP‑05` — `FAIL`<br>◦`L3‑DEF‑02`<br>219, 220, 221 px<br>◦`L3‑DEF‑03`<br>221 px<br>◦`L3‑DEF‑04`<br>304px                                                                                                                                                   |
-| `L3‑S05` | 09/11/2026 — 22h40  →<br>10/11/2026<br>— 2h      | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `L3‑BP‑06`                                                                                                                                                                                                                   | `L3‑BP‑06` — `PASS` ; 9/9 configurations conformes.                                                                                                                                                                                                                                                        |
-| `L3‑S06` | 10/11/2026<br>— 9h15<br>→ 15h                    | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `L3‑FND‑01` à 320, 390, 768, 1280 et 1440 px ; `L3‑FND‑02` à 1024, 1280 et 1440 px                                                                                                                                           | `L3‑FND‑01` — `PASS` ; `L3‑FND‑02` — `WIP` (rendu actuel conforme, comparaison historique non vérifiable) ; `L3‑DEF‑05` détectée                                                                                                                                                                           |
-| `L3‑S07` | 11/11/2026<br>— 23h<br>→<br>12/11/2026<br>— 2h45 | `ENV‑01`       | `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33`     | `L3‑FND‑03` — Inspection statique des tokens de layout, gouttières partagées et règles locales ; vérification des utilitaires CSS<br>`L3‑FND‑04` — Contrôle des débordements horizontaux en présence du défilement vertical. | `L3‑FND‑03` — `PASS` avec observation technique : référence --ref-lateral-pad non définie dans les CSS examinés ; aucun usage littéral simple des classes utilitaires concernées identifié.<br>`L3‑FND‑04` — `PASS` (6/6 largeurs nominales conformes et contrôle hors RDM avec scrollbar réservant 6 px). |
-| `L3‑S08` | 12/11/2026<br>— h<br>→<br>xx/xx/2026<br>— h      | `ENV‑01`       | `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33`     | `L3‑FND‑05` — Compatibilité des règles responsive locales avec la fondation globale ; contrôles géométriques et visuels à 320, 390, 768, 1024, 1280 et 1440 px                                                               | `L3‑FND‑05` — PASS ; 6/6 configurations conformes, aucun débordement horizontal global, aucune section mesurée hors viewport et cinq domaines visuellement conformes.                                                                                                                                      |
+| Session  | Date / heure                                     | Environ-nement | SHA applicatif testé                           | Périmètre                                                                                                                                                                                                                                                                                                                                                                                               | État                                                                                                                                                                                                                                                                                                       |
+| -------- | ------------------------------------------------ | -------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `L3‑S01` | 06/11/2026<br> — 16h                             | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `R16‑01`<br>et `R16‑02` <br>à 320px                                                                                                                                                                                                                                                                                                                                                                     | `L3‑RG‑01` — `PASS`                                                                                                                                                                                                                                                                                        |
+| `L3‑S02` | 06/11/2026 — 23h → 07/11/2026 — 2h               | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `R16‑01` <br>et `R16‑02` <br>à 390, 768, 1024,1280, 1440 px                                                                                                                                                                                                                                                                                                                                             | `L3‑RG‑02`, `L3‑RG‑03`, `L3‑RG‑04`, `L3‑RG‑05`, `L3‑RG‑06`  — `PASS`                                                                                                                                                                                                                                       |
+| `L3‑S03` | 08/11/2026<br>— 22h30 → 09/11/2026 — 2h          | `ENV‑01`<br>   | `209969704bbad0c6819376e3c75fd8553cc2cd0d`<br> | `L3‑BP‑01`<br>à 511, 512, 513 px<br>et<br>`L3‑BP‑02`<br>à 623, 624, 625 px                                                                                                                                                                                                                                                                                                                              | `L3‑BP‑01` — `PASS`<br>`L3‑BP‑02` — `PASS` avec réserve visuelle (`L3‑DEF‑01`)                                                                                                                                                                                                                             |
+| `L3‑S04` | 09/11/2026 — 9h  → 14h15                         | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `L3‑BP‑03`<br>à 767, 768, 769 px<br>et<br>`L3‑BP‑04`<br>à 991, 992, 993 px<br>et <br>`L3‑BP‑05`<br> à 219, 220, 221,299, 300, 301, 303, 304 et 305 px                                                                                                                                                                                                                                                   | `L3‑BP‑03` — `PASS`<br>`L3‑BP‑04` — `PASS`<br>`L3‑BP‑05` — `FAIL`<br>◦`L3‑DEF‑02`<br>219, 220, 221 px<br>◦`L3‑DEF‑03`<br>221 px<br>◦`L3‑DEF‑04`<br>304px                                                                                                                                                   |
+| `L3‑S05` | 09/11/2026 — 22h40  →<br>10/11/2026<br>— 2h      | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `L3‑BP‑06`                                                                                                                                                                                                                                                                                                                                                                                              | `L3‑BP‑06` — `PASS` ; 9/9 configurations conformes.                                                                                                                                                                                                                                                        |
+| `L3‑S06` | 10/11/2026<br>— 9h15<br>→ 15h                    | `ENV‑01`       | `209969704bbad0c6819376e3c75fd8553cc2cd0d`     | `L3‑FND‑01` à 320, 390, 768, 1280 et 1440 px ; `L3‑FND‑02` à 1024, 1280 et 1440 px                                                                                                                                                                                                                                                                                                                      | `L3‑FND‑01` — `PASS` ; `L3‑FND‑02` — `WIP` (rendu actuel conforme, comparaison historique non vérifiable) ; `L3‑DEF‑05` détectée                                                                                                                                                                           |
+| `L3‑S07` | 11/11/2026<br>— 23h<br>→<br>12/11/2026<br>— 2h45 | `ENV‑01`       | `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33`     | `L3‑FND‑03` — Inspection statique des tokens de layout, gouttières partagées et règles locales ; vérification des utilitaires CSS<br>`L3‑FND‑04` — Contrôle des débordements horizontaux en présence du défilement vertical.                                                                                                                                                                            | `L3‑FND‑03` — `PASS` avec observation technique : référence --ref-lateral-pad non définie dans les CSS examinés ; aucun usage littéral simple des classes utilitaires concernées identifié.<br>`L3‑FND‑04` — `PASS` (6/6 largeurs nominales conformes et contrôle hors RDM avec scrollbar réservant 6 px). |
+| `L3‑S08` | 12/11/2026<br>— 8h45<br>→16h10                   | `ENV‑01`       | `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33`     | `L3‑FND‑05` — Compatibilité des règles responsive locales avec la fondation globale, aux six largeurs nominales.<br>`L3‑HDR‑01` à `L3‑HDR‑04` — Validation du Header : états visuels, disposition responsive, navigation active, défilement, focus et interactions clavier/pointeur. Contrôles à 320, 390, 768, 1024, 1280 et 1440 px ; complément aux largeurs 479/480/481 px et avec mouvement réduit | `L3‑FND‑05` — `PASS` (6/6 configurations).<br>`L3‑HDR‑01` — `PASS`.<br>`L3‑HDR‑02` — `PASS`.<br>`L3‑HDR‑03` — `PASS`.<br>`L3‑HDR‑04` — `PASS`.<br>18/18 critères Header conformes sur le périmètre testé ; réserves méthodologiques consignées en §4.1.<br>                                                |
 
 #### Notes de la session L3‑S01
 
@@ -122,46 +122,50 @@ Chaque configuration reçoit un identifiant unique `CFG‑XX`.
 
 Les dimensions du viewport sont exprimées en pixels CSS. Le DPR correspond à la valeur retournée par `window.devicePixelRatio`.
 
-| Configuration | Session                                   | Viewport (L × H) | DPR    | Zoom | Police racine | Particularités                                                                                                                              |
-| ------------- | ----------------------------------------- | ---------------- | ------ | ---- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CFG‑01`      | `L3‑S01`                                  | 2111 ×  692 px   | 1.8182 | 100% | 16px          | Firefox desktop ; mesure initiale hors émulation responsive                                                                                 |
-| `CFG‑02`      | `L3‑S01`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 320 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑03`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 390 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑04`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 768 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑05`      | `L3‑S02`, `L3‑S06`, `L3‑S07`, `L3‑S08`    | 1024 x 800 px    | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑06`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 1280 x 800 px    | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑07`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 1440 x 800 px    | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑08`      | `L3‑S03`                                  | 511 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑09`      | `L3‑S03`                                  | 512 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑10`      | `L3‑S03`                                  | 513 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑11`      | `L3‑S03`                                  | 623 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑12`      | `L3‑S03`                                  | 624 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑13`      | `L3‑S03`                                  | 625 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑14`      | `L3‑S04`                                  | 767 x 800 px     | 3      | 100% | 16px<br>      | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑15`      | `L3‑S04`                                  | 768 x 800 px     | 3      | 100% | 16px<br>      | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑16`      | `L3‑S04`                                  | 769 x 800 px     | 3      | 100% | 16px<br>      | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑17`      | `L3‑S04`                                  | 991 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑18`      | `L3‑S04`                                  | 992 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑19`      | `L3‑S04`                                  | 993 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑20`      | `L3‑S04`                                  | 219 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑21`      | `L3‑S04`                                  | 220 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑22`      | `L3‑S04`                                  | 221 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑23`      | `L3‑S04`                                  | 299 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑24`      | `L3‑S04`                                  | 300 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑25`      | `L3‑S04`                                  | 301 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑26`      | `L3‑S04`                                  | 303 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑27`      | `L3‑S04`                                  | 304 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑28`      | `L3‑S04`                                  | 305 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑29`      | `L3‑S05`                                  | 319 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑30`      | `L3‑S05`                                  | 320 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑31`      | `L3‑S05`                                  | 321 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑32`      | `L3‑S05`                                  | 351 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑33`      | `L3‑S05`                                  | 352 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑34`      | `L3‑S05`                                  | 353 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑35`      | `L3‑S05`                                  | 415 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑36`      | `L3‑S05`                                  | 416 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑37`      | `L3‑S05`                                  | 417 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                    |
-| `CFG‑38`      | `L3‑S07`                                  | 1281 × 285 px    | 1.8182 | 100% | 16px          | Firefox hors RDM ; `widget.gtk.overlay-scrollbars.enabled = false` ; scrollbar verticale réservant 6 px ; absence de débordement horizontal |
+| Configuration | Session                                   | Viewport (L × H) | DPR    | Zoom | Police racine | Particularités                                                                                                                                                                                             |
+| ------------- | ----------------------------------------- | ---------------- | ------ | ---- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CFG‑01`      | `L3‑S01`                                  | 2111 ×  692 px   | 1.8182 | 100% | 16px          | Firefox desktop ; mesure initiale hors émulation responsive                                                                                                                                                |
+| `CFG‑02`      | `L3‑S01`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 320 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑03`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 390 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑04`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 768 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑05`      | `L3‑S02`, `L3‑S06`, `L3‑S07`, `L3‑S08`    | 1024 x 800 px    | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑06`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 1280 x 800 px    | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑07`      | `L3‑S02`,<br>`L3‑S06`, `L3‑S07`, `L3‑S08` | 1440 x 800 px    | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑08`      | `L3‑S03`                                  | 511 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑09`      | `L3‑S03`                                  | 512 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑10`      | `L3‑S03`                                  | 513 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑11`      | `L3‑S03`                                  | 623 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑12`      | `L3‑S03`                                  | 624 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑13`      | `L3‑S03`                                  | 625 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑14`      | `L3‑S04`                                  | 767 x 800 px     | 3      | 100% | 16px<br>      | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑15`      | `L3‑S04`                                  | 768 x 800 px     | 3      | 100% | 16px<br>      | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑16`      | `L3‑S04`                                  | 769 x 800 px     | 3      | 100% | 16px<br>      | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑17`      | `L3‑S04`                                  | 991 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑18`      | `L3‑S04`                                  | 992 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑19`      | `L3‑S04`                                  | 993 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑20`      | `L3‑S04`                                  | 219 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑21`      | `L3‑S04`                                  | 220 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑22`      | `L3‑S04`                                  | 221 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑23`      | `L3‑S04`                                  | 299 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑24`      | `L3‑S04`                                  | 300 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑25`      | `L3‑S04`                                  | 301 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑26`      | `L3‑S04`                                  | 303 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑27`      | `L3‑S04`                                  | 304 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑28`      | `L3‑S04`                                  | 305 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑29`      | `L3‑S05`                                  | 319 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑30`      | `L3‑S05`                                  | 320 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑31`      | `L3‑S05`                                  | 321 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑32`      | `L3‑S05`                                  | 351 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑33`      | `L3‑S05`                                  | 352 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑34`      | `L3‑S05`                                  | 353 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑35`      | `L3‑S05`                                  | 415 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑36`      | `L3‑S05`                                  | 416 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑37`      | `L3‑S05`                                  | 417 x 800 px     | 3      | 100% | 16px          | Firefox desktop — Responsive Design Mode                                                                                                                                                                   |
+| `CFG‑38`      | `L3‑S07`                                  | 1281 × 285 px    | 1.8182 | 100% | 16px          | Firefox hors RDM ; `widget.gtk.overlay-scrollbars.enabled = false` ; scrollbar verticale réservant 6 px ; absence de débordement horizontal                                                                |
+| `CFG‑39`      | `L3‑S08`                                  | 479 x 800 px     | 3      | 100% | 16px          | Firefox RDM ; contrôle du Header avant le breakpoint CSS de 480 px ; disposition en colonne                                                                                                                |
+| `CFG‑40`      | `L3‑S08`                                  | 480 x 800 px     | 3      | 100% | 16px          | Firefox RDM ; largeur géométrique effective d'environ 480,15 px ; media query `(max-width: 480px)` inactive ; disposition en ligne conforme à la largeur effective. Seuil exact de 480,00 px non reproduit |
+| `CFG‑41`      | `L3‑S08`                                  | 481 x 800 px     | 3      | 100% | 16px          | Firefox RDM ; contrôle du Header après le breakpoint CSS de 480 px ; disposition en ligne                                                                                                                  |
+| `CFG‑42`      | `L3‑S08`                                  | 1280 x 800 px    | 3      | 100% | 16px          | Firefox RDM ; `prefers-reduced-motion: reduce` activé temporairement dans Firefox (`ui.prefersReducedMotion = 1`) ; navigation immédiate vérifiée. Préférence normale restaurée après le test              |
 
 **Mesures complémentaires de `CFG‑01` :**
 
@@ -406,33 +410,37 @@ Les seuils ci-dessous sont ceux identifiés dans la matrice. Vérifier les condi
 
 Compléter les lignes lors des sessions dédiées. Les identifiants détaillés sont dans la matrice ; cette table suit uniquement l'avancement par domaine, sans prétendre qu'une issue d'implémentation clôturée vaut une revalidation.
 
-| Issue | Critères matriciels | Domaine                                       | Session(s)                   | État de la revalidation                                                                                                                                                                                                                                                                                                                                                            | Référence des résultats          |
-| ----- | ------------------- | --------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| #16   | `R16‑*`             | Exigences globales                            | `L3‑S01`, `L3‑S02`           | WIP — Largeurs nominales conformes et transitions vérifiées ; autres critères à contrôler                                                                                                                                                                                                                                                                                          | §2, §3, §5 et §7                 |
-| #17   | `FND‑*`             | Fondations responsive / gouttières            | `L3‑S06`, `L3‑S07`, `L3‑S08` | Partiel — `FND‑01` : `PASS` ; <br>`FND‑02` : `WIP` (rendu actuel conforme, comparaison historique non vérifiable) ; `FND‑03` : `PASS` avec observation technique non bloquante ; `FND‑04` : `PASS` (six largeurs nominales et scrollbar classique hors RDM) ; `FND‑05` restant à contrôler;<br> `FND‑05` : `PASS` (6/6 configurations conformes, aucun conflit de layout constaté) | §4.1 — `L3‑FND‑01` à `L3‑FND‑05` |
-| #18   | `HDR‑*`             | En-tête, transparence et navigation           | —                            | NOT TESTED                                                                                                                                                                                                                                                                                                                                                                         | —                                |
-| #19   | `SOC‑*`             | Navigation sociale, footer et point d'ancrage | —                            | Partiel — Transition sociale 512 px validée (`L3‑BP‑01`)                                                                                                                                                                                                                                                                                                                           | §3 — `L3‑BP‑01`                  |
-| #20   | `HRO‑*`             | Hero                                          | —                            | NOT TESTED                                                                                                                                                                                                                                                                                                                                                                         | —                                |
-| #21   | `SEC‑*`             | Intégration des sections validées             | —                            | NOT TESTED                                                                                                                                                                                                                                                                                                                                                                         | —                                |
-| #22   | `FRM‑*`             | Modale et formulaire de contact               | —                            | NOT TESTED                                                                                                                                                                                                                                                                                                                                                                         | —                                |
-| #24   | `PRS‑*`             | Présentation                                  | —                            | Partiel — Transitions Présentation contrôlées (`L3‑BP‑04/06`)                                                                                                                                                                                                                                                                                                                      | §3 — `L3‑BP‑04/06`               |
-| #25   | `FPR‑*`             | Principales Réalisations                      | —                            | Partiel — Transition galerie/diaporama validée avec réserve `L3‑DEF‑01`                                                                                                                                                                                                                                                                                                            | §3 — `L3‑BP‑02`                  |
-| #26   | `OPR‑*`             | Autres Réalisations                           | —                            | Partiel — Transition des grilles validée ; `L3‑DEF‑02` documentée sous 320 px                                                                                                                                                                                                                                                                                                      | §3 — `L3‑BP‑04/05`               |
-| #31   | `FTR‑*`             | Footer                                        | —                            | Partiel — Transition du footer validée (`L3‑BP‑03`) ; contrôles complémentaires ouverts                                                                                                                                                                                                                                                                                            | §3 — `L3‑BP‑03`                  |
-| #37   | `POV‑*`             | Débordements / robustesse étroite             | —                            | Non conforme — Transitions responsive contrôlées, mais robustesse défensive en échec (`L3‑BP‑05`) ; anomalies `L3‑DEF‑02`, `L3‑DEF‑03` et `L3‑DEF‑04` ouvertes                                                                                                                                                                                                                     | §3 — `L3‑BP‑05/06`               |
-| #23   | `QA‑*`              | Bilan transversal                             | —                            | WIP — `QA‑04` exécuté, `QA‑06` ouvert                                                                                                                                                                                                                                                                                                                                              | §2, §3 et §8                     |
+| Issue | Critères matriciels | Domaine                                       | Session(s)                   | État de la revalidation                                                                                                                                                                                                                                                                                                                       | Référence des résultats          |
+| ----- | ------------------- | --------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| #16   | `R16‑*`             | Exigences globales                            | `L3‑S01`, `L3‑S02`           | WIP — Largeurs nominales conformes et transitions vérifiées ; autres critères à contrôler                                                                                                                                                                                                                                                     | §2, §3, §5 et §7                 |
+| #17   | `FND‑*`             | Fondations responsive / gouttières            | `L3‑S06`, `L3‑S07`, `L3‑S08` | Partiel — `FND‑01` : `PASS` ; `FND‑02` : `WIP` (rendu actuel conforme, comparaison historique non vérifiable) ; `FND‑03` : `PASS` avec observation technique non bloquante ; `FND‑04` : `PASS` (six largeurs nominales et scrollbar classique hors RDM) ; `FND‑05` : `PASS` (6/6 configurations conformes, aucun conflit de layout constaté). | §4.1 — `L3‑FND‑01` à `L3‑FND‑05` |
+| #18   | `HDR‑*`             | En-tête, transparence et navigation           | `L3‑S08`                     | **PASS — 18/18 critères conformes sur le périmètre testé.** Quatre scénarios validés (`L3‑HDR‑01` à `L3‑HDR‑04`). États visuels, responsive, navigation active, défilement, mouvement réduit, focus et interactions clavier/pointeur conformes. Observations initiales non reproduites et limites méthodologiques documentées                 | §4.1 — `L3‑HDR‑01` à `L3‑HDR‑04` |
+| #19   | `SOC‑*`             | Navigation sociale, footer et point d'ancrage | —                            | Partiel — Transition sociale 512 px validée (`L3‑BP‑01`)                                                                                                                                                                                                                                                                                      | §3 — `L3‑BP‑01`                  |
+| #20   | `HRO‑*`             | Hero                                          | —                            | NOT TESTED                                                                                                                                                                                                                                                                                                                                    | —                                |
+| #21   | `SEC‑*`             | Intégration des sections validées             | —                            | NOT TESTED                                                                                                                                                                                                                                                                                                                                    | —                                |
+| #22   | `FRM‑*`             | Modale et formulaire de contact               | —                            | NOT TESTED                                                                                                                                                                                                                                                                                                                                    | —                                |
+| #24   | `PRS‑*`             | Présentation                                  | —                            | Partiel — Transitions Présentation contrôlées (`L3‑BP‑04/06`)                                                                                                                                                                                                                                                                                 | §3 — `L3‑BP‑04/06`               |
+| #25   | `FPR‑*`             | Principales Réalisations                      | —                            | Partiel — Transition galerie/diaporama validée avec réserve `L3‑DEF‑01`                                                                                                                                                                                                                                                                       | §3 — `L3‑BP‑02`                  |
+| #26   | `OPR‑*`             | Autres Réalisations                           | —                            | Partiel — Transition des grilles validée ; `L3‑DEF‑02` documentée sous 320 px                                                                                                                                                                                                                                                                 | §3 — `L3‑BP‑04/05`               |
+| #31   | `FTR‑*`             | Footer                                        | —                            | Partiel — Transition du footer validée (`L3‑BP‑03`) ; contrôles complémentaires ouverts                                                                                                                                                                                                                                                       | §3 — `L3‑BP‑03`                  |
+| #37   | `POV‑*`             | Débordements / robustesse étroite             | —                            | Non conforme — Transitions responsive contrôlées, mais robustesse défensive en échec (`L3‑BP‑05`) ; anomalies `L3‑DEF‑02`, `L3‑DEF‑03` et `L3‑DEF‑04` ouvertes                                                                                                                                                                                | §3 — `L3‑BP‑05/06`               |
+| #23   | `QA‑*`              | Bilan transversal                             | —                            | WIP — `QA‑04` exécuté, `QA‑06` ouvert                                                                                                                                                                                                                                                                                                         | §2, §3 et §8                     |
 
 ### 4.1. Résultats détaillés par session
 
 Ajouter un tableau par série de tests sans dupliquer les textes originaux des critères.
 
-| Test        | Session  | Critère(s) | Scénario exécuté / conditions                                                                                                                                                                                                                                                                                                                                                           | Verdict                 | Preuve / anomalie                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ----------- | -------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `L3‑FND‑01` | `L3‑S06` | `FND‑01`   | Gouttières et alignement du contenu à 320, 390, 768, 1280 et 1440 px CSS ; Firefox RDM, DPR 3, zoom 100 %, racine 16 px ; configurations `CFG‑02/03/04/06/07`                                                                                                                                                                                                                           | `PASS`                  | Gouttières symétriques de 20 px à 320/390/768 px ; 139,917 px à 1280 px ; 150 px à 1440 px. Largeur utile proche de 1000 px sur desktop. Aucun débordement horizontal global ; alignement visuel jugé correct sur les cinq largeurs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `L3‑FND‑02` | `L3‑S06` | `FND‑02`   | Largeur et alignement desktop à 1024, 1280 et 1440 px CSS ; `CFG‑05/06/07`. Mesures CSS et inspection visuelle de Présentation, Principales Réalisations et Autres Réalisations                                                                                                                                                                                                         | `WIP`                   | **Rendu actuel : PASS** — Géométrie cohérente, sections correctement alignées, aucun débordement horizontal global.<br>**Captures 1024 px :** [Présentation](./evidence/L3-FND-02_CFG-05_presentation-1024px.png), [Principales Réalisations](./evidence/L3-FND-02_CFG-05_featured-projects-1024px.png), [Autres Réalisations](./evidence/L3-FND-02_CFG-05_other-projects-1024px.png).<br>**Captures 1280 px :** [Présentation](./evidence/L3-FND-02_CFG-06_presentation-1280px.png), [Principales Réalisations](./evidence/L3-FND-02_CFG-06_featured-projects-1280px.png), [Autres Réalisations](./evidence/L3-FND-02_CFG-06_other-projects-1280px.png).<br>**Captures 1440 px :** [Présentation](./evidence/L3-FND-02_CFG-07_presentation-1440px.png), [Principales Réalisations](./evidence/L3-FND-02_CFG-07_featured-projects-1440px.png), [Autres Réalisations](./evidence/L3-FND-02_CFG-07_other-projects-1440px.png).<br>**Anomalie :** `L3‑DEF‑05`, recadrage du logo Kasa ; correction intégrée dans `main` via la PR #46 (issue #45). Les preuves de `L3‑S06` correspondent au rendu antérieur à cette correction.<br>**Réserve :** comparaison visuelle historique non vérifiable, références approuvées absentes (`DESK‑01/02/03`) |
-| `L3‑FND‑03` | `L3‑S07` | `FND‑03`   | Inspection statique des règles de layout partagées : définition et consommation des tokens, recherche des marges et paddings horizontaux, analyse des adaptations locales et des utilitaires CSS. SHA applicatif : `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33`                                                                                                                           | `PASS` avec observation | **Conforme :** règles communes centralisées dans `tokens.css` ; réutilisation par `Index`, `Footer`, `CollapsibleHeader` et `Page`. Aucune duplication injustifiée de la formule principale des gouttières identifiée. Les règles propres au Hero et aux composants sont distinctes du layout global.<br>**Observation technique non bloquante :** `utilities.css`, lignes 32 et 37, utilise `--ref-lateral-pad`, sans définition retrouvée dans les CSS examinés. Les classes `.container` et `.section` ne présentent aucun usage littéral simple identifié en TSX/JSX/HTML. Nettoyage éventuel à traiter séparément.<br>**Preuves :** inspection des fichiers CSS et recherches `rg` réalisées pendant `L3‑S07`<br>**Suivi :** candidat au nettoyage CSS du lot 4 de l'issue #23. Vérifier l'absence d'utilisations directes, indirectes ou dynamiques des classes utilitaires `.container` et `.section` avant leur suppression. Supprimer également les références obsolètes à `--ref-lateral-pad` devenues inutiles. Aucun changement applicatif effectué durant `L3‑FND‑03`                                                                                                                                                             |
-| `L3‑FND‑04` | `L3‑S07` | `FND‑04`   | Contrôle des débordements horizontaux en présence du défilement vertical. Firefox RDM à 320, 390, 768, 1024, 1280 et 1440 px (`CFG‑02/03/04/05/06/07`) ; essais complémentaires avec scrollbars superposées désactivées ; contrôle Firefox hors RDM avec scrollbar classique (`CFG‑38`)                                                                                                 | `PASS`                  | **RDM :** 6/6 largeurs nominales conformes, défilement vertical présent, `scrollWidth = clientWidth`, débordement horizontal global nul. Les essais supplémentaires à 390 et 1280 px avec `widget.gtk.overlay-scrollbars.enabled = false` restent conformes mais ne révèlent aucun espace réservé à la scrollbar en RDM.<br>**Hors RDM :** `innerWidth = 1281 px`, `clientWidth = scrollWidth = 1275 px` ; scrollbar verticale réservant 6 px ; débordement horizontal nul.<br>**Limite :** conformité établie pour les configurations exécutées et l'état courant de la page ; les états interactifs particuliers ne sont pas couverts par ce scénario<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `L3‑FND‑05` | `L3‑S08` | `FND‑05`   | Compatibilité des règles responsive locales avec la fondation globale. Firefox RDM à 320, 390, 768, 1024, 1280 et 1440 px CSS (`CFG‑02/03/04/05/06/07`) ; DPR 3, zoom 100 %, police racine 16 px. Contrôle géométrique des neuf sections `section[data-variant]` et inspection visuelle des cinq domaines : Hero, Présentation, Principales Réalisations, Autres Réalisations et Footer | `PASS`                  | **6/6 configurations conformes.** Aucun débordement horizontal global (`scrollWidth = clientWidth`) ; aucun rectangle de section hors viewport sur les 54 mesures effectuées. À 320/390 px, gouttières mobiles cohérentes ; à 768/1024 px, adaptation des dispositions locales et de l'espace réservé à la navigation sociale ; à 1280/1440 px, largeur maximale des sections principales de 1000 px et alignement cohérent. Les cinq domaines sont visuellement conformes aux six largeurs.<br>**Limite :** les mesures portent sur les conteneurs `section[data-variant]`, pas sur tous leurs descendants ni directement sur le Footer. Les contrôles fonctionnels et d'accessibilité propres aux composants restent distincts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Test        | Session      | Critère(s)                 | Scénario exécuté / conditions                                                                                                                                                                                                                                                                                                                                                           | Verdict                 | Preuve / anomalie                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------- | ------------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `L3‑FND‑01` | `L3‑S06`     | `FND‑01`                   | Gouttières et alignement du contenu à 320, 390, 768, 1280 et 1440 px CSS ; Firefox RDM, DPR 3, zoom 100 %, racine 16 px ; configurations `CFG‑02/03/04/06/07`                                                                                                                                                                                                                           | `PASS`                  | Gouttières symétriques de 20 px à 320/390/768 px ; 139,917 px à 1280 px ; 150 px à 1440 px. Largeur utile proche de 1000 px sur desktop. Aucun débordement horizontal global ; alignement visuel jugé correct sur les cinq largeurs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `L3‑FND‑02` | `L3‑S06`     | `FND‑02`                   | Largeur et alignement desktop à 1024, 1280 et 1440 px CSS ; `CFG‑05/06/07`. Mesures CSS et inspection visuelle de Présentation, Principales Réalisations et Autres Réalisations                                                                                                                                                                                                         | `WIP`                   | **Rendu actuel : PASS** — Géométrie cohérente, sections correctement alignées, aucun débordement horizontal global.<br>**Captures 1024 px :** [Présentation](./evidence/L3-FND-02_CFG-05_presentation-1024px.png), [Principales Réalisations](./evidence/L3-FND-02_CFG-05_featured-projects-1024px.png), [Autres Réalisations](./evidence/L3-FND-02_CFG-05_other-projects-1024px.png).<br>**Captures 1280 px :** [Présentation](./evidence/L3-FND-02_CFG-06_presentation-1280px.png), [Principales Réalisations](./evidence/L3-FND-02_CFG-06_featured-projects-1280px.png), [Autres Réalisations](./evidence/L3-FND-02_CFG-06_other-projects-1280px.png).<br>**Captures 1440 px :** [Présentation](./evidence/L3-FND-02_CFG-07_presentation-1440px.png), [Principales Réalisations](./evidence/L3-FND-02_CFG-07_featured-projects-1440px.png), [Autres Réalisations](./evidence/L3-FND-02_CFG-07_other-projects-1440px.png).<br>**Anomalie :** `L3‑DEF‑05`, recadrage du logo Kasa ; correction intégrée dans `main` via la PR #46 (issue #45). Les preuves de `L3‑S06` correspondent au rendu antérieur à cette correction.<br>**Réserve :** comparaison visuelle historique non vérifiable, références approuvées absentes (`DESK‑01/02/03`) |
+| `L3‑FND‑03` | `L3‑S07`     | `FND‑03`                   | Inspection statique des règles de layout partagées : définition et consommation des tokens, recherche des marges et paddings horizontaux, analyse des adaptations locales et des utilitaires CSS. SHA applicatif : `8fe4fca0c4aae375c5acfc736f1d2aa9f49d4f33`                                                                                                                           | `PASS` avec observation | **Conforme :** règles communes centralisées dans `tokens.css` ; réutilisation par `Index`, `Footer`, `CollapsibleHeader` et `Page`. Aucune duplication injustifiée de la formule principale des gouttières identifiée. Les règles propres au Hero et aux composants sont distinctes du layout global.<br>**Observation technique non bloquante :** `utilities.css`, lignes 32 et 37, utilise `--ref-lateral-pad`, sans définition retrouvée dans les CSS examinés. Les classes `.container` et `.section` ne présentent aucun usage littéral simple identifié en TSX/JSX/HTML. Nettoyage éventuel à traiter séparément.<br>**Preuves :** inspection des fichiers CSS et recherches `rg` réalisées pendant `L3‑S07`<br>**Suivi :** candidat au nettoyage CSS du lot 4 de l'issue #23. Vérifier l'absence d'utilisations directes, indirectes ou dynamiques des classes utilitaires `.container` et `.section` avant leur suppression. Supprimer également les références obsolètes à `--ref-lateral-pad` devenues inutiles. Aucun changement applicatif effectué durant `L3‑FND‑03`                                                                                                                                                             |
+| `L3‑FND‑04` | `L3‑S07`     | `FND‑04`                   | Contrôle des débordements horizontaux en présence du défilement vertical. Firefox RDM à 320, 390, 768, 1024, 1280 et 1440 px (`CFG‑02/03/04/05/06/07`) ; essais complémentaires avec scrollbars superposées désactivées ; contrôle Firefox hors RDM avec scrollbar classique (`CFG‑38`)                                                                                                 | `PASS`                  | **RDM :** 6/6 largeurs nominales conformes, défilement vertical présent, `scrollWidth = clientWidth`, débordement horizontal global nul. Les essais supplémentaires à 390 et 1280 px avec `widget.gtk.overlay-scrollbars.enabled = false` restent conformes mais ne révèlent aucun espace réservé à la scrollbar en RDM.<br>**Hors RDM :** `innerWidth = 1281 px`, `clientWidth = scrollWidth = 1275 px` ; scrollbar verticale réservant 6 px ; débordement horizontal nul.<br>**Limite :** conformité établie pour les configurations exécutées et l'état courant de la page ; les états interactifs particuliers ne sont pas couverts par ce scénario<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `L3‑FND‑05` | `L3‑S08`     | `FND‑05`                   | Compatibilité des règles responsive locales avec la fondation globale. Firefox RDM à 320, 390, 768, 1024, 1280 et 1440 px CSS (`CFG‑02/03/04/05/06/07`) ; DPR 3, zoom 100 %, police racine 16 px. Contrôle géométrique des neuf sections `section[data-variant]` et inspection visuelle des cinq domaines : Hero, Présentation, Principales Réalisations, Autres Réalisations et Footer | `PASS`                  | **6/6 configurations conformes.** Aucun débordement horizontal global (`scrollWidth = clientWidth`) ; aucun rectangle de section hors viewport sur les 54 mesures effectuées. À 320/390 px, gouttières mobiles cohérentes ; à 768/1024 px, adaptation des dispositions locales et de l'espace réservé à la navigation sociale ; à 1280/1440 px, largeur maximale des sections principales de 1000 px et alignement cohérent. Les cinq domaines sont visuellement conformes aux six largeurs.<br>**Limite :** les mesures portent sur les conteneurs `section[data-variant]`, pas sur tous leurs descendants ni directement sur le Footer. Les contrôles fonctionnels et d'accessibilité propres aux composants restent distincts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `L3‑HDR‑01` | `L3‑S08`     | `HDR‑01/02/03/06`          | États visuels du Header à 390 et 1280 px (`CFG‑03/06`) : sommet de page, défilement descendant, remontée. Inspection visuelle et relevés DOM/CSS (position, visibilité, transformation, arrière-plan, flou et ombre)                                                                                                                                                                    | `PASS`                  | **Sommet :** Header intégré, transparent, sans effet flottant. **Descente :** Header masqué (`aria-hidden="true"`, translation verticale négative). **Remontée :** Header révélé, surface translucide (`oklch(1 0 0 / 0.72)`), flou de 14 px, saturation de 120 % et ombre portée. Navigation lisible et séparation visuelle jugée satisfaisante. Aucun clignotement ni débordement horizontal observé. **Limite :** conformité visuelle constatée ; aucun ratio de contraste WCAG mesuré dans ce scénario                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `L3‑HDR‑02` | `L3‑S08`     | `HDR‑04/05`                | Contrôle géométrique et visuel du Header aux six largeurs nominales : 320, 390, 768, 1024, 1280 et 1440 px (`CFG‑02/03/04/05/06/07`). Complément autour du breakpoint de 480 px (`CFG‑39/40/41`). Mesure de l'alignement logo/menu, des rectangles des liens et du débordement horizontal global.                                                                                       | `PASS`                  | **6/6 largeurs nominales conformes.** Disposition en colonne à 320/390 px et en ligne aux largeurs supérieures testées. Logo et trois liens entièrement visibles, sans chevauchement, troncature ni débordement horizontal global (`horizontalOverflowPx = 0`). Alignement cohérent avec les gouttières responsive. Contrôles à 479 et 481 px conformes. **Réserve :** à 480 px affichés, largeur effective d'environ 480,15 px ; disposition en ligne cohérente avec la media query inactive. Le seuil exact de 480,00 px n'a pas été reproduit                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `L3‑HDR‑03` | `L3‑S08`<br> | `HDR‑07/08/09/10/11`       | Navigation active à 1280 × 800 px (`CFG‑06`). Contrôles manuels dans les trois sections, franchissement des frontières `home/about` et `about/work`, puis navigation programmée descendante (`#work`) et ascendante (`#about`). Inspection des styles actifs et des positions des sections par rapport à la ligne d'activation située à 400 px                                          | `PASS`                  | **Un seul lien actif** à toutes les positions contrôlées. Frontière `home/about` : `about.top` de 452,70 à 188,70 px, basculement correct de « accueil » vers « à propos ». Frontière `about/work` : `work.top` de 407,62 à 387,88 px, basculement correct vers « réalisations ». Navigations programmées descendante et ascendante conformes, sans scroll manuel supplémentaire nécessaire pour actualiser l'état actif. Cohérence constatée entre défilement manuel et navigation par le menu. **Limite :** contrôle effectué à 1280 px ; seuils encadrés mais non caractérisés au pixel exact                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `L3‑HDR‑04` | `L3‑S08`     | `HDR‑12/13/14/15/16/17/18` | Navigation par ancrage à 1280 × 800 px (`CFG‑06`), avec et sans mouvement réduit (`CFG‑42`), puis contrôles complémentaires de positionnement et de focus à 390 × 800 px (`CFG‑03`). Déplacements ascendants/descendants, activation au pointeur et par `Entrée`, observation des états du Header, contrôle du focus et des titres cibles.                                              | `PASS`                  | **Mouvement normal :** défilement progressif. **Mouvement réduit :** navigation immédiate (`prefers-reduced-motion: reduce = true`). Titres de `#about` et `#work` entièrement visibles, sans recouvrement par le Header, à 1280 et 390 px. Focus transféré vers les sections cibles (`SECTION#about` et `SECTION#work`) ; séquences `focusin` vérifiées. Activation par `Entrée` conforme au pointeur, anneau de focus visible ; clic pointeur ultérieur fonctionnel. Header masqué après descente et révélé en mode survol après remontée lors des reproductions ciblées. **Observations :** un premier focus sur le Header et un premier état masqué après remontée ont été constatés, puis non reproduits lors des vérifications ciblées. Leurs causes restent indéterminées ; aucune anomalie reproductible confirmée                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ## 5. Accessibilité et interactions
 
@@ -482,31 +490,30 @@ Les corrections des anciens lots restent traçables dans leurs PR. Les nouveaux 
 
 ## 9. Bilan de couverture et décision de sortie
 
-| Point                                                               | État actuel                                                                                                              |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| 146 critères de la matrice revalidés ou explicitement qualifiés     | NON                                                                                                                      |
-| Tests du parcours complet sur les six largeurs nominales            | NON                                                                                                                      |
-| Contrôles aux seuils et conditions particulières                    | PARTIEL — 6/6 scénarios de breakpoints exécutés ; autres conditions particulières à contrôler.                           |
-| Contrôles clavier, Orca, formulaire et contraintes de hauteur       | NON                                                                                                                      |
-| Comparaisons desktop historiques démontrées ou réserves formalisées | PARTIEL — Réserves historiques documentées pour `DESK‑01/02/03` ; comparaison BASE/CURRENT non réalisée, `QA‑02` ouvert. |
-| Revue de consentement `QA‑09` / suivi #41                           | NON                                                                                                                      |
-| Anomalies corrigées ou reportées avec justification                 | NON                                                                                                                      |
+| Point                                                               | État actuel                                                                                                                                                                                   |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 146 critères de la matrice revalidés ou explicitement qualifiés     | NON                                                                                                                                                                                           |
+| Tests du parcours complet sur les six largeurs nominales            | NON                                                                                                                                                                                           |
+| Contrôles aux seuils et conditions particulières                    | PARTIEL — 6/6 scénarios de breakpoints exécutés ; autres conditions particulières à contrôler.                                                                                                |
+| Contrôles clavier, Orca, formulaire et contraintes de hauteur       | PARTIEL — Navigation clavier, focus et mouvement réduit du Header contrôlés (`L3‑HDR‑04`). Parcours clavier transversal, tests Orca, formulaire et contraintes de hauteur restant à exécuter. |
+| Comparaisons desktop historiques démontrées ou réserves formalisées | PARTIEL — Réserves historiques documentées pour `DESK‑01/02/03` ; comparaison BASE/CURRENT non réalisée, `QA‑02` ouvert.                                                                      |
+| Revue de consentement `QA‑09` / suivi #41                           | NON                                                                                                                                                                                           |
+| Anomalies corrigées ou reportées avec justification                 | NON                                                                                                                                                                                           |
 
 **Décision :** lot 3 non terminé. Aucun résultat n'est présumé conforme avant exécution. La clôture de #23 sera examinée après les lots 3 et 4 et après traitement explicite des réserves.
 
 ---
 ## Annexe A — Scripts de diagnostic et de mesure
 
-Cette annexe conserve les scripts JavaScript réellement employés
-pendant les contrôles des transitions responsive.
 
-Ils sont exécutés dans la console de développement de Firefox,
-sur la page applicative chargée, avec la configuration de viewport
-correspondante.
+Cette annexe conserve les scripts JavaScript utilisés pendant les contrôles techniques de la campagne responsive du lot 3.
 
-Ils fournissent des mesures techniques reproductibles, mais ne
-remplacent pas les observations visuelles, les essais au clavier
-ni les vérifications d'accessibilité.
+Ils sont exécutés dans la console de développement de Firefox, sur la page applicative chargée, avec les configurations d'exécution correspondantes.
+
+Ils fournissent des diagnostics et mesures reproductibles, mais ne remplacent pas les observations visuelles, les essais au clavier et au pointeur, ni les vérifications d'accessibilité.
+
+Les résultats, verdicts et anomalies restent consignés dans les sections correspondantes du rapport.
+
 
 ### A.1. `L3‑SCR‑01` — Navigation sociale
 
@@ -1226,7 +1233,7 @@ Le scénario `L3‑BP‑01` a été validé aux trois largeurs affichées de 511
 
 **Session :** `L3‑S07`.
 
-**Configurations :** `CFG‑02` à `CFG‑07` (Firefox RDM) ; contrôle complémentaire hors RDM (`CFG‑38`, paramètres restant à compléter).
+**Configurations :** `CFG‑02` à `CFG‑07` (Firefox RDM) ; contrôle complémentaire hors RDM (`CFG‑38`, scrollbar verticale classique réservant 6 px).
 
 **Largeurs :** 320, 390, 768, 1024, 1280 et 1440 px CSS en RDM ; 1281 px mesurés hors RDM.
 
@@ -1392,3 +1399,443 @@ Le scénario `L3‑BP‑01` a été validé aux trois largeurs affichées de 511
 - Le diagnostic ne remplace pas les contrôles fonctionnels et d'accessibilité propres aux composants.
 
 **Résultats :** voir `L3‑FND‑05`, section 4.1.
+
+
+### A.10. `L3‑SCR‑10` — Géométrie et disposition responsive du Header
+
+**Scénario :** `L3‑HDR‑02` — Critères `HDR-04/05`.
+
+**Session :** `L3‑S08`.
+
+**Configurations :** `CFG‑02` à `CFG‑07` et `CFG‑39` à `CFG‑41`.
+
+**Objectifs :**
+
+- Mesurer les dimensions du Header, du logo, de la navigation et des liens.
+- Vérifier le passage entre les dispositions en colonne et en ligne.
+- Détecter les chevauchements entre logo et navigation ou entre liens.
+- Mesurer le débordement horizontal global.
+- Compléter les contrôles visuels d'alignement et de troncature.
+
+**Script exécuté :**
+
+```javascript
+(() => {
+  const root = document.documentElement;
+  const header = document.querySelector(
+    'header[aria-label="Collapsible Header"]'
+  );
+
+  if (!header) {
+    return { error: 'CollapsibleHeader not found' };
+  }
+
+  const nav = header.querySelector(
+    'nav[aria-label="Menu principal"]'
+  );
+  const logo = header.querySelector(':scope > a');
+  const links = [...(nav?.querySelectorAll('a') ?? [])];
+
+  const rect = (element) => {
+    if (!element) return null;
+
+    const bounds = element.getBoundingClientRect();
+
+    return {
+      left: Number(bounds.left.toFixed(2)),
+      right: Number(bounds.right.toFixed(2)),
+      top: Number(bounds.top.toFixed(2)),
+      bottom: Number(bounds.bottom.toFixed(2)),
+      width: Number(bounds.width.toFixed(2)),
+      height: Number(bounds.height.toFixed(2)),
+    };
+  };
+
+  const overlaps = (a, b) =>
+    a && b &&
+    Math.min(a.right, b.right) - Math.max(a.left, b.left) > 1 &&
+    Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1;
+
+  const logoRect = rect(logo);
+  const navRect = rect(nav);
+
+  const linkRects = links.map((link) => ({
+    label: link.textContent?.trim() ?? '',
+    ...rect(link),
+  }));
+
+  const overlappingLinks = [];
+
+  for (let i = 0; i < linkRects.length; i++) {
+    for (let j = i + 1; j < linkRects.length; j++) {
+      if (overlaps(linkRects[i], linkRects[j])) {
+        overlappingLinks.push(
+          `${linkRects[i].label} / ${linkRects[j].label}`
+        );
+      }
+    }
+  }
+
+  const result = {
+    viewport: `${window.innerWidth} × ${window.innerHeight}`,
+    clientWidth: root.clientWidth,
+    horizontalOverflowPx: Math.max(
+      0,
+      root.scrollWidth - root.clientWidth
+    ),
+    header: rect(header),
+    headerFlexDirection: getComputedStyle(header).flexDirection,
+    logo: logoRect,
+    navigation: navRect,
+    navigationWrap: nav
+      ? getComputedStyle(nav.querySelector('ul') ?? nav).flexWrap
+      : null,
+    logoNavigationOverlap: Boolean(overlaps(logoRect, navRect)),
+    overlappingLinks,
+    links: linkRects,
+  };
+
+  console.table(linkRects);
+  console.log(result);
+
+  return result;
+})()
+```
+
+**Limites :**
+
+- Les chevauchements sont détectés à partir des rectangles géométriques, avec une tolérance de 1 px ; le script ne vérifie pas l'intégralité des contenus visuels.
+- Une valeur `navigationWrap: "wrap"` décrit la propriété CSS autorisant le retour à la ligne, sans démontrer qu'un retour s'est effectivement produit.
+- Les mesures sont propres à l'état du Header et aux dimensions du viewport au moment de l'exécution.
+- Les variations fractionnaires de largeur dans Firefox RDM peuvent influencer l'évaluation des media queries.
+- Le diagnostic ne constitue pas une mesure de contraste ou un audit d'accessibilité complet.
+
+**Résultats :** voir `L3‑HDR‑02`, section 4.1.
+
+
+### A.11. `L3‑SCR‑11` — Navigation active et frontières entre sections
+
+**Scénario :** `L3‑HDR‑03` — Critères `HDR‑07` à `HDR‑11`.
+
+**Session :** `L3‑S08`.
+
+**Configuration :** `CFG‑06` — 1280 × 800 px.
+
+**Objectifs :**
+
+- Identifier le lien visuellement actif dans le menu.
+- Vérifier l'unicité de l'élément actif.
+- Mesurer les positions des sections principales.
+- Comparer leur position à la ligne d'activation située à mi-hauteur du viewport.
+- Vérifier les changements d'état après défilement manuel et navigation par ancrage.
+
+**Script exécuté :**
+
+```javascript
+(() => {
+  const nav = document.querySelector(
+    'header[aria-label="Collapsible Header"] nav'
+  );
+
+  const links = [...(nav?.querySelectorAll('a') ?? [])];
+
+  const items = links.map((link) => {
+    const style = getComputedStyle(link);
+
+    return {
+      label: link.textContent?.trim() ?? '',
+      target: new URL(link.href).hash,
+      fontWeight: style.fontWeight,
+      textDecoration: style.textDecorationLine,
+      visuallyActive:
+        Number(style.fontWeight) >= 700 &&
+        style.textDecorationLine.includes('underline'),
+    };
+  });
+
+  const sections = ['home', 'about', 'work'].map((id) => {
+    const element = document.getElementById(id);
+
+    return {
+      id,
+      top: element
+        ? Number(element.getBoundingClientRect().top.toFixed(2))
+        : null,
+    };
+  });
+
+  const result = {
+    scrollY: window.scrollY,
+    activationLine: window.innerHeight / 2,
+    activeCount: items.filter((item) => item.visuallyActive).length,
+    activeItem:
+      items.find((item) => item.visuallyActive)?.label ?? null,
+    items,
+    sections,
+  };
+
+  console.table(items);
+  console.log(result);
+
+  return result;
+})()
+```
+
+**Limites :**
+
+- L'identification de l'élément actif repose sur les styles CSS de graisse et de soulignement, conformément à l'implémentation contrôlée.
+- Le script relève un état ponctuel ; il ne mesure pas en continu les transitions entre sections.
+- La détermination du seuil exact nécessiterait des relevés plus fins autour de chaque frontière.
+- Les résultats doivent être rapprochés des interactions réellement effectuées dans le navigateur.
+
+**Résultats :** voir `L3‑HDR‑03`, section 4.1.
+
+
+### A.12. `L3‑SCR‑12` — Préférence de réduction des mouvements
+
+**Scénario :** `L3‑HDR‑04` — Critères `HDR‑12/13`.
+
+**Session :** `L3‑S08`.
+
+**Configurations :** `CFG‑06` et `CFG‑42`.
+
+**Objectifs :**
+
+- Vérifier la préférence de mouvement effectivement exposée à JavaScript.
+- Relever la propriété CSS calculée `scroll-behavior` sur l'élément racine.
+- Comparer le comportement réel de navigation en mode normal et en mouvement réduit.
+
+**Script exécuté :**
+
+```javascript
+(() => ({
+  prefersReducedMotion: matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches,
+  rootScrollBehavior: getComputedStyle(
+    document.documentElement
+  ).scrollBehavior,
+}))()
+```
+
+**Procédure complémentaire :**
+
+Dans Firefox, modifier temporairement la préférence numérique `ui.prefersReducedMotion` dans `about:config` pour activer le mouvement réduit, puis reproduire une navigation par le menu.
+
+Rétablir la préférence initiale après le contrôle.
+
+**Limites :**
+
+- La valeur CSS calculée de `scroll-behavior` ne démontre pas, à elle seule, le comportement d'un appel JavaScript explicite à `scrollIntoView()`.
+- Le script ne mesure pas la durée du défilement.
+- La distinction entre déplacement progressif et immédiat repose ici sur l'observation du comportement réel.
+- Le contrôle porte sur la navigation par le Header, et non sur toutes les animations de l'application.
+
+**Résultats :** voir `L3‑HDR‑04`, section 4.1.
+
+
+### A.13. `L3‑SCR‑13` — Positionnement et focus des sections cibles
+
+**Scénario :** `L3‑HDR‑04` — Critères `HDR‑14/15`.
+
+**Session :** `L3‑S08`.
+
+**Configurations :** `CFG‑03` et `CFG‑06`.
+
+**Objectifs :**
+
+- Identifier la section correspondant à l'ancre courante.
+- Vérifier que la section cible reçoit le focus.
+- Mesurer la position verticale de la section et de son titre.
+- Comparer ces positions avec celle du Header.
+- Détecter une éventuelle intersection géométrique entre le titre cible et le Header visible.
+
+**Script exécuté :**
+
+```javascript
+(() => {
+  const id = decodeURIComponent(window.location.hash.slice(1));
+  const target = document.getElementById(id);
+  const title = document.getElementById(`${id}-title`);
+  const header = document.querySelector(
+    'header[aria-label="Collapsible Header"]'
+  );
+
+  const focused = document.activeElement;
+  const headerRect = header?.getBoundingClientRect();
+  const targetRect = target?.getBoundingClientRect();
+  const titleRect = title?.getBoundingClientRect();
+
+  return {
+    viewport: `${window.innerWidth} × ${window.innerHeight}`,
+    hash: window.location.hash,
+    scrollY: Number(window.scrollY.toFixed(2)),
+    focusedTag: focused?.tagName ?? null,
+    focusedId: focused?.id ?? null,
+    focusIsTarget: focused === target,
+    headerAriaHidden: header?.getAttribute('aria-hidden') ?? null,
+    headerBottom: headerRect
+      ? Number(headerRect.bottom.toFixed(2))
+      : null,
+    targetTop: targetRect
+      ? Number(targetRect.top.toFixed(2))
+      : null,
+    titleTop: titleRect
+      ? Number(titleRect.top.toFixed(2))
+      : null,
+    titleBottom: titleRect
+      ? Number(titleRect.bottom.toFixed(2))
+      : null,
+    titleIntersectsHeader: Boolean(
+      header?.getAttribute('aria-hidden') === 'false' &&
+      headerRect &&
+      titleRect &&
+      titleRect.top < headerRect.bottom &&
+      titleRect.bottom > headerRect.top &&
+      titleRect.left < headerRect.right &&
+      titleRect.right > headerRect.left
+    ),
+  };
+})()
+```
+
+**Limites :**
+
+- Le diagnostic vérifie les rectangles géométriques des éléments, mais ne garantit pas à lui seul leur lisibilité visuelle.
+- La comparaison avec le Header dépend de son état de visibilité au moment du relevé.
+- Le focus est vérifié à l'instant de l'exécution, sans reconstitution de son historique.
+- L'identification automatique de la section cible suppose un hash correspondant à un identifiant DOM existant.
+- L'inspection visuelle des titres reste nécessaire.
+
+**Résultats :** voir `L3‑HDR‑04`, section 4.1.
+
+
+### A.14. `L3‑SCR‑14` — Traçage des transferts de focus
+
+**Scénario :** `L3‑HDR‑04` — Critère `HDR‑15`.
+
+**Session :** `L3‑S08`.
+
+**Configuration :** `CFG‑06`.
+
+**Objectifs :**
+
+- Enregistrer les événements `focusin` lors d'une navigation par le Header.
+- Identifier l'ordre des éléments recevant le focus.
+- Vérifier que la section cible reçoit le focus après l'activation du lien.
+- Rechercher un éventuel transfert ultérieur vers un autre élément.
+
+**Activation du suivi :**
+
+```javascript
+(() => {
+  const events = [];
+
+  const recordFocus = () => {
+    const element = document.activeElement;
+
+    events.push({
+      time: Number(performance.now().toFixed(2)),
+      hash: window.location.hash,
+      scrollY: Number(window.scrollY.toFixed(2)),
+      tag: element?.tagName ?? null,
+      id: element?.id ?? null,
+      ariaLabel: element?.getAttribute('aria-label') ?? null,
+    });
+  };
+
+  document.addEventListener('focusin', recordFocus, true);
+
+  window.__qaFocusTrace = {
+    events,
+    stop: () => {
+      document.removeEventListener('focusin', recordFocus, true);
+    },
+  };
+
+  return 'Focus tracking enabled';
+})()
+```
+
+**Lecture du journal :**
+
+```javascript
+console.table(window.__qaFocusTrace.events);
+```
+
+**Arrêt du suivi :**
+
+```javascript
+window.__qaFocusTrace.stop();
+```
+
+**Limites :**
+
+- Le script ne trace que les événements `focusin` survenus après son activation.
+- Le journal doit être réinitialisé avant chaque nouvelle séquence de navigation.
+- Les horodatages `performance.now()` permettent de calculer des intervalles entre événements, mais ne représentent pas directement la durée de l'animation de défilement.
+- L'absence d'événement `focusin` ne suffit pas à établir la cause d'une anomalie de focus.
+- Le suivi ne remplace pas le contrôle final de `document.activeElement`.
+
+**Résultats :** voir `L3‑HDR‑04`, section 4.1.
+
+
+### A.15. `L3‑SCR‑15` — Navigation au clavier et état final
+
+**Scénario :** `L3‑HDR‑04` — Critères `HDR‑17/18`.
+
+**Session :** `L3‑S08`.
+
+**Configuration :** `CFG‑06`.
+
+**Objectifs :**
+
+- Contrôler la destination atteinte après activation d'un lien du Header par `Entrée`.
+- Identifier l'unique lien actif.
+- Vérifier le transfert du focus vers la section cible.
+- Comparer la position finale obtenue au clavier à celle obtenue au pointeur.
+- Compléter la vérification d'une navigation au pointeur après navigation clavier.
+
+**Script exécuté pour la destination `#work` :**
+
+```javascript
+(() => {
+  const target = document.getElementById('work');
+  const focused = document.activeElement;
+  const links = [
+    ...document.querySelectorAll(
+      'header[aria-label="Collapsible Header"] nav a'
+    ),
+  ];
+
+  return {
+    hash: window.location.hash,
+    scrollY: Number(window.scrollY.toFixed(2)),
+    activeLinks: links
+      .filter((link) => {
+        const style = getComputedStyle(link);
+
+        return (
+          Number(style.fontWeight) >= 700 &&
+          style.textDecorationLine.includes('underline')
+        );
+      })
+      .map((link) => link.textContent?.trim()),
+    focusedTag: focused?.tagName ?? null,
+    focusedId: focused?.id ?? null,
+    focusIsTarget: focused === target,
+    targetTop: target
+      ? Number(target.getBoundingClientRect().top.toFixed(2))
+      : null,
+  };
+})()
+```
+
+**Limites :**
+
+- Ce script correspond au contrôle initial de la destination `#work` ; il ne déduit pas automatiquement la cible depuis le hash.
+- Lors du contrôle ultérieur vers `#about`, conserver `work` dans le script entraîne une comparaison de focus avec la mauvaise section. Cette particularité a été identifiée et écartée de l'interprétation des résultats.
+- L'anneau de focus visible et la fluidité du défilement sont contrôlés visuellement, et non mesurés par le script.
+- L'équivalence clavier/pointeur est évaluée à partir des interactions successives et des états finaux, sans mesure automatisée des trajectoires.
+
+**Résultats :** voir `L3‑HDR‑04`, section 4.1.
