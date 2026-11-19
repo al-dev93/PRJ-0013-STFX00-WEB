@@ -12,6 +12,37 @@ export function FeaturedProjectsGallery({ projects }: FeaturedProjectsProps): Re
   const projectCount = projectList.length;
   const { isRemote, urlBase } = getUrlBase();
 
+  /**
+   * Restores visibility of a focused gallery image link obscured by the fixed Header.
+   *
+   * @remarks
+   * Runs after the browser's native focus scrolling. Only the currently focused
+   * link is adjusted, and only when it overlaps the Header. The next-frame
+   * callback safely does nothing if the link was removed or focus changed.
+   *
+   * @param event Focus event for a gallery image link.
+   * @returns Nothing.
+   */
+  const handleMediaLinkFocus = (event: React.FocusEvent<HTMLAnchorElement>): void => {
+    const link = event.currentTarget;
+
+    requestAnimationFrame(() => {
+      if (!link.isConnected || document.activeElement !== link) return;
+
+      const header = document.querySelector('header[aria-label="Collapsible Header"]');
+      const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
+      const rect = link.getBoundingClientRect();
+
+      if (rect.top < headerBottom + 8 && rect.bottom > 0) {
+        link.scrollIntoView({
+          block: 'nearest',
+          inline: 'nearest',
+          behavior: 'instant',
+        });
+      }
+    });
+  };
+
   const renderFeaturedPProject = (project: ProjectData, index: number) => {
     const { id, description, deliverables, picture, projectSheet, title, subtitle, primaryTag, tags } = project;
     const projectSheetHref =
@@ -53,6 +84,7 @@ export function FeaturedProjectsGallery({ projects }: FeaturedProjectsProps): Re
               rel='noopener noreferrer'
               className={style.gallery__mediaLink}
               aria-label={`Ouvrir l'étude de cas « ${title} » (PDF) dans un nouvel onglet`}
+              onFocus={handleMediaLinkFocus}
             >
               {media}
             </a>
