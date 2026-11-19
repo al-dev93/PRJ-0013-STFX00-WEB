@@ -35,12 +35,10 @@
   --hero-text-fg: color-mix(in oklch, var(--semantic-text) 88%, var(--semantic-surface-1));
 }
 
-/* On narrow viewports, document scroll-padding already reserves the
-   persistent navigation areas. Avoid adding the section offset again. */
-@media (width <= 32rem) {
-  .section:not([data-variant='home']) {
-    --section-scroll-margin-top: 0px;
-  }
+/* Document scroll-padding already reserves the fixed Header clearance
+   at all widths. Avoid accumulating another 110px on anchor navigation. */
+.section:not([data-variant='home']) {
+  --section-scroll-margin-top: 0px;
 }
 
 strong {
