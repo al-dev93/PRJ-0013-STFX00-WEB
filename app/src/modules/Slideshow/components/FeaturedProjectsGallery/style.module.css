@@ -55,6 +55,14 @@
   border-radius: var(--semantic-radius-md);
 }
 
+/* In the horizontal gallery with desktop social navigation, give focused
+   image links a little extra clearance below the fixed Header. */
+@media (32rem < width <= 39rem) {
+  .gallery__mediaLink {
+    scroll-margin-block-start: 32px;
+  }
+}
+
 .gallery__mediaLink:focus {
   outline: none;
 }
