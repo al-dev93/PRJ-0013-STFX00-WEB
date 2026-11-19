@@ -135,6 +135,15 @@
     background: transparent;
   }
 
+  /* Keep native keyboard-focus scrolling clear of the fixed mobile Header
+     and the bottom social bar (48px controls + 12px padding + safe area). */
+  @media (width <= 32rem) {
+    html {
+      scroll-padding-block-start: 140px;
+      scroll-padding-block-end: calc(68px + env(safe-area-inset-bottom));
+    }
+  }
+
   /* Respect user motion preferences */
   @media (prefers-reduced-motion: reduce) {
     * {
