@@ -135,9 +135,13 @@
     background: transparent;
   }
 
-  /* Reserve space beneath the fixed mobile Header for native focus scrolling.
-     Apply the bottom offset to main content only: the sticky social bar itself
-     must not trigger document scrolling when its links receive focus. */
+  /* Keep keyboard focus clear of the fixed Header at every viewport width. */
+  html {
+    scroll-padding-block-start: 120px;
+  }
+
+  /* The narrow Header needs more clearance. Apply the bottom offset only to
+     main content, not to the sticky social bar whose links remain in view. */
   @media (width <= 32rem) {
     html {
       scroll-padding-block-start: 140px;
