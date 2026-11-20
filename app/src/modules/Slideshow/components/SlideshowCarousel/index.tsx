@@ -70,6 +70,34 @@ export function SlideshowCarousel({ projects }: FeaturedProjectsProps): React.JS
     [projects, slideshowState],
   );
 
+  /**
+   * Keeps a focused slideshow action link clear of the viewport bottom.
+   *
+   * @remarks
+   * Lets native keyboard focus scrolling finish before measuring the focused
+   * link. Only links inside the slideshow action navigation are handled, and
+   * scrolling occurs only when the bottom clearance is less than 16 CSS px.
+   *
+   * @param event Focus event bubbling from the slideshow action area.
+   * @returns Nothing.
+   */
+  const handleActionLinkFocus = (event: React.FocusEvent<HTMLElement>): void => {
+    const link = event.target;
+    if (!(link instanceof HTMLAnchorElement) || !link.closest('nav[data-variant="slideshow"]')) return;
+
+    requestAnimationFrame(() => {
+      if (!link.isConnected || document.activeElement !== link) return;
+
+      if (link.getBoundingClientRect().bottom > window.innerHeight - 16) {
+        link.scrollIntoView({
+          block: 'nearest',
+          inline: 'nearest',
+          behavior: 'instant',
+        });
+      }
+    });
+  };
+
   // Return null if no active slide available
   if (!activeSlide) return null;
 
@@ -86,7 +114,7 @@ export function SlideshowCarousel({ projects }: FeaturedProjectsProps): React.JS
       <Fade state={slideshowState}>
         <div className={style.slideshowWrapper}>
           <p className={style.description}>{activeSlide.description}</p>
-          <footer className={style.footer}>
+          <footer className={style.footer} onFocus={handleActionLinkFocus}>
             <SkillsList primaryTag={activeSlide.primaryTag} list={activeSlide.tags} layoutType='slideshow' />
             <SocialMediaNavBar
               classNameButton={style.externalLinks}
