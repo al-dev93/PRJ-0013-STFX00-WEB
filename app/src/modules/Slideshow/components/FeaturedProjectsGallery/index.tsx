@@ -13,12 +13,13 @@ export function FeaturedProjectsGallery({ projects }: FeaturedProjectsProps): Re
   const { isRemote, urlBase } = getUrlBase();
 
   /**
-   * Restores visibility of a focused gallery image link obscured by the fixed Header.
+   * Keeps a focused gallery image link clear of the Header and viewport edges.
    *
    * @remarks
    * Runs after the browser's native focus scrolling. Only the currently focused
-   * link is adjusted, and only when it overlaps the Header. The next-frame
-   * callback safely does nothing if the link was removed or focus changed.
+   * link is adjusted, and only when it overlaps the fixed Header or approaches
+   * the viewport bottom. The next-frame callback safely does nothing if the
+   * link was removed or focus changed.
    *
    * @param event Focus event for a gallery image link.
    * @returns Nothing.
@@ -33,7 +34,10 @@ export function FeaturedProjectsGallery({ projects }: FeaturedProjectsProps): Re
       const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
       const rect = link.getBoundingClientRect();
 
-      if (rect.top < headerBottom + 8 && rect.bottom > 0) {
+      const obscuredAtTop = rect.top < headerBottom + 8 && rect.bottom > 0;
+      const obscuredAtBottom = rect.bottom > window.innerHeight - 16 && rect.top < window.innerHeight;
+
+      if (obscuredAtTop || obscuredAtBottom) {
         link.scrollIntoView({
           block: 'nearest',
           inline: 'nearest',
