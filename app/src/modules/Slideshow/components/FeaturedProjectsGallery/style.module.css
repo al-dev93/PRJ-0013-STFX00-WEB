@@ -55,11 +55,13 @@
   border-radius: var(--semantic-radius-md);
 }
 
-/* In the horizontal gallery with desktop social navigation, give focused
-   image links a little extra clearance below the fixed Header. */
+/* In the horizontal gallery with desktop social navigation, keep focused
+   image links clear of the Header and the viewport bottom. Narrow layouts
+   already reserve space above the sticky bottom social navigation in base.css. */
 @media (32rem < width <= 39rem) {
   .gallery__mediaLink {
     scroll-margin-block-start: 32px;
+    scroll-margin-block-end: 16px;
   }
 }
 
