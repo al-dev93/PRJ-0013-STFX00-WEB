@@ -191,6 +191,11 @@
   cursor: pointer;
 }
 
+/* Clearance beneath the fixed Header when the current slide image receives focus. */
+.picturesToScroll__link[aria-current='true'] {
+  scroll-margin-block-start: 32px;
+}
+
 .picturesToScroll__link:focus-visible {
   outline: none;
 }

@@ -35,6 +35,12 @@
   --hero-text-fg: color-mix(in oklch, var(--semantic-text) 88%, var(--semantic-surface-1));
 }
 
+/* Document scroll-padding already reserves the fixed Header clearance
+   at all widths. Avoid accumulating another 110px on anchor navigation. */
+.section:not([data-variant='home']) {
+  --section-scroll-margin-top: 0px;
+}
+
 strong {
   font-weight: var(--strong-text-fw);
 }
