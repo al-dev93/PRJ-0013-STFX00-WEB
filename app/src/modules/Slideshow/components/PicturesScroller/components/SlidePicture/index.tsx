@@ -57,6 +57,37 @@ export const SlidePicture = memo(function SlidePicture({
     };
   }, [picture, projectSheet]);
 
+  /**
+   * Reveals the focused slide image if it overlaps the expanded fixed Header.
+   *
+   * @remarks
+   * Runs after native focus scrolling. It only repositions an image link that
+   * remains connected and focused and whose top overlaps the Header.
+   * The scroll-margin for this link is defined in the companion CSS module.
+   *
+   * @param event Focus event on the current slide image link.
+   * @returns Nothing.
+   */
+  const handleImageLinkFocus = (event: React.FocusEvent<HTMLAnchorElement>): void => {
+    const link = event.currentTarget;
+
+    requestAnimationFrame(() => {
+      if (!link.isConnected || document.activeElement !== link) return;
+
+      const header = document.querySelector('header[aria-label="Collapsible Header"]');
+      const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
+      const rect = link.getBoundingClientRect();
+
+      if (rect.top < headerBottom + 8 && rect.bottom > 0) {
+        link.scrollIntoView({
+          block: 'nearest',
+          inline: 'nearest',
+          behavior: 'instant',
+        });
+      }
+    });
+  };
+
   const renderImg = src ? (
     <>
       <div className={style.slideshowOverlay} aria-hidden={isCurrent ? 'false' : 'true'}>
@@ -113,6 +144,7 @@ export const SlidePicture = memo(function SlidePicture({
           className={style.picturesToScroll__link}
           aria-current='true'
           aria-label={`Ouvrir l'étude de cas « ${title} » (PDF) dans un nouvel onglet`}
+          onFocus={handleImageLinkFocus}
         >
           <div className={style.picturesToScroll__frame}>{renderImg}</div>
         </a>

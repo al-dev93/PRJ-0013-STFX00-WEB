@@ -135,6 +135,23 @@
     background: transparent;
   }
 
+  /* Keep keyboard focus clear of the fixed Header at every viewport width. */
+  html {
+    scroll-padding-block-start: 120px;
+  }
+
+  /* The narrow Header needs more clearance. Apply the bottom offset only to
+     main content, not to the sticky social bar whose links remain in view. */
+  @media (width <= 32rem) {
+    html {
+      scroll-padding-block-start: 140px;
+    }
+
+    main :is(a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])) {
+      scroll-margin-block-end: calc(68px + env(safe-area-inset-bottom));
+    }
+  }
+
   /* Respect user motion preferences */
   @media (prefers-reduced-motion: reduce) {
     * {
